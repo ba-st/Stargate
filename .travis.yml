@@ -1,0 +1,26 @@
+language: smalltalk
+sudo: false
+os:
+- linux
+smalltalk:
+- Pharo64-7.0
+- Pharo-7.0
+- Pharo-6.1
+matrix:
+  allow_failures:
+  - smalltalk: Pharo64-7.0
+  - smalltalk: Pharo-7.0
+  fast_finish: true
+before_deploy:
+  - cp "${SMALLTALK_CI_IMAGE}" "Stargate.image"
+  - cp "${SMALLTALK_CI_CHANGES}" "Stargate.changes"
+  - zip -q "${TRAVIS_BRANCH}-${TRAVIS_SMALLTALK_VERSION}.zip" "Stargate.image" "Stargate.changes"
+deploy:
+  provider: releases
+  api_key:
+    secure: TwpzX3XVrSLLzCMAWmTJyA1qBXdutY/adojcQX1RXb86jTbAhMJwi3Iv8xDhAT5Aa5lKpNOLBqIfS8GG8W0lt++f5RnI2S8RHSm4HtctjTc9uRhBK4qsnlU24WsyFgsvhURsA/NaPnWAqSnJBivoYKzob7b5rzAsElr7ofelisT+pQthzamNqkNg/NQW4nCJpkkMRbAAig1O3l8jA7l0DE/2XTXTzS87LTIi5wlmfX4N94dG5F3vmj9i1DSZGFURNgZxdUV80uNmabmZxtAscrwEJJgAcEBbPvSu9cLgUg/2vqFXDaY+ksD0euEsd6bOkcadBUSc28i9YZ5GX7PM/FJgXB2wfylb/PnqTiRkte7xIByGndBgIJcE9EujjNfxQl0j4GmTfK7dyHd5wxXS/n2Zbz/t3UutNaI3AqWb5BA8rEw3ri37Vh+sCiEEU60RzSocq6bOSXHXH8+HfcCnX26WYwQEgoe7Hbe9kGCmCt6prDQUUtC8St1DUac5ri+uc/7+g8HrBemps3miK3hxzTHDFbo4T322OTYniE7CkuXuUU/WzvFbyrjU+AJ0c1EqyTY8VJhii2U1zmNPkG2SYQyKm0gRvht8wjj07QGe+Ml62CHj9QIUuaSVrVAyZQYBfjfAJ7j8jS8kBl7ywqw7yM0v8Qr7Dytspw4qA1Hs50I=
+  file: "${TRAVIS_BRANCH}-${TRAVIS_SMALLTALK_VERSION}.zip"
+  skip_cleanup: true
+  on:
+    repo: ba-st/Stargate
+    tags: true
