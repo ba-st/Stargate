@@ -128,7 +128,7 @@ MappingRuleSetBuilder >> ruleToDecode: aMediaType to: aKeyRepresentingObjectType
 		assertThereIsntConfiguredRuleToDecode: aMediaType
 		to: aKeyRepresentingObjectType.
 
-	^ MappingRule
+	^ DecodingMappingRule 
 		decoding: aMediaType
 		to: aKeyRepresentingObjectType
 		using: aReader
@@ -141,7 +141,7 @@ MappingRuleSetBuilder >> ruleToEncode: aMediaType to: aKeyRepresentingObjectType
 		assertThereIsntConfiguredRuleToEncode: aKeyRepresentingObjectType
 		to: aMediaType.
 		
-	^ MappingRule
+	^ EncodingMappingRule 
 		encoding: aKeyRepresentingObjectType
 		to: aMediaType
 		using: aWriter

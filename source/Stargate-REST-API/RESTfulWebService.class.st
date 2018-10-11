@@ -56,7 +56,7 @@ RESTfulWebService >> get: aQueryEvaluationBlock encodedUsing: aKey basedOn: http
 		at: aKey
 		to: mediaType
 		within: context .
-	ZnResponse ok: (ZnEntity with: encodedResult ofType: mediaType) ]
+	ZnResponse ok: encodedResult  ]
 		on: ConflictingObjectFound
 		do: [ :error | HTTPClientError signalConflict: error messageText ]
 ]

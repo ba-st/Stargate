@@ -21,12 +21,6 @@ PetsRESTfulWebServiceSpecification >> addJsonEncoderVersion1dot0dot0MappingIn: a
 		addRuleToEncode: self petMappingKey to: self petSummaryVersion1dot0dot0MediaType using: [ :json | self halt ]
 ]
 
-{ #category : #'accessing - media types' }
-PetsRESTfulWebServiceSpecification >> applicationJsonVersion1dot0dot0 [
-
-	^ ZnMimeType fromString: 'application/json;version=1.0.0'
-]
-
 { #category : #routes }
 PetsRESTfulWebServiceSpecification >> createPetRoute [
 

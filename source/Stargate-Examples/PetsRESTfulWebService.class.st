@@ -15,6 +15,7 @@ PetsRESTfulWebService >> createPetBasedOn: anHttpRequest within: aHttpRequestCon
 		withCreatedResourceDo: [ :pet | 
 			pets add: pet.
 			pet at: self specification identifierKey put: nextId.
+			pet at: #status put: 'new'.
 			nextId := nextId + 1 ]
 		decodedUsing: self specification petMappingKey
 		basedOn: anHttpRequest
@@ -45,7 +46,7 @@ PetsRESTfulWebService >> initialize [
 { #category : #'private - accessing' }
 PetsRESTfulWebService >> locationOf: aPet [
 
-	^ 'base_url/<1s>/<2p>' expandMacrosWith: self specification endpoint with: (pets indexOf: aPet)
+	^ 'base_url<1s>/<2p>' expandMacrosWith: self specification endpoint with: (pets indexOf: aPet)
 ]
 
 { #category : #querying }
