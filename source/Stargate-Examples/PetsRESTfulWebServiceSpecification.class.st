@@ -18,7 +18,15 @@ PetsRESTfulWebServiceSpecification >> addJsonEncoderVersion1dot0dot0MappingIn: a
 		addDefaultRuleToEncode: self petMappingKey
 			to: self petVersion1dot0dot0MediaType
 			using: [ :pet | String streamContents: [ :stream | (NeoJSONWriter on: stream) nextPut: pet ] ];
-		addRuleToEncode: self petMappingKey to: self petSummaryVersion1dot0dot0MediaType using: [ :json | self halt ]
+		addRuleToEncode: self petMappingKey
+			to: self petSummaryVersion1dot0dot0MediaType
+			using: [ :pet | 
+			String
+				streamContents: [ :stream | 
+					(NeoJSONWriter on: stream)
+						nextPut:
+							{('identifier' -> pet identifier).
+							('name' -> pet name)} asDictionary ] ]
 ]
 
 { #category : #routes }

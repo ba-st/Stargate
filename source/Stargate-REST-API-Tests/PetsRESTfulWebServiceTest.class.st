@@ -64,6 +64,28 @@ PetsRESTfulWebServiceTest >> testGetPetNotFoundShouldFail [
 ]
 
 { #category : #tests }
+PetsRESTfulWebServiceTest >> testGetPetSummaryJustCreated [
+
+	| response |
+
+	self assert: webService pets isEmpty.
+
+	self
+		assert: (webService createPetBasedOn: (self requestToCreatePetFrom: '{"name":"Firulais","type":"dog"}') within: HttpRequestContext new) isSuccess;
+		assert: webService pets size equals: 1.
+
+	response := webService getPetBasedOn: (self requestToGetPetIdentifiedBy: 1 accepting: webService specification petSummaryVersion1dot0dot0MediaType) within: HttpRequestContext new.
+
+	self
+		assert: response isSuccess;
+		assert: response status equals: 200;
+		assert: (response contents includesSubstring: '"identifier":1');
+		assert: (response contents includesSubstring: '"name":"Firulais"');
+		deny: (response contents includesSubstring: '"type":"dog"');
+		assert: response contentType asZnMimeType equals: webService specification petSummaryVersion1dot0dot0MediaType
+]
+
+{ #category : #tests }
 PetsRESTfulWebServiceTest >> testPetCreation [
 
 	| petResponse |
