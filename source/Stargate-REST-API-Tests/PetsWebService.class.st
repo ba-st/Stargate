@@ -1,8 +1,7 @@
 Class {
 	#name : #PetsWebService,
-	#superclass : #Object,
+	#superclass : #RESTfulWebService,
 	#instVars : [
-		'mappingRuleSet',
 		'pets'
 	],
 	#category : #'Stargate-REST-API-Tests'
@@ -12,22 +11,6 @@ Class {
 PetsWebService class >> managing: aPetSet [ 
 	
 	^ self new initializeManaging: aPetSet 
-]
-
-{ #category : #'encoding and decoding' }
-PetsWebService >> decode: aJSON encodedAs: aMediaType to: aKeyRepresentingObjectType within: aContext [
-
-	^ (mappingRuleSet ruleToDecode: aMediaType to: aKeyRepresentingObjectType)
-		applyOn: aJSON
-		within: aContext
-]
-
-{ #category : #'encoding and decoding' }
-PetsWebService >> encode: anObject of: aKeyRepresentingObjectType to: aMediaType within: aContext [
-
-	^ (mappingRuleSet ruleToEncode: aKeyRepresentingObjectType to: aMediaType)
-		applyOn: anObject
-		within: aContext
 ]
 
 { #category : #initialization }
