@@ -21,6 +21,19 @@ PetsRESTfulWebService >> createPetBasedOn: anHttpRequest within: aHttpRequestCon
 		within: aHttpRequestContext
 ]
 
+{ #category : #API }
+PetsRESTfulWebService >> getPetBasedOn: aHttpRequest within: aHttpRequestContext [
+
+	^ self
+		get: [ | identifier |
+
+			identifier := aHttpRequest at: #identifier.
+			pets detect: [ :pet | pet identifier = identifier ] ifNone: [ ObjectNotFound signal ] ]
+		encodedUsing: self specification petMappingKey
+		basedOn: aHttpRequest
+		within: aHttpRequestContext
+]
+
 { #category : #initialization }
 PetsRESTfulWebService >> initialize [
 

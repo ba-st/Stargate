@@ -34,9 +34,11 @@ RESTfulWebService >> encode: theResource at: aKey to: targetMediaType within: aC
 { #category : #'private - API' }
 RESTfulWebService >> evaluateQuery: aQueryEvaluationBlock [
 
-	^ [ aQueryEvaluationBlock value ]
+	^ [ [ aQueryEvaluationBlock value ]
 		on: TeaNoSuchParam
-		do: [ :signal | HTTPClientError signalBadRequest: signal messageText ]
+		do: [ :signal | HTTPClientError signalBadRequest: signal messageText ] ]
+		on: ObjectNotFound
+		do: [ :signal | HTTPClientError signalNotFound: signal messageText ]
 ]
 
 { #category : #'private - API' }

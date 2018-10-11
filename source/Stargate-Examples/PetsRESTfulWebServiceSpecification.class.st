@@ -8,8 +8,7 @@ Class {
 PetsRESTfulWebServiceSpecification >> addJsonDecoderVersion1dot0dot0MappingIn: aBuilder [
 
 	aBuilder
-		addDefaultRuleToDecode: self petVersion1dot0dot0MediaType to: self petMappingKey using: [ :json | NeoJSONObject fromString: json ];
-		addRuleToDecode: self petSummaryVersion1dot0dot0MediaType to: self petMappingKey using: [ :json | self halt ]
+		addDefaultRuleToDecode: self petVersion1dot0dot0MediaType to: self petMappingKey using: [ :json | NeoJSONObject fromString: json ]
 ]
 
 { #category : #'mapping rules' }
@@ -17,8 +16,9 @@ PetsRESTfulWebServiceSpecification >> addJsonEncoderVersion1dot0dot0MappingIn: a
 
 	aBuilder
 		addDefaultRuleToEncode: self petMappingKey
-		to: self petVersion1dot0dot0MediaType
-		using: [ :pet | String streamContents: [ :stream | pet neoJsonOn: stream ] ]
+			to: self petVersion1dot0dot0MediaType
+			using: [ :pet | String streamContents: [ :stream | (NeoJSONWriter on: stream) nextPut: pet ] ];
+		addRuleToEncode: self petMappingKey to: self petSummaryVersion1dot0dot0MediaType using: [ :json | self halt ]
 ]
 
 { #category : #'accessing - media types' }
