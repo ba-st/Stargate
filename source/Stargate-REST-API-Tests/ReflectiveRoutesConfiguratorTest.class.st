@@ -11,7 +11,7 @@ ReflectiveRoutesConfiguratorTest >> testAddingRoutes [
 
 	teapot := Teapot on.
 
-	webService := PetsWebService managing: OrderedCollection new.
+	webService := PetsRESTfulWebService new.
 
 	(ReflectiveRoutesConfigurator appliedTo: teapot) 
 		addRoutesOf: webService.

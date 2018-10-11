@@ -1,11 +1,11 @@
 Class {
-	#name : #WebServiceSpecification,
+	#name : #RESTFulWebServiceSpecification,
 	#superclass : #Object,
 	#category : #'Stargate-REST-API'
 }
 
 { #category : #acccessing }
-WebServiceSpecification >> mappingRuleSet [
+RESTFulWebServiceSpecification >> mappingRuleSet [
 
 	^ (ReflectiveMappingRuleSetBuilder for: self) build
 ]

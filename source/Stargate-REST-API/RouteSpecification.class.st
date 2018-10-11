@@ -3,8 +3,8 @@ Class {
 	#superclass : #Object,
 	#instVars : [
 		'httpMethod',
-		'resourceLocation',
-		'handler'
+		'handler',
+		'urlTemplate'
 	],
 	#category : #'Stargate-REST-API'
 }
@@ -50,15 +50,15 @@ RouteSpecification >> httpMethod [
 ]
 
 { #category : #initialization }
-RouteSpecification >> initializeHandling: anHttpMethod at: aResourceLocation evaluating: aBlock [
+RouteSpecification >> initializeHandling: anHttpMethod at: anURLTemplate evaluating: aBlock [
 
 	httpMethod := anHttpMethod.
-	resourceLocation := aResourceLocation.
+	urlTemplate := anURLTemplate.
 	handler := aBlock
 ]
 
 { #category : #accessing }
-RouteSpecification >> resourceLocation [
+RouteSpecification >> urlTemplate [
 
-	^ resourceLocation
+	^ urlTemplate
 ]
