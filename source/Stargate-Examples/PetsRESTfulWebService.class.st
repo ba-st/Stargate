@@ -23,13 +23,20 @@ PetsRESTfulWebService >> createPetBasedOn: anHttpRequest within: aHttpRequestCon
 ]
 
 { #category : #API }
+PetsRESTfulWebService >> deletePetBasedOn: anHttpRequest within: aHttpRequestContext [
+
+	[ pets remove: (self petIdentifiedUsing: anHttpRequest) ]
+		on: ObjectNotFound
+		do: [ :signal | HTTPClientError signalNotFound ].
+
+	^ ZnResponse noContent
+]
+
+{ #category : #API }
 PetsRESTfulWebService >> getPetBasedOn: aHttpRequest within: aHttpRequestContext [
 
 	^ self
-		get: [ | identifier |
-
-			identifier := aHttpRequest at: #identifier.
-			pets detect: [ :pet | pet identifier = identifier ] ifNone: [ ObjectNotFound signal ] ]
+		get: [ self petIdentifiedUsing: aHttpRequest ]
 		encodedUsing: self specification petMappingKey
 		basedOn: aHttpRequest
 		within: aHttpRequestContext
@@ -49,6 +56,17 @@ PetsRESTfulWebService >> locationOf: aPet [
 	^ 'base_url<1s>/<2p>' expandMacrosWith: self specification endpoint with: (pets indexOf: aPet)
 ]
 
+{ #category : #'private - accessing' }
+PetsRESTfulWebService >> petIdentifiedUsing: aHttpRequest [
+
+	| identifier |
+
+	identifier := aHttpRequest at: #identifier.
+	^ pets
+		detect: [ :pet | pet identifier = identifier ]
+		ifNone: [ ObjectNotFound signal ]
+]
+
 { #category : #querying }
 PetsRESTfulWebService >> pets [
 
@@ -59,4 +77,23 @@ PetsRESTfulWebService >> pets [
 PetsRESTfulWebService >> specification [
 
 	^ PetsRESTfulWebServiceSpecification new
+]
+
+{ #category : #API }
+PetsRESTfulWebService >> updatePetStatusBasedOn: anHttpRequest within: aContext [
+
+	^ self
+		get: [ | resource pet |
+
+			resource := self
+				decode: anHttpRequest contents
+				at: #pets
+				from: anHttpRequest contentType
+				within: aContext.
+			pet := self petIdentifiedUsing: anHttpRequest.
+			pet at: #status put: (resource at: #status).
+			pet ]
+		encodedUsing: self specification petMappingKey
+		basedOn: anHttpRequest
+		within: aContext
 ]

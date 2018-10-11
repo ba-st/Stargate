@@ -16,6 +16,12 @@ PetsRESTfulWebServiceTest >> requestToCreatePetFrom: json [
 ]
 
 { #category : #'private - support' }
+PetsRESTfulWebServiceTest >> requestToDeletePetIdentifiedBy: id [
+
+	^ TeaRequest fromZnRequest: (ZnRequest delete: ('http://BASE_URL/pets/<1p>' expandMacrosWith: id)) pathParams: {(#identifier -> id)} asDictionary
+]
+
+{ #category : #'private - support' }
 PetsRESTfulWebServiceTest >> requestToGetPetIdentifiedBy: id accepting: anAcceptHeader [
 
 	^ TeaRequest
@@ -26,10 +32,48 @@ PetsRESTfulWebServiceTest >> requestToGetPetIdentifiedBy: id accepting: anAccept
 		pathParams: {(#identifier -> id)} asDictionary
 ]
 
+{ #category : #'private - support' }
+PetsRESTfulWebServiceTest >> requestToUpdatePetIdentifiedBy: id statusTo: status [
+
+	^ TeaRequest
+		fromZnRequest:
+			((ZnRequest patch: ('http://BASE_URL/pets/<1p>' expandMacrosWith: id))
+				entity: (ZnEntity with: ('{"status":"<1s>"}' expandMacrosWith: status) type: webService specification petVersion1dot0dot0MediaType);
+				yourself)
+		pathParams: {(#identifier -> id)} asDictionary
+]
+
 { #category : #running }
 PetsRESTfulWebServiceTest >> setUp [
 	
 	webService := PetsRESTfulWebService new
+]
+
+{ #category : #tests }
+PetsRESTfulWebServiceTest >> testCantDeleteInvalidPet [
+
+	self assert: webService pets isEmpty.
+
+	self should: [ webService deletePetBasedOn: (self requestToDeletePetIdentifiedBy: 1) within: HttpRequestContext new ] raise: HTTPClientError withExceptionDo: [ :signal | self assert: signal code equals: 404 ]
+]
+
+{ #category : #tests }
+PetsRESTfulWebServiceTest >> testDeletePet [
+
+	| response |
+
+	self assert: webService pets isEmpty.
+
+	self
+		assert: (webService createPetBasedOn: (self requestToCreatePetFrom: '{"name":"Firulais","type":"dog"}') within: HttpRequestContext new) isSuccess;
+		assert: webService pets size equals: 1.
+
+	response := webService deletePetBasedOn: (self requestToDeletePetIdentifiedBy: 1) within: HttpRequestContext new.
+
+	self
+		assert: response isSuccess;
+		assert: response status equals: 204;
+		deny: response hasEntity
 ]
 
 { #category : #tests }
@@ -101,4 +145,29 @@ PetsRESTfulWebServiceTest >> testPetCreation [
 		assert: petResponse hasEntity;
 		assert: webService pets size equals: 1;
 		assert: webService pets first identifier equals: 1
+]
+
+{ #category : #tests }
+PetsRESTfulWebServiceTest >> testUpdatePetStatus [
+
+	| response |
+
+	self assert: webService pets isEmpty.
+
+	self assert: (webService createPetBasedOn: (self requestToCreatePetFrom: '{"name":"Firulais","type":"dog"}') within: HttpRequestContext new) isSuccess.
+
+	self assert: webService pets first status equals: 'new'.
+
+	response := webService updatePetStatusBasedOn: (self requestToUpdatePetIdentifiedBy: 1 statusTo: 'gone') within: HttpRequestContext new.
+
+	self assert: webService pets first status equals: 'gone'.
+
+	self
+		assert: response isSuccess;
+		assert: response status equals: 200;
+		assert: response hasEntity;
+		assert: (response contents includesSubstring: '"status":"gone"');
+		assert: webService pets size equals: 1;
+		assert: webService pets first identifier equals: 1;
+		assert: webService pets first status equals: 'gone'
 ]
