@@ -63,7 +63,7 @@ RESTfulWebService >> get: aQueryEvaluationBlock encodedUsing: aKey basedOn: http
 RESTfulWebService >> initialize [
 
 	super initialize.
-	mappingRuleSet := (ReflectiveMappingRuleSetBuilder for: self specification) build
+	mappingRuleSet := self specification mappingRuleSet
 ]
 
 { #category : #'private - accessing' }

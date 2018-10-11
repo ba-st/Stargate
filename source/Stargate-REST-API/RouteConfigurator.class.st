@@ -46,13 +46,7 @@ RouteConfigurator >> configureRoute: aRouteSpecification [
 
 	teapot
 		perform: (aRouteSpecification httpMethod , ':') asSymbol
-		with:
-			aRouteSpecification resourceLocation
-				-> [ :request | 
-					webService
-						perform: aRouteSpecification message
-						with: request
-						with: HttpRequestContext new ]
+		with: aRouteSpecification resourceLocation -> [ :request | aRouteSpecification handler value: webService value: request value: HttpRequestContext new ]
 ]
 
 { #category : #initialization }

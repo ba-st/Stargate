@@ -16,8 +16,7 @@ PetsWebService class >> managing: aPetSet [
 { #category : #initialization }
 PetsWebService >> initializeManaging: aPetSet [
 
-	pets := aPetSet.
-	mappingRuleSet := (ReflectiveMappingRuleSetBuilder for: self specification) build
+	pets := aPetSet. 
 ]
 
 { #category : #accessing }
