@@ -16,9 +16,11 @@ Class {
 { #category : #'private - transformations' }
 RESTfulWebService >> decode: theRepresentation at: aKey from: sourceMediaType within: aContext [
 
-	^ (mappingRuleSet ruleToDecode: sourceMediaType to: aKey)
-		applyOn: theRepresentation
-		within: aContext
+	^ [ [ (mappingRuleSet ruleToDecode: sourceMediaType to: aKey) applyOn: theRepresentation within: aContext ]
+		on: KeyNotFound , DecodingFailed
+		do: [ :signal | HTTPClientError signalBadRequest: ('Expected key <1s> was not found' expandMacrosWith: signal key) ] ]
+		on: MappingNotFound
+		do: [ :signal | HTTPClientError signalUnsupportedMediaType: signal messageText ]
 ]
 
 { #category : #'private - transformations' }
@@ -64,6 +66,12 @@ RESTfulWebService >> initialize [
 	mappingRuleSet := (ReflectiveMappingRuleSetBuilder for: self specification) build
 ]
 
+{ #category : #'private - accessing' }
+RESTfulWebService >> locationOf: resource [
+
+	self subclassResponsibility
+]
+
 { #category : #specification }
 RESTfulWebService >> specification [
 
@@ -79,4 +87,22 @@ RESTfulWebService >> targetMediaTypeFrom: anHttpRequest [
 	^ [ anHttpRequest accept asZnMimeType ]
 		on: ObjectNotFound
 		do: [ :signal | HTTPClientError signalBadRequest: signal messageText ]
+]
+
+{ #category : #'private - API' }
+RESTfulWebService >> withCreatedResourceDo: aBlock decodedUsing: aKey basedOn: anHttpRequest within: aContext [
+
+	| resource |
+
+	resource := self
+		decode: anHttpRequest contents
+		at: aKey
+		from: anHttpRequest contentType
+		within: aContext.
+
+	[ aBlock value: resource ]
+		on: ConflictingObjectFound
+		do: [ :signal | HTTPClientError signalConflict: signal messageText ].
+
+	^ ZnResponse created: (self locationOf: resource)
 ]
