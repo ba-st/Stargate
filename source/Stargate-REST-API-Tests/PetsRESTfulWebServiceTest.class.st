@@ -45,8 +45,9 @@ PetsRESTfulWebServiceTest >> requestToUpdatePetIdentifiedBy: id statusTo: status
 
 { #category : #running }
 PetsRESTfulWebServiceTest >> setUp [
-	
-	webService := PetsRESTfulWebService new
+
+	webService := PetsRESTfulWebService new.
+	webService serverUrl: 'https://pets.example.com' asZnUrl
 ]
 
 { #category : #tests }
@@ -92,8 +93,16 @@ PetsRESTfulWebServiceTest >> testGetPetJustCreated [
 	self
 		assert: response isSuccess;
 		assert: response status equals: 200;
-		assert: (response contents includesSubstring: '"identifier":1');
-		assert: response contentType asZnMimeType equals: webService specification petVersion1dot0dot0MediaType
+		assert: response contentType asZnMimeType equals: webService specification petVersion1dot0dot0MediaType.
+
+	self
+		withJsonFromContentsIn: response
+		do: [ :json | 
+			self
+				assert: json name equals: 'Firulais';
+				assert: json type equals: 'dog';
+				assert: json status equals: 'new';
+				assert: json links self equals: 'https://pets.example.com/pets/1' ]
 ]
 
 { #category : #tests }
@@ -123,28 +132,33 @@ PetsRESTfulWebServiceTest >> testGetPetSummaryJustCreated [
 	self
 		assert: response isSuccess;
 		assert: response status equals: 200;
-		assert: (response contents includesSubstring: '"identifier":1');
-		assert: (response contents includesSubstring: '"name":"Firulais"');
-		deny: (response contents includesSubstring: '"type":"dog"');
-		assert: response contentType asZnMimeType equals: webService specification petSummaryVersion1dot0dot0MediaType
+		assert: response contentType asZnMimeType equals: webService specification petSummaryVersion1dot0dot0MediaType.
+
+	self
+		withJsonFromContentsIn: response
+		do: [ :json | 
+			self
+				assert: json name equals: 'Firulais';
+				assert: json links self equals: 'https://pets.example.com/pets/1';
+				assert: json type isNil ]
 ]
 
 { #category : #tests }
 PetsRESTfulWebServiceTest >> testPetCreation [
 
-	| petResponse |
+	| response |
 
 	self assert: webService pets isEmpty.
 
-	petResponse := webService createPetBasedOn: (self requestToCreatePetFrom: '{"name":"Firulais","type":"dog"}') within: HttpRequestContext new.
+	response := webService createPetBasedOn: (self requestToCreatePetFrom: '{"name":"Firulais","type":"dog"}') within: HttpRequestContext new.
 
 	self
-		assert: petResponse isSuccess;
-		assert: petResponse status equals: 201;
-		assert: (petResponse location endsWith: '/pets/1');
-		assert: petResponse hasEntity;
+		assert: response isSuccess;
+		assert: response status equals: 201;
+		assert: response location equals: 'https://pets.example.com/pets/1';
+		assert: response hasEntity;
 		assert: webService pets size equals: 1;
-		assert: webService pets first identifier equals: 1
+		assert: webService pets first name equals: 'Firulais'
 ]
 
 { #category : #tests }
@@ -166,8 +180,22 @@ PetsRESTfulWebServiceTest >> testUpdatePetStatus [
 		assert: response isSuccess;
 		assert: response status equals: 200;
 		assert: response hasEntity;
-		assert: (response contents includesSubstring: '"status":"gone"');
 		assert: webService pets size equals: 1;
-		assert: webService pets first identifier equals: 1;
-		assert: webService pets first status equals: 'gone'
+		assert: webService pets first name equals: 'Firulais';
+		assert: webService pets first status equals: 'gone'.
+
+	self
+		withJsonFromContentsIn: response
+		do: [ :json | 
+			self
+				assert: json name equals: 'Firulais';
+				assert: json type equals: 'dog';
+				assert: json status equals: 'gone';
+				assert: json links self equals: 'https://pets.example.com/pets/1' ]
+]
+
+{ #category : #'private - support' }
+PetsRESTfulWebServiceTest >> withJsonFromContentsIn: httpResponse do: aBlock [
+
+	aBlock value: (NeoJSONObject fromString: httpResponse contents)
 ]

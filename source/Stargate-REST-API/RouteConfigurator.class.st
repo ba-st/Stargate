@@ -52,10 +52,10 @@ RouteConfigurator >> configureRoute: aRouteSpecification [
 ]
 
 { #category : #initialization }
-RouteConfigurator >> initializeAppliedTo: aTeapot sendingMessagesTo: aWebService [ 
-	
-	teapot := aTeapot .
+RouteConfigurator >> initializeAppliedTo: aTeapot sendingMessagesTo: aWebService [
+
+	teapot := aTeapot.
 	webService := aWebService.
-	
-	routesAllowingCors := Dictionary new.
+	teapot server serverUrl ifNotNil: [ :url | webService serverUrl: url ].
+	routesAllowingCors := Dictionary new
 ]

@@ -3,7 +3,8 @@ Class {
 	#superclass : #RESTfulWebService,
 	#instVars : [
 		'pets',
-		'nextId'
+		'nextId',
+		'petById'
 	],
 	#category : #'Stargate-Examples'
 }
@@ -14,8 +15,8 @@ PetsRESTfulWebService >> createPetBasedOn: anHttpRequest within: aHttpRequestCon
 	^ self
 		withCreatedResourceDo: [ :pet | 
 			pets add: pet.
-			pet at: self specification identifierKey put: nextId.
 			pet at: #status put: 'new'.
+			petById at: nextId put: pet.
 			nextId := nextId + 1 ]
 		decodedUsing: self specification petMappingKey
 		basedOn: anHttpRequest
@@ -47,24 +48,25 @@ PetsRESTfulWebService >> initialize [
 
 	super initialize.
 	pets := OrderedCollection new.
+	petById := IdentityDictionary new.
 	nextId := 1 
 ]
 
 { #category : #'private - accessing' }
 PetsRESTfulWebService >> locationOf: aPet [
 
-	^ 'base_url<1s>/<2p>' expandMacrosWith: self specification endpoint with: (pets indexOf: aPet)
+	| baseUrl |
+
+	baseUrl := '' asZnUrl.
+	baseUrlOptional withContentDo: [ :theBaseUrl | baseUrl := theBaseUrl ].
+
+	^ '<1p>/<2p>' expandMacrosWith: baseUrl / self specification endpoint asZnUrl with: (petById keyAtValue: aPet)
 ]
 
 { #category : #'private - accessing' }
 PetsRESTfulWebService >> petIdentifiedUsing: aHttpRequest [
 
-	| identifier |
-
-	identifier := aHttpRequest at: #identifier.
-	^ pets
-		detect: [ :pet | pet identifier = identifier ]
-		ifNone: [ ObjectNotFound signal ]
+	^ petById at: (aHttpRequest at: #identifier) ifAbsent: [ ObjectNotFound signal ]
 ]
 
 { #category : #querying }

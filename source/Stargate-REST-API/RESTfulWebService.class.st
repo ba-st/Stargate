@@ -8,7 +8,8 @@ Class {
 	#name : #RESTfulWebService,
 	#superclass : #Object,
 	#instVars : [
-		'mappingRuleSet'
+		'mappingRuleSet',
+		'baseUrlOptional'
 	],
 	#category : #'Stargate-REST-API-Model'
 }
@@ -51,12 +52,13 @@ RESTfulWebService >> get: aQueryEvaluationBlock encodedUsing: aKey basedOn: http
 	^ [ | encodedResult |
 
 	result := self evaluateQuery: aQueryEvaluationBlock.
+	context hold: {('self' -> (self locationOf: result))} under: #mediaControls.
 	encodedResult := self
 		encode: result
 		at: aKey
 		to: mediaType
-		within: context .
-	ZnResponse ok: encodedResult  ]
+		within: context.
+	ZnResponse ok: encodedResult ]
 		on: ConflictingObjectFound
 		do: [ :error | HTTPClientError signalConflict: error messageText ]
 ]
@@ -65,13 +67,20 @@ RESTfulWebService >> get: aQueryEvaluationBlock encodedUsing: aKey basedOn: http
 RESTfulWebService >> initialize [
 
 	super initialize.
-	mappingRuleSet := self specification mappingRuleSet
+	mappingRuleSet := self specification mappingRuleSet.
+	baseUrlOptional := Optional unused.
 ]
 
 { #category : #'private - accessing' }
 RESTfulWebService >> locationOf: resource [
 
 	self subclassResponsibility
+]
+
+{ #category : #configuring }
+RESTfulWebService >> serverUrl: aServerUrl [
+
+	baseUrlOptional := Optional containing: aServerUrl asZnUrl 
 ]
 
 { #category : #specification }
