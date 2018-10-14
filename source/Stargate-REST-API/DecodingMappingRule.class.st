@@ -11,7 +11,7 @@ DecodingMappingRule class >> decoding: aMediaType to: anObjectType using: aReade
 ]
 
 { #category : #applying }
-DecodingMappingRule >> applyOn: anObjectToEncode within: aContext [
+DecodingMappingRule >> applyOn: anObjectToDecode within: aContext [
 
-	^ mapper cull: anObjectToEncode cull: aContext
+	^ mapper cull: anObjectToDecode cull: aContext
 ]

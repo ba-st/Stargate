@@ -1,3 +1,8 @@
+"
+I'm a reflective configurator of web service routes.
+
+I'm being used to configure a Teapot server routes reflectively. I expect web service specification declare its routes on messages that follow the pattern #*Route
+"
 Class {
 	#name : #ReflectiveRoutesConfigurator,
 	#superclass : #Object,
@@ -23,7 +28,7 @@ ReflectiveRoutesConfigurator >> addRoutesOf: aWebService [
 		sendingMessagesTo: aWebService.
 
 	(self specifiedRoutesFor: aWebService)
-		do: [ :routeSpecification | routeSpecification accept: routeConfigurator ].
+		do: [ :routeSpecification | routeSpecification configureUsing: routeConfigurator ].
 
 	routeConfigurator configureCrossOriginSharingRoutes
 ]

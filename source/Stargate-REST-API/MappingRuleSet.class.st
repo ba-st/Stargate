@@ -9,9 +9,9 @@ Class {
 }
 
 { #category : #'instance creation' }
-MappingRuleSet class >> consistingOf: encodingRules and: decodingRules [ 
+MappingRuleSet class >> consistingOf: aEncodingRuleCollection and: aDecodingRuleCollection [ 
 	
-	^ self new initializeConsistingOf: encodingRules and: decodingRules 
+	^ self new initializeConsistingOf: aEncodingRuleCollection and: aDecodingRuleCollection 
 ]
 
 { #category : #'private - querying' }
@@ -77,10 +77,10 @@ MappingRuleSet >> encodingRuleFor: anObjectType withMediaTypeEqualsTo: aMediaTyp
 ]
 
 { #category : #initialization }
-MappingRuleSet >> initializeConsistingOf: aCollectionOfEncodingRules and: aCollectionOfDecodingRules [ 
+MappingRuleSet >> initializeConsistingOf: anEncodingRuleCollection and: aDecodingRuleCollection [ 
 	
-	encodingRules := aCollectionOfEncodingRules.
-	decodingRules := aCollectionOfDecodingRules
+	encodingRules := anEncodingRuleCollection.
+	decodingRules := aDecodingRuleCollection
 ]
 
 { #category : #'private - testing media type' }

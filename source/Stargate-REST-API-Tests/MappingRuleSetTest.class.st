@@ -1,31 +1,88 @@
 Class {
 	#name : #MappingRuleSetTest,
 	#superclass : #TestCase,
+	#instVars : [
+		'mappingRuleSetBuilder'
+	],
 	#category : #'Stargate-REST-API-Tests'
 }
 
+{ #category : #'tests support' }
+MappingRuleSetTest >> addTriggersDecodingRuleForApplicationJsonVersion1dot0dot0 [
+
+	mappingRuleSetBuilder
+		addRuleToDecode: self applicationJsonVersion1dot0dot0MediaType
+		to: self keyRepresentingTriggers
+		using: self triggerJsonDecoderVersion1dot0dot0
+]
+
+{ #category : #'tests support' }
+MappingRuleSetTest >> addTriggersDefaultDecodingRuleForApplicationJsonVersion1dot0dot1 [
+
+	mappingRuleSetBuilder
+		addDefaultRuleToDecode: self applicationJsonVersion1dot0dot1MediaType
+		to: self keyRepresentingTriggers
+		using: self triggerJsonDecoderVersion1dot0dot1
+]
+
+{ #category : #'tests support' }
+MappingRuleSetTest >> addTriggersDefaultDecodingRuleForTextPlain [
+
+	mappingRuleSetBuilder
+		addDefaultRuleToDecode: self textPlain
+		to: self keyRepresentingTriggers
+		using: self triggerTextDecoder
+]
+
+{ #category : #'tests support' }
+MappingRuleSetTest >> addTriggersDefaultEncodingRuleForApplicationJsonVersion1dot0dot1 [
+
+	mappingRuleSetBuilder
+		addDefaultRuleToEncode: self keyRepresentingTriggers
+		to: self applicationJsonVersion1dot0dot1MediaType
+		using: self triggerJsonEncoderVersion1dot0dot1
+]
+
+{ #category : #'tests support' }
+MappingRuleSetTest >> addTriggersDefaultEncodingRuleForTextPlain [
+
+	mappingRuleSetBuilder
+		addDefaultRuleToEncode: self keyRepresentingTriggers
+		to: self textPlain
+		using: self triggerTextEncoder
+]
+
+{ #category : #'tests support' }
+MappingRuleSetTest >> addTriggersEncodingRuleForApplicationJsonVersion1dot0dot0 [
+
+	mappingRuleSetBuilder
+		addRuleToEncode: self keyRepresentingTriggers
+		to: self applicationJsonVersion1dot0dot0MediaType
+		using: self triggerJsonEncoderVersion1dot0dot0
+]
+
 { #category : #'accessing - media types' }
-MappingRuleSetTest >> applicationJson [
+MappingRuleSetTest >> applicationJsonMediaType [
 	
 	^ ZnMimeType applicationJson 
 ]
 
 { #category : #'accessing - media types' }
-MappingRuleSetTest >> applicationJsonVersion1dot0dot0 [
+MappingRuleSetTest >> applicationJsonVersion1dot0dot0MediaType [
 
-	^ ZnMimeType fromString: 'application/json; version=1.0.0'
+	^ 'application/json; version=1.0.0' asZnMimeType
 ]
 
 { #category : #'accessing - media types' }
-MappingRuleSetTest >> applicationJsonVersion1dot0dot1 [
+MappingRuleSetTest >> applicationJsonVersion1dot0dot1MediaType [
 
-	^ ZnMimeType fromString: 'application/json; version=1.0.1'
+	^ 'application/json; version=1.0.1' asZnMimeType 
 ]
 
 { #category : #'accessing - media types' }
-MappingRuleSetTest >> applicationJsonVersion1dot1dot0 [
+MappingRuleSetTest >> applicationJsonVersion1dot1dot0MediaType [
 
-	^ ZnMimeType fromString: 'application/json; version=1.1.0'
+	^ 'application/json; version=1.1.0' asZnMimeType
 ]
 
 { #category : #accessing }
@@ -34,182 +91,205 @@ MappingRuleSetTest >> keyRepresentingTriggers [
 	^ #triggers
 ]
 
-{ #category : #tests }
-MappingRuleSetTest >> testQueryingDecodingRuleByAnyMediaTypeGivesDefault [
+{ #category : #running }
+MappingRuleSetTest >> setUp [
 
-	| mappingRuleSetBuilder mappingRuleSet decodingRule |
-
-	mappingRuleSetBuilder := MappingRuleSetBuilder new.
-
-	mappingRuleSetBuilder
-		addRuleToDecode: self applicationJsonVersion1dot0dot0
-		to: #triggers
-		using: self triggerJsonDecoderVersion1dot0dot0.
-
-	mappingRuleSetBuilder
-		addDefaultRuleToDecode: self applicationJsonVersion1dot0dot1
-		to: #triggers
-		using: self triggerJsonDecoderVersion1dot0dot1.
-
-	mappingRuleSet := mappingRuleSetBuilder build.
-
-	decodingRule := mappingRuleSet ruleToDecode: ZnMimeType any to: #triggers.
-	self
-		assert: decodingRule mediaType equals: self applicationJsonVersion1dot0dot1;
-		assert: decodingRule objectType equals: #triggers
+		mappingRuleSetBuilder := MappingRuleSetBuilder new.
 ]
 
 { #category : #tests }
-MappingRuleSetTest >> testQueryingDecodingRuleByMediaTypeSpecificVersion [
+MappingRuleSetTest >> testQueryingDecodingRuleUsingAnyMediaTypeGivesDefault [
 
-	| mappingRuleSetBuilder mappingRuleSet decodingRule |
+	| mappingRuleSet decodingRule |
 
-	mappingRuleSetBuilder := MappingRuleSetBuilder new.
+	self
+		addTriggersDecodingRuleForApplicationJsonVersion1dot0dot0;
+		addTriggersDefaultDecodingRuleForApplicationJsonVersion1dot0dot1.
+	mappingRuleSet := mappingRuleSetBuilder build.
 
-	mappingRuleSetBuilder
-		addRuleToDecode: self applicationJsonVersion1dot0dot0
-		to: #triggers
-		using: self triggerJsonDecoderVersion1dot0dot0.
+	decodingRule := mappingRuleSet
+		ruleToDecode: ZnMimeType any
+		to: self keyRepresentingTriggers.
 
-	mappingRuleSetBuilder
-		addDefaultRuleToDecode: self applicationJsonVersion1dot0dot1
-		to: #triggers
-		using: self triggerJsonDecoderVersion1dot0dot1.
+	self
+		assert: decodingRule mediaType
+			equals: self applicationJsonVersion1dot0dot1MediaType;
+		assert: decodingRule objectType
+			equals: self keyRepresentingTriggers
+]
+
+{ #category : #tests }
+MappingRuleSetTest >> testQueryingDecodingRuleUsingNotRegisteredMediaTypeGivesObjectNotFound [
+
+	| mappingRuleSet |
+
+	self addTriggersDefaultDecodingRuleForTextPlain.
+	mappingRuleSet := mappingRuleSetBuilder build.
+
+	self
+		should: [ mappingRuleSet
+				ruleToDecode: self applicationJsonVersion1dot0dot0MediaType
+				to: self keyRepresentingTriggers ]
+		raise: MappingNotFound
+]
+
+{ #category : #tests }
+MappingRuleSetTest >> testQueryingDecodingRuleUsingNotRegisteredVersionOfMediaTypeGivesObjectNotFound [
+
+	| mappingRuleSet |
+
+	self
+		addTriggersDecodingRuleForApplicationJsonVersion1dot0dot0;
+		addTriggersDefaultDecodingRuleForApplicationJsonVersion1dot0dot1.
+
+	mappingRuleSet := mappingRuleSetBuilder build.
+
+	self
+		should: [ mappingRuleSet
+				ruleToDecode: self applicationJsonVersion1dot1dot0MediaType
+				to: self keyRepresentingTriggers ]
+		raise: MappingNotFound
+]
+
+{ #category : #tests }
+MappingRuleSetTest >> testQueryingDecodingRuleUsingNotVersionedMediaTypeGivesDefault [
+
+	| mappingRuleSet decodingRule |
+
+	self
+		addTriggersDecodingRuleForApplicationJsonVersion1dot0dot0;
+		addTriggersDefaultDecodingRuleForApplicationJsonVersion1dot0dot1.
 
 	mappingRuleSet := mappingRuleSetBuilder build.
 
 	decodingRule := mappingRuleSet
-		ruleToDecode: self applicationJsonVersion1dot0dot0
-		to: #triggers.
+		ruleToDecode: self applicationJsonMediaType
+		to: self keyRepresentingTriggers.
+
 	self
-		assert: decodingRule mediaType equals: self applicationJsonVersion1dot0dot0;
-		assert: decodingRule objectType equals: #triggers
+		assert: decodingRule mediaType
+			equals: self applicationJsonVersion1dot0dot1MediaType;
+		assert: decodingRule objectType
+			equals: self keyRepresentingTriggers
 ]
 
 { #category : #tests }
-MappingRuleSetTest >> testQueryingDecodingRuleByMediaTypeWithoutVersionGivesDefault [
+MappingRuleSetTest >> testQueryingDecodingRuleUsingVersionedMediaType [
 
-	| mappingRuleSetBuilder mappingRuleSet decodingRule |
+	| mappingRuleSet decodingRule |
 
-	mappingRuleSetBuilder := MappingRuleSetBuilder new.
-
-	mappingRuleSetBuilder
-		addRuleToDecode: self applicationJsonVersion1dot0dot0
-		to: #triggers
-		using: self triggerJsonDecoderVersion1dot0dot0.
-
-	mappingRuleSetBuilder
-		addDefaultRuleToDecode: self applicationJsonVersion1dot0dot1
-		to: #triggers
-		using: self triggerJsonDecoderVersion1dot0dot1.
+	self
+		addTriggersDecodingRuleForApplicationJsonVersion1dot0dot0;
+		addTriggersDefaultDecodingRuleForApplicationJsonVersion1dot0dot1.
 
 	mappingRuleSet := mappingRuleSetBuilder build.
 
-	decodingRule := mappingRuleSet ruleToDecode: self applicationJson to: #triggers.
+	decodingRule := mappingRuleSet
+		ruleToDecode: self applicationJsonVersion1dot0dot0MediaType
+		to: self keyRepresentingTriggers.
+
 	self
-		assert: decodingRule mediaType equals: self applicationJsonVersion1dot0dot1;
-		assert: decodingRule objectType equals: #triggers
+		assert: decodingRule mediaType equals: self applicationJsonVersion1dot0dot0MediaType;
+		assert: decodingRule objectType equals: self keyRepresentingTriggers
 ]
 
 { #category : #tests }
-MappingRuleSetTest >> testQueryingDecodingRuleByNotRegisteredMediaTypeGivesObjectNotFound [
+MappingRuleSetTest >> testQueryingEncodingRuleUsingAnyMediaTypeGivesDefault [
 
-	| mappingRuleSetBuilder mappingRuleSet |
-
-	mappingRuleSetBuilder := MappingRuleSetBuilder new.
-
-	mappingRuleSetBuilder
-		addDefaultRuleToDecode: self textPlain
-		to: #triggers
-		using: self triggerTextDecoder.
-
-	mappingRuleSet := mappingRuleSetBuilder build.
+	| mappingRuleSet encodingRule |
 
 	self
-		should: [ mappingRuleSet
-				ruleToDecode: self applicationJsonVersion1dot0dot0
-				to: #triggers ]
-		raise: MappingNotFound
-]
-
-{ #category : #tests }
-MappingRuleSetTest >> testQueryingDecodingRuleByNotRegisteredSpecificVersionGivesObjectNotFound [
-
-	| mappingRuleSetBuilder mappingRuleSet |
-
-	mappingRuleSetBuilder := MappingRuleSetBuilder new.
-
-	mappingRuleSetBuilder
-		addRuleToDecode: self applicationJsonVersion1dot0dot0
-		to: #triggers
-		using: self triggerJsonDecoderVersion1dot0dot0.
-
-	mappingRuleSetBuilder
-		addDefaultRuleToDecode: self applicationJsonVersion1dot0dot1
-		to: #triggers
-		using: self triggerJsonDecoderVersion1dot0dot1.
-
-	mappingRuleSet := mappingRuleSetBuilder build.
-
-	self
-		should: [ mappingRuleSet
-				ruleToDecode: self applicationJsonVersion1dot1dot0
-				to: #triggers ]
-		raise: MappingNotFound
-]
-
-{ #category : #tests }
-MappingRuleSetTest >> testQueryingEncodingRuleByAnyMediaTypeGivesDefault [
-
-	| mappingRuleSetBuilder mappingRuleSet encodingRule |
-
-	mappingRuleSetBuilder := MappingRuleSetBuilder new.
-
-	mappingRuleSetBuilder
-		addRuleToEncode: self keyRepresentingTriggers
-		to: self applicationJsonVersion1dot0dot0
-		using: self triggerJsonEncoderVersion1dot0dot0.
-
-	mappingRuleSetBuilder
-		addDefaultRuleToEncode: self keyRepresentingTriggers
-		to: self applicationJsonVersion1dot0dot1
-		using: self triggerJsonEncoderVersion1dot0dot1.
-
-	mappingRuleSet := mappingRuleSetBuilder build.
-
-	encodingRule := mappingRuleSet ruleToEncode: self keyRepresentingTriggers to: ZnMimeType any.
-	
-	self
-		assert: encodingRule mediaType equals: self applicationJsonVersion1dot0dot1;
-		assert: encodingRule objectType equals: self keyRepresentingTriggers
-]
-
-{ #category : #tests }
-MappingRuleSetTest >> testQueryingEncodingRuleByMediaTypeSpecificVersion [
-
-	| mappingRuleSetBuilder mappingRuleSet encodingRule |
-
-	mappingRuleSetBuilder := MappingRuleSetBuilder new.
-
-	mappingRuleSetBuilder
-		addRuleToEncode: self keyRepresentingTriggers
-		to: self applicationJsonVersion1dot0dot0
-		using: self triggerJsonEncoderVersion1dot0dot0.
-
-	mappingRuleSetBuilder
-		addDefaultRuleToEncode: self keyRepresentingTriggers
-		to: self applicationJsonVersion1dot0dot1
-		using: self triggerJsonEncoderVersion1dot0dot1.
-
+		addTriggersEncodingRuleForApplicationJsonVersion1dot0dot0;
+		addTriggersDefaultEncodingRuleForApplicationJsonVersion1dot0dot1.
+		
 	mappingRuleSet := mappingRuleSetBuilder build.
 
 	encodingRule := mappingRuleSet
 		ruleToEncode: self keyRepresentingTriggers
-		to: self applicationJsonVersion1dot0dot0.
-	
+		to: ZnMimeType any.
+
 	self
-		assert: encodingRule mediaType equals: self applicationJsonVersion1dot0dot0;
-		assert: encodingRule objectType equals: self keyRepresentingTriggers
+		assert: encodingRule mediaType
+			equals: self applicationJsonVersion1dot0dot1MediaType;
+		assert: encodingRule objectType
+			equals: self keyRepresentingTriggers
+]
+
+{ #category : #tests }
+MappingRuleSetTest >> testQueryingEncodingRuleUsingNotRegisteredMediaTypeGivesObjectNotFound [
+
+	| mappingRuleSet |
+
+	self addTriggersDefaultEncodingRuleForTextPlain.
+	mappingRuleSet := mappingRuleSetBuilder build.
+
+	self
+		should: [ mappingRuleSet
+				ruleToEncode: self applicationJsonVersion1dot0dot0MediaType
+				to: self keyRepresentingTriggers ]
+		raise: MappingNotFound
+]
+
+{ #category : #tests }
+MappingRuleSetTest >> testQueryingEncodingRuleUsingNotRegisteredVersionOfMediaTypeGivesObjectNotFound [
+
+	| mappingRuleSet |
+
+	self
+		addTriggersEncodingRuleForApplicationJsonVersion1dot0dot0;
+		addTriggersDefaultEncodingRuleForApplicationJsonVersion1dot0dot1.
+
+	mappingRuleSet := mappingRuleSetBuilder build.
+
+	self
+		should: [ mappingRuleSet
+				ruleToEncode: self applicationJsonVersion1dot1dot0MediaType
+				to: self keyRepresentingTriggers ]
+		raise: MappingNotFound
+]
+
+{ #category : #tests }
+MappingRuleSetTest >> testQueryingEncodingRuleUsingNotVersionedMediaTypeGivesDefault [
+
+	| mappingRuleSet encondingRule |
+
+	self
+		addTriggersEncodingRuleForApplicationJsonVersion1dot0dot0;
+		addTriggersDefaultEncodingRuleForApplicationJsonVersion1dot0dot1.
+
+	mappingRuleSet := mappingRuleSetBuilder build.
+
+	encondingRule := mappingRuleSet
+		ruleToEncode: self keyRepresentingTriggers
+		to: self applicationJsonMediaType.
+
+	self
+		assert: encondingRule mediaType
+			equals: self applicationJsonVersion1dot0dot1MediaType;
+		assert: encondingRule objectType
+			equals: self keyRepresentingTriggers
+]
+
+{ #category : #tests }
+MappingRuleSetTest >> testQueryingEncodingRuleUsingVersionedMediaType [
+
+	| mappingRuleSet encodingRule |
+
+	self
+		addTriggersEncodingRuleForApplicationJsonVersion1dot0dot0;
+		addTriggersDefaultEncodingRuleForApplicationJsonVersion1dot0dot1.
+		
+	mappingRuleSet := mappingRuleSetBuilder build.
+
+	encodingRule := mappingRuleSet
+		ruleToEncode: self keyRepresentingTriggers
+		to: self applicationJsonVersion1dot0dot0MediaType.
+
+	self
+		assert: encodingRule mediaType
+			equals: self applicationJsonVersion1dot0dot0MediaType;
+		assert: encodingRule objectType
+			equals: self keyRepresentingTriggers
 ]
 
 { #category : #'accessing - media types' }
@@ -246,4 +326,10 @@ MappingRuleSetTest >> triggerJsonEncoderVersion1dot0dot1 [
 MappingRuleSetTest >> triggerTextDecoder [
 
 	^ #triggerTextDecoder
+]
+
+{ #category : #'accessing - enconders and decoders' }
+MappingRuleSetTest >> triggerTextEncoder [
+
+	^ #triggerTextEncoder
 ]

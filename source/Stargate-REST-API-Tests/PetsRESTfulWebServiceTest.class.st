@@ -8,39 +8,39 @@ Class {
 }
 
 { #category : #'private - support' }
-PetsRESTfulWebServiceTest >> requestToCreatePetFrom: json [
+PetsRESTfulWebServiceTest >> requestToCreatePetFrom: aJson [
 
 	^ (ZnRequest post: 'http://BASE_URL/pets')
-		entity: (ZnEntity with: json type: webService specification petVersion1dot0dot0MediaType);
+		entity: (ZnEntity with: aJson type: webService specification petVersion1dot0dot0MediaType);
 		yourself
 ]
 
 { #category : #'private - support' }
-PetsRESTfulWebServiceTest >> requestToDeletePetIdentifiedBy: id [
+PetsRESTfulWebServiceTest >> requestToDeletePetIdentifiedBy: anIdentifier [
 
-	^ TeaRequest fromZnRequest: (ZnRequest delete: ('http://BASE_URL/pets/<1p>' expandMacrosWith: id)) pathParams: {(#identifier -> id)} asDictionary
+	^ TeaRequest fromZnRequest: (ZnRequest delete: ('http://BASE_URL/pets/<1p>' expandMacrosWith: anIdentifier)) pathParams: {(#identifier -> anIdentifier)} asDictionary
 ]
 
 { #category : #'private - support' }
-PetsRESTfulWebServiceTest >> requestToGetPetIdentifiedBy: id accepting: anAcceptHeader [
+PetsRESTfulWebServiceTest >> requestToGetPetIdentifiedBy: anIdentifier accepting: anAcceptHeader [
 
 	^ TeaRequest
 		fromZnRequest:
-			((ZnRequest get: ('http://BASE_URL/pets/<1p>' expandMacrosWith: id))
+			((ZnRequest get: ('http://BASE_URL/pets/<1p>' expandMacrosWith: anIdentifier))
 				setAccept: anAcceptHeader;
 				yourself)
-		pathParams: {(#identifier -> id)} asDictionary
+		pathParams: {(#identifier -> anIdentifier)} asDictionary
 ]
 
 { #category : #'private - support' }
-PetsRESTfulWebServiceTest >> requestToUpdatePetIdentifiedBy: id statusTo: status [
+PetsRESTfulWebServiceTest >> requestToUpdatePetIdentifiedBy: anIdentifier statusTo: aStatus [
 
 	^ TeaRequest
 		fromZnRequest:
-			((ZnRequest patch: ('http://BASE_URL/pets/<1p>' expandMacrosWith: id))
-				entity: (ZnEntity with: ('{"status":"<1s>"}' expandMacrosWith: status) type: webService specification petVersion1dot0dot0MediaType);
+			((ZnRequest patch: ('http://BASE_URL/pets/<1p>' expandMacrosWith: anIdentifier))
+				entity: (ZnEntity with: ('{"status":"<1s>"}' expandMacrosWith: aStatus) type: webService specification petVersion1dot0dot0MediaType);
 				yourself)
-		pathParams: {(#identifier -> id)} asDictionary
+		pathParams: {(#identifier -> anIdentifier)} asDictionary
 ]
 
 { #category : #running }

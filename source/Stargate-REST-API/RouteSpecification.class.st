@@ -10,31 +10,31 @@ Class {
 }
 
 { #category : #'instance creation' }
-RouteSpecification class >> handling: anHttpMethod at: aResourceLocation evaluating: aBlock [
+RouteSpecification class >> handling: anHttpMethod at: anUrlTemplate evaluating: aBlock [
 
-	^ self new initializeHandling: anHttpMethod at: aResourceLocation evaluating: aBlock
+	^ self new initializeHandling: anHttpMethod at: anUrlTemplate evaluating: aBlock
 ]
 
 { #category : #'instance creation' }
-RouteSpecification class >> handling: anHttpMethod at: aResourceLocation sending: aMessage [
+RouteSpecification class >> handling: anHttpMethod at: aUrlTemplate sending: aMessage [
 
 	^ self
 		handling: anHttpMethod
-		at: aResourceLocation
+		at: aUrlTemplate
 		evaluating:
 			[ :service :httpRequest :context | service perform: aMessage with: httpRequest with: context ]
-]
-
-{ #category : #visiting }
-RouteSpecification >> accept: aRouteConfigurator [
-
-	aRouteConfigurator configureRoute: self  
 ]
 
 { #category : #decorating }
 RouteSpecification >> asCorsAware [
 	
-	^ CorsAwareRouteSpecification for: self
+	^ CrossOriginResourceSharingAwareRouteSpecification decorating: self
+]
+
+{ #category : #configuring }
+RouteSpecification >> configureUsing: aRouteConfigurator [ 
+
+	aRouteConfigurator configureRouteFrom: self  
 ]
 
 { #category : #accessing }

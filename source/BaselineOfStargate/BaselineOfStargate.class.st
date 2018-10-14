@@ -31,5 +31,6 @@ BaselineOfStargate >> setUpDependencies: spec [
 		configuration: 'Teapot'
 		with: [ spec
 				versionString: #stable;
-				repository: 'http://smalltalkhub.com/mc/zeroflag/Teapot/main/' ]
+				repository: 'http://smalltalkhub.com/mc/zeroflag/Teapot/main/';
+				loads: #('Teapot-Core' 'Teapot-Tools') ]
 ]

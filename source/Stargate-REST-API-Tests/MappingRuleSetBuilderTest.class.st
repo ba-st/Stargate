@@ -4,112 +4,212 @@ Class {
 	#category : #'Stargate-REST-API-Tests'
 }
 
-{ #category : #accessing }
-MappingRuleSetBuilderTest >> applicationJsonVersion1dot0dot0 [
+{ #category : #'accessing - media types' }
+MappingRuleSetBuilderTest >> applicationJsonVersion1dot0dot0MediaType [
 
-	^ ZnMimeType fromString: 'application/json;version=1.0.0'
+	^ 'application/json;version=1.0.0' asZnMimeType 
+]
+
+{ #category : #'accessing - media types' }
+MappingRuleSetBuilderTest >> applicationJsonVersion1dot0dot1MediaType [
+
+	^ 'application/json;version=1.0.1' asZnMimeType 
 ]
 
 { #category : #accessing }
-MappingRuleSetBuilderTest >> applicationJsonVersion1dot0dot1 [
+MappingRuleSetBuilderTest >> keyRepresentingTriggers [
 
-	^ ZnMimeType fromString: 'application/json;version=1.0.1'
+	^ #triggers
 ]
 
 { #category : #tests }
-MappingRuleSetBuilderTest >> testAddingDecoderForAlreadyAddedMimeTypeFails [
+MappingRuleSetBuilderTest >> testAddingDecodingRuleWithAlreadyRegisteredMediaTypeGivesConflictingObjectFound [
 
-	| mappingRegistry |
+	| builder |
 
-	mappingRegistry := MappingRuleSetBuilder new.
+	builder := MappingRuleSetBuilder new.
 
-	mappingRegistry
+	builder
 		addRuleToDecode: ZnMimeType textPlain
-		to: #triggers
+		to: self keyRepresentingTriggers
 		using: self triggerJsonDecoderVersion1dot0dot0.
 
 	self
-		should: [ mappingRegistry
+		should: [ builder
 				addRuleToDecode: ZnMimeType textPlain
-				to: #triggers
+				to: self keyRepresentingTriggers
 				using: self triggerJsonDecoderVersion1dot0dot0 ]
 		raise: ConflictingObjectFound
+		withExceptionDo: [ :signal | 
+			self
+				assert: signal messageText
+				equals:
+					'Decoding rule for this media type already registered' ]
 ]
 
 { #category : #tests }
-MappingRuleSetBuilderTest >> testAddingEncoderForAlreadyAddedMimeTypeFails [
+MappingRuleSetBuilderTest >> testAddingEncodingRuleWithAlreadyRegisteredMediaTypeGivesConflictingObjectFound [
 
-	| mappingRegistry |
+	| builder |
 
-	mappingRegistry := MappingRuleSetBuilder new.
+	builder := MappingRuleSetBuilder new.
 
-	mappingRegistry
-		addRuleToEncode: #triggers
+	builder
+		addRuleToEncode: self keyRepresentingTriggers
 		to: ZnMimeType textPlain
 		using: self triggerJsonEncoderVersion1dot0dot0.
 
 	self
-		should: [ mappingRegistry
+		should: [ builder
 				addRuleToEncode: #triggers
 				to: ZnMimeType textPlain
 				using: self triggerJsonEncoderVersion1dot0dot0 ]
 		raise: ConflictingObjectFound
+		withExceptionDo: [ :signal | 
+			self
+				assert: signal messageText
+				equals: 'Encoding rule for this media type already registered' ]
 ]
 
 { #category : #tests }
-MappingRuleSetBuilderTest >> testBuilding [
+MappingRuleSetBuilderTest >> testBuildingGivesInstanceCreationFailedBecauseDefaultDecodingRuleIsMissing [
+
+	| builder |
+
+	builder := MappingRuleSetBuilder new.
+
+	builder
+		addRuleToDecode: self applicationJsonVersion1dot0dot0MediaType
+		to: self keyRepresentingTriggers
+		using: self triggerJsonDecoderVersion1dot0dot0.
+
+	self
+		should: [ builder build ]
+		raise: InstanceCreationFailed
+		withExceptionDo: [ :signal | 
+			self
+				assert: signal messageText
+				equals: 'You must provide exactly one default decoding rule for each object type' ]
+]
+
+{ #category : #tests }
+MappingRuleSetBuilderTest >> testBuildingGivesInstanceCreationFailedBecauseDefaultEncodingRuleIsMissing [
+
+	| builder |
+
+	builder := MappingRuleSetBuilder new.
+
+	builder
+		addRuleToEncode: self keyRepresentingTriggers
+		to: self applicationJsonVersion1dot0dot0MediaType
+		using: self triggerJsonDecoderVersion1dot0dot0.
+
+	self
+		should: [ builder build ]
+		raise: InstanceCreationFailed
+		withExceptionDo: [ :signal | 
+			self
+				assert: signal messageText
+				equals: 'You must provide exactly one default encoding rule for each object type' ]
+]
+
+{ #category : #tests }
+MappingRuleSetBuilderTest >> testBuildingGivesInstanceCreationFailedBecauseMoreThanOneDefaultDEncodingRuleWasConfigured [
+
+	| builder |
+
+	builder := MappingRuleSetBuilder new.
+
+	builder
+		addDefaultRuleToEncode: self keyRepresentingTriggers
+		to: self applicationJsonVersion1dot0dot0MediaType
+		using: self triggerJsonEncoderVersion1dot0dot0.
+
+	builder
+		addDefaultRuleToEncode: self keyRepresentingTriggers
+		to: self applicationJsonVersion1dot0dot1MediaType
+		using: self triggerJsonEncoderVersion1dot0dot1.
+
+	self
+		should: [ builder build ]
+		raise: InstanceCreationFailed
+		withExceptionDo: [ :signal | 
+			self
+				assert: signal messageText
+				equals: 'You must provide exactly one default encoding rule for each object type' ]
+]
+
+{ #category : #tests }
+MappingRuleSetBuilderTest >> testBuildingGivesInstanceCreationFailedBecauseMoreThanOneDefaultDecodingRuleWasConfigured [
+
+	| builder |
+
+	builder := MappingRuleSetBuilder new.
+
+	builder
+		addDefaultRuleToDecode: self applicationJsonVersion1dot0dot0MediaType
+		to: self keyRepresentingTriggers
+		using: self triggerJsonDecoderVersion1dot0dot0.
+
+	builder
+		addDefaultRuleToDecode: self applicationJsonVersion1dot0dot1MediaType
+		to: self keyRepresentingTriggers
+		using: self triggerJsonDecoderVersion1dot0dot1.
+
+	self
+		should: [ builder build ]
+		raise: InstanceCreationFailed
+		withExceptionDo: [ :signal | 
+			self
+				assert: signal messageText
+				equals: 'You must provide exactly one default decoding rule for each object type' ]
+]
+
+{ #category : #tests }
+MappingRuleSetBuilderTest >> testBuildingSuccessfully [
 
 	| mappingRuleSetBuilder |
 
 	mappingRuleSetBuilder := MappingRuleSetBuilder new.
 
 	mappingRuleSetBuilder
-		addDefaultRuleToDecode: self applicationJsonVersion1dot0dot1
-		to: #trigger
+		addDefaultRuleToDecode: self applicationJsonVersion1dot0dot1MediaType
+		to: self keyRepresentingTriggers
 		using: self triggerJsonDecoderVersion1dot0dot1.
 
 	mappingRuleSetBuilder
-		addRuleToDecode: self applicationJsonVersion1dot0dot0
-		to: #trigger
+		addRuleToDecode: self applicationJsonVersion1dot0dot0MediaType
+		to: self keyRepresentingTriggers
 		using: self triggerJsonDecoderVersion1dot0dot0.
 
 	mappingRuleSetBuilder
-		addDefaultRuleToEncode: #trigger
-		to: self applicationJsonVersion1dot0dot0
+		addDefaultRuleToEncode: self keyRepresentingTriggers
+		to: self applicationJsonVersion1dot0dot0MediaType
 		using: self triggerJsonDecoderVersion1dot0dot0.
 
 	self shouldnt: [ mappingRuleSetBuilder build ] raise: Error
 ]
 
-{ #category : #tests }
-MappingRuleSetBuilderTest >> testBuildingFailsBecauseMustProvideDefault [
-
-	| mappingRuleSetBuilder |
-
-	mappingRuleSetBuilder := MappingRuleSetBuilder new.
-
-	mappingRuleSetBuilder
-		addRuleToDecode: self applicationJsonVersion1dot0dot0
-		to: #triggers
-		using: self triggerJsonDecoderVersion1dot0dot0.
-
-	self should: [ mappingRuleSetBuilder build ] raise: AssertionFailed
-]
-
-{ #category : #accessing }
+{ #category : #'accessing - enconders and decoders' }
 MappingRuleSetBuilderTest >> triggerJsonDecoderVersion1dot0dot0 [
 
 	^ #triggerJsonDecoderVersion1dot0dot0
 ]
 
-{ #category : #accessing }
+{ #category : #'accessing - enconders and decoders' }
 MappingRuleSetBuilderTest >> triggerJsonDecoderVersion1dot0dot1 [
 
 	^ #triggerJsonDecoderVersion1dot0dot1
 ]
 
-{ #category : #accessing }
+{ #category : #'accessing - enconders and decoders' }
 MappingRuleSetBuilderTest >> triggerJsonEncoderVersion1dot0dot0 [
 
 	^ #triggerJsonEncoderVersion1dot0dot0
+]
+
+{ #category : #'accessing - enconders and decoders' }
+MappingRuleSetBuilderTest >> triggerJsonEncoderVersion1dot0dot1 [
+
+	^ #triggerJsonEncoderVersion1dot0dot1
 ]

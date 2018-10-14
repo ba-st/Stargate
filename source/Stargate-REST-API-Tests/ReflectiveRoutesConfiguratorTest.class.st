@@ -4,17 +4,32 @@ Class {
 	#category : #'Stargate-REST-API-Tests'
 }
 
+{ #category : #accessing }
+ReflectiveRoutesConfiguratorTest >> createTestRoute [
+
+	^ (RouteSpecification handling: #POST at: '/tests' sending: #createTestBasedOn:) asCorsAware
+]
+
+{ #category : #accessing }
+ReflectiveRoutesConfiguratorTest >> getTestsRoute [
+
+	^ RouteSpecification handling: #GET at: '/tests' sending: #getTestsBasedOn:
+]
+
+{ #category : #accessing }
+ReflectiveRoutesConfiguratorTest >> specification [
+	
+	^ self
+]
+
 { #category : #tests }
 ReflectiveRoutesConfiguratorTest >> testAddingRoutes [
 
-	| teapot webService |
+	| teapot |
 
 	teapot := Teapot on.
 
-	webService := PetsRESTfulWebService new.
+	(ReflectiveRoutesConfigurator appliedTo: teapot) addRoutesOf: self.
 
-	(ReflectiveRoutesConfigurator appliedTo: teapot) 
-		addRoutesOf: webService.
-
-	self assert: teapot routes size equals: 5
+	self assert: teapot routes size equals: 3
 ]

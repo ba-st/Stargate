@@ -1,3 +1,8 @@
+"
+I'm a web service route configurator.
+
+I'm being used to configure a route on a Teapot server. I also know how to configure a route supporting cross-origin resource sharing.
+"
 Class {
 	#name : #RouteConfigurator,
 	#superclass : #Object,
@@ -16,18 +21,18 @@ RouteConfigurator class >> appliedTo: aTeapot sendingMessagesTo: aWebService [
 ]
 
 { #category : #'private - configuring' }
-RouteConfigurator >> configureAsCorsAwareRoute: aCorsAwareRouteSpecification [
+RouteConfigurator >> configureCorsAwareRouteFrom: aCorsAwareRouteSpecification [
 
 	| specification |
 
 	specification := aCorsAwareRouteSpecification specification.
-	 
+
 	routesAllowingCors
 		at: specification urlTemplate
 		ifPresent: [ :httpMethods | httpMethods add: specification httpMethod ]
 		ifAbsentPut: (OrderedCollection with: specification httpMethod).
 
-	specification accept: self
+	specification configureUsing: self
 ]
 
 { #category : #configuring }
@@ -42,7 +47,7 @@ RouteConfigurator >> configureCrossOriginSharingRoutes [
 ]
 
 { #category : #'private - configuring' }
-RouteConfigurator >> configureRoute: aRouteSpecification [
+RouteConfigurator >> configureRouteFrom: aRouteSpecification [
 
 	teapot
 		perform: ('<1s>:' expandMacrosWith: aRouteSpecification httpMethod) asSymbol

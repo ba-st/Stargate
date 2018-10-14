@@ -2,6 +2,7 @@
 I represent a RESTful Web Service, and provide the base support to easily create specific services.
 
 I provide a way to encode/decode the resources into the representations produced/consumed by the service.
+
 I also provide standard error handling and templates for processing the differente HTTP verbs.
 "
 Class {
@@ -17,9 +18,13 @@ Class {
 { #category : #'private - transformations' }
 RESTfulWebService >> decode: theRepresentation at: aKey from: sourceMediaType within: aContext [
 
-	^ [ [ (mappingRuleSet ruleToDecode: sourceMediaType to: aKey) applyOn: theRepresentation within: aContext ]
+	^ [ [ (mappingRuleSet ruleToDecode: sourceMediaType to: aKey)
+		applyOn: theRepresentation
+		within: aContext ]
 		on: KeyNotFound , DecodingFailed
-		do: [ :signal | HTTPClientError signalBadRequest: ('Expected key <1s> was not found' expandMacrosWith: signal key) ] ]
+		do: [ :signal | 
+			HTTPClientError
+				signalBadRequest: ('Expected key <1s> was not found' expandMacrosWith: signal key) ] ]
 		on: MappingNotFound
 		do: [ :signal | HTTPClientError signalUnsupportedMediaType: signal messageText ]
 ]
@@ -27,7 +32,9 @@ RESTfulWebService >> decode: theRepresentation at: aKey from: sourceMediaType wi
 { #category : #'private - transformations' }
 RESTfulWebService >> encode: theResource at: aKey to: targetMediaType within: aContext [
 
-	^ [ (mappingRuleSet ruleToEncode: aKey to: targetMediaType) applyOn: theResource within: aContext ]
+	^ [ (mappingRuleSet ruleToEncode: aKey to: targetMediaType)
+		applyOn: theResource
+		within: aContext ]
 		on: MappingNotFound
 		do: [ :signal | HTTPClientError signalUnsupportedMediaType: signal messageText ]
 ]
@@ -43,21 +50,21 @@ RESTfulWebService >> evaluateQuery: aQueryEvaluationBlock [
 ]
 
 { #category : #'private - API' }
-RESTfulWebService >> get: aQueryEvaluationBlock encodedUsing: aKey basedOn: httpRequest within: context [
+RESTfulWebService >> get: aQueryEvaluationBlock encodedUsing: aKey basedOn: anHttpRequest within: aContext [
 
 	| mediaType result |
 
-	mediaType := self targetMediaTypeFrom: httpRequest.
+	mediaType := self targetMediaTypeFrom: anHttpRequest.
 
 	^ [ | encodedResult |
 
 	result := self evaluateQuery: aQueryEvaluationBlock.
-	context hold: {('self' -> (self locationOf: result))} under: #mediaControls.
+	aContext hold: {('self' -> (self locationOf: result))} under: #mediaControls.
 	encodedResult := self
 		encode: result
 		at: aKey
 		to: mediaType
-		within: context.
+		within: aContext.
 	ZnResponse ok: encodedResult ]
 		on: ConflictingObjectFound
 		do: [ :error | HTTPClientError signalConflict: error messageText ]

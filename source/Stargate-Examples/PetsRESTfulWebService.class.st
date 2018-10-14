@@ -10,7 +10,7 @@ Class {
 }
 
 { #category : #API }
-PetsRESTfulWebService >> createPetBasedOn: anHttpRequest within: aHttpRequestContext [
+PetsRESTfulWebService >> createPetBasedOn: anHttpRequest within: aContext [
 
 	^ self
 		withCreatedResourceDo: [ :pet | 
@@ -20,11 +20,11 @@ PetsRESTfulWebService >> createPetBasedOn: anHttpRequest within: aHttpRequestCon
 			nextId := nextId + 1 ]
 		decodedUsing: self specification petMappingKey
 		basedOn: anHttpRequest
-		within: aHttpRequestContext
+		within: aContext
 ]
 
 { #category : #API }
-PetsRESTfulWebService >> deletePetBasedOn: anHttpRequest within: aHttpRequestContext [
+PetsRESTfulWebService >> deletePetBasedOn: anHttpRequest within: aContext [
 
 	[ pets remove: (self petIdentifiedUsing: anHttpRequest) ]
 		on: ObjectNotFound
@@ -34,13 +34,13 @@ PetsRESTfulWebService >> deletePetBasedOn: anHttpRequest within: aHttpRequestCon
 ]
 
 { #category : #API }
-PetsRESTfulWebService >> getPetBasedOn: aHttpRequest within: aHttpRequestContext [
+PetsRESTfulWebService >> getPetBasedOn: anHttpRequest within: aContext [
 
 	^ self
-		get: [ self petIdentifiedUsing: aHttpRequest ]
+		get: [ self petIdentifiedUsing: anHttpRequest ]
 		encodedUsing: self specification petMappingKey
-		basedOn: aHttpRequest
-		within: aHttpRequestContext
+		basedOn: anHttpRequest
+		within: aContext
 ]
 
 { #category : #initialization }
@@ -64,9 +64,9 @@ PetsRESTfulWebService >> locationOf: aPet [
 ]
 
 { #category : #'private - accessing' }
-PetsRESTfulWebService >> petIdentifiedUsing: aHttpRequest [
+PetsRESTfulWebService >> petIdentifiedUsing: anHttpRequest [
 
-	^ petById at: (aHttpRequest at: #identifier) ifAbsent: [ ObjectNotFound signal ]
+	^ petById at: (anHttpRequest at: #identifier) ifAbsent: [ ObjectNotFound signal ]
 ]
 
 { #category : #querying }
