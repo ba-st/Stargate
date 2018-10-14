@@ -13,7 +13,7 @@ ReflectiveRoutesConfiguratorTest >> createTestRoute [
 { #category : #accessing }
 ReflectiveRoutesConfiguratorTest >> getTestsRoute [
 
-	^ RouteSpecification handling: #GET at: '/tests' sending: #getTestsBasedOn:
+	^ (RouteSpecification handling: #GET at: '/tests' sending: #getTestsBasedOn:) asCorsAware
 ]
 
 { #category : #accessing }
@@ -23,7 +23,7 @@ ReflectiveRoutesConfiguratorTest >> specification [
 ]
 
 { #category : #tests }
-ReflectiveRoutesConfiguratorTest >> testAddingRoutes [
+ReflectiveRoutesConfiguratorTest >> testConfiguringCrossOriginResourceSharingAwareRoutes [
 
 	| teapot |
 
@@ -32,4 +32,19 @@ ReflectiveRoutesConfiguratorTest >> testAddingRoutes [
 	(ReflectiveRoutesConfigurator appliedTo: teapot) addRoutesOf: self.
 
 	self assert: teapot routes size equals: 3
+]
+
+{ #category : #tests }
+ReflectiveRoutesConfiguratorTest >> testConfiguringPetsWebServiceRoutes [
+
+	| teapot webService |
+
+	teapot := Teapot on.
+
+	webService := PetsRESTfulWebService new.
+
+	(ReflectiveRoutesConfigurator appliedTo: teapot) 
+		addRoutesOf: webService.
+
+	self assert: teapot routes size equals: 5
 ]
