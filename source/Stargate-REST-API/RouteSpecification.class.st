@@ -3,28 +3,44 @@ Class {
 	#superclass : #Object,
 	#instVars : [
 		'httpMethod',
-		'resourceLocation',
-		'message'
+		'handler',
+		'urlTemplate'
 	],
 	#category : #'Stargate-REST-API'
 }
 
 { #category : #'instance creation' }
-RouteSpecification class >> handling: anHttpMethod at: aResourceLocation sending: aMessage [
+RouteSpecification class >> handling: anHttpMethod at: anUrlTemplate evaluating: aBlock [
 
-	^ self new initializeHandling: anHttpMethod at: aResourceLocation sending: aMessage
+	^ self new initializeHandling: anHttpMethod at: anUrlTemplate evaluating: aBlock
 ]
 
-{ #category : #visiting }
-RouteSpecification >> accept: aRouteConfigurator [
+{ #category : #'instance creation' }
+RouteSpecification class >> handling: anHttpMethod at: aUrlTemplate sending: aMessage [
 
-	aRouteConfigurator configureRoute: self  
+	^ self
+		handling: anHttpMethod
+		at: aUrlTemplate
+		evaluating:
+			[ :service :httpRequest :context | service perform: aMessage with: httpRequest with: context ]
 ]
 
 { #category : #decorating }
 RouteSpecification >> asCorsAware [
 	
-	^ CorsAwareRouteSpecification for: self
+	^ CrossOriginResourceSharingAwareRouteSpecification decorating: self
+]
+
+{ #category : #configuring }
+RouteSpecification >> configureUsing: aRouteConfigurator [ 
+
+	aRouteConfigurator configureRouteFrom: self  
+]
+
+{ #category : #accessing }
+RouteSpecification >> handler [
+
+	^ handler
 ]
 
 { #category : #accessing }
@@ -34,21 +50,15 @@ RouteSpecification >> httpMethod [
 ]
 
 { #category : #initialization }
-RouteSpecification >> initializeHandling: anHttpMethod at: aResourceLocation sending: aMessage [
+RouteSpecification >> initializeHandling: anHttpMethod at: anURLTemplate evaluating: aBlock [
 
 	httpMethod := anHttpMethod.
-	resourceLocation := aResourceLocation.
-	message := aMessage
+	urlTemplate := anURLTemplate.
+	handler := aBlock
 ]
 
 { #category : #accessing }
-RouteSpecification >> message [
+RouteSpecification >> urlTemplate [
 
-	^ message
-]
-
-{ #category : #accessing }
-RouteSpecification >> resourceLocation [
-
-	^ resourceLocation
+	^ urlTemplate
 ]

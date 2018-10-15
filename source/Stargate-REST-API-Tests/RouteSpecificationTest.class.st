@@ -16,6 +16,5 @@ RouteSpecificationTest >> testInstanceCreationAndAccessing [
 
 	self
 		assert: route httpMethod equals: #GET;
-		assert: route resourceLocation equals: '/pets';
-		assert: route message equals: #getPetsBasedOn:within:
+		assert: route urlTemplate equals: '/pets'
 ]

@@ -4,7 +4,7 @@ Class {
 	#instVars : [
 		'httpMethods'
 	],
-	#category : #'Stargate-REST-API'
+	#category : #'Stargate-REST-API-CORS'
 }
 
 { #category : #'instance creation' }

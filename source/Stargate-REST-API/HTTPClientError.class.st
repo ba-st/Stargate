@@ -1,3 +1,6 @@
+"
+I'm an exception expecting to be raised when someone makes an incorrect HTTP request.
+"
 Class {
 	#name : #HTTPClientError,
 	#superclass : #Error,

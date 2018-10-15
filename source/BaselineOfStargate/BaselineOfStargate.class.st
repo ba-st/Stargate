@@ -12,7 +12,8 @@ BaselineOfStargate >> baseline: spec [
 		for: #common
 		do: [ self setUpDependencies: spec.
 			spec package: 'Stargate-REST-API' with: [ spec requires: #('Buoy' 'Teapot') ].
-			spec package: 'Stargate-REST-API-Tests' with: [ spec requires: #('Stargate-REST-API') ].
+			spec package: 'Stargate-Examples' with: [ spec requires: 'Stargate-REST-API' ].
+			spec package: 'Stargate-REST-API-Tests' with: [ spec requires: #('Stargate-REST-API' 'Stargate-Examples') ].
 			spec
 				group: 'Deployment' with: #('Stargate-REST-API');
 				group: 'Development' with: #('Deployment' 'Stargate-REST-API-Tests');
@@ -30,5 +31,6 @@ BaselineOfStargate >> setUpDependencies: spec [
 		configuration: 'Teapot'
 		with: [ spec
 				versionString: #stable;
-				repository: 'http://smalltalkhub.com/mc/zeroflag/Teapot/main/' ]
+				repository: 'http://smalltalkhub.com/mc/zeroflag/Teapot/main/';
+				loads: #('Teapot-Core' 'Teapot-Tools') ]
 ]

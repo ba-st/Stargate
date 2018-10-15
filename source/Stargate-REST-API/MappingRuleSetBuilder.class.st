@@ -63,19 +63,18 @@ MappingRuleSetBuilder >> addRuleToEncode: aKeyRepreseningObjectType to: aMediaTy
 ]
 
 { #category : #'private - preconditions' }
-MappingRuleSetBuilder >> assertThereIsOnlyOneDefaultRuleForEachObjectType [
+MappingRuleSetBuilder >> assertDefaultRuleAreConfigured [
 
 	AssertionCheckerBuilder new
 		checking: [ :asserter | 
 			asserter
-				enforce: [ (decodingRules groupedBy: #objectType) values
-						allSatisfy:
-							[ :groupedDecodingRules | (groupedDecodingRules count: [ :decodingRule | decodingRule isDefault ]) = 1 ] ]
-					because: 'You must provide a default decoder for each scope';
-				enforce: [ (encodingRules groupedBy: #objectType) values
-						allSatisfy:
-							[ :groupedEncodingRules | (groupedEncodingRules count: [ :encodingRule | encodingRule isDefault ]) = 1 ] ]
-					because: 'You must provide a default decoder for each scope' ];
+				enforce: [ self
+						thereIsOnlyOneDefaultRuleForEachObjectTypeOn: decodingRules ]
+					because: 'You must provide exactly one default decoding rule for each object type';
+				enforce: [ self
+						thereIsOnlyOneDefaultRuleForEachObjectTypeOn: encodingRules ]
+					because: 'You must provide exactly one default encoding rule for each object type' ];
+		raising: InstanceCreationFailed;
 		buildAndCheck
 ]
 
@@ -87,9 +86,8 @@ MappingRuleSetBuilder >> assertThereIsntConfiguredRuleToDecode: aMediaType to: a
 		checking: [ :asserter | 
 			asserter
 				enforce: [ decodingRules
-						noneSatisfy:
-							[ :rule | rule mediaType = aMediaType and: [ rule objectType = anObjectType ] ] ]
-				because: 'Decoder for that MIME type already registered' ];
+						noneSatisfy: [ :rule | rule mediaType = aMediaType and: [ rule objectType = anObjectType ] ] ]
+				because: 'Decoding rule for this media type already registered' ];
 		buildAndCheck
 ]
 
@@ -102,14 +100,14 @@ MappingRuleSetBuilder >> assertThereIsntConfiguredRuleToEncode: anObjectType to:
 			asserter
 				enforce: [ encodingRules
 						noneSatisfy: [ :rule | rule mediaType = aMediaType and: [ rule objectType = anObjectType ] ] ]
-				because: 'Encoder for that MIME type already registered' ];
+				because: 'Encoding rule for this media type already registered' ];
 		buildAndCheck
 ]
 
 { #category : #building }
 MappingRuleSetBuilder >> build [
 
-	self assertThereIsOnlyOneDefaultRuleForEachObjectType.
+	self assertDefaultRuleAreConfigured.
 
 	^ MappingRuleSet consistingOf: encodingRules and: decodingRules
 ]
@@ -128,7 +126,7 @@ MappingRuleSetBuilder >> ruleToDecode: aMediaType to: aKeyRepresentingObjectType
 		assertThereIsntConfiguredRuleToDecode: aMediaType
 		to: aKeyRepresentingObjectType.
 
-	^ MappingRule
+	^ DecodingMappingRule 
 		decoding: aMediaType
 		to: aKeyRepresentingObjectType
 		using: aReader
@@ -141,8 +139,17 @@ MappingRuleSetBuilder >> ruleToEncode: aMediaType to: aKeyRepresentingObjectType
 		assertThereIsntConfiguredRuleToEncode: aKeyRepresentingObjectType
 		to: aMediaType.
 		
-	^ MappingRule
+	^ EncodingMappingRule 
 		encoding: aKeyRepresentingObjectType
 		to: aMediaType
 		using: aWriter
+]
+
+{ #category : #'private - preconditions' }
+MappingRuleSetBuilder >> thereIsOnlyOneDefaultRuleForEachObjectTypeOn: aMappingRuleCollection [
+
+	^ (aMappingRuleCollection groupedBy: #objectType) values
+		allSatisfy: [ :groupedMappingRules | 
+			(groupedMappingRules
+				count: [ :mappingRule | mappingRule isDefault ]) = 1 ]
 ]

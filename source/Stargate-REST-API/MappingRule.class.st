@@ -19,22 +19,10 @@ MappingRule class >> between: anObjectType and: aMediaType using: aMapper [
 		using: aMapper
 ]
 
-{ #category : #'instance creation' }
-MappingRule class >> decoding: aMediaType to: anObjectType using: aReader [
-
-	^ self between: anObjectType and: aMediaType using: aReader
-]
-
-{ #category : #'instance creation' }
-MappingRule class >> encoding: anObjectType to: aMediaType using: aWriter [
-
-	^ self between: anObjectType and: aMediaType using: aWriter
-]
-
 { #category : #applying }
 MappingRule >> applyOn: anObjectToEncode within: aContext [
 
-	^ mapper cull: anObjectToEncode cull: aContext
+	^ self subclassResponsibility 
 ]
 
 { #category : #configuring }

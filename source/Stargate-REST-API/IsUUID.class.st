@@ -7,11 +7,13 @@ Class {
 { #category : #'type constraint' }
 IsUUID class >> matchesTo: aString [
 
-	^ aString isString and: [ '[\da-z]+' asRegex matches: aString ]
+	^ aString isString
+		and: [ '[0-9a-f]{8}\-[0-9a-f]{4}\-[0-9a-f]{4}\-[0-9a-f]{4}\-[0-9a-f]{12}' asRegex
+				matches: aString ]
 ]
 
 { #category : #'type constraint' }
 IsUUID class >> parseString: aString [
 
-	^ UUID fromString36: aString
+	^ UUID fromString: aString
 ]
