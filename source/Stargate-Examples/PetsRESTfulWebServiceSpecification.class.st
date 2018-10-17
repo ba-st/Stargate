@@ -30,7 +30,15 @@ PetsRESTfulWebServiceSpecification >> addJsonEncoderVersion1dot0dot0MappingIn: a
 				streamContents: [ :stream | 
 					(HypermediaAwareJSONWriter on: stream)
 						mediaControls: (context objectUnder: #mediaControls ifNone: [ #() ]) asDictionary;
-						nextPut: {('name' -> pet name)} asDictionary ] ]
+						nextPut: {('name' -> pet name)} asDictionary ] ];
+		addDefaultRuleToEncode: self petsMappingKey
+			to: self petSummaryVersion1dot0dot0MediaType
+			using: [ :pets :context | 
+			String
+				streamContents: [ :stream | 
+					(HypermediaAwareJSONWriter on: stream)
+						mediaControls: (context objectUnder: #mediaControls ifNone: [ #() ]) asDictionary;
+						nextPut: {('items' -> pets)} asDictionary ] ]
 ]
 
 { #category : #routes }
@@ -78,7 +86,7 @@ PetsRESTfulWebServiceSpecification >> identifierKey [
 { #category : #accessing }
 PetsRESTfulWebServiceSpecification >> petMappingKey [
 
-	^ #pets
+	^ #pet
 ]
 
 { #category : #'accessing - media types' }
@@ -91,6 +99,12 @@ PetsRESTfulWebServiceSpecification >> petSummaryVersion1dot0dot0MediaType [
 PetsRESTfulWebServiceSpecification >> petVersion1dot0dot0MediaType [
 
 	^ 'application/vnd.stargate.pet+json;version=1.0.0' asZnMimeType 
+]
+
+{ #category : #accessing }
+PetsRESTfulWebServiceSpecification >> petsMappingKey [
+
+	^ #pets
 ]
 
 { #category : #routes }

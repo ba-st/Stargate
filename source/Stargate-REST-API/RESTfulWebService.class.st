@@ -50,6 +50,27 @@ RESTfulWebService >> evaluateQuery: aQueryEvaluationBlock [
 ]
 
 { #category : #'private - API' }
+RESTfulWebService >> get: aQueryEvaluationBlock asCollectionEncodedUsing: aKey basedOn: anHttpRequest within: aContext [
+
+	| mediaType result |
+
+	mediaType := self targetMediaTypeFrom: anHttpRequest.
+
+	^ [ | encodedResult |
+
+	result := self evaluateQuery: aQueryEvaluationBlock.
+	aContext hold: {('self' -> anHttpRequest absoluteUrl printString)} under: #mediaControls.
+	encodedResult := self
+		encode: result
+		at: aKey
+		to: mediaType
+		within: aContext.
+	ZnResponse ok: encodedResult ]
+		on: ConflictingObjectFound
+		do: [ :error | HTTPClientError signalConflict: error messageText ]
+]
+
+{ #category : #'private - API' }
 RESTfulWebService >> get: aQueryEvaluationBlock encodedUsing: aKey basedOn: anHttpRequest within: aContext [
 
 	| mediaType result |

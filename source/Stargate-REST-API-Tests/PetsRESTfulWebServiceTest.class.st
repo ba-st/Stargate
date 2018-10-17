@@ -8,9 +8,21 @@ Class {
 }
 
 { #category : #'private - support' }
+PetsRESTfulWebServiceTest >> baseUrl [
+
+	^ 'https://pets.example.com' asZnUrl 
+]
+
+{ #category : #'private - support' }
+PetsRESTfulWebServiceTest >> petsUrl [
+
+	^ self baseUrl / '/pets/' asZnUrl
+]
+
+{ #category : #'private - support' }
 PetsRESTfulWebServiceTest >> requestToCreatePetFrom: aJson [
 
-	^ (ZnRequest post: 'http://BASE_URL/pets')
+	^ (ZnRequest post: self petsUrl)
 		entity: (ZnEntity with: aJson type: webService specification petVersion1dot0dot0MediaType);
 		yourself
 ]
@@ -18,7 +30,7 @@ PetsRESTfulWebServiceTest >> requestToCreatePetFrom: aJson [
 { #category : #'private - support' }
 PetsRESTfulWebServiceTest >> requestToDeletePetIdentifiedBy: anIdentifier [
 
-	^ TeaRequest fromZnRequest: (ZnRequest delete: ('http://BASE_URL/pets/<1p>' expandMacrosWith: anIdentifier)) pathParams: {(#identifier -> anIdentifier)} asDictionary
+	^ TeaRequest fromZnRequest: (ZnRequest delete: (self urlForPetIdentifiedBy: anIdentifier)) pathParams: {(#identifier -> anIdentifier)} asDictionary
 ]
 
 { #category : #'private - support' }
@@ -26,10 +38,18 @@ PetsRESTfulWebServiceTest >> requestToGetPetIdentifiedBy: anIdentifier accepting
 
 	^ TeaRequest
 		fromZnRequest:
-			((ZnRequest get: ('http://BASE_URL/pets/<1p>' expandMacrosWith: anIdentifier))
+			((ZnRequest get: (self urlForPetIdentifiedBy: anIdentifier))
 				setAccept: anAcceptHeader;
 				yourself)
 		pathParams: {(#identifier -> anIdentifier)} asDictionary
+]
+
+{ #category : #'private - support' }
+PetsRESTfulWebServiceTest >> requestToGetPetsAccepting: anAcceptHeader [
+
+	^ (ZnRequest get: self petsUrl)
+		setAccept: anAcceptHeader;
+		yourself
 ]
 
 { #category : #'private - support' }
@@ -37,7 +57,7 @@ PetsRESTfulWebServiceTest >> requestToUpdatePetIdentifiedBy: anIdentifier status
 
 	^ TeaRequest
 		fromZnRequest:
-			((ZnRequest patch: ('http://BASE_URL/pets/<1p>' expandMacrosWith: anIdentifier))
+			((ZnRequest patch: (self urlForPetIdentifiedBy: anIdentifier))
 				entity: (ZnEntity with: ('{"status":"<1s>"}' expandMacrosWith: aStatus) type: webService specification petVersion1dot0dot0MediaType);
 				yourself)
 		pathParams: {(#identifier -> anIdentifier)} asDictionary
@@ -47,7 +67,7 @@ PetsRESTfulWebServiceTest >> requestToUpdatePetIdentifiedBy: anIdentifier status
 PetsRESTfulWebServiceTest >> setUp [
 
 	webService := PetsRESTfulWebService new.
-	webService serverUrl: 'https://pets.example.com' asZnUrl
+	webService serverUrl: self baseUrl asZnUrl
 ]
 
 { #category : #tests }
@@ -144,6 +164,28 @@ PetsRESTfulWebServiceTest >> testGetPetSummaryJustCreated [
 ]
 
 { #category : #tests }
+PetsRESTfulWebServiceTest >> testGetPets [
+
+	| response |
+
+	self assert: webService pets isEmpty.
+
+	response := webService getPetsBasedOn: (self requestToGetPetsAccepting: '*/*') within: HttpRequestContext new.
+
+	self
+		assert: response isSuccess;
+		assert: response status equals: 200;
+		assert: response contentType asZnMimeType equals: webService specification petSummaryVersion1dot0dot0MediaType.
+
+	self
+		withJsonFromContentsIn: response
+		do: [ :json | 
+			self
+				assert: json items isEmpty;
+				assert: json links self equals: 'https://pets.example.com/pets/' ]
+]
+
+{ #category : #tests }
 PetsRESTfulWebServiceTest >> testPetCreation [
 
 	| response |
@@ -192,6 +234,12 @@ PetsRESTfulWebServiceTest >> testUpdatePetStatus [
 				assert: json type equals: 'dog';
 				assert: json status equals: 'gone';
 				assert: json links self equals: 'https://pets.example.com/pets/1' ]
+]
+
+{ #category : #'private - support' }
+PetsRESTfulWebServiceTest >> urlForPetIdentifiedBy: anIdentifier [
+
+	^ self petsUrl / anIdentifier printString asZnUrl
 ]
 
 { #category : #'private - support' }

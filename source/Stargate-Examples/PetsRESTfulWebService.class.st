@@ -43,6 +43,16 @@ PetsRESTfulWebService >> getPetBasedOn: anHttpRequest within: aContext [
 		within: aContext
 ]
 
+{ #category : #API }
+PetsRESTfulWebService >> getPetsBasedOn: anHttpRequest within: aContext [
+
+	^ self
+		get: [ self pets ]
+		asCollectionEncodedUsing: self specification petsMappingKey
+		basedOn: anHttpRequest
+		within: aContext
+]
+
 { #category : #initialization }
 PetsRESTfulWebService >> initialize [
 
@@ -89,7 +99,7 @@ PetsRESTfulWebService >> updatePetStatusBasedOn: anHttpRequest within: aContext 
 
 			resource := self
 				decode: anHttpRequest contents
-				at: #pets
+				at: self specification petMappingKey
 				from: anHttpRequest contentType
 				within: aContext.
 			pet := self petIdentifiedUsing: anHttpRequest.
