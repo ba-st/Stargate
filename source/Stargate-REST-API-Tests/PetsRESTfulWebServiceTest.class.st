@@ -186,6 +186,39 @@ PetsRESTfulWebServiceTest >> testGetPets [
 ]
 
 { #category : #tests }
+PetsRESTfulWebServiceTest >> testGetPetsNotEmpty [
+
+	| response |
+
+	self assert: webService pets isEmpty.
+
+	webService createPetBasedOn: (self requestToCreatePetFrom: '{"name":"Firulais","type":"dog"}') within: HttpRequestContext new.
+
+	self assert: webService pets notEmpty.
+
+	response := webService getPetsBasedOn: (self requestToGetPetsAccepting: '*/*') within: HttpRequestContext new.
+
+	self
+		assert: response isSuccess;
+		assert: response status equals: 200;
+		assert: response contentType asZnMimeType equals: webService specification petSummaryVersion1dot0dot0MediaType.
+
+	self
+		withJsonFromContentsIn: response
+		do: [ :json | 
+			| dogSummary |
+
+			self
+				assert: json links self equals: 'https://pets.example.com/pets/';
+				assert: json items size equals: 1.
+			dogSummary := json items first.
+			self
+				assert: dogSummary name equals: 'Firulais';
+				assert: dogSummary links self equals: 'https://pets.example.com/pets/1';
+				assert: dogSummary type isNil ]
+]
+
+{ #category : #tests }
 PetsRESTfulWebServiceTest >> testPetCreation [
 
 	| response |
