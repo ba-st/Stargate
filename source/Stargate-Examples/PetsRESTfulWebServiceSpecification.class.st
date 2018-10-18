@@ -25,7 +25,7 @@ PetsRESTfulWebServiceSpecification >> addJsonEncoderVersion1dot0dot0MappingIn: a
 							do: [ :mapping | 
 							mapping
 								mapInstVars;
-								mapProperty: #links getter: [ :thePet | (self mediaControlsIn: context) asDictionary ] setter: [ :object :value |  ] ];
+								mapHypermediaControlsIn: context ];
 						nextPut: pet ] ];
 		addRuleToEncode: self petMappingKey
 			to: self petSummaryVersion1dot0dot0MediaType
@@ -37,25 +37,22 @@ PetsRESTfulWebServiceSpecification >> addJsonEncoderVersion1dot0dot0MappingIn: a
 							do: [ :mapping | 
 							mapping
 								mapInstVar: #name;
-								mapProperty: #links getter: [ :thePet | (self mediaControlsIn: context) asDictionary ] setter: [ :object :value |  ] ];
+								mapHypermediaControlsIn: context ];
 						nextPut: pet ] ];
 		addDefaultRuleToEncode: self petsMappingKey
 			to: self petSummaryVersion1dot0dot0MediaType
 			using: [ :pets :context | 
 			String
 				streamContents: [ :stream | 
-					| individualMediaControls |
-
-					individualMediaControls := context objectUnder: #individualMediaControls ifNone: [ #() ].
 					(NeoJSONWriter on: stream)
 						for: Pet
 							do: [ :mapping | 
 							mapping
 								mapInstVar: #name;
-								mapProperty: #links getter: [ :pet | (individualMediaControls at: pet) asDictionary ] setter: [ :object :value |  ] ];
+								mapAsHypermediaControls: [ :pet | context hypermediaControlsFor: pet ] ];
 						nextPut:
 							{('items' -> pets).
-							('links' -> (self mediaControlsIn: context) asDictionary)} asDictionary ] ]
+							('links' -> context hypermediaControls asDictionary)} asDictionary ] ]
 ]
 
 { #category : #routes }
@@ -98,12 +95,6 @@ PetsRESTfulWebServiceSpecification >> idTemplate [
 PetsRESTfulWebServiceSpecification >> identifierKey [
 
 	^ #identifier
-]
-
-{ #category : #'mapping rules' }
-PetsRESTfulWebServiceSpecification >> mediaControlsIn: context [
-
-	^ context objectUnder: #mediaControls ifNone: [ #() ]
 ]
 
 { #category : #accessing }
