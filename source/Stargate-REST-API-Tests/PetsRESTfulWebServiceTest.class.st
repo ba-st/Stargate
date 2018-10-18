@@ -53,6 +53,17 @@ PetsRESTfulWebServiceTest >> requestToGetPetsAccepting: anAcceptHeader [
 ]
 
 { #category : #'private - support' }
+PetsRESTfulWebServiceTest >> requestToUpdatePetIdentifiedBy: anIdentifier nameTo: aName [
+
+	^ TeaRequest
+		fromZnRequest:
+			((ZnRequest patch: (self urlForPetIdentifiedBy: anIdentifier))
+				entity: (ZnEntity with: ('{"name":"<1s>"}' expandMacrosWith: aName) type: webService specification petVersion1dot0dot0MediaType);
+				yourself)
+		pathParams: {(#identifier -> anIdentifier)} asDictionary
+]
+
+{ #category : #'private - support' }
 PetsRESTfulWebServiceTest >> requestToUpdatePetIdentifiedBy: anIdentifier statusTo: aStatus [
 
 	^ TeaRequest
@@ -160,7 +171,8 @@ PetsRESTfulWebServiceTest >> testGetPetSummaryJustCreated [
 			self
 				assert: json name equals: 'Firulais';
 				assert: json links self equals: 'https://pets.example.com/pets/1';
-				assert: json type isNil ]
+				assert: json type isNil;
+				assert: json status isNil ]
 ]
 
 { #category : #tests }
@@ -234,6 +246,37 @@ PetsRESTfulWebServiceTest >> testPetCreation [
 		assert: response hasEntity;
 		assert: webService pets size equals: 1;
 		assert: webService pets first name equals: 'Firulais'
+]
+
+{ #category : #tests }
+PetsRESTfulWebServiceTest >> testUpdatePetName [
+
+	| response |
+
+	self assert: webService pets isEmpty.
+
+	self assert: (webService createPetBasedOn: (self requestToCreatePetFrom: '{"name":"Firulais","type":"dog"}') within: HttpRequestContext new) isSuccess.
+
+	self assert: webService pets first name equals: 'Firulais'.
+
+	response := webService updatePetStatusBasedOn: (self requestToUpdatePetIdentifiedBy: 1 nameTo: 'Mendieta') within: HttpRequestContext new.
+
+	self
+		assert: response isSuccess;
+		assert: response status equals: 200;
+		assert: response hasEntity;
+		assert: webService pets size equals: 1;
+		assert: webService pets first name equals: 'Mendieta';
+		assert: webService pets first status equals: 'new'.
+
+	self
+		withJsonFromContentsIn: response
+		do: [ :json | 
+			self
+				assert: json name equals: 'Mendieta';
+				assert: json type equals: 'dog';
+				assert: json status equals: 'new';
+				assert: json links self equals: 'https://pets.example.com/pets/1' ]
 ]
 
 { #category : #tests }

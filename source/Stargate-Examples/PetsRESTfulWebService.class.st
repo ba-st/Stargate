@@ -1,3 +1,6 @@
+"
+I'm an example RESTful Web Service implementing Pet resource management
+"
 Class {
 	#name : #PetsRESTfulWebService,
 	#superclass : #RESTfulWebService,
@@ -13,11 +16,14 @@ Class {
 PetsRESTfulWebService >> createPetBasedOn: anHttpRequest within: aContext [
 
 	^ self
-		withCreatedResourceDo: [ :pet | 
-			pets add: pet.
-			pet at: #status put: 'new'.
-			petById at: nextId put: pet.
-			nextId := nextId + 1 ]
+		withCreatedResourceDo: [ :resource | 
+			| newPet |
+
+			newPet := Pet named: resource name ofType: resource type.
+			pets add: newPet.
+			petById at: nextId put: newPet.
+			nextId := nextId + 1.
+			newPet ]
 		decodedUsing: self specification petMappingKey
 		basedOn: anHttpRequest
 		within: aContext
@@ -103,7 +109,7 @@ PetsRESTfulWebService >> updatePetStatusBasedOn: anHttpRequest within: aContext 
 				from: anHttpRequest contentType
 				within: aContext.
 			pet := self petIdentifiedUsing: anHttpRequest.
-			pet at: #status put: (resource at: #status).
+			pet synchronizeWith: (Pet named: (resource at: #name ifAbsent: [ pet name ]) ofType: (resource at: #type ifAbsent: [ pet type ]) withStatus: (resource at: #status ifAbsent: [ pet status ])).
 			pet ]
 		encodedUsing: self specification petMappingKey
 		basedOn: anHttpRequest

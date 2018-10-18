@@ -20,25 +20,42 @@ PetsRESTfulWebServiceSpecification >> addJsonEncoderVersion1dot0dot0MappingIn: a
 			using: [ :pet :context | 
 			String
 				streamContents: [ :stream | 
-					(HypermediaAwareJSONWriter on: stream)
-						mediaControls: (context objectUnder: #mediaControls ifNone: [ #() ]) asDictionary;
+					(NeoJSONWriter on: stream)
+						for: Pet
+							do: [ :mapping | 
+							mapping
+								mapInstVars;
+								mapProperty: #links getter: [ :thePet | (self mediaControlsIn: context) asDictionary ] setter: [ :object :value |  ] ];
 						nextPut: pet ] ];
 		addRuleToEncode: self petMappingKey
 			to: self petSummaryVersion1dot0dot0MediaType
 			using: [ :pet :context | 
 			String
 				streamContents: [ :stream | 
-					(HypermediaAwareJSONWriter on: stream)
-						mediaControls: (context objectUnder: #mediaControls ifNone: [ #() ]) asDictionary;
-						nextPut: {('name' -> pet name)} asDictionary ] ];
+					(NeoJSONWriter on: stream)
+						for: Pet
+							do: [ :mapping | 
+							mapping
+								mapInstVar: #name;
+								mapProperty: #links getter: [ :thePet | (self mediaControlsIn: context) asDictionary ] setter: [ :object :value |  ] ];
+						nextPut: pet ] ];
 		addDefaultRuleToEncode: self petsMappingKey
 			to: self petSummaryVersion1dot0dot0MediaType
 			using: [ :pets :context | 
 			String
 				streamContents: [ :stream | 
-					(HypermediaAwareJSONWriter on: stream)
-						mediaControls: (context objectUnder: #mediaControls ifNone: [ #() ]) asDictionary;
-						nextPut: {('items' -> pets)} asDictionary ] ]
+					| individualMediaControls |
+
+					individualMediaControls := context objectUnder: #individualMediaControls ifNone: [ #() ].
+					(NeoJSONWriter on: stream)
+						for: Pet
+							do: [ :mapping | 
+							mapping
+								mapInstVar: #name;
+								mapProperty: #links getter: [ :pet | (individualMediaControls at: pet) asDictionary ] setter: [ :object :value |  ] ];
+						nextPut:
+							{('items' -> pets).
+							('links' -> (self mediaControlsIn: context) asDictionary)} asDictionary ] ]
 ]
 
 { #category : #routes }
@@ -81,6 +98,12 @@ PetsRESTfulWebServiceSpecification >> idTemplate [
 PetsRESTfulWebServiceSpecification >> identifierKey [
 
 	^ #identifier
+]
+
+{ #category : #'mapping rules' }
+PetsRESTfulWebServiceSpecification >> mediaControlsIn: context [
+
+	^ context objectUnder: #mediaControls ifNone: [ #() ]
 ]
 
 { #category : #accessing }

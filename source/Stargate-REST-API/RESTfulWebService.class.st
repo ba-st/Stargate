@@ -52,16 +52,20 @@ RESTfulWebService >> evaluateQuery: aQueryEvaluationBlock [
 { #category : #'private - API' }
 RESTfulWebService >> get: aQueryEvaluationBlock asCollectionEncodedUsing: aKey basedOn: anHttpRequest within: aContext [
 
-	| mediaType result |
+	| mediaType collection |
 
 	mediaType := self targetMediaTypeFrom: anHttpRequest.
 
-	^ [ | encodedResult |
+	^ [ | encodedResult individualMediaControls |
 
-	result := self evaluateQuery: aQueryEvaluationBlock.
-	aContext hold: {('self' -> anHttpRequest absoluteUrl printString)} under: #mediaControls.
+	collection := self evaluateQuery: aQueryEvaluationBlock.
+	individualMediaControls := IdentityDictionary new.
+	collection do: [ :individual | individualMediaControls at: individual put: (self mediaControlsFor: individual) ].
+	aContext
+		hold: {('self' -> anHttpRequest absoluteUrl printString)} under: #mediaControls;
+		hold: individualMediaControls under: #individualMediaControls.
 	encodedResult := self
-		encode: result
+		encode: collection
 		at: aKey
 		to: mediaType
 		within: aContext.
@@ -80,7 +84,7 @@ RESTfulWebService >> get: aQueryEvaluationBlock encodedUsing: aKey basedOn: anHt
 	^ [ | encodedResult |
 
 	result := self evaluateQuery: aQueryEvaluationBlock.
-	aContext hold: {('self' -> (self locationOf: result))} under: #mediaControls.
+	aContext hold: (self mediaControlsFor: result) under: #mediaControls.
 	encodedResult := self
 		encode: result
 		at: aKey
@@ -103,6 +107,12 @@ RESTfulWebService >> initialize [
 RESTfulWebService >> locationOf: resource [
 
 	self subclassResponsibility
+]
+
+{ #category : #'private - accessing' }
+RESTfulWebService >> mediaControlsFor: result [
+
+	^ {('self' -> (self locationOf: result))}
 ]
 
 { #category : #configuring }
@@ -131,7 +141,7 @@ RESTfulWebService >> targetMediaTypeFrom: anHttpRequest [
 { #category : #'private - API' }
 RESTfulWebService >> withCreatedResourceDo: aBlock decodedUsing: aKey basedOn: anHttpRequest within: aContext [
 
-	| resource |
+	| resource newObject |
 
 	resource := self
 		decode: anHttpRequest contents
@@ -139,9 +149,9 @@ RESTfulWebService >> withCreatedResourceDo: aBlock decodedUsing: aKey basedOn: a
 		from: anHttpRequest contentType
 		within: aContext.
 
-	[ aBlock value: resource ]
+	newObject := [ aBlock value: resource ]
 		on: ConflictingObjectFound
 		do: [ :signal | HTTPClientError signalConflict: signal messageText ].
 
-	^ ZnResponse created: (self locationOf: resource)
+	^ ZnResponse created: (self locationOf: newObject)
 ]
