@@ -20,17 +20,39 @@ PetsRESTfulWebServiceSpecification >> addJsonEncoderVersion1dot0dot0MappingIn: a
 			using: [ :pet :context | 
 			String
 				streamContents: [ :stream | 
-					(HypermediaAwareJSONWriter on: stream)
-						mediaControls: (context objectUnder: #mediaControls ifNone: [ #() ]) asDictionary;
+					(NeoJSONWriter on: stream)
+						for: Pet
+							do: [ :mapping | 
+							mapping
+								mapInstVars;
+								mapHypermediaControlsIn: context ];
 						nextPut: pet ] ];
 		addRuleToEncode: self petMappingKey
 			to: self petSummaryVersion1dot0dot0MediaType
 			using: [ :pet :context | 
 			String
 				streamContents: [ :stream | 
-					(HypermediaAwareJSONWriter on: stream)
-						mediaControls: (context objectUnder: #mediaControls ifNone: [ #() ]) asDictionary;
-						nextPut: {('name' -> pet name)} asDictionary ] ]
+					(NeoJSONWriter on: stream)
+						for: Pet
+							do: [ :mapping | 
+							mapping
+								mapInstVar: #name;
+								mapHypermediaControlsIn: context ];
+						nextPut: pet ] ];
+		addDefaultRuleToEncode: self petsMappingKey
+			to: self petSummaryVersion1dot0dot0MediaType
+			using: [ :pets :context | 
+			String
+				streamContents: [ :stream | 
+					(NeoJSONWriter on: stream)
+						for: Pet
+							do: [ :mapping | 
+							mapping
+								mapInstVar: #name;
+								mapAsHypermediaControls: [ :pet | context hypermediaControlsFor: pet ] ];
+						nextPut:
+							{('items' -> pets).
+							('links' -> context hypermediaControls asDictionary)} asDictionary ] ]
 ]
 
 { #category : #routes }
@@ -78,7 +100,7 @@ PetsRESTfulWebServiceSpecification >> identifierKey [
 { #category : #accessing }
 PetsRESTfulWebServiceSpecification >> petMappingKey [
 
-	^ #pets
+	^ #pet
 ]
 
 { #category : #'accessing - media types' }
@@ -91,6 +113,12 @@ PetsRESTfulWebServiceSpecification >> petSummaryVersion1dot0dot0MediaType [
 PetsRESTfulWebServiceSpecification >> petVersion1dot0dot0MediaType [
 
 	^ 'application/vnd.stargate.pet+json;version=1.0.0' asZnMimeType 
+]
+
+{ #category : #accessing }
+PetsRESTfulWebServiceSpecification >> petsMappingKey [
+
+	^ #pets
 ]
 
 { #category : #routes }

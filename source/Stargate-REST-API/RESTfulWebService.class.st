@@ -50,22 +50,40 @@ RESTfulWebService >> evaluateQuery: aQueryEvaluationBlock [
 ]
 
 { #category : #'private - API' }
-RESTfulWebService >> get: aQueryEvaluationBlock encodedUsing: aKey basedOn: anHttpRequest within: aContext [
+RESTfulWebService >> get: aQueryEvaluationBlock asCollectionEncodedUsing: aKey basedOn: anHttpRequest within: aContext [
 
-	| mediaType result |
+	| mediaType |
 
 	mediaType := self targetMediaTypeFrom: anHttpRequest.
 
-	^ [ | encodedResult |
+	^ [ | resourceCollection encodedResourceCollection |
 
-	result := self evaluateQuery: aQueryEvaluationBlock.
-	aContext hold: {('self' -> (self locationOf: result))} under: #mediaControls.
-	encodedResult := self
-		encode: result
+	resourceCollection := self evaluateQuery: aQueryEvaluationBlock.
+	
+	aContext holdAsHypermediaControls: {('self' -> anHttpRequest absoluteUrl printString)}.
+	resourceCollection do: [ :resource | aContext holdAsHypermediaControls: (self mediaControlsFor: resource) forSubresource: resource ].
+	
+	encodedResourceCollection := self
+		encode: resourceCollection
 		at: aKey
 		to: mediaType
 		within: aContext.
-	ZnResponse ok: encodedResult ]
+	ZnResponse ok: encodedResourceCollection ]
+		on: ConflictingObjectFound
+		do: [ :error | HTTPClientError signalConflict: error messageText ]
+]
+
+{ #category : #'private - API' }
+RESTfulWebService >> get: aQueryEvaluationBlock encodedUsing: aKey basedOn: anHttpRequest within: aContext [
+
+	| mediaType resource |
+
+	mediaType := self targetMediaTypeFrom: anHttpRequest.
+
+	^ [ 
+		resource := self evaluateQuery: aQueryEvaluationBlock.
+		aContext holdAsHypermediaControls: (self mediaControlsFor: resource).
+		ZnResponse ok: (self encode: resource at: aKey to: mediaType within: aContext) ]
 		on: ConflictingObjectFound
 		do: [ :error | HTTPClientError signalConflict: error messageText ]
 ]
@@ -82,6 +100,12 @@ RESTfulWebService >> initialize [
 RESTfulWebService >> locationOf: resource [
 
 	self subclassResponsibility
+]
+
+{ #category : #'private - accessing' }
+RESTfulWebService >> mediaControlsFor: result [
+
+	^ {('self' -> (self locationOf: result))}
 ]
 
 { #category : #configuring }
@@ -110,17 +134,17 @@ RESTfulWebService >> targetMediaTypeFrom: anHttpRequest [
 { #category : #'private - API' }
 RESTfulWebService >> withCreatedResourceDo: aBlock decodedUsing: aKey basedOn: anHttpRequest within: aContext [
 
-	| resource |
+	| decodedRepresentation newResource |
 
-	resource := self
+	decodedRepresentation := self
 		decode: anHttpRequest contents
 		at: aKey
 		from: anHttpRequest contentType
 		within: aContext.
 
-	[ aBlock value: resource ]
+	newResource := [ aBlock value: decodedRepresentation ]
 		on: ConflictingObjectFound
 		do: [ :signal | HTTPClientError signalConflict: signal messageText ].
 
-	^ ZnResponse created: (self locationOf: resource)
+	^ ZnResponse created: (self locationOf: newResource)
 ]
