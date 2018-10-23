@@ -62,7 +62,7 @@ PetsRESTfulWebServiceSpecification >> createPetRoute [
 ]
 
 { #category : #routes }
-PetsRESTfulWebServiceSpecification >> deletePet [
+PetsRESTfulWebServiceSpecification >> deletePetRoute [
 
 	^ RouteSpecification handling: #DELETE at: self idTemplate evaluating: [ :service :httpRequest :context | service deletePetBasedOn: httpRequest within: context ]
 ]

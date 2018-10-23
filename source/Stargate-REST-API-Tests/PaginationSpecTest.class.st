@@ -16,5 +16,6 @@ PaginationSpecTest >> testAccessing [
 
 	self
 		assert: spec start equals: 1;
-		assert: spec limit equals: 5
+		assert: spec limit equals: 5;
+		assert: spec end equals: 5
 ]
