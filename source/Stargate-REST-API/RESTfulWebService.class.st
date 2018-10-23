@@ -29,6 +29,12 @@ RESTfulWebService >> decode: theRepresentation at: aKey from: sourceMediaType wi
 		do: [ :signal | HTTPClientError signalUnsupportedMediaType: signal messageText ]
 ]
 
+{ #category : #'private - accessing' }
+RESTfulWebService >> defaultPagination [
+
+	^ self subclassResponsibility
+]
+
 { #category : #'private - transformations' }
 RESTfulWebService >> encode: theResource at: aKey to: targetMediaType within: aContext [
 
@@ -39,7 +45,7 @@ RESTfulWebService >> encode: theResource at: aKey to: targetMediaType within: aC
 		do: [ :signal | HTTPClientError signalUnsupportedMediaType: signal messageText ]
 ]
 
-{ #category : #'private - API' }
+{ #category : #'private - querying' }
 RESTfulWebService >> evaluateQuery: aQueryEvaluationBlock [
 
 	^ [ [ aQueryEvaluationBlock value ]
@@ -47,6 +53,12 @@ RESTfulWebService >> evaluateQuery: aQueryEvaluationBlock [
 		do: [ :signal | HTTPClientError signalBadRequest: signal messageText ] ]
 		on: ObjectNotFound
 		do: [ :signal | HTTPClientError signalNotFound: signal messageText ]
+]
+
+{ #category : #'private - querying' }
+RESTfulWebService >> evaluateQuery: aQueryEvaluationBlock accordingTo: aPaginationSpec [
+
+	^ self evaluateQuery: [ aQueryEvaluationBlock cull: aPaginationSpec ]
 ]
 
 { #category : #'private - API' }
@@ -58,11 +70,11 @@ RESTfulWebService >> get: aQueryEvaluationBlock asCollectionEncodedUsing: aKey b
 
 	^ [ | resourceCollection encodedResourceCollection |
 
-	resourceCollection := self evaluateQuery: aQueryEvaluationBlock.
-	
+	resourceCollection := self evaluateQuery: aQueryEvaluationBlock accordingTo: (aContext objectUnder: #pagination ifNone: [ self defaultPagination ]).
+
 	aContext holdAsHypermediaControls: {('self' -> anHttpRequest absoluteUrl printString)}.
 	resourceCollection do: [ :resource | aContext holdAsHypermediaControls: (self mediaControlsFor: resource) forSubresource: resource ].
-	
+
 	encodedResourceCollection := self
 		encode: resourceCollection
 		at: aKey

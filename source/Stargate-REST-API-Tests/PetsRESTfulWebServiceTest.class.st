@@ -1,10 +1,13 @@
+"
+I'm a user stoty test testing the service providing the Pet resource, in the classic Pet Store example
+"
 Class {
 	#name : #PetsRESTfulWebServiceTest,
 	#superclass : #TestCase,
 	#instVars : [
 		'webService'
 	],
-	#category : #'Stargate-REST-API-Tests'
+	#category : #'Stargate-REST-API-Tests-PetStore'
 }
 
 { #category : #'private - support' }
@@ -223,6 +226,47 @@ PetsRESTfulWebServiceTest >> testGetPetsNotEmpty [
 			self
 				assert: json links self equals: 'https://pets.example.com/pets/';
 				assert: json items size equals: 1.
+			dogSummary := json items first.
+			self
+				assert: dogSummary name equals: 'Firulais';
+				assert: dogSummary links self equals: 'https://pets.example.com/pets/1';
+				assert: dogSummary type isNil ]
+]
+
+{ #category : #tests }
+PetsRESTfulWebServiceTest >> testGetPetsWithPagination [
+
+	| response |
+
+	self assert: webService pets isEmpty.
+
+	webService
+		createPetBasedOn: (self requestToCreatePetFrom: '{"name":"Firulais","type":"dog"}') within: HttpRequestContext new;
+		createPetBasedOn: (self requestToCreatePetFrom: '{"name":"Lassie","type":"dog"}') within: HttpRequestContext new;
+		createPetBasedOn: (self requestToCreatePetFrom: '{"name":"Garfield","type":"cat"}') within: HttpRequestContext new;
+		createPetBasedOn: (self requestToCreatePetFrom: '{"name":"Rin Tin Tin","type":"dog"}') within: HttpRequestContext new;
+		createPetBasedOn: (self requestToCreatePetFrom: '{"name":"Babe","type":"pig"}') within: HttpRequestContext new;
+		createPetBasedOn: (self requestToCreatePetFrom: '{"name":"Beethoven","type":"dog"}') within: HttpRequestContext new.
+
+	self assert: webService pets notEmpty.
+
+	response := webService getPetsBasedOn: (self requestToGetPetsAccepting: '*/*') within: HttpRequestContext new.
+
+	self
+		assert: response isSuccess;
+		assert: response status equals: 200;
+		assert: response contentType asZnMimeType equals: webService specification petSummaryVersion1dot0dot0MediaType.
+
+	self
+		withJsonFromContentsIn: response
+		do: [ :json | 
+			| dogSummary |
+
+			self
+				assert: json links self equals: 'https://pets.example.com/pets/';
+				assert: json links next equals: 'https://pets.example.com/pets?start=6&limit=5';
+				assert: json links last equals: 'https://pets.example.com/pets?start=6&limit=5';				
+				assert: json items size equals: 5.
 			dogSummary := json items first.
 			self
 				assert: dogSummary name equals: 'Firulais';

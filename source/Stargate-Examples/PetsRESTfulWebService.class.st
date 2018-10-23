@@ -29,6 +29,12 @@ PetsRESTfulWebService >> createPetBasedOn: anHttpRequest within: aContext [
 		within: aContext
 ]
 
+{ #category : #'private - accessing' }
+PetsRESTfulWebService >> defaultPagination [
+
+	^ PaginationSpec startingAt: 1 limitedTo: 5
+]
+
 { #category : #API }
 PetsRESTfulWebService >> deletePetBasedOn: anHttpRequest within: aContext [
 
@@ -53,7 +59,10 @@ PetsRESTfulWebService >> getPetBasedOn: anHttpRequest within: aContext [
 PetsRESTfulWebService >> getPetsBasedOn: anHttpRequest within: aContext [
 
 	^ self
-		get: [ self pets ]
+		get: [ :pagination | 
+			self pets
+				ifEmpty: [ #() ]
+				ifNotEmpty: [ self pets copyFrom: (pagination start min: self pets size) to: (pagination end min: self pets size) ] ]
 		asCollectionEncodedUsing: self specification petsMappingKey
 		basedOn: anHttpRequest
 		within: aContext

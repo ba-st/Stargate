@@ -1,7 +1,7 @@
 Class {
 	#name : #MappingRuleSetBuilderTest,
 	#superclass : #TestCase,
-	#category : #'Stargate-REST-API-Tests'
+	#category : #'Stargate-REST-API-Tests-Model'
 }
 
 { #category : #'accessing - media types' }
