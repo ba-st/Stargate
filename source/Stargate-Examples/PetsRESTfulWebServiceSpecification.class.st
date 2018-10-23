@@ -52,7 +52,7 @@ PetsRESTfulWebServiceSpecification >> addJsonEncoderVersion1dot0dot0MappingIn: a
 								mapAsHypermediaControls: [ :pet | context hypermediaControlsFor: pet ] ];
 						nextPut:
 							{('items' -> pets).
-							('links' -> context hypermediaControls asDictionary)} asDictionary ] ]
+							('links' -> (context hypermediaControls collect: [ :assoc  | assoc key  -> assoc value printString ]) asDictionary)} asDictionary ] ]
 ]
 
 { #category : #routes }

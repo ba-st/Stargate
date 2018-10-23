@@ -84,7 +84,7 @@ PetsRESTfulWebServiceTest >> setUp [
 	webService serverUrl: self baseUrl asZnUrl
 ]
 
-{ #category : #tests }
+{ #category : #'tests - delete' }
 PetsRESTfulWebServiceTest >> testCantDeleteInvalidPet [
 
 	self assert: webService pets isEmpty.
@@ -92,7 +92,7 @@ PetsRESTfulWebServiceTest >> testCantDeleteInvalidPet [
 	self should: [ webService deletePetBasedOn: (self requestToDeletePetIdentifiedBy: 1) within: HttpRequestContext new ] raise: HTTPClientError withExceptionDo: [ :signal | self assert: signal code equals: 404 ]
 ]
 
-{ #category : #tests }
+{ #category : #'tests - delete' }
 PetsRESTfulWebServiceTest >> testDeletePet [
 
 	| response |
@@ -111,7 +111,7 @@ PetsRESTfulWebServiceTest >> testDeletePet [
 		deny: response hasEntity
 ]
 
-{ #category : #tests }
+{ #category : #'tests - get individual' }
 PetsRESTfulWebServiceTest >> testGetPetJustCreated [
 
 	| response |
@@ -139,7 +139,7 @@ PetsRESTfulWebServiceTest >> testGetPetJustCreated [
 				assert: json links self equals: 'https://pets.example.com/pets/1' ]
 ]
 
-{ #category : #tests }
+{ #category : #'tests - get individual' }
 PetsRESTfulWebServiceTest >> testGetPetNotFoundShouldFail [
 
 	self assert: webService pets isEmpty.
@@ -150,7 +150,7 @@ PetsRESTfulWebServiceTest >> testGetPetNotFoundShouldFail [
 		withExceptionDo: [ :error | self assert: error code equals: 404 ]
 ]
 
-{ #category : #tests }
+{ #category : #'tests - get individual' }
 PetsRESTfulWebServiceTest >> testGetPetSummaryJustCreated [
 
 	| response |
@@ -178,7 +178,7 @@ PetsRESTfulWebServiceTest >> testGetPetSummaryJustCreated [
 				assert: json status isNil ]
 ]
 
-{ #category : #tests }
+{ #category : #'tests - get collection' }
 PetsRESTfulWebServiceTest >> testGetPets [
 
 	| response |
@@ -200,7 +200,7 @@ PetsRESTfulWebServiceTest >> testGetPets [
 				assert: json links self equals: 'https://pets.example.com/pets/' ]
 ]
 
-{ #category : #tests }
+{ #category : #'tests - get collection' }
 PetsRESTfulWebServiceTest >> testGetPetsNotEmpty [
 
 	| response |
@@ -233,7 +233,7 @@ PetsRESTfulWebServiceTest >> testGetPetsNotEmpty [
 				assert: dogSummary type isNil ]
 ]
 
-{ #category : #tests }
+{ #category : #'tests - get collection' }
 PetsRESTfulWebServiceTest >> testGetPetsWithPagination [
 
 	| response |
@@ -248,33 +248,29 @@ PetsRESTfulWebServiceTest >> testGetPetsWithPagination [
 		createPetBasedOn: (self requestToCreatePetFrom: '{"name":"Babe","type":"pig"}') within: HttpRequestContext new;
 		createPetBasedOn: (self requestToCreatePetFrom: '{"name":"Beethoven","type":"dog"}') within: HttpRequestContext new.
 
-	self assert: webService pets notEmpty.
+	self assert: webService pets size equals: 6.
 
 	response := webService getPetsBasedOn: (self requestToGetPetsAccepting: '*/*') within: HttpRequestContext new.
 
 	self
 		assert: response isSuccess;
 		assert: response status equals: 200;
-		assert: response contentType asZnMimeType equals: webService specification petSummaryVersion1dot0dot0MediaType.
+		assert: response contentType asZnMimeType equals: webService specification petSummaryVersion1dot0dot0MediaType;
+		assert: (response headers at: 'Link') url equals: 'https://pets.example.com/pets/?start=6&limit=5' asZnUrl;
+		assert: (response headers at: 'Link') rel equals: 'next'.
 
 	self
 		withJsonFromContentsIn: response
 		do: [ :json | 
-			| dogSummary |
-
 			self
 				assert: json links self equals: 'https://pets.example.com/pets/';
-				assert: json links next equals: 'https://pets.example.com/pets?start=6&limit=5';
-				assert: json links last equals: 'https://pets.example.com/pets?start=6&limit=5';				
-				assert: json items size equals: 5.
-			dogSummary := json items first.
-			self
-				assert: dogSummary name equals: 'Firulais';
-				assert: dogSummary links self equals: 'https://pets.example.com/pets/1';
-				assert: dogSummary type isNil ]
+				assert: json links next asZnUrl equals: 'https://pets.example.com/pets/?start=6&limit=5' asZnUrl;
+				"
+				assert: json links last equals: 'https://pets.example.com/pets?start=6&limit=5';"
+					assert: json items size equals: 5 ]
 ]
 
-{ #category : #tests }
+{ #category : #'tests - creation' }
 PetsRESTfulWebServiceTest >> testPetCreation [
 
 	| response |
@@ -292,7 +288,7 @@ PetsRESTfulWebServiceTest >> testPetCreation [
 		assert: webService pets first name equals: 'Firulais'
 ]
 
-{ #category : #tests }
+{ #category : #'tests - update' }
 PetsRESTfulWebServiceTest >> testUpdatePetName [
 
 	| response |
@@ -323,7 +319,7 @@ PetsRESTfulWebServiceTest >> testUpdatePetName [
 				assert: json links self equals: 'https://pets.example.com/pets/1' ]
 ]
 
-{ #category : #tests }
+{ #category : #'tests - update' }
 PetsRESTfulWebServiceTest >> testUpdatePetStatus [
 
 	| response |

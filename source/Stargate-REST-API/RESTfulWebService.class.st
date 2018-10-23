@@ -68,11 +68,12 @@ RESTfulWebService >> get: aQueryEvaluationBlock asCollectionEncodedUsing: aKey b
 
 	mediaType := self targetMediaTypeFrom: anHttpRequest.
 
-	^ [ | resourceCollection encodedResourceCollection |
+	^ [ | resourceCollection encodedResourceCollection response paginationLinks |
 
 	resourceCollection := self evaluateQuery: aQueryEvaluationBlock accordingTo: (aContext objectUnder: #pagination ifNone: [ self defaultPagination ]).
+	paginationLinks := aContext objectUnder: #paginationLinks ifNone: [ #() ].
 
-	aContext holdAsHypermediaControls: {('self' -> anHttpRequest absoluteUrl printString)}.
+	aContext holdAsHypermediaControls: {('self' -> anHttpRequest absoluteUrl)} , paginationLinks.
 	resourceCollection do: [ :resource | aContext holdAsHypermediaControls: (self mediaControlsFor: resource) forSubresource: resource ].
 
 	encodedResourceCollection := self
@@ -80,7 +81,15 @@ RESTfulWebService >> get: aQueryEvaluationBlock asCollectionEncodedUsing: aKey b
 		at: aKey
 		to: mediaType
 		within: aContext.
-	ZnResponse ok: encodedResourceCollection ]
+	response := ZnResponse ok: encodedResourceCollection.
+	paginationLinks
+		do: [ :assoc | 
+			response
+				addLink:
+					((ZnLink to: assoc value)
+						rel: assoc key;
+						yourself) ].
+	response ]
 		on: ConflictingObjectFound
 		do: [ :error | HTTPClientError signalConflict: error messageText ]
 ]
@@ -117,7 +126,7 @@ RESTfulWebService >> locationOf: resource [
 { #category : #'private - accessing' }
 RESTfulWebService >> mediaControlsFor: result [
 
-	^ {('self' -> (self locationOf: result))}
+	^ {'self' -> (self locationOf: result)}
 ]
 
 { #category : #configuring }

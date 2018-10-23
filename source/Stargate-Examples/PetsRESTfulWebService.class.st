@@ -62,7 +62,22 @@ PetsRESTfulWebService >> getPetsBasedOn: anHttpRequest within: aContext [
 		get: [ :pagination | 
 			self pets
 				ifEmpty: [ #() ]
-				ifNotEmpty: [ self pets copyFrom: (pagination start min: self pets size) to: (pagination end min: self pets size) ] ]
+				ifNotEmpty: [ | start end petCount |
+
+					petCount := self pets size.
+					start := pagination start min: petCount.
+					end := pagination end min: petCount.
+					petCount > end
+						ifTrue: [ aContext
+								hold:
+									{('next'
+										->
+											(anHttpRequest absoluteUrl copy
+												queryAt: 'start' put: end + 1;
+												queryAt: 'limit' put: pagination limit;
+												yourself))}
+								under: #paginationLinks ].
+					self pets copyFrom: start to: end ] ]
 		asCollectionEncodedUsing: self specification petsMappingKey
 		basedOn: anHttpRequest
 		within: aContext
@@ -85,7 +100,7 @@ PetsRESTfulWebService >> locationOf: aPet [
 	baseUrl := '' asZnUrl.
 	baseUrlOptional withContentDo: [ :theBaseUrl | baseUrl := theBaseUrl ].
 
-	^ '<1p>/<2p>' expandMacrosWith: baseUrl / self specification endpoint asZnUrl with: (petById keyAtValue: aPet)
+	^ baseUrl / self specification endpoint asZnUrl / (petById keyAtValue: aPet) printString asZnUrl
 ]
 
 { #category : #'private - accessing' }
