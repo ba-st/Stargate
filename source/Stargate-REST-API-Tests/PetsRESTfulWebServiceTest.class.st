@@ -256,8 +256,11 @@ PetsRESTfulWebServiceTest >> testGetPetsWithPagination [
 		assert: response isSuccess;
 		assert: response status equals: 200;
 		assert: response contentType asZnMimeType equals: webService specification petSummaryVersion1dot0dot0MediaType;
-		assert: (response headers at: 'Link') url equals: 'https://pets.example.com/pets/?start=6&limit=5' asZnUrl;
-		assert: (response headers at: 'Link') rel equals: 'next'.
+		assert: response links size equals: 2;
+		assert: response links first url equals: 'https://pets.example.com/pets/?start=6&limit=5' asZnUrl;
+		assert: response links first rel equals: 'next';
+		assert: response links second url equals: 'https://pets.example.com/pets/?start=6&limit=5' asZnUrl;
+		assert: response links second rel equals: 'last'.
 
 	self
 		withJsonFromContentsIn: response
@@ -265,9 +268,8 @@ PetsRESTfulWebServiceTest >> testGetPetsWithPagination [
 			self
 				assert: json links self equals: 'https://pets.example.com/pets/';
 				assert: json links next asZnUrl equals: 'https://pets.example.com/pets/?start=6&limit=5' asZnUrl;
-				"
-				assert: json links last equals: 'https://pets.example.com/pets?start=6&limit=5';"
-					assert: json items size equals: 5 ]
+				assert: json links last asZnUrl equals: 'https://pets.example.com/pets/?start=6&limit=5' asZnUrl;
+				assert: json items size equals: 5 ]
 ]
 
 { #category : #'tests - creation' }

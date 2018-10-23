@@ -71,7 +71,7 @@ RESTfulWebService >> get: aQueryEvaluationBlock asCollectionEncodedUsing: aKey b
 	^ [ | resourceCollection encodedResourceCollection response paginationLinks |
 
 	resourceCollection := self evaluateQuery: aQueryEvaluationBlock accordingTo: (aContext objectUnder: #pagination ifNone: [ self defaultPagination ]).
-	paginationLinks := aContext objectUnder: #paginationLinks ifNone: [ #() ].
+	paginationLinks := aContext paginationControls.
 
 	aContext holdAsHypermediaControls: {('self' -> anHttpRequest absoluteUrl)} , paginationLinks.
 	resourceCollection do: [ :resource | aContext holdAsHypermediaControls: (self mediaControlsFor: resource) forSubresource: resource ].

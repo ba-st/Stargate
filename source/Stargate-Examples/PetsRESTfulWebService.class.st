@@ -62,21 +62,30 @@ PetsRESTfulWebService >> getPetsBasedOn: anHttpRequest within: aContext [
 		get: [ :pagination | 
 			self pets
 				ifEmpty: [ #() ]
-				ifNotEmpty: [ | start end petCount |
+				ifNotEmpty: [ | start end petCount limit |
 
 					petCount := self pets size.
 					start := pagination start min: petCount.
 					end := pagination end min: petCount.
+					limit := pagination limit.
 					petCount > end
 						ifTrue: [ aContext
-								hold:
-									{('next'
+								addPaginationControl:
+									'next'
 										->
 											(anHttpRequest absoluteUrl copy
 												queryAt: 'start' put: end + 1;
-												queryAt: 'limit' put: pagination limit;
-												yourself))}
-								under: #paginationLinks ].
+												queryAt: 'limit' put: limit;
+												yourself) ].
+					petCount = end
+						ifFalse: [ aContext
+								addPaginationControl:
+									'last'
+										->
+											(anHttpRequest absoluteUrl copy
+												queryAt: 'start' put: ((petCount // limit) * limit) + 1;
+												queryAt: 'limit' put: limit;
+												yourself) ].
 					self pets copyFrom: start to: end ] ]
 		asCollectionEncodedUsing: self specification petsMappingKey
 		basedOn: anHttpRequest
