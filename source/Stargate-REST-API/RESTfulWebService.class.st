@@ -70,11 +70,18 @@ RESTfulWebService >> get: aQueryEvaluationBlock asCollectionEncodedUsing: aKey b
 
 	^ [ | resourceCollection encodedResourceCollection response paginationLinks |
 
-	resourceCollection := self evaluateQuery: aQueryEvaluationBlock accordingTo: (aContext objectUnder: #pagination ifNone: [ self defaultPagination ]).
+	resourceCollection := self
+		evaluateQuery: aQueryEvaluationBlock
+		accordingTo: (self paginationFrom: anHttpRequest).
 	paginationLinks := aContext paginationControls.
 
-	aContext holdAsHypermediaControls: {('self' -> anHttpRequest absoluteUrl)} , paginationLinks.
-	resourceCollection do: [ :resource | aContext holdAsHypermediaControls: (self mediaControlsFor: resource) forSubresource: resource ].
+	aContext
+		holdAsHypermediaControls: {('self' -> anHttpRequest absoluteUrl)} , paginationLinks.
+	resourceCollection
+		do: [ :resource | 
+			aContext
+				holdAsHypermediaControls: (self mediaControlsFor: resource)
+				forSubresource: resource ].
 
 	encodedResourceCollection := self
 		encode: resourceCollection
@@ -127,6 +134,14 @@ RESTfulWebService >> locationOf: resource [
 RESTfulWebService >> mediaControlsFor: result [
 
 	^ {'self' -> (self locationOf: result)}
+]
+
+{ #category : #'private - querying' }
+RESTfulWebService >> paginationFrom: anHttpRequest [
+
+	^ [ PaginationSpec startingAt: (IsInteger parseString: (anHttpRequest at: #start)) limitedTo: (IsInteger parseString: (anHttpRequest at: #limit)) ]
+		on: TeaNoSuchParam
+		do: [ :error | error return: self defaultPagination ]
 ]
 
 { #category : #configuring }

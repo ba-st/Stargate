@@ -12,6 +12,19 @@ Class {
 	#category : #'Stargate-Examples'
 }
 
+{ #category : #'private - accessing' }
+PetsRESTfulWebService >> addPaginationControlsTo: aContext basedOn: url start: start limit: limit end: end count: total [
+
+	start = 1
+		ifFalse: [ aContext addPaginationControl: 'first' -> (self urlFrom: url startingAt: 1 limitedTo: limit) ].
+	start > limit
+		ifTrue: [ aContext addPaginationControl: 'prev' -> (self urlFrom: url startingAt: start - limit limitedTo: limit) ].
+	total > end
+		ifTrue: [ aContext addPaginationControl: 'next' -> (self urlFrom: url startingAt: end + 1 limitedTo: limit) ].
+	total = end
+		ifFalse: [ aContext addPaginationControl: 'last' -> (self urlFrom: url startingAt: total // limit * limit + 1 limitedTo: limit) ]
+]
+
 { #category : #API }
 PetsRESTfulWebService >> createPetBasedOn: anHttpRequest within: aContext [
 
@@ -62,30 +75,18 @@ PetsRESTfulWebService >> getPetsBasedOn: anHttpRequest within: aContext [
 		get: [ :pagination | 
 			self pets
 				ifEmpty: [ #() ]
-				ifNotEmpty: [ | start end petCount limit |
+				ifNotEmpty: [ | start end total |
 
-					petCount := self pets size.
-					start := pagination start min: petCount.
-					end := pagination end min: petCount.
-					limit := pagination limit.
-					petCount > end
-						ifTrue: [ aContext
-								addPaginationControl:
-									'next'
-										->
-											(anHttpRequest absoluteUrl copy
-												queryAt: 'start' put: end + 1;
-												queryAt: 'limit' put: limit;
-												yourself) ].
-					petCount = end
-						ifFalse: [ aContext
-								addPaginationControl:
-									'last'
-										->
-											(anHttpRequest absoluteUrl copy
-												queryAt: 'start' put: ((petCount // limit) * limit) + 1;
-												queryAt: 'limit' put: limit;
-												yourself) ].
+					total := self pets size.
+					start := pagination start min: total.
+					end := pagination end min: total.
+					self
+						addPaginationControlsTo: aContext
+						basedOn: anHttpRequest absoluteUrl
+						start: start
+						limit: pagination limit
+						end: end
+						count: total.
 					self pets copyFrom: start to: end ] ]
 		asCollectionEncodedUsing: self specification petsMappingKey
 		basedOn: anHttpRequest
@@ -147,4 +148,13 @@ PetsRESTfulWebService >> updatePetStatusBasedOn: anHttpRequest within: aContext 
 		encodedUsing: self specification petMappingKey
 		basedOn: anHttpRequest
 		within: aContext
+]
+
+{ #category : #'private - accessing' }
+PetsRESTfulWebService >> urlFrom: url startingAt: start limitedTo: limit [
+
+	^ url copy
+		queryAt: 'start' put: start;
+		queryAt: 'limit' put: limit;
+		yourself
 ]

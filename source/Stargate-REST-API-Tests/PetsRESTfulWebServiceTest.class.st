@@ -37,6 +37,16 @@ PetsRESTfulWebServiceTest >> requestToDeletePetIdentifiedBy: anIdentifier [
 ]
 
 { #category : #'private - support' }
+PetsRESTfulWebServiceTest >> requestToGet: aUrl accepting: anAcceptHeader [
+
+	^ TeaRequest
+		fromZnRequest:
+			((ZnRequest get: aUrl)
+				setAccept: anAcceptHeader;
+				yourself)
+]
+
+{ #category : #'private - support' }
 PetsRESTfulWebServiceTest >> requestToGetPetIdentifiedBy: anIdentifier accepting: anAcceptHeader [
 
 	^ TeaRequest
@@ -50,9 +60,7 @@ PetsRESTfulWebServiceTest >> requestToGetPetIdentifiedBy: anIdentifier accepting
 { #category : #'private - support' }
 PetsRESTfulWebServiceTest >> requestToGetPetsAccepting: anAcceptHeader [
 
-	^ (ZnRequest get: self petsUrl)
-		setAccept: anAcceptHeader;
-		yourself
+	^ self requestToGet: self petsUrl accepting: anAcceptHeader
 ]
 
 { #category : #'private - support' }
@@ -269,7 +277,28 @@ PetsRESTfulWebServiceTest >> testGetPetsWithPagination [
 				assert: json links self equals: 'https://pets.example.com/pets/';
 				assert: json links next asZnUrl equals: 'https://pets.example.com/pets/?start=6&limit=5' asZnUrl;
 				assert: json links last asZnUrl equals: 'https://pets.example.com/pets/?start=6&limit=5' asZnUrl;
-				assert: json items size equals: 5 ]
+				assert: json items size equals: 5.
+
+			response := webService getPetsBasedOn: (self requestToGet: json links next accepting: response contentType) within: HttpRequestContext new.
+			self
+				assert: response isSuccess;
+				assert: response status equals: 200;
+				assert: response contentType asZnMimeType equals: webService specification petSummaryVersion1dot0dot0MediaType;
+				assert: response links size equals: 2;
+				assert: response links first url equals: 'https://pets.example.com/pets/?start=1&limit=5' asZnUrl;
+				assert: response links first rel equals: 'first';
+				assert: response links second url equals: 'https://pets.example.com/pets/?start=1&limit=5' asZnUrl;
+				assert: response links second rel equals: 'prev'.
+			self
+				withJsonFromContentsIn: response
+				do: [ :json2 | 
+					self
+						assert: json2 links self asZnUrl equals: 'https://pets.example.com/pets/?start=6&limit=5' asZnUrl;
+						assert: json2 links first asZnUrl equals: 'https://pets.example.com/pets/?start=1&limit=5' asZnUrl;
+						assert: json2 links prev asZnUrl equals: 'https://pets.example.com/pets/?start=1&limit=5' asZnUrl;
+						assert: json2 links next isNil;
+						assert: json2 links last isNil;
+						assert: json2 items size equals: 1 ] ]
 ]
 
 { #category : #'tests - creation' }
