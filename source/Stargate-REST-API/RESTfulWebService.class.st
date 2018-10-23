@@ -30,7 +30,7 @@ RESTfulWebService >> decode: theRepresentation at: aKey from: sourceMediaType wi
 ]
 
 { #category : #'private - accessing' }
-RESTfulWebService >> defaultPagination [
+RESTfulWebService >> defaultPaginationLimit [
 
 	^ self subclassResponsibility
 ]
@@ -139,9 +139,9 @@ RESTfulWebService >> mediaControlsFor: result [
 { #category : #'private - querying' }
 RESTfulWebService >> paginationFrom: anHttpRequest [
 
-	^ [ PaginationSpec startingAt: (IsInteger parseString: (anHttpRequest at: #start)) limitedTo: (IsInteger parseString: (anHttpRequest at: #limit)) ]
-		on: TeaNoSuchParam
-		do: [ :error | error return: self defaultPagination ]
+	^ PaginationSpec
+		startingAt: (IsInteger parseString: (anHttpRequest at: #start ifAbsent: [ 1 ]))
+		limitedTo: (IsInteger parseString: (anHttpRequest at: #limit ifAbsent: [ self defaultPaginationLimit ]))
 ]
 
 { #category : #configuring }

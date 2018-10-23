@@ -22,7 +22,7 @@ PetsRESTfulWebService >> addPaginationControlsTo: aContext basedOn: url start: s
 	total > end
 		ifTrue: [ aContext addPaginationControl: 'next' -> (self urlFrom: url startingAt: end + 1 limitedTo: limit) ].
 	total = end
-		ifFalse: [ aContext addPaginationControl: 'last' -> (self urlFrom: url startingAt: total // limit * limit + 1 limitedTo: limit) ]
+		ifFalse: [ aContext addPaginationControl: 'last' -> (self urlFrom: url startingAt: (total - 1)// limit * limit + 1 limitedTo: limit) ]
 ]
 
 { #category : #API }
@@ -43,9 +43,9 @@ PetsRESTfulWebService >> createPetBasedOn: anHttpRequest within: aContext [
 ]
 
 { #category : #'private - accessing' }
-PetsRESTfulWebService >> defaultPagination [
+PetsRESTfulWebService >> defaultPaginationLimit [
 
-	^ PaginationSpec startingAt: 1 limitedTo: 5
+	^ 5
 ]
 
 { #category : #API }
