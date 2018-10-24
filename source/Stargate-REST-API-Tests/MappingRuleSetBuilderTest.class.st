@@ -7,13 +7,13 @@ Class {
 { #category : #'accessing - media types' }
 MappingRuleSetBuilderTest >> applicationJsonVersion1dot0dot0MediaType [
 
-	^ 'application/json;version=1.0.0' asZnMimeType 
+	^ 'application/json;version=1.0.0' asMediaType 
 ]
 
 { #category : #'accessing - media types' }
 MappingRuleSetBuilderTest >> applicationJsonVersion1dot0dot1MediaType [
 
-	^ 'application/json;version=1.0.1' asZnMimeType 
+	^ 'application/json;version=1.0.1' asMediaType 
 ]
 
 { #category : #accessing }

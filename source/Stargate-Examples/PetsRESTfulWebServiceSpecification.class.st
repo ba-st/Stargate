@@ -106,13 +106,13 @@ PetsRESTfulWebServiceSpecification >> petMappingKey [
 { #category : #'accessing - media types' }
 PetsRESTfulWebServiceSpecification >> petSummaryVersion1dot0dot0MediaType [
 
-	^ 'application/vnd.stargate.pet.summary+json;version=1.0.0' asZnMimeType 
+	^ 'application/vnd.stargate.pet.summary+json;version=1.0.0' asMediaType 
 ]
 
 { #category : #'accessing - media types' }
 PetsRESTfulWebServiceSpecification >> petVersion1dot0dot0MediaType [
 
-	^ 'application/vnd.stargate.pet+json;version=1.0.0' asZnMimeType 
+	^ 'application/vnd.stargate.pet+json;version=1.0.0' asMediaType 
 ]
 
 { #category : #accessing }

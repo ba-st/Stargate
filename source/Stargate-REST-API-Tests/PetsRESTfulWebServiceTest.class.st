@@ -89,6 +89,7 @@ PetsRESTfulWebServiceTest >> requestToUpdatePetIdentifiedBy: anIdentifier nameTo
 	^ TeaRequest
 		fromZnRequest:
 			((ZnRequest patch: (self urlForPetIdentifiedBy: anIdentifier))
+				setAccept: webService specification petVersion1dot0dot0MediaType;
 				entity: (ZnEntity with: ('{"name":"<1s>"}' expandMacrosWith: aName) type: webService specification petVersion1dot0dot0MediaType);
 				yourself)
 		pathParams: {(#identifier -> anIdentifier)} asDictionary
@@ -100,6 +101,7 @@ PetsRESTfulWebServiceTest >> requestToUpdatePetIdentifiedBy: anIdentifier status
 	^ TeaRequest
 		fromZnRequest:
 			((ZnRequest patch: (self urlForPetIdentifiedBy: anIdentifier))
+				setAccept: webService specification petVersion1dot0dot0MediaType;
 				entity: (ZnEntity with: ('{"status":"<1s>"}' expandMacrosWith: aStatus) type: webService specification petVersion1dot0dot0MediaType);
 				yourself)
 		pathParams: {(#identifier -> anIdentifier)} asDictionary
@@ -130,7 +132,7 @@ PetsRESTfulWebServiceTest >> testComplexPagination [
 	self
 		assert: response isSuccess;
 		assert: response status equals: 200;
-		assert: response contentType asZnMimeType equals: webService specification petSummaryVersion1dot0dot0MediaType;
+		assert: response contentType asMediaType equals: webService specification petSummaryVersion1dot0dot0MediaType;
 		assert: response links size equals: 2;
 		assertUrl: response links first url equals: 'https://pets.example.com/pets/?start=3&limit=2';
 		assert: response links first rel equals: 'next';
@@ -149,7 +151,7 @@ PetsRESTfulWebServiceTest >> testComplexPagination [
 	self
 		assert: response isSuccess;
 		assert: response status equals: 200;
-		assert: response contentType asZnMimeType equals: webService specification petSummaryVersion1dot0dot0MediaType;
+		assert: response contentType asMediaType equals: webService specification petSummaryVersion1dot0dot0MediaType;
 		assert: response links size equals: 4;
 		assertUrl: response links first url equals: 'https://pets.example.com/pets/?start=1&limit=2';
 		assert: response links first rel equals: 'first';
@@ -197,12 +199,12 @@ PetsRESTfulWebServiceTest >> testGetPetJustCreated [
 		assert: (webService createPetBasedOn: (self requestToCreatePetFrom: '{"name":"Firulais","type":"dog"}') within: HttpRequestContext new) isSuccess;
 		assert: webService pets size equals: 1.
 
-	response := webService getPetBasedOn: (self requestToGetPetIdentifiedBy: 1 accepting: '*/*') within: HttpRequestContext new.
+	response := webService getPetBasedOn: (self requestToGetPetIdentifiedBy: 1 accepting: webService specification petVersion1dot0dot0MediaType) within: HttpRequestContext new.
 
 	self
 		assert: response isSuccess;
 		assert: response status equals: 200;
-		assert: response contentType asZnMimeType equals: webService specification petVersion1dot0dot0MediaType.
+		assert: response contentType asMediaType equals: webService specification petVersion1dot0dot0MediaType.
 
 	self
 		withJsonFromContentsIn: response
@@ -237,7 +239,7 @@ PetsRESTfulWebServiceTest >> testGetPetSummaryJustCreated [
 	self
 		assert: response isSuccess;
 		assert: response status equals: 200;
-		assert: response contentType asZnMimeType equals: webService specification petSummaryVersion1dot0dot0MediaType.
+		assert: response contentType asMediaType equals: webService specification petSummaryVersion1dot0dot0MediaType.
 
 	self
 		withJsonFromContentsIn: response
@@ -259,7 +261,7 @@ PetsRESTfulWebServiceTest >> testGetPets [
 	self
 		assert: response isSuccess;
 		assert: response status equals: 200;
-		assert: response contentType asZnMimeType equals: webService specification petSummaryVersion1dot0dot0MediaType.
+		assert: response contentType asMediaType equals: webService specification petSummaryVersion1dot0dot0MediaType.
 
 	self
 		withJsonFromContentsIn: response
@@ -283,7 +285,7 @@ PetsRESTfulWebServiceTest >> testGetPetsNotEmpty [
 	self
 		assert: response isSuccess;
 		assert: response status equals: 200;
-		assert: response contentType asZnMimeType equals: webService specification petSummaryVersion1dot0dot0MediaType.
+		assert: response contentType asMediaType equals: webService specification petSummaryVersion1dot0dot0MediaType.
 
 	self
 		withJsonFromContentsIn: response
@@ -312,7 +314,7 @@ PetsRESTfulWebServiceTest >> testGetPetsWithPagination [
 	self
 		assert: response isSuccess;
 		assert: response status equals: 200;
-		assert: response contentType asZnMimeType equals: webService specification petSummaryVersion1dot0dot0MediaType;
+		assert: response contentType asMediaType equals: webService specification petSummaryVersion1dot0dot0MediaType;
 		assert: response links size equals: 2;
 		assertUrl: response links first url equals: 'https://pets.example.com/pets/?start=6&limit=5';
 		assert: response links first rel equals: 'next';
@@ -332,7 +334,7 @@ PetsRESTfulWebServiceTest >> testGetPetsWithPagination [
 			self
 				assert: response isSuccess;
 				assert: response status equals: 200;
-				assert: response contentType asZnMimeType equals: webService specification petSummaryVersion1dot0dot0MediaType;
+				assert: response contentType asMediaType equals: webService specification petSummaryVersion1dot0dot0MediaType;
 				assert: response links size equals: 2;
 				assertUrl: response links first url equals: 'https://pets.example.com/pets/?start=1&limit=5';
 				assert: response links first rel equals: 'first';
