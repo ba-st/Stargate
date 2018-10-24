@@ -1,5 +1,5 @@
 "
-I will provide the preferred media type to use for processing an HTTP Request given an available media type list
+I will provide the best representation (media type) to use for processing an HTTP Request given an available media type list
 "
 Class {
 	#name : #RESTfulWebServiceAcceptNegotiator,
@@ -16,6 +16,15 @@ RESTfulWebServiceAcceptNegotiator class >> basedOn: aMediaTypeCollection [
 	^ self new initializeBasedOn: aMediaTypeCollection
 ]
 
+{ #category : #querying }
+RESTfulWebServiceAcceptNegotiator >> bestRepresentationFor: anHttpRequest [
+
+	"This method returns the best suited representation for the given request"
+
+	self withAcceptableMediaTypesIn: anHttpRequest do: [ :mediaType | (self sortByPrecedence: (self mediaTypesAvailableFor: mediaType)) ifNotEmpty: [ :availableTypes | ^ availableTypes first ] ].
+	HTTPClientError signalUnsupportedMediaType: 'No media type can be served according to the Accept header'
+]
+
 { #category : #'initialize - release' }
 RESTfulWebServiceAcceptNegotiator >> initializeBasedOn: aMediaTypeCollection [
 
@@ -23,12 +32,12 @@ RESTfulWebServiceAcceptNegotiator >> initializeBasedOn: aMediaTypeCollection [
 ]
 
 { #category : #'private - accessing' }
-RESTfulWebServiceAcceptNegotiator >> mediaTypesAvailableFor: acceptable [
+RESTfulWebServiceAcceptNegotiator >> mediaTypesAvailableFor: aMediaType [
 
 	^ availableMediaTypes
 		select: [ :available | 
-			(available canAccept: acceptable)
-				and: [ self versionIn: acceptable canBeHandledBy: available ] ]
+			(available accepts: aMediaType)
+				and: [ self versionIn: aMediaType canBeHandledBy: available ] ]
 ]
 
 { #category : #'private - accessing' }
@@ -49,13 +58,6 @@ RESTfulWebServiceAcceptNegotiator >> precedenceFor: aMediaType [
 	precedence := precedence + versionParts size.
 	versionParts doWithIndex: [ :part :index | precedence := precedence + (part asInteger * (2 raisedTo: 4 - index)) ].
 	^ precedence
-]
-
-{ #category : #querying }
-RESTfulWebServiceAcceptNegotiator >> preferredMediaTypeFor: anHttpRequest [
-
-	self withAcceptableMediaTypesIn: anHttpRequest do: [ :mediaType | (self sortByPrecedence: (self mediaTypesAvailableFor: mediaType)) ifNotEmpty: [ :availableTypes | ^ availableTypes first ] ].
-	HTTPClientError signalUnsupportedMediaType: 'No media type can be served according to the Accept header'
 ]
 
 { #category : #'private - accessing' }

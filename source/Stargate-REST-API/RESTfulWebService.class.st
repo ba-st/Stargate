@@ -161,7 +161,7 @@ RESTfulWebService >> specification [
 { #category : #'private - transformations' }
 RESTfulWebService >> targetMediaTypeFrom: anHttpRequest [
 
-	^ acceptNegotiator preferredMediaTypeFor: anHttpRequest
+	^ acceptNegotiator bestRepresentationFor: anHttpRequest
 ]
 
 { #category : #'private - API' }

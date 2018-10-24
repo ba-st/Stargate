@@ -8,24 +8,24 @@ Class {
 }
 
 { #category : #tests }
-MediaTypeTest >> testCanAccept [
+MediaTypeTest >> testAccepts [
 
 	| mediaType |
 
 	mediaType := 'application/vnd.stargate.pet+json;version=1.0.0' asMediaType.
 
 	self
-		assert: (mediaType canAccept: mediaType);
-		assert: (mediaType canAccept: 'application/vnd.stargate.pet+json' asMediaType);
-		assert: (mediaType canAccept: 'application/json' asMediaType);
-		assert: (mediaType canAccept: 'application/*' asMediaType);
-		assert: (mediaType canAccept: '*/*' asMediaType);
-		assert: (mediaType canAccept: 'application/vnd.stargate.pet' asMediaType);
-		assert: (mediaType canAccept: 'application/vnd.stargate.pet+json;version=2.0.0' asMediaType).
+		assert: (mediaType accepts: mediaType);
+		assert: (mediaType accepts: 'application/vnd.stargate.pet+json' asMediaType);
+		assert: (mediaType accepts: 'application/json' asMediaType);
+		assert: (mediaType accepts: 'application/*' asMediaType);
+		assert: (mediaType accepts: '*/*' asMediaType);
+		assert: (mediaType accepts: 'application/vnd.stargate.pet' asMediaType);
+		assert: (mediaType accepts: 'application/vnd.stargate.pet+json;version=2.0.0' asMediaType).
 
 	self
-		deny: (mediaType canAccept: 'text/*' asMediaType);
-		deny: (mediaType canAccept: 'application/xml' asMediaType)
+		deny: (mediaType accepts: 'text/*' asMediaType);
+		deny: (mediaType accepts: 'application/xml' asMediaType)
 ]
 
 { #category : #tests }
