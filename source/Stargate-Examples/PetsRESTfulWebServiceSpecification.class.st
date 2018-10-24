@@ -52,7 +52,7 @@ PetsRESTfulWebServiceSpecification >> addJsonEncoderVersion1dot0dot0MappingIn: a
 								mapAsHypermediaControls: [ :pet | context hypermediaControlsFor: pet ] ];
 						nextPut:
 							{('items' -> pets).
-							('links' -> context hypermediaControls asDictionary)} asDictionary ] ]
+							('links' -> (context hypermediaControls collect: [ :assoc  | assoc key  -> assoc value printString ]) asDictionary)} asDictionary ] ]
 ]
 
 { #category : #routes }
@@ -62,7 +62,7 @@ PetsRESTfulWebServiceSpecification >> createPetRoute [
 ]
 
 { #category : #routes }
-PetsRESTfulWebServiceSpecification >> deletePet [
+PetsRESTfulWebServiceSpecification >> deletePetRoute [
 
 	^ RouteSpecification handling: #DELETE at: self idTemplate evaluating: [ :service :httpRequest :context | service deletePetBasedOn: httpRequest within: context ]
 ]

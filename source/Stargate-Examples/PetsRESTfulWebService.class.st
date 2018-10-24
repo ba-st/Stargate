@@ -12,6 +12,19 @@ Class {
 	#category : #'Stargate-Examples'
 }
 
+{ #category : #'private - accessing' }
+PetsRESTfulWebService >> addPaginationControlsTo: aContext basedOn: url start: start limit: limit end: end count: total [
+
+	start = 1
+		ifFalse: [ aContext addPaginationControl: 'first' -> (self urlFrom: url startingAt: 1 limitedTo: limit) ].
+	start > limit
+		ifTrue: [ aContext addPaginationControl: 'prev' -> (self urlFrom: url startingAt: start - limit limitedTo: limit) ].
+	total > end
+		ifTrue: [ aContext addPaginationControl: 'next' -> (self urlFrom: url startingAt: end + 1 limitedTo: limit) ].
+	total = end
+		ifFalse: [ aContext addPaginationControl: 'last' -> (self urlFrom: url startingAt: (total - 1)// limit * limit + 1 limitedTo: limit) ]
+]
+
 { #category : #API }
 PetsRESTfulWebService >> createPetBasedOn: anHttpRequest within: aContext [
 
@@ -27,6 +40,12 @@ PetsRESTfulWebService >> createPetBasedOn: anHttpRequest within: aContext [
 		decodedUsing: self specification petMappingKey
 		basedOn: anHttpRequest
 		within: aContext
+]
+
+{ #category : #'private - accessing' }
+PetsRESTfulWebService >> defaultPaginationLimit [
+
+	^ 5
 ]
 
 { #category : #API }
@@ -53,7 +72,22 @@ PetsRESTfulWebService >> getPetBasedOn: anHttpRequest within: aContext [
 PetsRESTfulWebService >> getPetsBasedOn: anHttpRequest within: aContext [
 
 	^ self
-		get: [ self pets ]
+		get: [ :pagination | 
+			self pets
+				ifEmpty: [ #() ]
+				ifNotEmpty: [ | start end total |
+
+					total := self pets size.
+					start := pagination start min: total.
+					end := pagination end min: total.
+					self
+						addPaginationControlsTo: aContext
+						basedOn: anHttpRequest absoluteUrl
+						start: start
+						limit: pagination limit
+						end: end
+						count: total.
+					self pets copyFrom: start to: end ] ]
 		asCollectionEncodedUsing: self specification petsMappingKey
 		basedOn: anHttpRequest
 		within: aContext
@@ -76,7 +110,7 @@ PetsRESTfulWebService >> locationOf: aPet [
 	baseUrl := '' asZnUrl.
 	baseUrlOptional withContentDo: [ :theBaseUrl | baseUrl := theBaseUrl ].
 
-	^ '<1p>/<2p>' expandMacrosWith: baseUrl / self specification endpoint asZnUrl with: (petById keyAtValue: aPet)
+	^ baseUrl / self specification endpoint asZnUrl / (petById keyAtValue: aPet) printString asZnUrl
 ]
 
 { #category : #'private - accessing' }
@@ -114,4 +148,13 @@ PetsRESTfulWebService >> updatePetStatusBasedOn: anHttpRequest within: aContext 
 		encodedUsing: self specification petMappingKey
 		basedOn: anHttpRequest
 		within: aContext
+]
+
+{ #category : #'private - accessing' }
+PetsRESTfulWebService >> urlFrom: url startingAt: start limitedTo: limit [
+
+	^ url copy
+		queryAt: 'start' put: start;
+		queryAt: 'limit' put: limit;
+		yourself
 ]
