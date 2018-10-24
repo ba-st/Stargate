@@ -124,7 +124,7 @@ PetsRESTfulWebServiceTest >> testGetPetJustCreated [
 	self
 		assert: response isSuccess;
 		assert: response status equals: 200;
-		assert: response contentType asZnMimeType equals: webService specification petVersion1dot0dot0MediaType.
+		assert: response contentType asMediaType equals: webService specification petVersion1dot0dot0MediaType.
 
 	self
 		withJsonFromContentsIn: response
@@ -163,7 +163,7 @@ PetsRESTfulWebServiceTest >> testGetPetSummaryJustCreated [
 	self
 		assert: response isSuccess;
 		assert: response status equals: 200;
-		assert: response contentType asZnMimeType equals: webService specification petSummaryVersion1dot0dot0MediaType.
+		assert: response contentType asMediaType equals: webService specification petSummaryVersion1dot0dot0MediaType.
 
 	self
 		withJsonFromContentsIn: response
@@ -187,7 +187,7 @@ PetsRESTfulWebServiceTest >> testGetPets [
 	self
 		assert: response isSuccess;
 		assert: response status equals: 200;
-		assert: response contentType asZnMimeType equals: webService specification petSummaryVersion1dot0dot0MediaType.
+		assert: response contentType asMediaType equals: webService specification petSummaryVersion1dot0dot0MediaType.
 
 	self
 		withJsonFromContentsIn: response
@@ -213,7 +213,7 @@ PetsRESTfulWebServiceTest >> testGetPetsNotEmpty [
 	self
 		assert: response isSuccess;
 		assert: response status equals: 200;
-		assert: response contentType asZnMimeType equals: webService specification petSummaryVersion1dot0dot0MediaType.
+		assert: response contentType asMediaType equals: webService specification petSummaryVersion1dot0dot0MediaType.
 
 	self
 		withJsonFromContentsIn: response

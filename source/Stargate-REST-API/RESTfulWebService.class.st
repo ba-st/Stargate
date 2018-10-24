@@ -126,7 +126,7 @@ RESTfulWebService >> targetMediaTypeFrom: anHttpRequest [
 	"This is not quite right because the accept header can include several media types including a priority.
 	I'm just extracting the current behavior but this needs to be fixed"
 
-	^ [ anHttpRequest accept asZnMimeType ]
+	^ [ anHttpRequest accept asMediaType ]
 		on: ObjectNotFound
 		do: [ :signal | HTTPClientError signalBadRequest: signal messageText ]
 ]
