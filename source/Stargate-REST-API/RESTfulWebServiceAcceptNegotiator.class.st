@@ -29,7 +29,7 @@ RESTfulWebServiceAcceptNegotiator >> preferredMediaTypeFor: anHttpRequest [
 
 	acceptableMediaTypes := (anHttpRequest accept splitOn: ',') collect: [ :type | type asMediaType ].
 	groupedAcceptableMediaTypes := acceptableMediaTypes groupedBy: [ :mediaType | mediaType quality ].
-	(groupedAcceptableMediaTypes keys sorted: SortFunction default reversed)
+	(groupedAcceptableMediaTypes keys sorted reverse)
 		do: [ :quality | 
 			((groupedAcceptableMediaTypes at: quality) sorted: #precedence descending)
 				do: [ :acceptable | 
