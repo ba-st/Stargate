@@ -1,6 +1,12 @@
 Extension { #name : #ZnMimeType }
 
 { #category : #'*Stargate-REST-API' }
+ZnMimeType >> asMediaType [
+
+	^ self
+]
+
+{ #category : #'*Stargate-REST-API' }
 ZnMimeType >> canAccept: aMimeType [
 
 	^ (aMimeType main = '*' or: [ aMimeType main = self main ])
