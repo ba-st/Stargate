@@ -1,18 +1,31 @@
+"
+I'm a test for media type extensions
+"
 Class {
 	#name : #MediaTypeTest,
 	#superclass : #TestCase,
-	#category : #'Stargate-REST-API-Tests'
+	#category : #'Stargate-REST-API-Tests-Model'
 }
 
 { #category : #tests }
-MediaTypeTest >> testPrecendce [
+MediaTypeTest >> testCanAccept [
+
+	| mediaType |
+
+	mediaType := 'application/vnd.stargate.pet+json;version=1.0.0' asMediaType.
 
 	self
-		assert: 'text/html' asMediaType precedence equals: 3;
-		assert: 'text/html;q=0.8' asMediaType precedence equals: 3;
-		assert: 'text/*' asMediaType precedence equals: 2;
-		assert: '*/*' asMediaType precedence equals: 1;
-		assert: 'text/vnd.api+html' asMediaType precedence equals: 4
+		assert: (mediaType canAccept: mediaType);
+		assert: (mediaType canAccept: 'application/vnd.stargate.pet+json' asMediaType);
+		assert: (mediaType canAccept: 'application/json' asMediaType);
+		assert: (mediaType canAccept: 'application/*' asMediaType);
+		assert: (mediaType canAccept: '*/*' asMediaType);
+		assert: (mediaType canAccept: 'application/vnd.stargate.pet' asMediaType);
+		assert: (mediaType canAccept: 'application/vnd.stargate.pet+json;version=2.0.0' asMediaType).
+
+	self
+		deny: (mediaType canAccept: 'text/*' asMediaType);
+		deny: (mediaType canAccept: 'application/xml' asMediaType)
 ]
 
 { #category : #tests }

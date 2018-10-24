@@ -22,21 +22,75 @@ RESTfulWebServiceAcceptNegotiator >> initializeBasedOn: aMediaTypeCollection [
 	availableMediaTypes := aMediaTypeCollection 
 ]
 
+{ #category : #'private - accessing' }
+RESTfulWebServiceAcceptNegotiator >> mediaTypesAvailableFor: acceptable [
+
+	^ availableMediaTypes
+		select: [ :available | 
+			(available canAccept: acceptable)
+				and: [ self versionIn: acceptable canBeHandledBy: available ] ]
+]
+
+{ #category : #'private - accessing' }
+RESTfulWebServiceAcceptNegotiator >> precedenceFor: aMediaType [
+
+	| precedence version versionParts |
+
+	aMediaType main = '*'
+		ifTrue: [ ^ 1 ].
+	aMediaType sub = '*'
+		ifTrue: [ ^ 2 ].
+	precedence := 3.
+	(aMediaType isVendorSpecific and: [ aMediaType sub includes: $+ ])
+		ifTrue: [ precedence := precedence + 1 ].
+	version := aMediaType parameterAt: 'version' ifAbsent: [ ^ precedence ].
+	precedence := precedence + 2.
+	versionParts := version splitOn: $..
+	precedence := precedence + versionParts size.
+	versionParts doWithIndex: [ :part :index | precedence := precedence + (part asInteger * (2 raisedTo: 4 - index)) ].
+	^ precedence
+]
+
 { #category : #querying }
 RESTfulWebServiceAcceptNegotiator >> preferredMediaTypeFor: anHttpRequest [
 
-	| acceptableMediaTypes groupedAcceptableMediaTypes |
+	self withAcceptableMediaTypesIn: anHttpRequest do: [ :mediaType | (self sortByPrecedence: (self mediaTypesAvailableFor: mediaType)) ifNotEmpty: [ :availableTypes | ^ availableTypes first ] ].
+	HTTPClientError signalUnsupportedMediaType: 'No media type can be served according to the Accept header'
+]
 
-	acceptableMediaTypes := (anHttpRequest accept splitOn: ',') collect: [ :type | type asMediaType ].
-	groupedAcceptableMediaTypes := acceptableMediaTypes groupedBy: [ :mediaType | mediaType quality ].
-	(groupedAcceptableMediaTypes keys sorted reverse)
-		do: [ :quality | 
-			((groupedAcceptableMediaTypes at: quality) sorted: #precedence descending)
-				do: [ :acceptable | 
-					| options |
+{ #category : #'private - accessing' }
+RESTfulWebServiceAcceptNegotiator >> sortByPrecedence: mediaTypes [
 
-					options := availableMediaTypes select: [ :available | available canAccept: acceptable ].
-					"Here we need to handle the versioning part"
-					options ifNotEmpty: [ ^ (options sorted: #precedence descending) first ] ] ].
-	HTTPClientError signalUnsupportedMediaType: acceptableMediaTypes
+	^ (mediaTypes sorted: [ :a :b | (self precedenceFor: a) < (self precedenceFor: b) ]) reversed 
+]
+
+{ #category : #'private - accessing' }
+RESTfulWebServiceAcceptNegotiator >> versionIn: acceptable canBeHandledBy: available [
+
+	| acceptVersion availableVersion acceptVersionParts availableVersionParts |
+
+	acceptVersion := acceptable parameterAt: 'version' ifAbsent: [ ^ true ].
+	availableVersion := available parameterAt: 'version' ifAbsent: [ ^ false ].
+	acceptVersionParts := acceptVersion splitOn: $..
+	availableVersionParts := availableVersion splitOn: $..
+	acceptVersionParts
+		doWithIndex: [ :acceptPart :index | 
+			| availablePart |
+			availablePart := availableVersionParts at: index.
+			acceptPart ~= availablePart
+				ifTrue: [ ^ false ] ].
+	^ true
+]
+
+{ #category : #'private - accessing' }
+RESTfulWebServiceAcceptNegotiator >> withAcceptableMediaTypesIn: anHttpRequest do: aBlock [
+
+	| acceptable grouped |
+
+	"Parse accept header"
+	acceptable := (anHttpRequest accept splitOn: ',') collect: [ :type | type asMediaType ].
+	"Group it by quality"
+	grouped := acceptable groupedBy: [ :mediaType | mediaType quality ].
+	"Iterate it by max to minimum quality and for each quality group by precedence"
+	grouped keys sorted reverse do: [ :quality | (self sortByPrecedence: (grouped at: quality)) do: aBlock ]
 ]

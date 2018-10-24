@@ -10,7 +10,8 @@ Class {
 	#superclass : #Object,
 	#instVars : [
 		'mappingRuleSet',
-		'baseUrlOptional'
+		'baseUrlOptional',
+		'acceptNegotiator'
 	],
 	#category : #'Stargate-REST-API-Model'
 }
@@ -122,6 +123,7 @@ RESTfulWebService >> initialize [
 	super initialize.
 	mappingRuleSet := self specification mappingRuleSet.
 	baseUrlOptional := Optional unused.
+	acceptNegotiator := RESTfulWebServiceAcceptNegotiator basedOn: self specification mediaTypes
 ]
 
 { #category : #'private - accessing' }
@@ -159,12 +161,7 @@ RESTfulWebService >> specification [
 { #category : #'private - transformations' }
 RESTfulWebService >> targetMediaTypeFrom: anHttpRequest [
 
-	"This is not quite right because the accept header can include several media types including a priority.
-	I'm just extracting the current behavior but this needs to be fixed"
-
-	^ [ anHttpRequest accept asMediaType ]
-		on: ObjectNotFound
-		do: [ :signal | HTTPClientError signalBadRequest: signal messageText ]
+	^ acceptNegotiator preferredMediaTypeFor: anHttpRequest
 ]
 
 { #category : #'private - API' }

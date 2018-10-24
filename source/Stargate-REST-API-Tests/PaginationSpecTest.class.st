@@ -19,3 +19,13 @@ PaginationSpecTest >> testAccessing [
 		assert: spec limit equals: 5;
 		assert: spec end equals: 5
 ]
+
+{ #category : #tests }
+PaginationSpecTest >> testPrintString [
+
+	self
+		assert: (PaginationSpec startingAt: 1 limitedTo: 5) printString
+		equals:
+			'start=1
+limit=5'
+]
