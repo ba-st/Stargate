@@ -11,6 +11,15 @@ Class {
 	#category : #'Stargate-REST-API'
 }
 
+{ #category : #pagination }
+HttpRequestContext >> addPaginationControl: aControl [
+
+	| controls |
+
+	controls := self objectUnder: #paginationLinks ifNone: [ self hold: OrderedCollection new under: #paginationLinks ].
+	controls add: aControl
+]
+
 { #category : #accessing }
 HttpRequestContext >> hold: anObject under: aConcept [
 
@@ -59,4 +68,10 @@ HttpRequestContext >> initialize [
 HttpRequestContext >> objectUnder: aConcept ifNone: aBlock [
 
 	^ knownObjects at: aConcept ifAbsent: aBlock
+]
+
+{ #category : #pagination }
+HttpRequestContext >> paginationControls [
+
+	^ (self objectUnder: #paginationLinks ifNone: [ #() ]) asArray
 ]

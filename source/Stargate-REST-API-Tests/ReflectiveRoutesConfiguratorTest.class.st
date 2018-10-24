@@ -1,7 +1,7 @@
 Class {
 	#name : #ReflectiveRoutesConfiguratorTest,
 	#superclass : #TestCase,
-	#category : #'Stargate-REST-API-Tests'
+	#category : #'Stargate-REST-API-Tests-Model'
 }
 
 { #category : #accessing }
@@ -46,5 +46,5 @@ ReflectiveRoutesConfiguratorTest >> testConfiguringPetsWebServiceRoutes [
 	(ReflectiveRoutesConfigurator appliedTo: teapot) 
 		addRoutesOf: webService.
 
-	self assert: teapot routes size equals: 5
+	self assert: teapot routes size equals: 6
 ]

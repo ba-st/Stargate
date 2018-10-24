@@ -29,6 +29,12 @@ RESTfulWebService >> decode: theRepresentation at: aKey from: sourceMediaType wi
 		do: [ :signal | HTTPClientError signalUnsupportedMediaType: signal messageText ]
 ]
 
+{ #category : #'private - accessing' }
+RESTfulWebService >> defaultPaginationLimit [
+
+	^ self subclassResponsibility
+]
+
 { #category : #'private - transformations' }
 RESTfulWebService >> encode: theResource at: aKey to: targetMediaType within: aContext [
 
@@ -39,7 +45,7 @@ RESTfulWebService >> encode: theResource at: aKey to: targetMediaType within: aC
 		do: [ :signal | HTTPClientError signalUnsupportedMediaType: signal messageText ]
 ]
 
-{ #category : #'private - API' }
+{ #category : #'private - querying' }
 RESTfulWebService >> evaluateQuery: aQueryEvaluationBlock [
 
 	^ [ [ aQueryEvaluationBlock value ]
@@ -49,6 +55,12 @@ RESTfulWebService >> evaluateQuery: aQueryEvaluationBlock [
 		do: [ :signal | HTTPClientError signalNotFound: signal messageText ]
 ]
 
+{ #category : #'private - querying' }
+RESTfulWebService >> evaluateQuery: aQueryEvaluationBlock accordingTo: aPaginationSpec [
+
+	^ self evaluateQuery: [ aQueryEvaluationBlock cull: aPaginationSpec ]
+]
+
 { #category : #'private - API' }
 RESTfulWebService >> get: aQueryEvaluationBlock asCollectionEncodedUsing: aKey basedOn: anHttpRequest within: aContext [
 
@@ -56,19 +68,35 @@ RESTfulWebService >> get: aQueryEvaluationBlock asCollectionEncodedUsing: aKey b
 
 	mediaType := self targetMediaTypeFrom: anHttpRequest.
 
-	^ [ | resourceCollection encodedResourceCollection |
+	^ [ | resourceCollection encodedResourceCollection response paginationLinks |
 
-	resourceCollection := self evaluateQuery: aQueryEvaluationBlock.
-	
-	aContext holdAsHypermediaControls: {('self' -> anHttpRequest absoluteUrl printString)}.
-	resourceCollection do: [ :resource | aContext holdAsHypermediaControls: (self mediaControlsFor: resource) forSubresource: resource ].
-	
+	resourceCollection := self
+		evaluateQuery: aQueryEvaluationBlock
+		accordingTo: (self paginationFrom: anHttpRequest).
+	paginationLinks := aContext paginationControls.
+
+	aContext
+		holdAsHypermediaControls: {('self' -> anHttpRequest absoluteUrl)} , paginationLinks.
+	resourceCollection
+		do: [ :resource | 
+			aContext
+				holdAsHypermediaControls: (self mediaControlsFor: resource)
+				forSubresource: resource ].
+
 	encodedResourceCollection := self
 		encode: resourceCollection
 		at: aKey
 		to: mediaType
 		within: aContext.
-	ZnResponse ok: encodedResourceCollection ]
+	response := ZnResponse ok: encodedResourceCollection.
+	paginationLinks
+		do: [ :assoc | 
+			response
+				addLink:
+					((ZnLink to: assoc value)
+						rel: assoc key;
+						yourself) ].
+	response ]
 		on: ConflictingObjectFound
 		do: [ :error | HTTPClientError signalConflict: error messageText ]
 ]
@@ -105,7 +133,15 @@ RESTfulWebService >> locationOf: resource [
 { #category : #'private - accessing' }
 RESTfulWebService >> mediaControlsFor: result [
 
-	^ {('self' -> (self locationOf: result))}
+	^ {'self' -> (self locationOf: result)}
+]
+
+{ #category : #'private - querying' }
+RESTfulWebService >> paginationFrom: anHttpRequest [
+
+	^ PaginationSpec
+		startingAt: (IsInteger parseString: (anHttpRequest at: #start ifAbsent: [ 1 ]))
+		limitedTo: (IsInteger parseString: (anHttpRequest at: #limit ifAbsent: [ self defaultPaginationLimit ]))
 ]
 
 { #category : #configuring }

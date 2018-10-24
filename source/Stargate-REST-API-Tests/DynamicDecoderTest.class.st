@@ -1,7 +1,7 @@
 Class {
 	#name : #DynamicDecoderTest,
 	#superclass : #TestCase,
-	#category : #'Stargate-REST-API-Tests'
+	#category : #'Stargate-REST-API-Tests-Model'
 }
 
 { #category : #tests }
