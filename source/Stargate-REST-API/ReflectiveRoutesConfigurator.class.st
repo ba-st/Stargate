@@ -9,7 +9,7 @@ Class {
 	#instVars : [
 		'teapot'
 	],
-	#category : #'Stargate-REST-API'
+	#category : #'Stargate-REST-API-Routing'
 }
 
 { #category : #'instance creation' }
@@ -23,13 +23,8 @@ ReflectiveRoutesConfigurator >> addRoutesOf: aWebService [
 
 	| routeConfigurator |
 
-	routeConfigurator := RouteConfigurator
-		appliedTo: teapot
-		sendingMessagesTo: aWebService.
-
-	(self specifiedRoutesFor: aWebService)
-		do: [ :routeSpecification | routeSpecification configureUsing: routeConfigurator ].
-
+	routeConfigurator := RouteConfigurator appliedTo: teapot sendingMessagesTo: aWebService.
+	aWebService specification routes do: [ :routeSpecification | routeSpecification configureUsing: routeConfigurator ].
 	routeConfigurator configureCrossOriginSharingRoutes
 ]
 
@@ -37,12 +32,4 @@ ReflectiveRoutesConfigurator >> addRoutesOf: aWebService [
 ReflectiveRoutesConfigurator >> initializeAppliedTo: aTeapot [ 
 	
 	teapot := aTeapot
-]
-
-{ #category : #accessing }
-ReflectiveRoutesConfigurator >> specifiedRoutesFor: aWebService [
-
-	^ (UnaryMessageSendingCollector
-		sendingAllMessagesEndingWith: 'Route'
-		to: aWebService specification) value
 ]

@@ -4,5 +4,5 @@ I'm an exception expecting to be raised when someone seeks a mapping and cannot 
 Class {
 	#name : #MappingNotFound,
 	#superclass : #Error,
-	#category : #'Stargate-REST-API'
+	#category : #'Stargate-REST-API-Mapping'
 }

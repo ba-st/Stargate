@@ -21,6 +21,13 @@ PetOrdersRESTfulWebService >> cancelOrderBasedOn: anHttpRequest within: aContext
 ]
 
 { #category : #API }
+PetOrdersRESTfulWebService >> completeOrderBasedOn: anHttpRequest within: aContext [
+
+	orderStatus at: (self identifierIn: anHttpRequest) put: 'completed'.
+	^ ZnResponse noContent
+]
+
+{ #category : #API }
 PetOrdersRESTfulWebService >> createOrderBasedOn: anHttpRequest within: aContext [
 
 	^ self
@@ -33,6 +40,12 @@ PetOrdersRESTfulWebService >> createOrderBasedOn: anHttpRequest within: aContext
 		decodedUsing: self specification orderMappingKey
 		basedOn: anHttpRequest
 		within: aContext
+]
+
+{ #category : #'private - accessing' }
+PetOrdersRESTfulWebService >> defaultPaginationLimit [
+
+	^ 10
 ]
 
 { #category : #API }

@@ -9,7 +9,7 @@ Class {
 	#instVars : [
 		'specification'
 	],
-	#category : #'Stargate-REST-API-Model'
+	#category : #'Stargate-REST-API-Mapping'
 }
 
 { #category : #'instance creation' }

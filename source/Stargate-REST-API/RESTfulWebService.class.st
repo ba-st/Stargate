@@ -13,7 +13,7 @@ Class {
 		'baseUrlOptional',
 		'acceptNegotiator'
 	],
-	#category : #'Stargate-REST-API-Model'
+	#category : #'Stargate-REST-API-Services'
 }
 
 { #category : #'private - transformations' }

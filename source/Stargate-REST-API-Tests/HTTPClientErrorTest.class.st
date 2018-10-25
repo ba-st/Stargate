@@ -4,7 +4,7 @@ A HTTPClientErrorTest is a test class for testing the behavior of HTTPClientErro
 Class {
 	#name : #HTTPClientErrorTest,
 	#superclass : #TestCase,
-	#category : #'Stargate-REST-API-Tests-Model'
+	#category : #'Stargate-REST-API-Tests-Services'
 }
 
 { #category : #tests }

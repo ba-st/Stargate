@@ -1,7 +1,10 @@
+"
+Test case
+"
 Class {
 	#name : #RouteSpecificationTest,
 	#superclass : #TestCase,
-	#category : #'Stargate-REST-API-Tests-Model'
+	#category : #'Stargate-REST-API-Tests-Routing'
 }
 
 { #category : #tests }

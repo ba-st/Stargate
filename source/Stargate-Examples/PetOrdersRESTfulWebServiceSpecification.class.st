@@ -1,3 +1,6 @@
+"
+I'm an example RESTful Web Service specification implementing Pet Order resource management
+"
 Class {
 	#name : #PetOrdersRESTfulWebServiceSpecification,
 	#superclass : #RESTFulWebServiceSpecification,

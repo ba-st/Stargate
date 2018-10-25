@@ -8,7 +8,7 @@ Class {
 		'start',
 		'limit'
 	],
-	#category : #'Stargate-REST-API-Model'
+	#category : #'Stargate-REST-API-Services'
 }
 
 { #category : #'Instance creation' }

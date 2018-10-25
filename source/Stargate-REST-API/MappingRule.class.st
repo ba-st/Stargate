@@ -7,7 +7,7 @@ Class {
 		'objectType',
 		'mapper'
 	],
-	#category : #'Stargate-REST-API'
+	#category : #'Stargate-REST-API-Mapping'
 }
 
 { #category : #'private - instance creation' }

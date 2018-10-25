@@ -14,7 +14,7 @@ Class {
 		'parameters',
 		'url'
 	],
-	#category : #'Stargate-REST-API-Model'
+	#category : #'Stargate-REST-API-Zinc'
 }
 
 { #category : #'instance creation' }

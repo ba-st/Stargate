@@ -1,3 +1,6 @@
+"
+I'm an example RESTful Web Service specification implementing Pet resource management
+"
 Class {
 	#name : #PetsRESTfulWebServiceSpecification,
 	#superclass : #RESTFulWebServiceSpecification,

@@ -1,7 +1,7 @@
 Class {
 	#name : #DecodingMappingRule,
 	#superclass : #MappingRule,
-	#category : #'Stargate-REST-API'
+	#category : #'Stargate-REST-API-Mapping'
 }
 
 { #category : #'instance creation' }

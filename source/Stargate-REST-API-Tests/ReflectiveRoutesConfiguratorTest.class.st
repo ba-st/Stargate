@@ -1,7 +1,7 @@
 Class {
 	#name : #ReflectiveRoutesConfiguratorTest,
 	#superclass : #TestCase,
-	#category : #'Stargate-REST-API-Tests-Model'
+	#category : #'Stargate-REST-API-Tests-Routing'
 }
 
 { #category : #accessing }

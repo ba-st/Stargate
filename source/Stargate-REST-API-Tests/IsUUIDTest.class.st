@@ -1,7 +1,10 @@
+"
+Test case
+"
 Class {
 	#name : #IsUUIDTest,
 	#superclass : #TestCase,
-	#category : #'Stargate-REST-API-Tests-Model'
+	#category : #'Stargate-REST-API-Tests-Teapot'
 }
 
 { #category : #tests }
