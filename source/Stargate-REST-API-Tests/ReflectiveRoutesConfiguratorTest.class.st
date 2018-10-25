@@ -17,6 +17,12 @@ ReflectiveRoutesConfiguratorTest >> getTestsRoute [
 ]
 
 { #category : #accessing }
+ReflectiveRoutesConfiguratorTest >> routes [
+
+	^ (UnaryMessageSendingCollector sendingAllMessagesEndingWith: 'Route' to: self) value
+]
+
+{ #category : #accessing }
 ReflectiveRoutesConfiguratorTest >> specification [
 	
 	^ self
