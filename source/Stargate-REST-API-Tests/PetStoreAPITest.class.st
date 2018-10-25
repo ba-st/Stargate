@@ -16,6 +16,16 @@ PetStoreAPITest >> baseUrl [
 	^ 'http://localhost' asUrl port: self port
 ]
 
+{ #category : #tests }
+PetStoreAPITest >> expectedFailures [
+
+	"This test are Ok but failing due to some problem in Teapot. 
+	See https://github.com/zeroflag/Teapot/issues/4,
+	when this issue is fixed we can remove the expected failure"
+
+	^ #(testInvalidMethod)
+]
+
 { #category : #private }
 PetStoreAPITest >> newClient [
 
@@ -88,6 +98,15 @@ PetStoreAPITest >> testCreatePet [
 ]
 
 { #category : #tests }
+PetStoreAPITest >> testGetNotFoundPet [
+
+	self 
+		should: [ self newClient get: self baseUrl / 'pets/1' asUrl ] 
+		raise: ZnHttpUnsuccessful 
+		withExceptionDo: [ :error | self assert: error response isNotFound ]
+]
+
+{ #category : #tests }
 PetStoreAPITest >> testGetPets [
 
 	| json |
@@ -97,4 +116,21 @@ PetStoreAPITest >> testGetPets [
 	self
 		assert: json items isEmpty;
 		assert: json links size equals: 1
+]
+
+{ #category : #tests }
+PetStoreAPITest >> testInvalidMethod [
+
+	self newClient
+		url: self baseUrl / 'pets' asUrl;
+		entity: (ZnEntity with: '{"name":"Firulais","type":"dog"}' ofType: PetsRESTfulWebServiceSpecification new petVersion1dot0dot0MediaType);
+		post.
+
+	self
+		should: [ self newClient put: self baseUrl / 'pets/1' asUrl contents: '' ]
+		raise: ZnHttpUnsuccessful
+		withExceptionDo: [ :error | 
+			self
+				assert: error response isError;
+				assert: error response code equals: 405 ]
 ]
