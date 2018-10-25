@@ -22,7 +22,7 @@ RESTfulWebService >> decode: theRepresentation at: aKey from: sourceMediaType wi
 	^ [ [ (mappingRuleSet ruleToDecode: sourceMediaType to: aKey)
 		applyOn: theRepresentation
 		within: aContext ]
-		on: KeyNotFound , DecodingFailed
+		on: KeyNotFound 
 		do: [ :signal | 
 			HTTPClientError
 				signalBadRequest: ('Expected key <1s> was not found' expandMacrosWith: signal key) ] ]

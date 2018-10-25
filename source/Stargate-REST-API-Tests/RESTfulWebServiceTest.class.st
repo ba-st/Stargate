@@ -7,7 +7,7 @@ Class {
 	#instVars : [
 		'webService'
 	],
-	#category : #'Stargate-REST-API-Tests-PetStore'
+	#category : #'Stargate-REST-API-Tests-Services'
 }
 
 { #category : #testing }
