@@ -25,11 +25,15 @@ HTTPBasedRESTfulAPI >> beCORSAwareAllowing: origins [
 		after:
 			'/*'
 				-> [ :request :response | 
+					| requestOrigin requestOriginUrl |
+
+					requestOrigin := request headers at: 'Origin'.
+					requestOriginUrl := requestOrigin asUrl.
 					origins
-						detect: [ :origin | origin = (request headers at: 'Origin') ]
+						detect: [ :origin | origin = requestOriginUrl ]
 						ifFound: [ :allowedOrigin | 
-							request headers
-								at: 'Access-Control-Allow-Origin' put: allowedOrigin;
+							response headers
+								at: 'Access-Control-Allow-Origin' put: requestOrigin;
 								at: 'Vary' put: 'Origin' ].
 					response ];
 		when: [ :request | request headers includesKey: 'Origin' ]

@@ -67,6 +67,40 @@ PetStoreAPITest >> tearDown [
 ]
 
 { #category : #tests }
+PetStoreAPITest >> testCORS [
+
+	| response |
+
+	api beCORSAwareAllowing: {self baseUrl}.
+	response := self newClient
+		url: self baseUrl / 'pets' asUrl;
+		headerAt: 'Origin' put: self baseUrl printString;
+		get;
+		response.
+
+	self
+		assert: (response headers at: 'Vary') equals: 'Origin';
+		assert: (response headers at: 'Access-Control-Allow-Origin') asUrl equals: self baseUrl
+]
+
+{ #category : #tests }
+PetStoreAPITest >> testCORSWhenNoAllowedOrigin [
+
+	| response |
+
+	api beCORSAwareAllowing: {'https://google.com' asUrl}.
+	response := self newClient
+		url: self baseUrl / 'pets' asUrl;
+		headerAt: 'Origin' put: self baseUrl printString;
+		get;
+		response.
+
+	self
+		should: [ response headers at: 'Vary' ] raise: KeyNotFound;
+		should: [ response headers at: 'Access-Control-Allow-Origin' ] raise: KeyNotFound
+]
+
+{ #category : #tests }
 PetStoreAPITest >> testCantCreatePetWithInvalidContentType [
 
 	self
