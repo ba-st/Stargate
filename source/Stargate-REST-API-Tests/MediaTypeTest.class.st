@@ -4,7 +4,7 @@ I'm a test for media type extensions
 Class {
 	#name : #MediaTypeTest,
 	#superclass : #TestCase,
-	#category : #'Stargate-REST-API-Tests-Model'
+	#category : #'Stargate-REST-API-Tests-Zinc'
 }
 
 { #category : #tests }

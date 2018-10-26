@@ -6,7 +6,7 @@ Class {
 		'handler',
 		'urlTemplate'
 	],
-	#category : #'Stargate-REST-API'
+	#category : #'Stargate-REST-API-Routing'
 }
 
 { #category : #'instance creation' }

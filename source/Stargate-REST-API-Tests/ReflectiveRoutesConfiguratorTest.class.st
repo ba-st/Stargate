@@ -1,7 +1,7 @@
 Class {
 	#name : #ReflectiveRoutesConfiguratorTest,
 	#superclass : #TestCase,
-	#category : #'Stargate-REST-API-Tests-Model'
+	#category : #'Stargate-REST-API-Tests-Routing'
 }
 
 { #category : #accessing }
@@ -14,6 +14,12 @@ ReflectiveRoutesConfiguratorTest >> createTestRoute [
 ReflectiveRoutesConfiguratorTest >> getTestsRoute [
 
 	^ (RouteSpecification handling: #GET at: '/tests' sending: #getTestsBasedOn:) asCorsAware
+]
+
+{ #category : #accessing }
+ReflectiveRoutesConfiguratorTest >> routes [
+
+	^ (UnaryMessageSendingCollector sendingAllMessagesEndingWith: 'Route' to: self) value
 ]
 
 { #category : #accessing }

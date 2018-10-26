@@ -4,7 +4,7 @@ Class {
 	#instVars : [
 		'mappingRuleSetBuilder'
 	],
-	#category : #'Stargate-REST-API-Tests-Model'
+	#category : #'Stargate-REST-API-Tests-Mapping'
 }
 
 { #category : #'tests support' }

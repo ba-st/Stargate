@@ -13,19 +13,15 @@ Class {
 		'baseUrlOptional',
 		'acceptNegotiator'
 	],
-	#category : #'Stargate-REST-API-Model'
+	#category : #'Stargate-REST-API-Services'
 }
 
 { #category : #'private - transformations' }
 RESTfulWebService >> decode: theRepresentation at: aKey from: sourceMediaType within: aContext [
 
-	^ [ [ (mappingRuleSet ruleToDecode: sourceMediaType to: aKey)
-		applyOn: theRepresentation
-		within: aContext ]
-		on: KeyNotFound , DecodingFailed
-		do: [ :signal | 
-			HTTPClientError
-				signalBadRequest: ('Expected key <1s> was not found' expandMacrosWith: signal key) ] ]
+	^ [ [ (mappingRuleSet ruleToDecode: sourceMediaType to: aKey) applyOn: theRepresentation within: aContext ]
+		on: KeyNotFound , NeoJSONParseError
+		do: [ :signal | HTTPClientError signalBadRequest: signal messageText ] ]
 		on: MappingNotFound
 		do: [ :signal | HTTPClientError signalUnsupportedMediaType: signal messageText ]
 ]

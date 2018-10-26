@@ -4,7 +4,7 @@ I'm an exception expecting to be raised when someone makes an incorrect HTTP req
 Class {
 	#name : #HTTPClientError,
 	#superclass : #Error,
-	#category : #'Stargate-REST-API'
+	#category : #'Stargate-REST-API-Services'
 }
 
 { #category : #signaling }

@@ -1,7 +1,7 @@
 Class {
 	#name : #IsUUID,
 	#superclass : #IsObject,
-	#category : #'Stargate-REST-API'
+	#category : #'Stargate-REST-API-Teapot'
 }
 
 { #category : #'type constraint' }

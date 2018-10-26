@@ -8,7 +8,7 @@ Class {
 	#instVars : [
 		'knownObjects'
 	],
-	#category : #'Stargate-REST-API'
+	#category : #'Stargate-REST-API-Routing'
 }
 
 { #category : #pagination }

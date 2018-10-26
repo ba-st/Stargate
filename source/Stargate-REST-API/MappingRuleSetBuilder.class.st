@@ -5,7 +5,7 @@ Class {
 		'decodingRules',
 		'encodingRules'
 	],
-	#category : #'Stargate-REST-API'
+	#category : #'Stargate-REST-API-Mapping'
 }
 
 { #category : #configuring }

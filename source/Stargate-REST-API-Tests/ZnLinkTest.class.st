@@ -4,7 +4,7 @@ I'm a test case for ZnLink
 Class {
 	#name : #ZnLinkTest,
 	#superclass : #TestCase,
-	#category : #'Stargate-REST-API-Tests-Model'
+	#category : #'Stargate-REST-API-Tests-Zinc'
 }
 
 { #category : #support }

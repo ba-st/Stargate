@@ -7,7 +7,7 @@ Class {
 	#instVars : [
 		'availableMediaTypes'
 	],
-	#category : #'Stargate-REST-API-Model'
+	#category : #'Stargate-REST-API-Services'
 }
 
 { #category : #'instance creation' }
