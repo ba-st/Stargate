@@ -28,7 +28,7 @@ PetOrdersRESTfulWebServiceTest >> petUrl [
 { #category : #'private - support' }
 PetOrdersRESTfulWebServiceTest >> requestToCreateOrderFrom: json [
 
-	^ self requestToPOST: json type: webService specification orderVersion1dot0dot0MediaType
+	^ self requestToPOST: json as: webService specification orderVersion1dot0dot0MediaType
 ]
 
 { #category : #'private - support' }

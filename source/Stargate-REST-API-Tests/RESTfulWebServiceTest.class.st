@@ -46,7 +46,7 @@ RESTfulWebServiceTest >> requestToGetResourceIdentifiedBy: anIdentifier acceptin
 ]
 
 { #category : #'private - support' }
-RESTfulWebServiceTest >> requestToPOST: content type: aMediaType [
+RESTfulWebServiceTest >> requestToPOST: content as: aMediaType [
 
 	^ TeaRequest
 		fromZnRequest:

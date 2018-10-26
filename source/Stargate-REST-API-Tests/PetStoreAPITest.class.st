@@ -23,7 +23,7 @@ PetStoreAPITest >> expectedFailures [
 	See https://github.com/zeroflag/Teapot/issues/4,
 	when this issue is fixed we can remove the expected failure"
 
-	^ #(testInvalidMethod)
+	^ #(#testMethodNotAllowed)
 ]
 
 { #category : #private }
@@ -33,6 +33,18 @@ PetStoreAPITest >> newClient [
 		beOneShot;
 		enforceHttpSuccess: true;
 		yourself
+]
+
+{ #category : #private }
+PetStoreAPITest >> ordersSpec [
+
+	^ PetOrdersRESTfulWebServiceSpecification new
+]
+
+{ #category : #private }
+PetStoreAPITest >> petsSpec [
+
+	^ PetsRESTfulWebServiceSpecification new
 ]
 
 { #category : #private }
@@ -66,8 +78,21 @@ PetStoreAPITest >> tearDown [
 	super tearDown
 ]
 
-{ #category : #tests }
-PetStoreAPITest >> testCORS [
+{ #category : #'tests - client errors' }
+PetStoreAPITest >> testBadRequest [
+
+	self
+		should: [ self newClient
+				url: self baseUrl / 'orders' asUrl;
+				entity: (ZnEntity with: '{xxxx}' ofType: self ordersSpec orderVersion1dot0dot0MediaType);
+				post;
+				response ]
+		raise: ZnHttpUnsuccessful
+		withExceptionDo: [ :error | self assert: error response isBadRequest ]
+]
+
+{ #category : #'tests - CORS' }
+PetStoreAPITest >> testCORSHeadersWhenOriginIsAllowed [
 
 	| response |
 
@@ -83,8 +108,8 @@ PetStoreAPITest >> testCORS [
 		assert: (response headers at: 'Access-Control-Allow-Origin') asUrl equals: self baseUrl
 ]
 
-{ #category : #tests }
-PetStoreAPITest >> testCORSWhenNoAllowedOrigin [
+{ #category : #'tests - CORS' }
+PetStoreAPITest >> testCORSHeadersWhenOriginIsNotAllowed [
 
 	| response |
 
@@ -101,43 +126,19 @@ PetStoreAPITest >> testCORSWhenNoAllowedOrigin [
 ]
 
 { #category : #tests }
-PetStoreAPITest >> testCantCreatePetWithInvalidContentType [
-
-	self
-		should: [ self newClient 
-				url: self baseUrl / 'pets' asUrl;
-				entity: (ZnEntity json: '{"name":"Firulais","type":"dog"}');
-				post ]
-		raise: ZnHttpUnsuccessful
-		withExceptionDo: [ :error | 
-			self
-				assert: error response isError;
-				assert: error response code equals: 415 ]
-]
-
-{ #category : #tests }
 PetStoreAPITest >> testCreatePet [
 
 	| response |
 
 	response := self newClient
 		url: self baseUrl / 'pets' asUrl;
-		entity: (ZnEntity with: '{"name":"Firulais","type":"dog"}' ofType: PetsRESTfulWebServiceSpecification new petVersion1dot0dot0MediaType);
+		entity: (ZnEntity with: '{"name":"Firulais","type":"dog"}' ofType: self petsSpec petVersion1dot0dot0MediaType);
 		post;
 		response.
 
 	self
 		assert: response isCreated;
 		assert: response location equals: 'http://localhost:9999/pets/1'
-]
-
-{ #category : #tests }
-PetStoreAPITest >> testGetNotFoundPet [
-
-	self 
-		should: [ self newClient get: self baseUrl / 'pets/1' asUrl ] 
-		raise: ZnHttpUnsuccessful 
-		withExceptionDo: [ :error | self assert: error response isNotFound ]
 ]
 
 { #category : #tests }
@@ -152,12 +153,12 @@ PetStoreAPITest >> testGetPets [
 		assert: json links size equals: 1
 ]
 
-{ #category : #tests }
-PetStoreAPITest >> testInvalidMethod [
+{ #category : #'tests - client errors' }
+PetStoreAPITest >> testMethodNotAllowed [
 
 	self newClient
 		url: self baseUrl / 'pets' asUrl;
-		entity: (ZnEntity with: '{"name":"Firulais","type":"dog"}' ofType: PetsRESTfulWebServiceSpecification new petVersion1dot0dot0MediaType);
+		entity: (ZnEntity with: '{"name":"Firulais","type":"dog"}' ofType: self petsSpec petVersion1dot0dot0MediaType);
 		post.
 
 	self
@@ -167,4 +168,28 @@ PetStoreAPITest >> testInvalidMethod [
 			self
 				assert: error response isError;
 				assert: error response code equals: 405 ]
+]
+
+{ #category : #'tests - client errors' }
+PetStoreAPITest >> testNotFound [
+
+	self 
+		should: [ self newClient get: self baseUrl / 'pets/1' asUrl ] 
+		raise: ZnHttpUnsuccessful 
+		withExceptionDo: [ :error | self assert: error response isNotFound ]
+]
+
+{ #category : #'tests - client errors' }
+PetStoreAPITest >> testUnsupportedMediaType [
+
+	self
+		should: [ self newClient 
+				url: self baseUrl / 'pets' asUrl;
+				entity: (ZnEntity json: '{"name":"Firulais","type":"dog"}');
+				post ]
+		raise: ZnHttpUnsuccessful
+		withExceptionDo: [ :error | 
+			self
+				assert: error response isError;
+				assert: error response code equals: 415 ]
 ]

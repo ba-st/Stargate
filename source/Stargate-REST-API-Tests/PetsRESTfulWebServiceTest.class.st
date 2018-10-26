@@ -30,7 +30,7 @@ PetsRESTfulWebServiceTest >> createSixPets [
 { #category : #'private - support' }
 PetsRESTfulWebServiceTest >> requestToCreatePetFrom: json [
 
-	^ self requestToPOST: json type: webService specification petVersion1dot0dot0MediaType
+	^ self requestToPOST: json as: webService specification petVersion1dot0dot0MediaType
 ]
 
 { #category : #'private - support' }
