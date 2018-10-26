@@ -56,5 +56,5 @@ HTTPNotAcceptable >> neoJsonOn: neoJSONWriter [
 		writeMap:
 			{(#code -> self code).
 			(#message -> self messageText).
-			(#allowedMediaTypes -> allowedMediaTypes)} asDictionary
+			(#allowedMediaTypes -> self allowedMediaTypes)} asDictionary
 ]
