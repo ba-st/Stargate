@@ -171,6 +171,20 @@ PetStoreAPITest >> testMethodNotAllowed [
 ]
 
 { #category : #'tests - client errors' }
+PetStoreAPITest >> testNotAcceptable [
+
+	self
+		should: [ self newClient
+				setAccept: 'application/xml';
+				get: self baseUrl / 'pets' asUrl ]
+		raise: ZnHttpUnsuccessful
+		withExceptionDo: [ :error | 
+			self
+				assert: error response code equals: 406;
+				assert: error response hasEntity ]
+]
+
+{ #category : #'tests - client errors' }
 PetStoreAPITest >> testNotFound [
 
 	self 

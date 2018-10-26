@@ -50,3 +50,12 @@ HTTPClientError >> code [
 
 	^self tag
 ]
+
+{ #category : #converting }
+HTTPClientError >> neoJsonOn: neoJSONWriter [
+
+	neoJSONWriter
+		writeMap:
+			{(#code -> self code).
+			(#message -> self messageText)} asDictionary
+]
