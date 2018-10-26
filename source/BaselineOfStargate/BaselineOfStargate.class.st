@@ -11,12 +11,15 @@ BaselineOfStargate >> baseline: spec [
 	spec
 		for: #common
 		do: [ self setUpDependencies: spec.
-			spec package: 'Stargate-REST-API' with: [ spec requires: #('Buoy' 'Teapot') ].
-			spec package: 'Stargate-Examples' with: [ spec requires: 'Stargate-REST-API' ].
-			spec package: 'Stargate-REST-API-Tests' with: [ spec requires: #('Stargate-REST-API' 'Stargate-Examples') ].
+			spec package: 'Stargate-Model' with: [ spec requires: #('Buoy' 'Teapot') ].
+			spec package: 'Stargate-Examples' with: [ spec requires: 'Stargate-Model' ].
+			spec package: 'Stargate-Model-Tests' with: [ spec requires: #('Stargate-Model') ].
+			spec package: 'Stargate-Examples-Tests' with: [ spec requires: #('Stargate-Model-Tests' 'Stargate-Examples') ].
 			spec
-				group: 'Deployment' with: #('Stargate-REST-API');
-				group: 'Development' with: #('Deployment' 'Stargate-REST-API-Tests');
+				group: 'Deployment' with: #('Stargate-Model');
+				group: 'Examples' with: #('Deployment' 'Stargate-Examples');
+				group: 'Tests' with: #('Examples' 'Stargate-Examples-Tests' 'Stargate-Model-Tests');
+				group: 'Development' with: #('Tests');
 				group: 'default' with: #('Deployment') ]
 ]
 
