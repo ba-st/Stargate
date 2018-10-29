@@ -20,6 +20,20 @@ PetOrdersRESTfulWebServiceTest >> createOrder [
 ]
 
 { #category : #'private - support' }
+PetOrdersRESTfulWebServiceTest >> getFirstOrderAndWithJsonDo: aBlock [
+
+	| response |
+
+	response := webService getOrderBasedOn: (self requestToGetResourceIdentifiedBy: 1 accepting: webService specification orderVersion1dot0dot0MediaType) within: self newHttpRequestContext.
+
+	self
+		assert: response isSuccess;
+		assert: response status equals: 200;
+		assert: response contentType asMediaType equals: webService specification orderVersion1dot0dot0MediaType;
+		withJsonFromContentsIn: response do: aBlock
+]
+
+{ #category : #'private - support' }
 PetOrdersRESTfulWebServiceTest >> petUrl [
 
 	^ self baseUrl / 'pets/1' asUrl
@@ -55,41 +69,17 @@ PetOrdersRESTfulWebServiceTest >> setUpWebService [
 { #category : #tests }
 PetOrdersRESTfulWebServiceTest >> testGetCanceledOrder [
 
-	| response |
-
 	self
-		assert: self createOrder isSuccess;
-		assert: webService orders size equals: 1.
-
-	response := webService getOrderBasedOn: (self requestToGetResourceIdentifiedBy: 1 accepting: webService specification orderVersion1dot0dot0MediaType) within: self newHttpRequestContext.
-
-	self
-		assert: response isSuccess;
-		assert: response status equals: 200;
-		assert: response contentType asMediaType equals: webService specification orderVersion1dot0dot0MediaType.
-
-	self
-		withJsonFromContentsIn: response
-		do: [ :json | 
+		createOrder;
+		getFirstOrderAndWithJsonDo: [ :json | 
 			self
 				assertUrl: json pet equals: self petUrl;
 				assert: json status equals: 'registered';
 				assertUrl: json links self equals: 'https://petstore.example.com/orders/1';
 				assertUrl: json links cancel equals: 'https://petstore.example.com/orders/1/cancel';
-				assertUrl: json links complete equals: 'https://petstore.example.com/orders/1/complete'.
-
-			self assert: (webService cancelOrderBasedOn: (self requestToPOST: json links cancel identifiedBy: 1) within: self newHttpRequestContext) isSuccess ].
-
-	response := webService getOrderBasedOn: (self requestToGetResourceIdentifiedBy: 1 accepting: webService specification orderVersion1dot0dot0MediaType) within: self newHttpRequestContext.
-
-	self
-		assert: response isSuccess;
-		assert: response status equals: 200;
-		assert: response contentType asMediaType equals: webService specification orderVersion1dot0dot0MediaType.
-
-	self
-		withJsonFromContentsIn: response
-		do: [ :json | 
+				assertUrl: json links complete equals: 'https://petstore.example.com/orders/1/complete';
+				assert: (webService cancelOrderBasedOn: (self requestToPOST: json links cancel identifiedBy: 1) within: self newHttpRequestContext) isSuccess ];
+		getFirstOrderAndWithJsonDo: [ :json | 
 			self
 				assertUrl: json pet equals: self petUrl;
 				assert: json status equals: 'canceled';
@@ -99,22 +89,9 @@ PetOrdersRESTfulWebServiceTest >> testGetCanceledOrder [
 { #category : #tests }
 PetOrdersRESTfulWebServiceTest >> testGetOrderJustCreated [
 
-	| response |
-
 	self
-		assert: self createOrder isSuccess;
-		assert: webService orders size equals: 1.
-
-	response := webService getOrderBasedOn: (self requestToGetResourceIdentifiedBy: 1 accepting: webService specification orderVersion1dot0dot0MediaType) within: self newHttpRequestContext.
-
-	self
-		assert: response isSuccess;
-		assert: response status equals: 200;
-		assert: response contentType asMediaType equals: webService specification orderVersion1dot0dot0MediaType.
-
-	self
-		withJsonFromContentsIn: response
-		do: [ :json | 
+		createOrder;
+		getFirstOrderAndWithJsonDo: [ :json | 
 			self
 				assertUrl: json pet equals: self petUrl;
 				assert: json status equals: 'registered';
@@ -126,66 +103,55 @@ PetOrdersRESTfulWebServiceTest >> testGetOrderJustCreated [
 { #category : #tests }
 PetOrdersRESTfulWebServiceTest >> testHATEOAS [
 
-	| response |
+	"This case will transition an order from registered to completed to canceled, using the hypermedia controls provided
+	in the response."
 
 	self
-		assert: self createOrder isSuccess;
-		assert: webService orders size equals: 1.
-
-	response := webService getOrderBasedOn: (self requestToGetResourceIdentifiedBy: 1 accepting: webService specification orderVersion1dot0dot0MediaType) within: self newHttpRequestContext.
-
-	self
-		assert: response isSuccess;
-		assert: response status equals: 200;
-		assert: response contentType asMediaType equals: webService specification orderVersion1dot0dot0MediaType.
-
-	self
-		withJsonFromContentsIn: response
-		do: [ :json | 
+		createOrder;
+		getFirstOrderAndWithJsonDo: [ :json | 
 			self
 				assertUrl: json pet equals: self petUrl;
 				assert: json status equals: 'registered';
 				assertUrl: json links self equals: 'https://petstore.example.com/orders/1';
 				assertUrl: json links cancel equals: 'https://petstore.example.com/orders/1/cancel';
-				assertUrl: json links complete equals: 'https://petstore.example.com/orders/1/complete'.
-
-			self assert: (webService completeOrderBasedOn:  (self requestToPOST: json links complete identifiedBy: 1) within: self newHttpRequestContext) isSuccess ].
-
-	response := webService getOrderBasedOn: (self requestToGetResourceIdentifiedBy: 1 accepting: webService specification orderVersion1dot0dot0MediaType) within: self newHttpRequestContext.
-
-	self
-		assert: response isSuccess;
-		assert: response status equals: 200;
-		assert: response contentType asMediaType equals: webService specification orderVersion1dot0dot0MediaType.
-
-	self
-		withJsonFromContentsIn: response
-		do: [ :json | 
+				assertUrl: json links complete equals: 'https://petstore.example.com/orders/1/complete';
+				assert: (webService completeOrderBasedOn: (self requestToPOST: json links complete identifiedBy: 1) within: self newHttpRequestContext) isSuccess ];
+		getFirstOrderAndWithJsonDo: [ :json | 
 			self
 				assertUrl: json pet equals: self petUrl;
 				assert: json status equals: 'completed';
 				assertUrl: json links self equals: 'https://petstore.example.com/orders/1';
 				assertUrl: json links cancel equals: 'https://petstore.example.com/orders/1/cancel';
-				assert: json links complete isNil.
-
-			self assert: (webService cancelOrderBasedOn: (self requestToPOST: json links cancel identifiedBy: 1) within: self newHttpRequestContext) isSuccess ].
-
-	response := webService getOrderBasedOn: (self requestToGetResourceIdentifiedBy: 1 accepting: webService specification orderVersion1dot0dot0MediaType) within: self newHttpRequestContext.
-
-	self
-		assert: response isSuccess;
-		assert: response status equals: 200;
-		assert: response contentType asMediaType equals: webService specification orderVersion1dot0dot0MediaType.
-
-	self
-		withJsonFromContentsIn: response
-		do: [ :json | 
+				assert: json links complete isNil;
+				assert: (webService cancelOrderBasedOn: (self requestToPOST: json links cancel identifiedBy: 1) within: self newHttpRequestContext) isSuccess ];
+		getFirstOrderAndWithJsonDo: [ :json | 
 			self
 				assertUrl: json pet equals: self petUrl;
 				assert: json status equals: 'canceled';
 				assertUrl: json links self equals: 'https://petstore.example.com/orders/1';
 				assert: json links cancel isNil;
 				assert: json links complete isNil ]
+]
+
+{ #category : #tests }
+PetOrdersRESTfulWebServiceTest >> testInvalidStateTransition [
+
+	| completeOrderLink |
+
+	self
+		createOrder;
+		getFirstOrderAndWithJsonDo: [ :json | 
+			self assert: json status equals: 'registered'.
+			completeOrderLink := json links complete.
+			self assert: (webService cancelOrderBasedOn: (self requestToPOST: json links cancel identifiedBy: 1) within: self newHttpRequestContext) isSuccess ];
+		getFirstOrderAndWithJsonDo: [ :json | 
+			self
+				assert: json status equals: 'canceled';
+				assert: json links cancel isNil;
+				assert: json links complete isNil ];
+		should: [ webService completeOrderBasedOn: (self requestToPOST: completeOrderLink identifiedBy: 1) within: self newHttpRequestContext ]
+			raise: HTTPClientError
+			withExceptionDo: [ :error | self assert: error code equals: 409 ]
 ]
 
 { #category : #tests }

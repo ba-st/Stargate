@@ -65,37 +65,29 @@ RESTfulWebService >> get: aQueryEvaluationBlock asCollectionEncodedUsing: aKey b
 
 	mediaType := self targetMediaTypeFrom: anHttpRequest.
 
-	^ [ | resourceCollection encodedResourceCollection response paginationLinks |
+	^ self
+		handleConflictsIn: [ | resourceCollection encodedResourceCollection response paginationLinks |
 
-	resourceCollection := self
-		evaluateQuery: aQueryEvaluationBlock
-		accordingTo: (self paginationFrom: anHttpRequest).
-	paginationLinks := aContext paginationControls.
+			resourceCollection := self evaluateQuery: aQueryEvaluationBlock accordingTo: (self paginationFrom: anHttpRequest).
+			paginationLinks := aContext paginationControls.
 
-	aContext
-		holdAsHypermediaControls: {('self' -> anHttpRequest absoluteUrl)} , paginationLinks.
-	resourceCollection
-		do: [ :resource | 
-			aContext
-				holdAsHypermediaControls: (self mediaControlsFor: resource)
-				forSubresource: resource ].
+			aContext holdAsHypermediaControls: {('self' -> anHttpRequest absoluteUrl)} , paginationLinks.
+			resourceCollection do: [ :resource | aContext holdAsHypermediaControls: (self mediaControlsFor: resource) forSubresource: resource ].
 
-	encodedResourceCollection := self
-		encode: resourceCollection
-		at: aKey
-		to: mediaType
-		within: aContext.
-	response := ZnResponse ok: encodedResourceCollection.
-	paginationLinks
-		do: [ :assoc | 
-			response
-				addLink:
-					((ZnLink to: assoc value)
-						rel: assoc key;
-						yourself) ].
-	response ]
-		on: ConflictingObjectFound
-		do: [ :error | HTTPClientError signalConflict: error messageText ]
+			encodedResourceCollection := self
+				encode: resourceCollection
+				at: aKey
+				to: mediaType
+				within: aContext.
+			response := ZnResponse ok: encodedResourceCollection.
+			paginationLinks
+				do: [ :assoc | 
+					response
+						addLink:
+							((ZnLink to: assoc value)
+								rel: assoc key;
+								yourself) ].
+			response ]
 ]
 
 { #category : #'private - API' }
@@ -105,12 +97,18 @@ RESTfulWebService >> get: aQueryEvaluationBlock encodedUsing: aKey basedOn: anHt
 
 	mediaType := self targetMediaTypeFrom: anHttpRequest.
 
-	^ [ 
+	^ self handleConflictsIn: [ 
 		resource := self evaluateQuery: aQueryEvaluationBlock.
 		aContext holdAsHypermediaControls: (self mediaControlsFor: resource).
 		ZnResponse ok: (self encode: resource at: aKey to: mediaType within: aContext) ]
+]
+
+{ #category : #'private - transformations' }
+RESTfulWebService >> handleConflictsIn: aBlock [
+
+	^ aBlock
 		on: ConflictingObjectFound
-		do: [ :error | HTTPClientError signalConflict: error messageText ]
+		do: [ :signal | HTTPClientError signalConflict: signal messageText ]
 ]
 
 { #category : #initialization }
@@ -171,9 +169,7 @@ RESTfulWebService >> withCreatedResourceDo: aBlock decodedUsing: aKey basedOn: a
 		from: anHttpRequest contentType
 		within: aContext.
 
-	newResource := [ aBlock value: decodedRepresentation ]
-		on: ConflictingObjectFound
-		do: [ :signal | HTTPClientError signalConflict: signal messageText ].
+	newResource := self handleConflictsIn: [ aBlock value: decodedRepresentation ].
 
 	^ ZnResponse created: (self locationOf: newResource)
 ]

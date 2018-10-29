@@ -16,14 +16,14 @@ Class {
 { #category : #API }
 PetOrdersRESTfulWebService >> cancelOrderBasedOn: anHttpRequest within: aContext [
 
-	orderStatus at: (self identifierIn: anHttpRequest) put: 'canceled'.
+	self handleConflictsIn: [ orderStatus at: (self identifierIn: anHttpRequest) put: 'canceled' ].
 	^ ZnResponse noContent
 ]
 
 { #category : #API }
 PetOrdersRESTfulWebService >> completeOrderBasedOn: anHttpRequest within: aContext [
 
-	orderStatus at: (self identifierIn: anHttpRequest) put: 'completed'.
+	self handleConflictsIn: [ self updateOrderStatusToCompletedBasedOn: anHttpRequest ].
 	^ ZnResponse noContent
 ]
 
@@ -119,4 +119,17 @@ PetOrdersRESTfulWebService >> orders [
 PetOrdersRESTfulWebService >> specification [
 
 	^ PetOrdersRESTfulWebServiceSpecification new
+]
+
+{ #category : #'private - API' }
+PetOrdersRESTfulWebService >> updateOrderStatusToCompletedBasedOn: anHttpRequest [
+
+	| orderId |
+
+	orderId := self identifierIn: anHttpRequest.
+	AssertionChecker
+		enforce: [ (orderStatus at: orderId) = 'registered' ]
+		because: 'Non pending orders cannot be completed.'
+		raising: ConflictingObjectFound.
+	^ orderStatus at: orderId put: 'completed'
 ]

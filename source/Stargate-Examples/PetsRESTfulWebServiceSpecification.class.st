@@ -91,7 +91,7 @@ PetsRESTfulWebServiceSpecification >> getPetsRoute [
 { #category : #'private - accessing' }
 PetsRESTfulWebServiceSpecification >> idTemplate [
 
-	^ '<1s>/<2s:IsInteger>' expandMacrosWith: self endpoint with: self identifierKey
+	^ '<1s>/%<<2s>:IsInteger>' expandMacrosWith: self endpoint with: self identifierKey
 ]
 
 { #category : #accessing }
