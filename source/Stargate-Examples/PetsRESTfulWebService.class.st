@@ -7,7 +7,8 @@ Class {
 	#instVars : [
 		'pets',
 		'nextId',
-		'petById'
+		'petById',
+		'updateTimestamps'
 	],
 	#category : #'Stargate-Examples'
 }
@@ -34,7 +35,7 @@ PetsRESTfulWebService >> createPetBasedOn: anHttpRequest within: aContext [
 
 			newPet := Pet named: resource name ofType: resource type.
 			pets add: newPet.
-			petById at: nextId put: newPet.
+			self recordIdAndUpdateTimestampFor: newPet.
 			nextId := nextId + 1.
 			newPet ]
 		decodedUsing: self specification petMappingKey
@@ -56,6 +57,17 @@ PetsRESTfulWebService >> deletePetBasedOn: anHttpRequest within: aContext [
 		do: [ :signal | HTTPClientError signalNotFound ].
 
 	^ ZnResponse noContent
+]
+
+{ #category : #'private - accessing' }
+PetsRESTfulWebService >> entityTagOf: aPet encodedAs: mediaType [
+
+	^ (SHA1 new
+		hashMessage:
+			('<1s>-<2s>-<3s>'
+				expandMacrosWith: (self identifierOf: aPet) asString
+				with: (self lastModificationOf: aPet) asString
+				with: mediaType asString)) hex
 ]
 
 { #category : #API }
@@ -93,13 +105,26 @@ PetsRESTfulWebService >> getPetsBasedOn: anHttpRequest within: aContext [
 		within: aContext
 ]
 
+{ #category : #'private - accessing' }
+PetsRESTfulWebService >> identifierOf: aPet [
+
+	^ petById keyAtValue: aPet
+]
+
 { #category : #initialization }
 PetsRESTfulWebService >> initialize [
 
 	super initialize.
 	pets := OrderedCollection new.
 	petById := IdentityDictionary new.
+	updateTimestamps := IdentityDictionary new.
 	nextId := 1 
+]
+
+{ #category : #'private - accessing' }
+PetsRESTfulWebService >> lastModificationOf: aPet [
+
+	^ updateTimestamps at: (self identifierOf: aPet)
 ]
 
 { #category : #'private - accessing' }
@@ -110,7 +135,7 @@ PetsRESTfulWebService >> locationOf: aPet [
 	baseUrl := '' asZnUrl.
 	baseUrlOptional withContentDo: [ :theBaseUrl | baseUrl := theBaseUrl ].
 
-	^ baseUrl / self specification endpoint asZnUrl / (petById keyAtValue: aPet) printString asZnUrl
+	^ baseUrl / self specification endpoint asZnUrl / (self identifierOf: aPet) printString asZnUrl
 ]
 
 { #category : #'private - accessing' }
@@ -125,25 +150,51 @@ PetsRESTfulWebService >> pets [
 	^ pets
 ]
 
+{ #category : #'private - state management' }
+PetsRESTfulWebService >> recordIdAndUpdateTimestampFor: newPet [
+
+	petById at: nextId put: newPet.
+	"I will simulate a timestamp using a fixed version revision,
+	because for the tests it's easier that using the current datetime"
+	updateTimestamps at: nextId put: 1
+]
+
 { #category : #accessing }
 PetsRESTfulWebService >> specification [
 
 	^ PetsRESTfulWebServiceSpecification new
 ]
 
+{ #category : #'private - state management' }
+PetsRESTfulWebService >> updatePet: pet with: resource [
+
+	pet
+		synchronizeWith:
+			(Pet
+				named: (resource at: #name ifAbsent: [ pet name ])
+				ofType: (resource at: #type ifAbsent: [ pet type ])
+				withStatus: (resource at: #status ifAbsent: [ pet status ])).
+	updateTimestamps at: (self identifierOf: pet) put: (updateTimestamps at: (self identifierOf: pet)) + 1
+]
+
 { #category : #API }
-PetsRESTfulWebService >> updatePetStatusBasedOn: anHttpRequest within: aContext [
+PetsRESTfulWebService >> updatePetBasedOn: anHttpRequest within: aContext [
+
+	| etag |
+
+	etag := self entityTagToMatchBasedOn: anHttpRequest.
 
 	^ self
 		get: [ | resource pet |
 
+			pet := self petIdentifiedUsing: anHttpRequest.
+			self assert: etag matchesEntityTagOf: pet encodedAs: anHttpRequest contentType.
 			resource := self
 				decode: anHttpRequest contents
 				at: self specification petMappingKey
 				from: anHttpRequest contentType
 				within: aContext.
-			pet := self petIdentifiedUsing: anHttpRequest.
-			pet synchronizeWith: (Pet named: (resource at: #name ifAbsent: [ pet name ]) ofType: (resource at: #type ifAbsent: [ pet type ]) withStatus: (resource at: #status ifAbsent: [ pet status ])).
+			self updatePet: pet with: resource.
 			pet ]
 		encodedUsing: self specification petMappingKey
 		basedOn: anHttpRequest

@@ -127,11 +127,5 @@ PetsRESTfulWebServiceSpecification >> petsMappingKey [
 { #category : #routes }
 PetsRESTfulWebServiceSpecification >> updatePetRoute [
 
-	^ RouteSpecification handling: #PUT at: self endpoint evaluating: [ :service :httpRequest :context | service updatePetBasedOn: httpRequest within: context ]
-]
-
-{ #category : #routes }
-PetsRESTfulWebServiceSpecification >> updatePetStatusRoute [
-
-	^ RouteSpecification handling: #PATCH at: self idTemplate evaluating: [ :service :httpRequest :context | service updatePetStatusBasedOn: httpRequest within: context ]
+	^ RouteSpecification handling: #PATCH at: self idTemplate evaluating: [ :service :httpRequest :context | service updatePetBasedOn: httpRequest within: context ]
 ]

@@ -16,6 +16,13 @@ Class {
 	#category : #'Stargate-Model-Services'
 }
 
+{ #category : #'private - asserting' }
+RESTfulWebService >> assert: etag matchesEntityTagOf: pet encodedAs: mediaType [
+
+	(etag = (self entityTagOf: pet encodedAs: mediaType))
+		ifFalse: [ HTTPClientError signalPreconditionFailed ]
+]
+
 { #category : #'private - transformations' }
 RESTfulWebService >> decode: theRepresentation at: aKey from: sourceMediaType within: aContext [
 
@@ -40,6 +47,24 @@ RESTfulWebService >> encode: theResource at: aKey to: targetMediaType within: aC
 		within: aContext ]
 		on: MappingNotFound
 		do: [ :signal | HTTPClientError signalUnsupportedMediaType: signal messageText ]
+]
+
+{ #category : #'private - accessing' }
+RESTfulWebService >> entityTagOf: resource encodedAs: mediaType [
+
+	self subclassResponsibility
+]
+
+{ #category : #'private - accessing' }
+RESTfulWebService >> entityTagToMatchBasedOn: anHttpRequest [
+
+	| ifMatchHeader |
+
+	ifMatchHeader := anHttpRequest headers at: #'If-Match' ifAbsent: [ ^ HTTPClientError signalPreconditionRequired: 'Missing If-Match header.' ].
+	ifMatchHeader size > 3
+		ifFalse: [ HTTPClientError signalBadRequest: 'Invalid ETag syntax in If-Match' ].
+	"We need to remove the quotes"
+	^ ifMatchHeader copyFrom: 2 to: ifMatchHeader size - 1
 ]
 
 { #category : #'private - querying' }
@@ -93,14 +118,16 @@ RESTfulWebService >> get: aQueryEvaluationBlock asCollectionEncodedUsing: aKey b
 { #category : #'private - API' }
 RESTfulWebService >> get: aQueryEvaluationBlock encodedUsing: aKey basedOn: anHttpRequest within: aContext [
 
-	| mediaType resource |
+	| mediaType resource response |
 
 	mediaType := self targetMediaTypeFrom: anHttpRequest.
 
-	^ self handleConflictsIn: [ 
-		resource := self evaluateQuery: aQueryEvaluationBlock.
-		aContext holdAsHypermediaControls: (self mediaControlsFor: resource).
-		ZnResponse ok: (self encode: resource at: aKey to: mediaType within: aContext) ]
+	^ self
+		handleConflictsIn: [ resource := self evaluateQuery: aQueryEvaluationBlock.
+			aContext holdAsHypermediaControls: (self mediaControlsFor: resource).
+			response := ZnResponse ok:(self encode: resource at: aKey to: mediaType within: aContext).
+			self putEntityTagOf: resource encodedAs: mediaType in: response.
+			response ]
 ]
 
 { #category : #'private - transformations' }
@@ -138,6 +165,12 @@ RESTfulWebService >> paginationFrom: anHttpRequest [
 	^ PaginationSpec
 		startingAt: (IsInteger parseString: (anHttpRequest at: #start ifAbsent: [ 1 ]))
 		limitedTo: (IsInteger parseString: (anHttpRequest at: #limit ifAbsent: [ self defaultPaginationLimit ]))
+]
+
+{ #category : #'private - API' }
+RESTfulWebService >> putEntityTagOf: resource encodedAs: mediaType in: response [
+
+	response headers at: 'ETag' put: ('"<1s>"' expandMacrosWith: (self entityTagOf: resource encodedAs: mediaType))
 ]
 
 { #category : #configuring }

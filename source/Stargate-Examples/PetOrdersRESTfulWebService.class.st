@@ -8,7 +8,8 @@ Class {
 		'orders',
 		'nextId',
 		'orderById',
-		'orderStatus'
+		'orderStatus',
+		'updateTimestamps'
 	],
 	#category : #'Stargate-Examples'
 }
@@ -16,15 +17,13 @@ Class {
 { #category : #API }
 PetOrdersRESTfulWebService >> cancelOrderBasedOn: anHttpRequest within: aContext [
 
-	self handleConflictsIn: [ orderStatus at: (self identifierIn: anHttpRequest) put: 'canceled' ].
-	^ ZnResponse noContent
+	^ self updateOrderStatusBasedOn: anHttpRequest within: aContext with: [ self updateOrderStatusAt: (self identifierIn: anHttpRequest) to: 'canceled' ]
 ]
 
 { #category : #API }
 PetOrdersRESTfulWebService >> completeOrderBasedOn: anHttpRequest within: aContext [
 
-	self handleConflictsIn: [ self updateOrderStatusToCompletedBasedOn: anHttpRequest ].
-	^ ZnResponse noContent
+	^ self updateOrderStatusBasedOn: anHttpRequest within: aContext with: [ self updateOrderStatusToCompletedBasedOn: anHttpRequest ]
 ]
 
 { #category : #API }
@@ -33,8 +32,7 @@ PetOrdersRESTfulWebService >> createOrderBasedOn: anHttpRequest within: aContext
 	^ self
 		withCreatedResourceDo: [ :order | 
 			orders add: order.
-			orderById at: nextId put: order.
-			orderStatus at: nextId put: 'registered'.
+			self recordIdAndUpdateTimestampFor: order.
 			nextId := nextId + 1.
 			order ]
 		decodedUsing: self specification orderMappingKey
@@ -46,6 +44,17 @@ PetOrdersRESTfulWebService >> createOrderBasedOn: anHttpRequest within: aContext
 PetOrdersRESTfulWebService >> defaultPaginationLimit [
 
 	^ 10
+]
+
+{ #category : #'private - accessing' }
+PetOrdersRESTfulWebService >> entityTagOf: aPetOrder encodedAs: mediaType [
+
+	^ (SHA1 new
+		hashMessage:
+			('<1s>-<2s>-<3s>'
+				expandMacrosWith: (self identifierOf: aPetOrder) asString
+				with: (self lastModificationOf: aPetOrder) asString
+				with: mediaType asString)) hex
 ]
 
 { #category : #API }
@@ -65,6 +74,12 @@ PetOrdersRESTfulWebService >> identifierIn: anHttpRequest [
 	^ anHttpRequest at: #identifier
 ]
 
+{ #category : #'private - accessing' }
+PetOrdersRESTfulWebService >> identifierOf: aPetOrder [
+
+	^ orderById keyAtValue: aPetOrder
+]
+
 { #category : #initialization }
 PetOrdersRESTfulWebService >> initialize [
 
@@ -72,7 +87,14 @@ PetOrdersRESTfulWebService >> initialize [
 	orders := OrderedCollection new.
 	orderById := IdentityDictionary new.
 	orderStatus := IdentityDictionary new.
+	updateTimestamps := IdentityDictionary new.
 	nextId := 1
+]
+
+{ #category : #'private - accessing' }
+PetOrdersRESTfulWebService >> lastModificationOf: aPetOrder [
+
+	^ updateTimestamps at: (self identifierOf: aPetOrder)
 ]
 
 { #category : #'private - accessing' }
@@ -83,7 +105,7 @@ PetOrdersRESTfulWebService >> locationOf: aPetOrder [
 	baseUrl := '' asZnUrl.
 	baseUrlOptional withContentDo: [ :theBaseUrl | baseUrl := theBaseUrl ].
 
-	^ baseUrl / self specification endpoint asZnUrl / (orderById keyAtValue: aPetOrder) printString asZnUrl
+	^ baseUrl / self specification endpoint asZnUrl / (self identifierOf: aPetOrder) printString asZnUrl
 ]
 
 { #category : #'private - accessing' }
@@ -115,10 +137,38 @@ PetOrdersRESTfulWebService >> orders [
 	^ orders
 ]
 
+{ #category : #'private - API' }
+PetOrdersRESTfulWebService >> recordIdAndUpdateTimestampFor: order [
+
+	orderById at: nextId put: order.
+	orderStatus at: nextId put: 'registered'.
+	"I will simulate a timestamp using a fixed version revision,
+	because for the tests it's easier that using the current datetime"
+	updateTimestamps at: nextId put: 1
+]
+
 { #category : #specification }
 PetOrdersRESTfulWebService >> specification [
 
 	^ PetOrdersRESTfulWebServiceSpecification new
+]
+
+{ #category : #'private - API' }
+PetOrdersRESTfulWebService >> updateOrderStatusAt: id to: aTargetStatus [
+
+	orderStatus at: id put: aTargetStatus.
+	updateTimestamps at: id put: (updateTimestamps at: id) + 1
+]
+
+{ #category : #API }
+PetOrdersRESTfulWebService >> updateOrderStatusBasedOn: anHttpRequest within: aContext with: anUpdateBlock [
+
+	| response |
+
+	self handleConflictsIn: anUpdateBlock.
+	response := ZnResponse noContent.
+	self putEntityTagOf: (self orderIdentifiedUsing: anHttpRequest) encodedAs: self specification orderVersion1dot0dot0MediaType in: response.
+	^ response
 ]
 
 { #category : #'private - API' }
@@ -127,9 +177,6 @@ PetOrdersRESTfulWebService >> updateOrderStatusToCompletedBasedOn: anHttpRequest
 	| orderId |
 
 	orderId := self identifierIn: anHttpRequest.
-	AssertionChecker
-		enforce: [ (orderStatus at: orderId) = 'registered' ]
-		because: 'Non pending orders cannot be completed.'
-		raising: ConflictingObjectFound.
-	^ orderStatus at: orderId put: 'completed'
+	AssertionChecker enforce: [ (orderStatus at: orderId) = 'registered' ] because: 'Non pending orders cannot be completed.' raising: ConflictingObjectFound.
+	self updateOrderStatusAt: orderId to: 'completed'
 ]
