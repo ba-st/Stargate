@@ -55,5 +55,5 @@ ReflectiveRoutesConfiguratorTest >> testConfiguringPetsWebServiceRoutes [
 	(ReflectiveRoutesConfigurator appliedTo: teapot) 
 		addRoutesOf: webService.
 
-	self assert: teapot routes size equals: 6
+	self assert: teapot routes size equals: 5
 ]

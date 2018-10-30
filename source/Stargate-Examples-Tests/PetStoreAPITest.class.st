@@ -125,6 +125,29 @@ PetStoreAPITest >> testCORSHeadersWhenOriginIsNotAllowed [
 		should: [ response headers at: 'Access-Control-Allow-Origin' ] raise: KeyNotFound
 ]
 
+{ #category : #'tests - client errors' }
+PetStoreAPITest >> testConflict [
+
+	self newClient
+		url: self baseUrl / 'orders' asUrl;
+		entity: (ZnEntity with: '{"date":"2018-10-24T18:05:46.418Z","pet":"https://api.example.com/pets/1"}' ofType: self ordersSpec orderVersion1dot0dot0MediaType);
+		post.
+
+	self newClient
+		url: self baseUrl / 'orders/1/cancel' asUrl;
+		post.
+
+	self
+		should: [ self newClient
+				url: self baseUrl / 'orders/1/complete' asUrl;
+				post ]
+		raise: ZnHttpUnsuccessful
+		withExceptionDo: [ :error | 
+			self
+				assert: error response isError;
+				assert: error response code equals: 409 ]
+]
+
 { #category : #tests }
 PetStoreAPITest >> testCreatePet [
 
@@ -168,6 +191,20 @@ PetStoreAPITest >> testMethodNotAllowed [
 			self
 				assert: error response isError;
 				assert: error response code equals: 405 ]
+]
+
+{ #category : #'tests - client errors' }
+PetStoreAPITest >> testNotAcceptable [
+
+	self
+		should: [ self newClient
+				setAccept: 'application/xml';
+				get: self baseUrl / 'pets' asUrl ]
+		raise: ZnHttpUnsuccessful
+		withExceptionDo: [ :error | 
+			self
+				assert: error response code equals: 406;
+				assert: error response hasEntity ]
 ]
 
 { #category : #'tests - client errors' }

@@ -45,13 +45,11 @@ HTTPBasedRESTfulAPI >> configureHttpClientErrorHandler [
 	teapotServer
 		exception:
 			HTTPClientError
-				-> [ :error :request | 
+				-> [ :clientError :request | 
 					| json |
-					json := STONJSON
-						toStringPretty:
-							{(#code -> error code).
-							(#message -> error messageText)} asDictionary.
-					(ZnResponse statusCode: error code)
+
+					json := NeoJSONWriter toStringPretty: clientError.
+					(ZnResponse statusCode: clientError code)
 						entity: (ZnEntity json: json);
 						yourself ]
 ]

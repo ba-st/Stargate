@@ -22,7 +22,7 @@ RESTfulWebServiceAcceptNegotiator >> bestRepresentationFor: anHttpRequest [
 	"This method returns the best suited representation for the given request"
 
 	self withAcceptableMediaTypesIn: anHttpRequest do: [ :mediaType | (self sortByPrecedence: (self mediaTypesAvailableFor: mediaType)) ifNotEmpty: [ :availableTypes | ^ availableTypes first ] ].
-	HTTPClientError signalUnsupportedMediaType: 'No media type can be served according to the Accept header'
+	HTTPNotAcceptable signal: 'Cannot generate a response entity with acceptable characteristics.' accepting: availableMediaTypes
 ]
 
 { #category : #'initialize - release' }

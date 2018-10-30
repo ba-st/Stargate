@@ -40,6 +40,18 @@ HTTPClientError class >> signalNotFound: aFailureExplanation [
 ]
 
 { #category : #signaling }
+HTTPClientError class >> signalPreconditionFailed [
+
+	^ self signal: 412 describedBy: 'One or more conditions given in the request header fields evaluated to false when tested on the server.'
+]
+
+{ #category : #signaling }
+HTTPClientError class >> signalPreconditionRequired: aMessageText [
+
+	^ self signal: 428 describedBy: aMessageText
+]
+
+{ #category : #signaling }
 HTTPClientError class >> signalUnsupportedMediaType: aFailureExplanation [
 
 	^ self signal: 415 describedBy: aFailureExplanation
@@ -49,4 +61,13 @@ HTTPClientError class >> signalUnsupportedMediaType: aFailureExplanation [
 HTTPClientError >> code [
 
 	^self tag
+]
+
+{ #category : #converting }
+HTTPClientError >> neoJsonOn: neoJSONWriter [
+
+	neoJSONWriter
+		writeMap:
+			{(#code -> self code).
+			(#message -> self messageText)} asDictionary
 ]

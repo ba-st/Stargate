@@ -91,7 +91,7 @@ PetsRESTfulWebServiceSpecification >> getPetsRoute [
 { #category : #'private - accessing' }
 PetsRESTfulWebServiceSpecification >> idTemplate [
 
-	^ '<1s>/<2s:IsInteger>' expandMacrosWith: self endpoint with: self identifierKey
+	^ '<1s>/%<<2s>:IsInteger>' expandMacrosWith: self endpoint with: self identifierKey
 ]
 
 { #category : #accessing }
@@ -127,11 +127,5 @@ PetsRESTfulWebServiceSpecification >> petsMappingKey [
 { #category : #routes }
 PetsRESTfulWebServiceSpecification >> updatePetRoute [
 
-	^ RouteSpecification handling: #PUT at: self endpoint evaluating: [ :service :httpRequest :context | service updatePetBasedOn: httpRequest within: context ]
-]
-
-{ #category : #routes }
-PetsRESTfulWebServiceSpecification >> updatePetStatusRoute [
-
-	^ RouteSpecification handling: #PATCH at: self idTemplate evaluating: [ :service :httpRequest :context | service updatePetStatusBasedOn: httpRequest within: context ]
+	^ RouteSpecification handling: #PATCH at: self idTemplate evaluating: [ :service :httpRequest :context | service updatePetBasedOn: httpRequest within: context ]
 ]

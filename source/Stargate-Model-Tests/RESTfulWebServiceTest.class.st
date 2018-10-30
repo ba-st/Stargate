@@ -46,6 +46,18 @@ RESTfulWebServiceTest >> requestToGetResourceIdentifiedBy: anIdentifier acceptin
 ]
 
 { #category : #'private - support' }
+RESTfulWebServiceTest >> requestToGetResourceIdentifiedBy: anIdentifier accepting: anAcceptHeader conditionalTo: anETag [
+
+	^ TeaRequest
+		fromZnRequest:
+			((ZnRequest get: (self urlForResourceIdentifiedBy: anIdentifier))
+				setAccept: anAcceptHeader;
+				setIfNoneMatchTo: anETag;
+				yourself)
+		pathParams: {(#identifier -> anIdentifier)} asDictionary
+]
+
+{ #category : #'private - support' }
 RESTfulWebServiceTest >> requestToPOST: content as: aMediaType [
 
 	^ TeaRequest

@@ -16,6 +16,13 @@ Class {
 	#category : #'Stargate-Model-Services'
 }
 
+{ #category : #'private - asserting' }
+RESTfulWebService >> assert: etag matchesEntityTagOf: entity encodedAs: mediaType [
+
+	(etag = (self entityTagOf: entity encodedAs: mediaType))
+		ifFalse: [ HTTPClientError signalPreconditionFailed ]
+]
+
 { #category : #'private - transformations' }
 RESTfulWebService >> decode: theRepresentation at: aKey from: sourceMediaType within: aContext [
 
@@ -42,6 +49,18 @@ RESTfulWebService >> encode: theResource at: aKey to: targetMediaType within: aC
 		do: [ :signal | HTTPClientError signalUnsupportedMediaType: signal messageText ]
 ]
 
+{ #category : #'private - accessing' }
+RESTfulWebService >> entityTagOf: resource encodedAs: mediaType [
+
+	self subclassResponsibility
+]
+
+{ #category : #'private - accessing' }
+RESTfulWebService >> entityTagToMatchBasedOn: anHttpRequest [
+
+	^ (anHttpRequest headers at: #'If-Match' ifAbsent: [ HTTPClientError signalPreconditionRequired: 'Missing If-Match header.' ]) asETag
+]
+
 { #category : #'private - querying' }
 RESTfulWebService >> evaluateQuery: aQueryEvaluationBlock [
 
@@ -65,52 +84,72 @@ RESTfulWebService >> get: aQueryEvaluationBlock asCollectionEncodedUsing: aKey b
 
 	mediaType := self targetMediaTypeFrom: anHttpRequest.
 
-	^ [ | resourceCollection encodedResourceCollection response paginationLinks |
+	^ self
+		handleConflictsIn: [ | resourceCollection encodedResourceCollection response paginationLinks |
 
-	resourceCollection := self
-		evaluateQuery: aQueryEvaluationBlock
-		accordingTo: (self paginationFrom: anHttpRequest).
-	paginationLinks := aContext paginationControls.
+			resourceCollection := self evaluateQuery: aQueryEvaluationBlock accordingTo: (self paginationFrom: anHttpRequest).
+			paginationLinks := aContext paginationControls.
 
-	aContext
-		holdAsHypermediaControls: {('self' -> anHttpRequest absoluteUrl)} , paginationLinks.
-	resourceCollection
-		do: [ :resource | 
-			aContext
-				holdAsHypermediaControls: (self mediaControlsFor: resource)
-				forSubresource: resource ].
+			aContext holdAsHypermediaControls: {('self' -> anHttpRequest absoluteUrl)} , paginationLinks.
+			resourceCollection do: [ :resource | aContext holdAsHypermediaControls: (self mediaControlsFor: resource) forSubresource: resource ].
 
-	encodedResourceCollection := self
-		encode: resourceCollection
-		at: aKey
-		to: mediaType
-		within: aContext.
-	response := ZnResponse ok: encodedResourceCollection.
-	paginationLinks
-		do: [ :assoc | 
-			response
-				addLink:
-					((ZnLink to: assoc value)
-						rel: assoc key;
-						yourself) ].
-	response ]
-		on: ConflictingObjectFound
-		do: [ :error | HTTPClientError signalConflict: error messageText ]
+			encodedResourceCollection := self
+				encode: resourceCollection
+				at: aKey
+				to: mediaType
+				within: aContext.
+			response := ZnResponse ok: encodedResourceCollection.
+			paginationLinks
+				do: [ :assoc | 
+					response
+						addLink:
+							((ZnLink to: assoc value)
+								rel: assoc key;
+								yourself) ].
+			response ]
 ]
 
 { #category : #'private - API' }
 RESTfulWebService >> get: aQueryEvaluationBlock encodedUsing: aKey basedOn: anHttpRequest within: aContext [
 
-	| mediaType resource |
+	| mediaType resource response |
 
 	mediaType := self targetMediaTypeFrom: anHttpRequest.
 
-	^ [ 
-		resource := self evaluateQuery: aQueryEvaluationBlock.
-		aContext holdAsHypermediaControls: (self mediaControlsFor: resource).
-		ZnResponse ok: (self encode: resource at: aKey to: mediaType within: aContext) ]
+	^ self
+		handleConflictsIn: [ resource := self evaluateQuery: aQueryEvaluationBlock.
+			self
+				ifNoneMatchHeaderPresentIn: anHttpRequest
+				do: [ :etag | 
+					etag = (self entityTagOf: resource encodedAs: mediaType)
+						ifTrue: [ ^ ZnResponse notModified
+								setEntityTag: etag;
+								yourself ] ].
+
+			aContext holdAsHypermediaControls: (self mediaControlsFor: resource).
+			response := ZnResponse
+				ok:
+					(self
+						encode: resource
+						at: aKey
+						to: mediaType
+						within: aContext).
+			self putEntityTagOf: resource encodedAs: mediaType in: response.
+			response ]
+]
+
+{ #category : #'private - transformations' }
+RESTfulWebService >> handleConflictsIn: aBlock [
+
+	^ aBlock
 		on: ConflictingObjectFound
-		do: [ :error | HTTPClientError signalConflict: error messageText ]
+		do: [ :signal | HTTPClientError signalConflict: signal messageText ]
+]
+
+{ #category : #'private - accessing' }
+RESTfulWebService >> ifNoneMatchHeaderPresentIn: anHttpRequest do: aMonadycBlock [
+
+	anHttpRequest headers at: #'If-None-Match' ifPresent: [ :ifNoneMatchHeader | aMonadycBlock value: ifNoneMatchHeader asETag ]
 ]
 
 { #category : #initialization }
@@ -142,6 +181,12 @@ RESTfulWebService >> paginationFrom: anHttpRequest [
 		limitedTo: (IsInteger parseString: (anHttpRequest at: #limit ifAbsent: [ self defaultPaginationLimit ]))
 ]
 
+{ #category : #'private - API' }
+RESTfulWebService >> putEntityTagOf: resource encodedAs: mediaType in: response [
+
+	response setEntityTag: (self entityTagOf: resource encodedAs: mediaType)
+]
+
 { #category : #configuring }
 RESTfulWebService >> serverUrl: aServerUrl [
 
@@ -171,9 +216,7 @@ RESTfulWebService >> withCreatedResourceDo: aBlock decodedUsing: aKey basedOn: a
 		from: anHttpRequest contentType
 		within: aContext.
 
-	newResource := [ aBlock value: decodedRepresentation ]
-		on: ConflictingObjectFound
-		do: [ :signal | HTTPClientError signalConflict: signal messageText ].
+	newResource := self handleConflictsIn: [ aBlock value: decodedRepresentation ].
 
 	^ ZnResponse created: (self locationOf: newResource)
 ]

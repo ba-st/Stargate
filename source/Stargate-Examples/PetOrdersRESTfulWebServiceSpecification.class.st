@@ -52,7 +52,7 @@ PetOrdersRESTfulWebServiceSpecification >> cancelOrderRoute [
 { #category : #'private - accessing' }
 PetOrdersRESTfulWebServiceSpecification >> cancelTemplate [
 
-	^ '<1s>/<2s:IsInteger>/cancel' expandMacrosWith: self endpoint with: self identifierKey
+	^ '<1s>/%<<2s>:IsInteger>/cancel' expandMacrosWith: self endpoint with: self identifierKey
 ]
 
 { #category : #routes }
@@ -64,7 +64,7 @@ PetOrdersRESTfulWebServiceSpecification >> completeOrderRoute [
 { #category : #'private - accessing' }
 PetOrdersRESTfulWebServiceSpecification >> completeTemplate [
 
-	^ '<1s>/<2s:IsInteger>/complete' expandMacrosWith: self endpoint with: self identifierKey
+	^ '<1s>/%<<2s>:IsInteger>/complete' expandMacrosWith: self endpoint with: self identifierKey
 ]
 
 { #category : #routes }
@@ -88,7 +88,7 @@ PetOrdersRESTfulWebServiceSpecification >> getOrderRoute [
 { #category : #'private - accessing' }
 PetOrdersRESTfulWebServiceSpecification >> idTemplate [
 
-	^ '<1s>/<2s:IsInteger>' expandMacrosWith: self endpoint with: self identifierKey
+	^ '<1s>/%<<2s>:IsInteger>' expandMacrosWith: self endpoint with: self identifierKey
 ]
 
 { #category : #accessing }

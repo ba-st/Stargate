@@ -14,23 +14,61 @@ PetsRESTfulWebServiceTest >> baseUrl [
 ]
 
 { #category : #'private - support' }
+PetsRESTfulWebServiceTest >> createPet [
+
+	self
+		assert:
+			(webService
+				createPetBasedOn: (self requestToCreatePetFrom: '{"name":"Firulais","type":"dog"}')
+				within: self newHttpRequestContext) isSuccess
+]
+
+{ #category : #'private - support' }
 PetsRESTfulWebServiceTest >> createSixPets [
 
 	webService
-		createPetBasedOn: (self requestToCreatePetFrom: '{"name":"Firulais","type":"dog"}') within: HttpRequestContext new;
-		createPetBasedOn: (self requestToCreatePetFrom: '{"name":"Lassie","type":"dog"}') within: HttpRequestContext new;
-		createPetBasedOn: (self requestToCreatePetFrom: '{"name":"Garfield","type":"cat"}') within: HttpRequestContext new;
-		createPetBasedOn: (self requestToCreatePetFrom: '{"name":"Rin Tin Tin","type":"dog"}') within: HttpRequestContext new;
-		createPetBasedOn: (self requestToCreatePetFrom: '{"name":"Babe","type":"pig"}') within: HttpRequestContext new;
-		createPetBasedOn: (self requestToCreatePetFrom: '{"name":"Beethoven","type":"dog"}') within: HttpRequestContext new.
+		createPetBasedOn: (self requestToCreatePetFrom: '{"name":"Firulais","type":"dog"}') within: self newHttpRequestContext;
+		createPetBasedOn: (self requestToCreatePetFrom: '{"name":"Lassie","type":"dog"}') within: self newHttpRequestContext;
+		createPetBasedOn: (self requestToCreatePetFrom: '{"name":"Garfield","type":"cat"}') within: self newHttpRequestContext;
+		createPetBasedOn: (self requestToCreatePetFrom: '{"name":"Rin Tin Tin","type":"dog"}') within: self newHttpRequestContext;
+		createPetBasedOn: (self requestToCreatePetFrom: '{"name":"Babe","type":"pig"}') within: self newHttpRequestContext;
+		createPetBasedOn: (self requestToCreatePetFrom: '{"name":"Beethoven","type":"dog"}') within: self newHttpRequestContext.
 
 	self assert: webService pets size equals: 6
 ]
 
 { #category : #'private - support' }
+PetsRESTfulWebServiceTest >> defaultPetMediaType [
+
+	^ webService specification petVersion1dot0dot0MediaType
+]
+
+{ #category : #'private - support' }
+PetsRESTfulWebServiceTest >> entityTagOfPetIdentifiedBy: anIdentifier [
+
+	| getResponse |
+
+	getResponse := webService getPetBasedOn: (self requestToGetResourceIdentifiedBy: anIdentifier accepting: self defaultPetMediaType) within: self newHttpRequestContext.
+	self assert: getResponse isSuccess.
+	^ getResponse headers at: 'ETag'
+]
+
+{ #category : #'private - support' }
+PetsRESTfulWebServiceTest >> requestMissingIfMatchHeaderToUpdatePetIdentifiedBy: anIdentifier nameTo: aName [
+
+	^ TeaRequest
+		fromZnRequest:
+			((ZnRequest patch: (self urlForResourceIdentifiedBy: anIdentifier))
+				setAccept: self defaultPetMediaType;
+				entity: (ZnEntity with: ('{"name":"<1s>"}' expandMacrosWith: aName) type: self defaultPetMediaType);
+				yourself)
+		pathParams: {(#identifier -> anIdentifier)} asDictionary
+]
+
+{ #category : #'private - support' }
 PetsRESTfulWebServiceTest >> requestToCreatePetFrom: json [
 
-	^ self requestToPOST: json as: webService specification petVersion1dot0dot0MediaType
+	^ self requestToPOST: json as: self defaultPetMediaType
 ]
 
 { #category : #'private - support' }
@@ -58,11 +96,18 @@ PetsRESTfulWebServiceTest >> requestToGetPetsAccepting: anAcceptHeader [
 { #category : #'private - support' }
 PetsRESTfulWebServiceTest >> requestToUpdatePetIdentifiedBy: anIdentifier nameTo: aName [
 
+	^ self requestToUpdatePetIdentifiedBy: anIdentifier nameTo: aName using: (self entityTagOfPetIdentifiedBy: anIdentifier)
+]
+
+{ #category : #'private - support' }
+PetsRESTfulWebServiceTest >> requestToUpdatePetIdentifiedBy: anIdentifier nameTo: aName using: anETag [
+
 	^ TeaRequest
 		fromZnRequest:
 			((ZnRequest patch: (self urlForResourceIdentifiedBy: anIdentifier))
-				setAccept: webService specification petVersion1dot0dot0MediaType;
-				entity: (ZnEntity with: ('{"name":"<1s>"}' expandMacrosWith: aName) type: webService specification petVersion1dot0dot0MediaType);
+				setAccept: self defaultPetMediaType;
+				setIfMatchTo: anETag;
+				entity: (ZnEntity with: ('{"name":"<1s>"}' expandMacrosWith: aName) type: self defaultPetMediaType);
 				yourself)
 		pathParams: {(#identifier -> anIdentifier)} asDictionary
 ]
@@ -73,8 +118,9 @@ PetsRESTfulWebServiceTest >> requestToUpdatePetIdentifiedBy: anIdentifier status
 	^ TeaRequest
 		fromZnRequest:
 			((ZnRequest patch: (self urlForResourceIdentifiedBy: anIdentifier))
-				setAccept: webService specification petVersion1dot0dot0MediaType;
-				entity: (ZnEntity with: ('{"status":"<1s>"}' expandMacrosWith: aStatus) type: webService specification petVersion1dot0dot0MediaType);
+				setAccept: self defaultPetMediaType;
+				setIfMatchTo: (self entityTagOfPetIdentifiedBy: anIdentifier);
+				entity: (ZnEntity with: ('{"status":"<1s>"}' expandMacrosWith: aStatus) type: self defaultPetMediaType);
 				yourself)
 		pathParams: {(#identifier -> anIdentifier)} asDictionary
 ]
@@ -95,7 +141,30 @@ PetsRESTfulWebServiceTest >> setUpWebService [
 { #category : #'tests - delete' }
 PetsRESTfulWebServiceTest >> testCantDeleteInvalidPet [
 
-	self should: [ webService deletePetBasedOn: (self requestToDeletePetIdentifiedBy: 1) within: HttpRequestContext new ] raise: HTTPClientError withExceptionDo: [ :signal | self assert: signal code equals: 404 ]
+	self
+		should: [ webService deletePetBasedOn: (self requestToDeletePetIdentifiedBy: 1) within: self newHttpRequestContext ]
+		raise: HTTPClientError
+		withExceptionDo: [ :signal | self assert: signal code equals: 404 ]
+]
+
+{ #category : #'tests - update' }
+PetsRESTfulWebServiceTest >> testCantUpdatePetIfMissingETag [
+
+	self
+		createPet;
+		should: [ webService updatePetBasedOn: (self requestMissingIfMatchHeaderToUpdatePetIdentifiedBy: 1 nameTo: 'Mendieta') within: self newHttpRequestContext ]
+			raise: HTTPClientError
+			withExceptionDo: [ :error | self assert: error code equals: 428 ]
+]
+
+{ #category : #'tests - update' }
+PetsRESTfulWebServiceTest >> testCantUpdatePetWhenETagNotMatching [
+
+	self
+		createPet;
+		should: [ webService updatePetBasedOn: (self requestToUpdatePetIdentifiedBy: 1 nameTo: 'Mendieta' using: '"Frula"') within: self newHttpRequestContext ]
+			raise: HTTPClientError
+			withExceptionDo: [ :error | self assert: error code equals: 412 ]
 ]
 
 { #category : #'tests - get collection' }
@@ -105,7 +174,7 @@ PetsRESTfulWebServiceTest >> testComplexPagination [
 
 	self createSixPets.
 	"Get the 1st page"
-	response := webService getPetsBasedOn: (self requestToGet: 'https://pets.example.com/pets?limit=2' accepting: '*/*') within: HttpRequestContext new.
+	response := webService getPetsBasedOn: (self requestToGet: 'https://pets.example.com/pets?limit=2' accepting: '*/*') within: self newHttpRequestContext.
 	self
 		assert: response isSuccess;
 		assert: response status equals: 200;
@@ -124,7 +193,7 @@ PetsRESTfulWebServiceTest >> testComplexPagination [
 				assertUrl: json links last equals: 'https://pets.example.com/pets?start=5&limit=2';
 				assert: json items size equals: 2 ].
 	"Get the 2nd page"
-	response := webService getPetsBasedOn: (self requestToGet: 'https://pets.example.com/pets?start=3&limit=2' accepting: '*/*') within: HttpRequestContext new.
+	response := webService getPetsBasedOn: (self requestToGet: 'https://pets.example.com/pets?start=3&limit=2' accepting: '*/*') within: self newHttpRequestContext.
 	self
 		assert: response isSuccess;
 		assert: response status equals: 200;
@@ -155,11 +224,9 @@ PetsRESTfulWebServiceTest >> testDeletePet [
 
 	| response |
 
-	self
-		assert: (webService createPetBasedOn: (self requestToCreatePetFrom: '{"name":"Firulais","type":"dog"}') within: HttpRequestContext new) isSuccess;
-		assert: webService pets size equals: 1.
+	self createPet.
 
-	response := webService deletePetBasedOn: (self requestToDeletePetIdentifiedBy: 1) within: HttpRequestContext new.
+	response := webService deletePetBasedOn: (self requestToDeletePetIdentifiedBy: 1) within: self newHttpRequestContext.
 
 	self
 		assert: response isSuccess;
@@ -168,20 +235,49 @@ PetsRESTfulWebServiceTest >> testDeletePet [
 ]
 
 { #category : #'tests - get individual' }
+PetsRESTfulWebServiceTest >> testGetNotModifiedWhenValidETag [
+
+	| response |
+
+	self createPet.
+
+	response := webService
+		getPetBasedOn: (self requestToGetResourceIdentifiedBy: 1 accepting: self defaultPetMediaType)
+		within: self newHttpRequestContext.
+
+	self
+		assert: response isSuccess;
+		assert: response entityTag equals: '"c051344b8c92c5ed8a2bd0752070c35ed3de3bab"' asETag.
+
+	response := webService
+		getPetBasedOn:
+			(self
+				requestToGetResourceIdentifiedBy: 1
+				accepting: self defaultPetMediaType
+				conditionalTo: '"c051344b8c92c5ed8a2bd0752070c35ed3de3bab"' asETag)
+		within: self newHttpRequestContext.
+
+	self
+		assert: response code equals: 304;
+		assert: response entityTag equals: '"c051344b8c92c5ed8a2bd0752070c35ed3de3bab"' asETag
+]
+
+{ #category : #'tests - get individual' }
 PetsRESTfulWebServiceTest >> testGetPetJustCreated [
 
 	| response |
 
 	self
-		assert: (webService createPetBasedOn: (self requestToCreatePetFrom: '{"name":"Firulais","type":"dog"}') within: HttpRequestContext new) isSuccess;
+		assert: (webService createPetBasedOn: (self requestToCreatePetFrom: '{"name":"Firulais","type":"dog"}') within: self newHttpRequestContext) isSuccess;
 		assert: webService pets size equals: 1.
 
-	response := webService getPetBasedOn: (self requestToGetResourceIdentifiedBy: 1 accepting: webService specification petVersion1dot0dot0MediaType) within: HttpRequestContext new.
+	response := webService getPetBasedOn: (self requestToGetResourceIdentifiedBy: 1 accepting: self defaultPetMediaType) within: self newHttpRequestContext.
 
 	self
 		assert: response isSuccess;
 		assert: response status equals: 200;
-		assert: response contentType asMediaType equals: webService specification petVersion1dot0dot0MediaType.
+		assert: response contentType asMediaType equals: self defaultPetMediaType;
+		assert: response entityTag equals: '"c051344b8c92c5ed8a2bd0752070c35ed3de3bab"' asETag.
 
 	self
 		withJsonFromContentsIn: response
@@ -197,7 +293,7 @@ PetsRESTfulWebServiceTest >> testGetPetJustCreated [
 PetsRESTfulWebServiceTest >> testGetPetNotFoundShouldFail [
 
 	self
-		should: [ webService getPetBasedOn: (self requestToGetResourceIdentifiedBy: 1 accepting: '*/*') within: HttpRequestContext new ]
+		should: [ webService getPetBasedOn: (self requestToGetResourceIdentifiedBy: 1 accepting: '*/*') within: self newHttpRequestContext ]
 		raise: HTTPClientError
 		withExceptionDo: [ :error | self assert: error code equals: 404 ]
 ]
@@ -208,15 +304,16 @@ PetsRESTfulWebServiceTest >> testGetPetSummaryJustCreated [
 	| response |
 
 	self
-		assert: (webService createPetBasedOn: (self requestToCreatePetFrom: '{"name":"Firulais","type":"dog"}') within: HttpRequestContext new) isSuccess;
+		assert: (webService createPetBasedOn: (self requestToCreatePetFrom: '{"name":"Firulais","type":"dog"}') within: self newHttpRequestContext) isSuccess;
 		assert: webService pets size equals: 1.
 
-	response := webService getPetBasedOn: (self requestToGetResourceIdentifiedBy: 1 accepting: webService specification petSummaryVersion1dot0dot0MediaType) within: HttpRequestContext new.
+	response := webService getPetBasedOn: (self requestToGetResourceIdentifiedBy: 1 accepting: webService specification petSummaryVersion1dot0dot0MediaType) within: self newHttpRequestContext.
 
 	self
 		assert: response isSuccess;
 		assert: response status equals: 200;
-		assert: response contentType asMediaType equals: webService specification petSummaryVersion1dot0dot0MediaType.
+		assert: response contentType asMediaType equals: webService specification petSummaryVersion1dot0dot0MediaType;
+		assert: response entityTag equals: '"1323cdfb8bb0f9011fbd480c5a87c17d05883214"' asETag.
 
 	self
 		withJsonFromContentsIn: response
@@ -233,7 +330,7 @@ PetsRESTfulWebServiceTest >> testGetPets [
 
 	| response |
 
-	response := webService getPetsBasedOn: (self requestToGetPetsAccepting: '*/*') within: HttpRequestContext new.
+	response := webService getPetsBasedOn: (self requestToGetPetsAccepting: '*/*') within: self newHttpRequestContext.
 
 	self
 		assert: response isSuccess;
@@ -253,11 +350,11 @@ PetsRESTfulWebServiceTest >> testGetPetsNotEmpty [
 
 	| response |
 
-	webService createPetBasedOn: (self requestToCreatePetFrom: '{"name":"Firulais","type":"dog"}') within: HttpRequestContext new.
+	webService createPetBasedOn: (self requestToCreatePetFrom: '{"name":"Firulais","type":"dog"}') within: self newHttpRequestContext.
 
 	self assert: webService pets notEmpty.
 
-	response := webService getPetsBasedOn: (self requestToGetPetsAccepting: '*/*') within: HttpRequestContext new.
+	response := webService getPetsBasedOn: (self requestToGetPetsAccepting: '*/*') within: self newHttpRequestContext.
 
 	self
 		assert: response isSuccess;
@@ -286,7 +383,7 @@ PetsRESTfulWebServiceTest >> testGetPetsWithPagination [
 
 	self createSixPets.
 
-	response := webService getPetsBasedOn: (self requestToGetPetsAccepting: '*/*') within: HttpRequestContext new.
+	response := webService getPetsBasedOn: (self requestToGetPetsAccepting: '*/*') within: self newHttpRequestContext.
 
 	self
 		assert: response isSuccess;
@@ -307,7 +404,7 @@ PetsRESTfulWebServiceTest >> testGetPetsWithPagination [
 				assertUrl: json links last equals: 'https://pets.example.com/pets?start=6&limit=5';
 				assert: json items size equals: 5.
 
-			response := webService getPetsBasedOn: (self requestToGet: json links next accepting: response contentType) within: HttpRequestContext new.
+			response := webService getPetsBasedOn: (self requestToGet: json links next accepting: response contentType) within: self newHttpRequestContext.
 			self
 				assert: response isSuccess;
 				assert: response status equals: 200;
@@ -350,11 +447,11 @@ PetsRESTfulWebServiceTest >> testUpdatePetName [
 
 	| response |
 
-	self assert: (webService createPetBasedOn: (self requestToCreatePetFrom: '{"name":"Firulais","type":"dog"}') within: HttpRequestContext new) isSuccess.
+	self
+		createPet;
+		assert: webService pets first name equals: 'Firulais'.
 
-	self assert: webService pets first name equals: 'Firulais'.
-
-	response := webService updatePetStatusBasedOn: (self requestToUpdatePetIdentifiedBy: 1 nameTo: 'Mendieta') within: HttpRequestContext new.
+	response := webService updatePetBasedOn: (self requestToUpdatePetIdentifiedBy: 1 nameTo: 'Mendieta') within: self newHttpRequestContext.
 
 	self
 		assert: response isSuccess;
@@ -362,11 +459,9 @@ PetsRESTfulWebServiceTest >> testUpdatePetName [
 		assert: response hasEntity;
 		assert: webService pets size equals: 1;
 		assert: webService pets first name equals: 'Mendieta';
-		assert: webService pets first status equals: 'new'.
-
-	self
+		assert: webService pets first status equals: 'new';
 		withJsonFromContentsIn: response
-		do: [ :json | 
+			do: [ :json | 
 			self
 				assert: json name equals: 'Mendieta';
 				assert: json type equals: 'dog';
@@ -379,13 +474,11 @@ PetsRESTfulWebServiceTest >> testUpdatePetStatus [
 
 	| response |
 
-	self assert: (webService createPetBasedOn: (self requestToCreatePetFrom: '{"name":"Firulais","type":"dog"}') within: HttpRequestContext new) isSuccess.
+	self
+		createPet;
+		assert: webService pets first status equals: 'new'.
 
-	self assert: webService pets first status equals: 'new'.
-
-	response := webService updatePetStatusBasedOn: (self requestToUpdatePetIdentifiedBy: 1 statusTo: 'gone') within: HttpRequestContext new.
-
-	self assert: webService pets first status equals: 'gone'.
+	response := webService updatePetBasedOn: (self requestToUpdatePetIdentifiedBy: 1 statusTo: 'gone') within: self newHttpRequestContext.
 
 	self
 		assert: response isSuccess;
@@ -393,11 +486,9 @@ PetsRESTfulWebServiceTest >> testUpdatePetStatus [
 		assert: response hasEntity;
 		assert: webService pets size equals: 1;
 		assert: webService pets first name equals: 'Firulais';
-		assert: webService pets first status equals: 'gone'.
-
-	self
+		assert: webService pets first status equals: 'gone';
 		withJsonFromContentsIn: response
-		do: [ :json | 
+			do: [ :json | 
 			self
 				assert: json name equals: 'Firulais';
 				assert: json type equals: 'dog';
