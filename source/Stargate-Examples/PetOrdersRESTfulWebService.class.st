@@ -49,12 +49,14 @@ PetOrdersRESTfulWebService >> defaultPaginationLimit [
 { #category : #'private - accessing' }
 PetOrdersRESTfulWebService >> entityTagOf: aPetOrder encodedAs: mediaType [
 
-	^ (SHA1 new
-		hashMessage:
-			('<1s>-<2s>-<3s>'
-				expandMacrosWith: (self identifierOf: aPetOrder) asString
-				with: (self lastModificationOf: aPetOrder) asString
-				with: mediaType asString)) hex
+	^ ZnETag
+		with:
+			(SHA1 new
+				hashMessage:
+					('<1s>-<2s>-<3s>'
+						expandMacrosWith: (self identifierOf: aPetOrder) asString
+						with: (self lastModificationOf: aPetOrder) asString
+						with: mediaType asString)) hex
 ]
 
 { #category : #API }

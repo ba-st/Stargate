@@ -7,6 +7,12 @@ ZnResponse >> addLink: aLink [
 ]
 
 { #category : #'*Stargate-Model' }
+ZnResponse >> entityTag [
+
+	^ (self headers at: 'ETag') asETag
+]
+
+{ #category : #'*Stargate-Model' }
 ZnResponse >> links [
 
 	| links |
@@ -15,4 +21,10 @@ ZnResponse >> links [
 	^ links isCollection
 		ifTrue: [ links ]
 		ifFalse: [ Array with: links ]
+]
+
+{ #category : #'*Stargate-Model' }
+ZnResponse >> setEntityTag: aStringORETag [
+
+	self headers at: 'ETag' put: aStringORETag asETag asString
 ]

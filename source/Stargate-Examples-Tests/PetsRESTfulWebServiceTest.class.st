@@ -235,6 +235,34 @@ PetsRESTfulWebServiceTest >> testDeletePet [
 ]
 
 { #category : #'tests - get individual' }
+PetsRESTfulWebServiceTest >> testGetNotModifiedWhenValidETag [
+
+	| response |
+
+	self createPet.
+
+	response := webService
+		getPetBasedOn: (self requestToGetResourceIdentifiedBy: 1 accepting: self defaultPetMediaType)
+		within: self newHttpRequestContext.
+
+	self
+		assert: response isSuccess;
+		assert: response entityTag equals: '"c051344b8c92c5ed8a2bd0752070c35ed3de3bab"' asETag.
+
+	response := webService
+		getPetBasedOn:
+			(self
+				requestToGetResourceIdentifiedBy: 1
+				accepting: self defaultPetMediaType
+				conditionalTo: '"c051344b8c92c5ed8a2bd0752070c35ed3de3bab"' asETag)
+		within: self newHttpRequestContext.
+
+	self
+		assert: response code equals: 304;
+		assert: response entityTag equals: '"c051344b8c92c5ed8a2bd0752070c35ed3de3bab"' asETag
+]
+
+{ #category : #'tests - get individual' }
 PetsRESTfulWebServiceTest >> testGetPetJustCreated [
 
 	| response |
@@ -249,7 +277,7 @@ PetsRESTfulWebServiceTest >> testGetPetJustCreated [
 		assert: response isSuccess;
 		assert: response status equals: 200;
 		assert: response contentType asMediaType equals: self defaultPetMediaType;
-		assert: (response headers at: 'ETag') equals: '"c051344b8c92c5ed8a2bd0752070c35ed3de3bab"'.
+		assert: response entityTag equals: '"c051344b8c92c5ed8a2bd0752070c35ed3de3bab"' asETag.
 
 	self
 		withJsonFromContentsIn: response
@@ -285,7 +313,7 @@ PetsRESTfulWebServiceTest >> testGetPetSummaryJustCreated [
 		assert: response isSuccess;
 		assert: response status equals: 200;
 		assert: response contentType asMediaType equals: webService specification petSummaryVersion1dot0dot0MediaType;
-		assert: (response headers at: 'ETag') equals: '"1323cdfb8bb0f9011fbd480c5a87c17d05883214"'.
+		assert: response entityTag equals: '"1323cdfb8bb0f9011fbd480c5a87c17d05883214"' asETag.
 
 	self
 		withJsonFromContentsIn: response

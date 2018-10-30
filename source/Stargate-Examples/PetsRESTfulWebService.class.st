@@ -62,12 +62,14 @@ PetsRESTfulWebService >> deletePetBasedOn: anHttpRequest within: aContext [
 { #category : #'private - accessing' }
 PetsRESTfulWebService >> entityTagOf: aPet encodedAs: mediaType [
 
-	^ (SHA1 new
-		hashMessage:
-			('<1s>-<2s>-<3s>'
-				expandMacrosWith: (self identifierOf: aPet) asString
-				with: (self lastModificationOf: aPet) asString
-				with: mediaType asString)) hex
+	^ ZnETag
+		with:
+			(SHA1 new
+				hashMessage:
+					('<1s>-<2s>-<3s>'
+						expandMacrosWith: (self identifierOf: aPet) asString
+						with: (self lastModificationOf: aPet) asString
+						with: mediaType asString)) hex
 ]
 
 { #category : #API }

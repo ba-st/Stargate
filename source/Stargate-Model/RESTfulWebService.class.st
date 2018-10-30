@@ -58,13 +58,7 @@ RESTfulWebService >> entityTagOf: resource encodedAs: mediaType [
 { #category : #'private - accessing' }
 RESTfulWebService >> entityTagToMatchBasedOn: anHttpRequest [
 
-	| ifMatchHeader |
-
-	ifMatchHeader := anHttpRequest headers at: #'If-Match' ifAbsent: [ ^ HTTPClientError signalPreconditionRequired: 'Missing If-Match header.' ].
-	ifMatchHeader size > 3
-		ifFalse: [ HTTPClientError signalBadRequest: 'Invalid ETag syntax in If-Match' ].
-	"We need to remove the quotes"
-	^ ifMatchHeader copyFrom: 2 to: ifMatchHeader size - 1
+	^ (anHttpRequest headers at: #'If-Match' ifAbsent: [ HTTPClientError signalPreconditionRequired: 'Missing If-Match header.' ]) asETag
 ]
 
 { #category : #'private - querying' }
@@ -124,8 +118,22 @@ RESTfulWebService >> get: aQueryEvaluationBlock encodedUsing: aKey basedOn: anHt
 
 	^ self
 		handleConflictsIn: [ resource := self evaluateQuery: aQueryEvaluationBlock.
+			self
+				ifNoneMatchHeaderPresentIn: anHttpRequest
+				do: [ :etag | 
+					etag = (self entityTagOf: resource encodedAs: mediaType)
+						ifTrue: [ ^ ZnResponse notModified
+								setEntityTag: etag;
+								yourself ] ].
+
 			aContext holdAsHypermediaControls: (self mediaControlsFor: resource).
-			response := ZnResponse ok:(self encode: resource at: aKey to: mediaType within: aContext).
+			response := ZnResponse
+				ok:
+					(self
+						encode: resource
+						at: aKey
+						to: mediaType
+						within: aContext).
 			self putEntityTagOf: resource encodedAs: mediaType in: response.
 			response ]
 ]
@@ -136,6 +144,12 @@ RESTfulWebService >> handleConflictsIn: aBlock [
 	^ aBlock
 		on: ConflictingObjectFound
 		do: [ :signal | HTTPClientError signalConflict: signal messageText ]
+]
+
+{ #category : #'private - accessing' }
+RESTfulWebService >> ifNoneMatchHeaderPresentIn: anHttpRequest do: aMonadycBlock [
+
+	anHttpRequest headers at: #'If-None-Match' ifPresent: [ :ifNoneMatchHeader | aMonadycBlock value: ifNoneMatchHeader asETag ]
 ]
 
 { #category : #initialization }
@@ -170,7 +184,7 @@ RESTfulWebService >> paginationFrom: anHttpRequest [
 { #category : #'private - API' }
 RESTfulWebService >> putEntityTagOf: resource encodedAs: mediaType in: response [
 
-	response headers at: 'ETag' put: ('"<1s>"' expandMacrosWith: (self entityTagOf: resource encodedAs: mediaType))
+	response setEntityTag: (self entityTagOf: resource encodedAs: mediaType)
 ]
 
 { #category : #configuring }
