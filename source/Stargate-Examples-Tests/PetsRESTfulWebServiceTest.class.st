@@ -54,6 +54,18 @@ PetsRESTfulWebServiceTest >> entityTagOfPetIdentifiedBy: anIdentifier [
 ]
 
 { #category : #'private - support' }
+PetsRESTfulWebServiceTest >> requestMissingIfMatchHeaderToUpdatePetIdentifiedBy: anIdentifier nameTo: aName [
+
+	^ TeaRequest
+		fromZnRequest:
+			((ZnRequest patch: (self urlForResourceIdentifiedBy: anIdentifier))
+				setAccept: self defaultPetMediaType;
+				entity: (ZnEntity with: ('{"name":"<1s>"}' expandMacrosWith: aName) type: self defaultPetMediaType);
+				yourself)
+		pathParams: {(#identifier -> anIdentifier)} asDictionary
+]
+
+{ #category : #'private - support' }
 PetsRESTfulWebServiceTest >> requestToCreatePetFrom: json [
 
 	^ self requestToPOST: json as: self defaultPetMediaType
@@ -113,18 +125,6 @@ PetsRESTfulWebServiceTest >> requestToUpdatePetIdentifiedBy: anIdentifier status
 		pathParams: {(#identifier -> anIdentifier)} asDictionary
 ]
 
-{ #category : #'private - support' }
-PetsRESTfulWebServiceTest >> requestToUpdatePetMissingIfMatchIdentifiedBy: anIdentifier nameTo: aName [
-
-	^ TeaRequest
-		fromZnRequest:
-			((ZnRequest patch: (self urlForResourceIdentifiedBy: anIdentifier))
-				setAccept: self defaultPetMediaType;
-				entity: (ZnEntity with: ('{"name":"<1s>"}' expandMacrosWith: aName) type: self defaultPetMediaType);
-				yourself)
-		pathParams: {(#identifier -> anIdentifier)} asDictionary
-]
-
 { #category : #running }
 PetsRESTfulWebServiceTest >> setUp [
 
@@ -152,7 +152,7 @@ PetsRESTfulWebServiceTest >> testCantUpdatePetIfMissingETag [
 
 	self
 		createPet;
-		should: [ webService updatePetBasedOn: (self requestToUpdatePetMissingIfMatchIdentifiedBy: 1 nameTo: 'Mendieta') within: self newHttpRequestContext ]
+		should: [ webService updatePetBasedOn: (self requestMissingIfMatchHeaderToUpdatePetIdentifiedBy: 1 nameTo: 'Mendieta') within: self newHttpRequestContext ]
 			raise: HTTPClientError
 			withExceptionDo: [ :error | self assert: error code equals: 428 ]
 ]

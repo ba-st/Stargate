@@ -17,9 +17,9 @@ Class {
 }
 
 { #category : #'private - asserting' }
-RESTfulWebService >> assert: etag matchesEntityTagOf: pet encodedAs: mediaType [
+RESTfulWebService >> assert: etag matchesEntityTagOf: entity encodedAs: mediaType [
 
-	(etag = (self entityTagOf: pet encodedAs: mediaType))
+	(etag = (self entityTagOf: entity encodedAs: mediaType))
 		ifFalse: [ HTTPClientError signalPreconditionFailed ]
 ]
 

@@ -39,13 +39,13 @@ HTTPClientError class >> signalNotFound: aFailureExplanation [
 	^self signal: 404 describedBy: aFailureExplanation 
 ]
 
-{ #category : #'as yet unclassified' }
+{ #category : #signaling }
 HTTPClientError class >> signalPreconditionFailed [
 
 	^ self signal: 412 describedBy: 'One or more conditions given in the request header fields evaluated to false when tested on the server.'
 ]
 
-{ #category : #'as yet unclassified' }
+{ #category : #signaling }
 HTTPClientError class >> signalPreconditionRequired: aMessageText [
 
 	^ self signal: 428 describedBy: aMessageText

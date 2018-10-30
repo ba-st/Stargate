@@ -12,7 +12,7 @@ Class {
 	#category : #'Stargate-Model-Zinc'
 }
 
-{ #category : #'as yet unclassified' }
+{ #category : #'instance creation' }
 ZnETag class >> fromString: aString [
 
 	AssertionCheckerBuilder new
