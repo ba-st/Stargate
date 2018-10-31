@@ -85,7 +85,7 @@ PetsRESTfulWebServiceSpecification >> getPetRoute [
 { #category : #routes }
 PetsRESTfulWebServiceSpecification >> getPetsRoute [
 
-	^ RouteSpecification handling: #GET at: '/pets' evaluating: [ :service :httpRequest :context | service getPetsBasedOn: httpRequest within: context ]
+	^ RouteSpecification handling: #GET at: self endpoint evaluating: [ :service :httpRequest :context | service getPetsBasedOn: httpRequest within: context ]
 ]
 
 { #category : #'private - accessing' }
