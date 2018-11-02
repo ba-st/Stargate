@@ -139,6 +139,18 @@ PetOrdersRESTfulWebService >> orders [
 	^ orders
 ]
 
+{ #category : #'private - accessing' }
+PetOrdersRESTfulWebService >> provideHypermediaPolicy [
+
+	^ HypermediaDrivenResourcePolicy for: self
+]
+
+{ #category : #'private - accessing' }
+PetOrdersRESTfulWebService >> providePaginationPolicy [
+
+	^ ResourceIsPaginatedPolicy for: self with: self defaultPaginationLimit
+]
+
 { #category : #'private - API' }
 PetOrdersRESTfulWebService >> recordIdAndUpdateTimestampFor: order [
 

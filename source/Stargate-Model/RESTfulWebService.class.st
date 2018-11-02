@@ -11,7 +11,9 @@ Class {
 	#instVars : [
 		'mappingRuleSet',
 		'baseUrlOptional',
-		'acceptNegotiator'
+		'acceptNegotiator',
+		'paginationPolicy',
+		'hypermediaPolicy'
 	],
 	#category : #'Stargate-Model-Services'
 }
@@ -31,12 +33,6 @@ RESTfulWebService >> decode: theRepresentation at: aKey from: sourceMediaType wi
 		do: [ :signal | HTTPClientError signalBadRequest: signal messageText ] ]
 		on: MappingNotFound
 		do: [ :signal | HTTPClientError signalUnsupportedMediaType: signal messageText ]
-]
-
-{ #category : #'private - accessing' }
-RESTfulWebService >> defaultPaginationLimit [
-
-	^ self subclassResponsibility
 ]
 
 { #category : #'private - transformations' }
@@ -71,12 +67,6 @@ RESTfulWebService >> evaluateQuery: aQueryEvaluationBlock [
 		do: [ :signal | HTTPClientError signalNotFound: signal messageText ]
 ]
 
-{ #category : #'private - querying' }
-RESTfulWebService >> evaluateQuery: aQueryEvaluationBlock accordingTo: aPaginationSpec [
-
-	^ self evaluateQuery: [ aQueryEvaluationBlock cull: aPaginationSpec ]
-]
-
 { #category : #'private - API' }
 RESTfulWebService >> get: aQueryEvaluationBlock asCollectionEncodedUsing: aKey basedOn: anHttpRequest within: aContext [
 
@@ -85,13 +75,11 @@ RESTfulWebService >> get: aQueryEvaluationBlock asCollectionEncodedUsing: aKey b
 	mediaType := self targetMediaTypeFrom: anHttpRequest.
 
 	^ self
-		handleConflictsIn: [ | resourceCollection encodedResourceCollection response paginationLinks |
+		handleConflictsIn: [ | resourceCollection encodedResourceCollection response |
 
-			resourceCollection := self evaluateQuery: aQueryEvaluationBlock accordingTo: (self paginationFrom: anHttpRequest).
-			paginationLinks := aContext paginationControls.
+			resourceCollection := self paginationPolicy evaluateQuery: aQueryEvaluationBlock basedOn: anHttpRequest.
 
-			aContext holdAsHypermediaControls: {('self' -> anHttpRequest absoluteUrl)} , paginationLinks.
-			resourceCollection do: [ :resource | aContext holdAsHypermediaControls: (self mediaControlsFor: resource) forSubresource: resource ].
+			self hypermediaPolicy holdCollection: resourceCollection controlsBasedOn: anHttpRequest within: aContext.
 
 			encodedResourceCollection := self
 				encode: resourceCollection
@@ -99,13 +87,7 @@ RESTfulWebService >> get: aQueryEvaluationBlock asCollectionEncodedUsing: aKey b
 				to: mediaType
 				within: aContext.
 			response := ZnResponse ok: encodedResourceCollection.
-			paginationLinks
-				do: [ :assoc | 
-					response
-						addLink:
-							((ZnLink to: assoc value)
-								rel: assoc key;
-								yourself) ].
+			self paginationPolicy affect: response within: aContext.
 			response ]
 ]
 
@@ -126,7 +108,7 @@ RESTfulWebService >> get: aQueryEvaluationBlock encodedUsing: aKey basedOn: anHt
 								setEntityTag: etag;
 								yourself ] ].
 
-			aContext holdAsHypermediaControls: (self mediaControlsFor: resource).
+			self hypermediaPolicy holdResource: resource controlsWithin: aContext.
 			response := ZnResponse
 				ok:
 					(self
@@ -144,6 +126,13 @@ RESTfulWebService >> handleConflictsIn: aBlock [
 	^ aBlock
 		on: ConflictingObjectFound
 		do: [ :signal | HTTPClientError signalConflict: signal messageText ]
+]
+
+{ #category : #'private - accessing' }
+RESTfulWebService >> hypermediaPolicy [
+
+	hypermediaPolicy ifNil: [ hypermediaPolicy := self provideHypermediaPolicy ].
+	^ hypermediaPolicy
 ]
 
 { #category : #'private - accessing' }
@@ -173,12 +162,23 @@ RESTfulWebService >> mediaControlsFor: result [
 	^ {'self' -> (self locationOf: result)}
 ]
 
-{ #category : #'private - querying' }
-RESTfulWebService >> paginationFrom: anHttpRequest [
+{ #category : #'private - accessing' }
+RESTfulWebService >> paginationPolicy [
 
-	^ PaginationSpec
-		startingAt: (IsInteger parseString: (anHttpRequest at: #start ifAbsent: [ 1 ]))
-		limitedTo: (IsInteger parseString: (anHttpRequest at: #limit ifAbsent: [ self defaultPaginationLimit ]))
+	paginationPolicy ifNil: [ paginationPolicy := self providePaginationPolicy ].
+	^ paginationPolicy
+]
+
+{ #category : #'private - accessing' }
+RESTfulWebService >> provideHypermediaPolicy [
+
+	^ self subclassResponsibility
+]
+
+{ #category : #'private - accessing' }
+RESTfulWebService >> providePaginationPolicy [
+
+	^ self subclassResponsibility
 ]
 
 { #category : #'private - API' }

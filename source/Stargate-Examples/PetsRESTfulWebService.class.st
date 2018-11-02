@@ -152,6 +152,18 @@ PetsRESTfulWebService >> pets [
 	^ pets
 ]
 
+{ #category : #'private - accessing' }
+PetsRESTfulWebService >> provideHypermediaPolicy [
+
+	^ HypermediaDrivenResourcePolicy for: self
+]
+
+{ #category : #'private - accessing' }
+PetsRESTfulWebService >> providePaginationPolicy [
+
+	^ ResourceIsPaginatedPolicy for: self with: self defaultPaginationLimit
+]
+
 { #category : #'private - state management' }
 PetsRESTfulWebService >> recordIdAndUpdateTimestampFor: newPet [
 
