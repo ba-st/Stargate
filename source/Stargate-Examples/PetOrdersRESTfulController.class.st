@@ -41,12 +41,6 @@ PetOrdersRESTfulController >> createOrderBasedOn: anHttpRequest within: aContext
 ]
 
 { #category : #'private - accessing' }
-PetOrdersRESTfulController >> defaultPaginationLimit [
-
-	^ 10
-]
-
-{ #category : #'private - accessing' }
 PetOrdersRESTfulController >> entityTagOf: aPetOrder encodedAs: mediaType [
 
 	^ ZnETag
@@ -148,7 +142,7 @@ PetOrdersRESTfulController >> provideHypermediaPolicy [
 { #category : #'private - accessing' }
 PetOrdersRESTfulController >> providePaginationPolicy [
 
-	^ ResourceIsPaginatedPolicy for: self with: self defaultPaginationLimit
+	^ ResourceNotPaginatedPolicy for: self
 ]
 
 { #category : #'private - API' }
