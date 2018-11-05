@@ -13,9 +13,9 @@ Class {
 }
 
 { #category : #'instance creation' }
-ReflectiveMappingRuleSetBuilder class >> for: aWebServiceSpecification [
+ReflectiveMappingRuleSetBuilder class >> for: aResourceRESTfulControllerSpecification [
 
-	^ self new initializeFor: aWebServiceSpecification
+	^ self new initializeFor: aResourceRESTfulControllerSpecification
 ]
 
 { #category : #building }
@@ -35,7 +35,7 @@ ReflectiveMappingRuleSetBuilder >> build [
 ]
 
 { #category : #initialization }
-ReflectiveMappingRuleSetBuilder >> initializeFor: aWebServiceSpecification [
+ReflectiveMappingRuleSetBuilder >> initializeFor: aResourceRESTfulControllerSpecification [
 
-	specification := aWebServiceSpecification
+	specification := aResourceRESTfulControllerSpecification
 ]

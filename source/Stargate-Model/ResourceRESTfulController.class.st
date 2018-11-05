@@ -6,7 +6,7 @@ I provide a way to encode/decode the resources into the representations produced
 I also provide standard error handling and templates for processing the differente HTTP verbs.
 "
 Class {
-	#name : #RESTfulWebService,
+	#name : #ResourceRESTfulController,
 	#superclass : #Object,
 	#instVars : [
 		'mappingRuleSet',
@@ -15,18 +15,18 @@ Class {
 		'paginationPolicy',
 		'hypermediaPolicy'
 	],
-	#category : #'Stargate-Model-Services'
+	#category : #'Stargate-Model-Controllers'
 }
 
 { #category : #'private - asserting' }
-RESTfulWebService >> assert: etag matchesEntityTagOf: entity encodedAs: mediaType [
+ResourceRESTfulController >> assert: etag matchesEntityTagOf: entity encodedAs: mediaType [
 
 	(etag = (self entityTagOf: entity encodedAs: mediaType))
 		ifFalse: [ HTTPClientError signalPreconditionFailed ]
 ]
 
 { #category : #'private - transformations' }
-RESTfulWebService >> decode: theRepresentation at: aKey from: sourceMediaType within: aContext [
+ResourceRESTfulController >> decode: theRepresentation at: aKey from: sourceMediaType within: aContext [
 
 	^ [ [ (mappingRuleSet ruleToDecode: sourceMediaType to: aKey) applyOn: theRepresentation within: aContext ]
 		on: KeyNotFound , NeoJSONParseError
@@ -36,7 +36,7 @@ RESTfulWebService >> decode: theRepresentation at: aKey from: sourceMediaType wi
 ]
 
 { #category : #'private - transformations' }
-RESTfulWebService >> encode: theResource at: aKey to: targetMediaType within: aContext [
+ResourceRESTfulController >> encode: theResource at: aKey to: targetMediaType within: aContext [
 
 	^ [ (mappingRuleSet ruleToEncode: aKey to: targetMediaType)
 		applyOn: theResource
@@ -46,19 +46,19 @@ RESTfulWebService >> encode: theResource at: aKey to: targetMediaType within: aC
 ]
 
 { #category : #'private - accessing' }
-RESTfulWebService >> entityTagOf: resource encodedAs: mediaType [
+ResourceRESTfulController >> entityTagOf: resource encodedAs: mediaType [
 
 	self subclassResponsibility
 ]
 
 { #category : #'private - accessing' }
-RESTfulWebService >> entityTagToMatchBasedOn: anHttpRequest [
+ResourceRESTfulController >> entityTagToMatchBasedOn: anHttpRequest [
 
 	^ (anHttpRequest headers at: #'If-Match' ifAbsent: [ HTTPClientError signalPreconditionRequired: 'Missing If-Match header.' ]) asETag
 ]
 
 { #category : #'private - querying' }
-RESTfulWebService >> evaluateQuery: aQueryEvaluationBlock [
+ResourceRESTfulController >> evaluateQuery: aQueryEvaluationBlock [
 
 	^ [ [ aQueryEvaluationBlock value ]
 		on: TeaNoSuchParam
@@ -68,7 +68,7 @@ RESTfulWebService >> evaluateQuery: aQueryEvaluationBlock [
 ]
 
 { #category : #'private - API' }
-RESTfulWebService >> get: aQueryEvaluationBlock asCollectionEncodedUsing: aKey basedOn: anHttpRequest within: aContext [
+ResourceRESTfulController >> get: aQueryEvaluationBlock asCollectionEncodedUsing: aKey basedOn: anHttpRequest within: aContext [
 
 	| mediaType |
 
@@ -92,7 +92,7 @@ RESTfulWebService >> get: aQueryEvaluationBlock asCollectionEncodedUsing: aKey b
 ]
 
 { #category : #'private - API' }
-RESTfulWebService >> get: aQueryEvaluationBlock encodedUsing: aKey basedOn: anHttpRequest within: aContext [
+ResourceRESTfulController >> get: aQueryEvaluationBlock encodedUsing: aKey basedOn: anHttpRequest within: aContext [
 
 	| mediaType resource response |
 
@@ -121,7 +121,7 @@ RESTfulWebService >> get: aQueryEvaluationBlock encodedUsing: aKey basedOn: anHt
 ]
 
 { #category : #'private - transformations' }
-RESTfulWebService >> handleConflictsIn: aBlock [
+ResourceRESTfulController >> handleConflictsIn: aBlock [
 
 	^ aBlock
 		on: ConflictingObjectFound
@@ -129,84 +129,84 @@ RESTfulWebService >> handleConflictsIn: aBlock [
 ]
 
 { #category : #'private - accessing' }
-RESTfulWebService >> hypermediaPolicy [
+ResourceRESTfulController >> hypermediaPolicy [
 
 	hypermediaPolicy ifNil: [ hypermediaPolicy := self provideHypermediaPolicy ].
 	^ hypermediaPolicy
 ]
 
 { #category : #'private - accessing' }
-RESTfulWebService >> ifNoneMatchHeaderPresentIn: anHttpRequest do: aMonadycBlock [
+ResourceRESTfulController >> ifNoneMatchHeaderPresentIn: anHttpRequest do: aMonadycBlock [
 
 	anHttpRequest headers at: #'If-None-Match' ifPresent: [ :ifNoneMatchHeader | aMonadycBlock value: ifNoneMatchHeader asETag ]
 ]
 
 { #category : #initialization }
-RESTfulWebService >> initialize [
+ResourceRESTfulController >> initialize [
 
 	super initialize.
 	mappingRuleSet := self specification mappingRuleSet.
 	baseUrlOptional := Optional unused.
-	acceptNegotiator := RESTfulWebServiceAcceptNegotiator basedOn: self specification mediaTypes
+	acceptNegotiator := RESTfulControllerAcceptNegotiator basedOn: self specification mediaTypes
 ]
 
 { #category : #'private - accessing' }
-RESTfulWebService >> locationOf: resource [
+ResourceRESTfulController >> locationOf: resource [
 
 	self subclassResponsibility
 ]
 
 { #category : #'private - accessing' }
-RESTfulWebService >> mediaControlsFor: result [
+ResourceRESTfulController >> mediaControlsFor: result [
 
 	^ {'self' -> (self locationOf: result)}
 ]
 
 { #category : #'private - accessing' }
-RESTfulWebService >> paginationPolicy [
+ResourceRESTfulController >> paginationPolicy [
 
 	paginationPolicy ifNil: [ paginationPolicy := self providePaginationPolicy ].
 	^ paginationPolicy
 ]
 
 { #category : #'private - accessing' }
-RESTfulWebService >> provideHypermediaPolicy [
+ResourceRESTfulController >> provideHypermediaPolicy [
 
 	^ self subclassResponsibility
 ]
 
 { #category : #'private - accessing' }
-RESTfulWebService >> providePaginationPolicy [
+ResourceRESTfulController >> providePaginationPolicy [
 
 	^ self subclassResponsibility
 ]
 
 { #category : #'private - API' }
-RESTfulWebService >> putEntityTagOf: resource encodedAs: mediaType in: response [
+ResourceRESTfulController >> putEntityTagOf: resource encodedAs: mediaType in: response [
 
 	response setEntityTag: (self entityTagOf: resource encodedAs: mediaType)
 ]
 
 { #category : #configuring }
-RESTfulWebService >> serverUrl: aServerUrl [
+ResourceRESTfulController >> serverUrl: aServerUrl [
 
 	baseUrlOptional := Optional containing: aServerUrl asZnUrl 
 ]
 
 { #category : #specification }
-RESTfulWebService >> specification [
+ResourceRESTfulController >> specification [
 
 	^ self subclassResponsibility 
 ]
 
 { #category : #'private - transformations' }
-RESTfulWebService >> targetMediaTypeFrom: anHttpRequest [
+ResourceRESTfulController >> targetMediaTypeFrom: anHttpRequest [
 
 	^ acceptNegotiator bestRepresentationFor: anHttpRequest
 ]
 
 { #category : #'private - API' }
-RESTfulWebService >> withCreatedResourceDo: aBlock decodedUsing: aKey basedOn: anHttpRequest within: aContext [
+ResourceRESTfulController >> withCreatedResourceDo: aBlock decodedUsing: aKey basedOn: anHttpRequest within: aContext [
 
 	| decodedRepresentation newResource |
 

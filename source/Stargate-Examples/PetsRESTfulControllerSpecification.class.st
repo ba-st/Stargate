@@ -2,20 +2,20 @@
 I'm an example RESTful Web Service specification implementing Pet resource management
 "
 Class {
-	#name : #PetsRESTfulWebServiceSpecification,
-	#superclass : #RESTFulWebServiceSpecification,
+	#name : #PetsRESTfulControllerSpecification,
+	#superclass : #ResourceRESTFulControllerSpecification,
 	#category : #'Stargate-Examples'
 }
 
 { #category : #'mapping rules' }
-PetsRESTfulWebServiceSpecification >> addJsonDecoderVersion1dot0dot0MappingIn: aBuilder [
+PetsRESTfulControllerSpecification >> addJsonDecoderVersion1dot0dot0MappingIn: aBuilder [
 
 	aBuilder
 		addDefaultRuleToDecode: self petVersion1dot0dot0MediaType to: self petMappingKey using: [ :json | NeoJSONObject fromString: json ]
 ]
 
 { #category : #'mapping rules' }
-PetsRESTfulWebServiceSpecification >> addJsonEncoderVersion1dot0dot0MappingIn: aBuilder [
+PetsRESTfulControllerSpecification >> addJsonEncoderVersion1dot0dot0MappingIn: aBuilder [
 
 	aBuilder
 		addDefaultRuleToEncode: self petMappingKey
@@ -59,73 +59,73 @@ PetsRESTfulWebServiceSpecification >> addJsonEncoderVersion1dot0dot0MappingIn: a
 ]
 
 { #category : #routes }
-PetsRESTfulWebServiceSpecification >> createPetRoute [
+PetsRESTfulControllerSpecification >> createPetRoute [
 
 	^ RouteSpecification handling: #POST at: self endpoint evaluating: [ :service :httpRequest :context | service createPetBasedOn: httpRequest within: context ]
 ]
 
 { #category : #routes }
-PetsRESTfulWebServiceSpecification >> deletePetRoute [
+PetsRESTfulControllerSpecification >> deletePetRoute [
 
 	^ RouteSpecification handling: #DELETE at: self idTemplate evaluating: [ :service :httpRequest :context | service deletePetBasedOn: httpRequest within: context ]
 ]
 
 { #category : #'private - accessing' }
-PetsRESTfulWebServiceSpecification >> endpoint [
+PetsRESTfulControllerSpecification >> endpoint [
 
 	^ '/pets'
 ]
 
 { #category : #routes }
-PetsRESTfulWebServiceSpecification >> getPetRoute [
+PetsRESTfulControllerSpecification >> getPetRoute [
 
 	^ RouteSpecification handling: #GET at: self idTemplate evaluating: [ :service :httpRequest :context | service getPetBasedOn: httpRequest within: context ]
 ]
 
 { #category : #routes }
-PetsRESTfulWebServiceSpecification >> getPetsRoute [
+PetsRESTfulControllerSpecification >> getPetsRoute [
 
 	^ RouteSpecification handling: #GET at: self endpoint evaluating: [ :service :httpRequest :context | service getPetsBasedOn: httpRequest within: context ]
 ]
 
 { #category : #'private - accessing' }
-PetsRESTfulWebServiceSpecification >> idTemplate [
+PetsRESTfulControllerSpecification >> idTemplate [
 
 	^ '<1s>/%<<2s>:IsInteger>' expandMacrosWith: self endpoint with: self identifierKey
 ]
 
 { #category : #accessing }
-PetsRESTfulWebServiceSpecification >> identifierKey [
+PetsRESTfulControllerSpecification >> identifierKey [
 
 	^ #identifier
 ]
 
 { #category : #accessing }
-PetsRESTfulWebServiceSpecification >> petMappingKey [
+PetsRESTfulControllerSpecification >> petMappingKey [
 
 	^ #pet
 ]
 
 { #category : #'accessing - media types' }
-PetsRESTfulWebServiceSpecification >> petSummaryVersion1dot0dot0MediaType [
+PetsRESTfulControllerSpecification >> petSummaryVersion1dot0dot0MediaType [
 
 	^ 'application/vnd.stargate.pet.summary+json;version=1.0.0' asMediaType 
 ]
 
 { #category : #'accessing - media types' }
-PetsRESTfulWebServiceSpecification >> petVersion1dot0dot0MediaType [
+PetsRESTfulControllerSpecification >> petVersion1dot0dot0MediaType [
 
 	^ 'application/vnd.stargate.pet+json;version=1.0.0' asMediaType 
 ]
 
 { #category : #accessing }
-PetsRESTfulWebServiceSpecification >> petsMappingKey [
+PetsRESTfulControllerSpecification >> petsMappingKey [
 
 	^ #pets
 ]
 
 { #category : #routes }
-PetsRESTfulWebServiceSpecification >> updatePetRoute [
+PetsRESTfulControllerSpecification >> updatePetRoute [
 
 	^ RouteSpecification handling: #PATCH at: self idTemplate evaluating: [ :service :httpRequest :context | service updatePetBasedOn: httpRequest within: context ]
 ]

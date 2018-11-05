@@ -50,7 +50,7 @@ ReflectiveRoutesConfiguratorTest >> testConfiguringPetsWebServiceRoutes [
 
 	teapot := Teapot on.
 
-	webService := PetsRESTfulWebService new.
+	webService := PetsRESTfulController new.
 
 	(ReflectiveRoutesConfigurator appliedTo: teapot) 
 		addRoutesOf: webService.

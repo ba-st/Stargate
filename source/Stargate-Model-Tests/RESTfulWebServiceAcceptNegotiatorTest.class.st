@@ -19,7 +19,7 @@ RESTfulWebServiceAcceptNegotiatorTest >> assertBestRepresentationFor: anAcceptHe
 { #category : #'private - accessing' }
 RESTfulWebServiceAcceptNegotiatorTest >> bestRepresentationFor: anAcceptHeaderContent given: theAvailableMediaTypes [
 
-	^ (RESTfulWebServiceAcceptNegotiator basedOn: theAvailableMediaTypes)
+	^ (RESTfulControllerAcceptNegotiator basedOn: theAvailableMediaTypes)
 		bestRepresentationFor:
 			((ZnRequest get: '/example' asZnUrl)
 				setAccept: anAcceptHeaderContent;

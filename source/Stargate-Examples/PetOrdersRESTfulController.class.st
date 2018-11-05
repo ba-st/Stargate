@@ -2,8 +2,8 @@
 I'm an example RESTful Web Service implementing Pet Order resource management
 "
 Class {
-	#name : #PetOrdersRESTfulWebService,
-	#superclass : #RESTfulWebService,
+	#name : #PetOrdersRESTfulController,
+	#superclass : #ResourceRESTfulController,
 	#instVars : [
 		'orders',
 		'nextId',
@@ -15,19 +15,19 @@ Class {
 }
 
 { #category : #API }
-PetOrdersRESTfulWebService >> cancelOrderBasedOn: anHttpRequest within: aContext [
+PetOrdersRESTfulController >> cancelOrderBasedOn: anHttpRequest within: aContext [
 
 	^ self updateOrderStatusBasedOn: anHttpRequest within: aContext with: [ self updateOrderStatusAt: (self identifierIn: anHttpRequest) to: 'canceled' ]
 ]
 
 { #category : #API }
-PetOrdersRESTfulWebService >> completeOrderBasedOn: anHttpRequest within: aContext [
+PetOrdersRESTfulController >> completeOrderBasedOn: anHttpRequest within: aContext [
 
 	^ self updateOrderStatusBasedOn: anHttpRequest within: aContext with: [ self updateOrderStatusToCompletedBasedOn: anHttpRequest ]
 ]
 
 { #category : #API }
-PetOrdersRESTfulWebService >> createOrderBasedOn: anHttpRequest within: aContext [
+PetOrdersRESTfulController >> createOrderBasedOn: anHttpRequest within: aContext [
 
 	^ self
 		withCreatedResourceDo: [ :order | 
@@ -41,13 +41,13 @@ PetOrdersRESTfulWebService >> createOrderBasedOn: anHttpRequest within: aContext
 ]
 
 { #category : #'private - accessing' }
-PetOrdersRESTfulWebService >> defaultPaginationLimit [
+PetOrdersRESTfulController >> defaultPaginationLimit [
 
 	^ 10
 ]
 
 { #category : #'private - accessing' }
-PetOrdersRESTfulWebService >> entityTagOf: aPetOrder encodedAs: mediaType [
+PetOrdersRESTfulController >> entityTagOf: aPetOrder encodedAs: mediaType [
 
 	^ ZnETag
 		with:
@@ -60,7 +60,7 @@ PetOrdersRESTfulWebService >> entityTagOf: aPetOrder encodedAs: mediaType [
 ]
 
 { #category : #API }
-PetOrdersRESTfulWebService >> getOrderBasedOn: anHttpRequest within: aContext [
+PetOrdersRESTfulController >> getOrderBasedOn: anHttpRequest within: aContext [
 
 	^ self
 		get: [ aContext hold: (orderStatus at: (self identifierIn: anHttpRequest)) under: #status.
@@ -71,19 +71,19 @@ PetOrdersRESTfulWebService >> getOrderBasedOn: anHttpRequest within: aContext [
 ]
 
 { #category : #'private - accessing' }
-PetOrdersRESTfulWebService >> identifierIn: anHttpRequest [
+PetOrdersRESTfulController >> identifierIn: anHttpRequest [
 
 	^ anHttpRequest at: #identifier
 ]
 
 { #category : #'private - accessing' }
-PetOrdersRESTfulWebService >> identifierOf: aPetOrder [
+PetOrdersRESTfulController >> identifierOf: aPetOrder [
 
 	^ orderById keyAtValue: aPetOrder
 ]
 
 { #category : #initialization }
-PetOrdersRESTfulWebService >> initialize [
+PetOrdersRESTfulController >> initialize [
 
 	super initialize.
 	orders := OrderedCollection new.
@@ -94,13 +94,13 @@ PetOrdersRESTfulWebService >> initialize [
 ]
 
 { #category : #'private - accessing' }
-PetOrdersRESTfulWebService >> lastModificationOf: aPetOrder [
+PetOrdersRESTfulController >> lastModificationOf: aPetOrder [
 
 	^ updateTimestamps at: (self identifierOf: aPetOrder)
 ]
 
 { #category : #'private - accessing' }
-PetOrdersRESTfulWebService >> locationOf: aPetOrder [
+PetOrdersRESTfulController >> locationOf: aPetOrder [
 
 	| baseUrl |
 
@@ -111,7 +111,7 @@ PetOrdersRESTfulWebService >> locationOf: aPetOrder [
 ]
 
 { #category : #'private - accessing' }
-PetOrdersRESTfulWebService >> mediaControlsFor: order [
+PetOrdersRESTfulController >> mediaControlsFor: order [
 
 	| status |
 
@@ -128,31 +128,31 @@ PetOrdersRESTfulWebService >> mediaControlsFor: order [
 ]
 
 { #category : #'private - accessing' }
-PetOrdersRESTfulWebService >> orderIdentifiedUsing: anHttpRequest [
+PetOrdersRESTfulController >> orderIdentifiedUsing: anHttpRequest [
 
 	^ orderById at: (self identifierIn: anHttpRequest) ifAbsent: [ ObjectNotFound signal ]
 ]
 
 { #category : #accessing }
-PetOrdersRESTfulWebService >> orders [
+PetOrdersRESTfulController >> orders [
 
 	^ orders
 ]
 
 { #category : #'private - accessing' }
-PetOrdersRESTfulWebService >> provideHypermediaPolicy [
+PetOrdersRESTfulController >> provideHypermediaPolicy [
 
 	^ HypermediaDrivenResourcePolicy for: self
 ]
 
 { #category : #'private - accessing' }
-PetOrdersRESTfulWebService >> providePaginationPolicy [
+PetOrdersRESTfulController >> providePaginationPolicy [
 
 	^ ResourceIsPaginatedPolicy for: self with: self defaultPaginationLimit
 ]
 
 { #category : #'private - API' }
-PetOrdersRESTfulWebService >> recordIdAndUpdateTimestampFor: order [
+PetOrdersRESTfulController >> recordIdAndUpdateTimestampFor: order [
 
 	orderById at: nextId put: order.
 	orderStatus at: nextId put: 'registered'.
@@ -162,20 +162,20 @@ PetOrdersRESTfulWebService >> recordIdAndUpdateTimestampFor: order [
 ]
 
 { #category : #specification }
-PetOrdersRESTfulWebService >> specification [
+PetOrdersRESTfulController >> specification [
 
-	^ PetOrdersRESTfulWebServiceSpecification new
+	^ PetOrdersRESTfulControllerSpecification new
 ]
 
 { #category : #'private - API' }
-PetOrdersRESTfulWebService >> updateOrderStatusAt: id to: aTargetStatus [
+PetOrdersRESTfulController >> updateOrderStatusAt: id to: aTargetStatus [
 
 	orderStatus at: id put: aTargetStatus.
 	updateTimestamps at: id put: (updateTimestamps at: id) + 1
 ]
 
 { #category : #API }
-PetOrdersRESTfulWebService >> updateOrderStatusBasedOn: anHttpRequest within: aContext with: anUpdateBlock [
+PetOrdersRESTfulController >> updateOrderStatusBasedOn: anHttpRequest within: aContext with: anUpdateBlock [
 
 	| response |
 
@@ -186,7 +186,7 @@ PetOrdersRESTfulWebService >> updateOrderStatusBasedOn: anHttpRequest within: aC
 ]
 
 { #category : #'private - API' }
-PetOrdersRESTfulWebService >> updateOrderStatusToCompletedBasedOn: anHttpRequest [
+PetOrdersRESTfulController >> updateOrderStatusToCompletedBasedOn: anHttpRequest [
 
 	| orderId |
 

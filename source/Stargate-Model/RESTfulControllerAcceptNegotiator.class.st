@@ -2,22 +2,22 @@
 I will provide the best representation (media type) to use for processing an HTTP Request given an available media type list
 "
 Class {
-	#name : #RESTfulWebServiceAcceptNegotiator,
+	#name : #RESTfulControllerAcceptNegotiator,
 	#superclass : #Object,
 	#instVars : [
 		'availableMediaTypes'
 	],
-	#category : #'Stargate-Model-Services'
+	#category : #'Stargate-Model-Controllers'
 }
 
 { #category : #'instance creation' }
-RESTfulWebServiceAcceptNegotiator class >> basedOn: aMediaTypeCollection [
+RESTfulControllerAcceptNegotiator class >> basedOn: aMediaTypeCollection [
 
 	^ self new initializeBasedOn: aMediaTypeCollection
 ]
 
 { #category : #querying }
-RESTfulWebServiceAcceptNegotiator >> bestRepresentationFor: anHttpRequest [
+RESTfulControllerAcceptNegotiator >> bestRepresentationFor: anHttpRequest [
 
 	"This method returns the best suited representation for the given request"
 
@@ -26,13 +26,13 @@ RESTfulWebServiceAcceptNegotiator >> bestRepresentationFor: anHttpRequest [
 ]
 
 { #category : #'initialize - release' }
-RESTfulWebServiceAcceptNegotiator >> initializeBasedOn: aMediaTypeCollection [
+RESTfulControllerAcceptNegotiator >> initializeBasedOn: aMediaTypeCollection [
 
 	availableMediaTypes := aMediaTypeCollection 
 ]
 
 { #category : #'private - accessing' }
-RESTfulWebServiceAcceptNegotiator >> mediaTypesAvailableFor: aMediaType [
+RESTfulControllerAcceptNegotiator >> mediaTypesAvailableFor: aMediaType [
 
 	^ availableMediaTypes
 		select: [ :available | 
@@ -41,7 +41,7 @@ RESTfulWebServiceAcceptNegotiator >> mediaTypesAvailableFor: aMediaType [
 ]
 
 { #category : #'private - accessing' }
-RESTfulWebServiceAcceptNegotiator >> precedenceFor: aMediaType [
+RESTfulControllerAcceptNegotiator >> precedenceFor: aMediaType [
 
 	| precedence version versionParts |
 
@@ -57,17 +57,18 @@ RESTfulWebServiceAcceptNegotiator >> precedenceFor: aMediaType [
 	versionParts := version splitOn: $..
 	precedence := precedence + versionParts size.
 	versionParts doWithIndex: [ :part :index | precedence := precedence + (part asInteger * (2 raisedTo: 4 - index)) ].
+
 	^ precedence
 ]
 
 { #category : #'private - accessing' }
-RESTfulWebServiceAcceptNegotiator >> sortByPrecedence: mediaTypes [
+RESTfulControllerAcceptNegotiator >> sortByPrecedence: mediaTypes [
 
 	^ (mediaTypes sorted: [ :a :b | (self precedenceFor: a) < (self precedenceFor: b) ]) reversed 
 ]
 
 { #category : #'private - accessing' }
-RESTfulWebServiceAcceptNegotiator >> versionIn: acceptable canBeHandledBy: available [
+RESTfulControllerAcceptNegotiator >> versionIn: acceptable canBeHandledBy: available [
 
 	| acceptVersion availableVersion acceptVersionParts availableVersionParts |
 
@@ -85,7 +86,7 @@ RESTfulWebServiceAcceptNegotiator >> versionIn: acceptable canBeHandledBy: avail
 ]
 
 { #category : #'private - accessing' }
-RESTfulWebServiceAcceptNegotiator >> withAcceptableMediaTypesIn: anHttpRequest do: aBlock [
+RESTfulControllerAcceptNegotiator >> withAcceptableMediaTypesIn: anHttpRequest do: aBlock [
 
 	| acceptable grouped |
 

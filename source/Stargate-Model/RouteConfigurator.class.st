@@ -8,16 +8,16 @@ Class {
 	#superclass : #Object,
 	#instVars : [
 		'teapot',
-		'webService',
-		'routesAllowingCors'
+		'routesAllowingCors',
+		'resourceController'
 	],
 	#category : #'Stargate-Model-Routing'
 }
 
 { #category : #'instance creation' }
-RouteConfigurator class >> appliedTo: aTeapot sendingMessagesTo: aWebService [
+RouteConfigurator class >> appliedTo: aTeapot sendingMessagesTo: aResourceRESTfulController [
 
-	^ self new initializeAppliedTo: aTeapot sendingMessagesTo: aWebService
+	^ self new initializeAppliedTo: aTeapot sendingMessagesTo: aResourceRESTfulController
 ]
 
 { #category : #'private - configuring' }
@@ -53,14 +53,14 @@ RouteConfigurator >> configureRouteFrom: aRouteSpecification [
 		perform: ('<1s>:' expandMacrosWith: aRouteSpecification httpMethod) asSymbol
 		with:
 			aRouteSpecification urlTemplate
-				-> [ :request | aRouteSpecification handler value: webService value: request value: HttpRequestContext new ]
+				-> [ :request | aRouteSpecification handler value: resourceController value: request value: HttpRequestContext new ]
 ]
 
 { #category : #initialization }
-RouteConfigurator >> initializeAppliedTo: aTeapot sendingMessagesTo: aWebService [
+RouteConfigurator >> initializeAppliedTo: aTeapot sendingMessagesTo: aResourceRESTfulController [
 
 	teapot := aTeapot.
-	webService := aWebService.
-	teapot server serverUrl ifNotNil: [ :url | webService serverUrl: url ].
+	resourceController := aResourceRESTfulController.
+	teapot server serverUrl ifNotNil: [ :url | resourceController serverUrl: url ].
 	routesAllowingCors := Dictionary new
 ]

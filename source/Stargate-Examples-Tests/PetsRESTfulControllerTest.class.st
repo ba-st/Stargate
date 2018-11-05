@@ -2,31 +2,31 @@
 I'm a user stoty test testing the service providing the Pet resource, in the classic Pet Store example
 "
 Class {
-	#name : #PetsRESTfulWebServiceTest,
-	#superclass : #RESTfulWebServiceTest,
+	#name : #PetsRESTfulControllerTest,
+	#superclass : #ResourceRESTfulControllerTest,
 	#category : #'Stargate-Examples-Tests'
 }
 
 { #category : #'private - support' }
-PetsRESTfulWebServiceTest >> baseUrl [
+PetsRESTfulControllerTest >> baseUrl [
 
 	^ 'https://pets.example.com' asZnUrl 
 ]
 
 { #category : #'private - support' }
-PetsRESTfulWebServiceTest >> createPet [
+PetsRESTfulControllerTest >> createPet [
 
 	self
 		assert:
-			(webService
+			(resourceController
 				createPetBasedOn: (self requestToCreatePetFrom: '{"name":"Firulais","type":"dog"}')
 				within: self newHttpRequestContext) isSuccess
 ]
 
 { #category : #'private - support' }
-PetsRESTfulWebServiceTest >> createSixPets [
+PetsRESTfulControllerTest >> createSixPets [
 
-	webService
+	resourceController
 		createPetBasedOn: (self requestToCreatePetFrom: '{"name":"Firulais","type":"dog"}') within: self newHttpRequestContext;
 		createPetBasedOn: (self requestToCreatePetFrom: '{"name":"Lassie","type":"dog"}') within: self newHttpRequestContext;
 		createPetBasedOn: (self requestToCreatePetFrom: '{"name":"Garfield","type":"cat"}') within: self newHttpRequestContext;
@@ -34,27 +34,27 @@ PetsRESTfulWebServiceTest >> createSixPets [
 		createPetBasedOn: (self requestToCreatePetFrom: '{"name":"Babe","type":"pig"}') within: self newHttpRequestContext;
 		createPetBasedOn: (self requestToCreatePetFrom: '{"name":"Beethoven","type":"dog"}') within: self newHttpRequestContext.
 
-	self assert: webService pets size equals: 6
+	self assert: resourceController pets size equals: 6
 ]
 
 { #category : #'private - support' }
-PetsRESTfulWebServiceTest >> defaultPetMediaType [
+PetsRESTfulControllerTest >> defaultPetMediaType [
 
-	^ webService specification petVersion1dot0dot0MediaType
+	^ resourceController specification petVersion1dot0dot0MediaType
 ]
 
 { #category : #'private - support' }
-PetsRESTfulWebServiceTest >> entityTagOfPetIdentifiedBy: anIdentifier [
+PetsRESTfulControllerTest >> entityTagOfPetIdentifiedBy: anIdentifier [
 
 	| getResponse |
 
-	getResponse := webService getPetBasedOn: (self requestToGetResourceIdentifiedBy: anIdentifier accepting: self defaultPetMediaType) within: self newHttpRequestContext.
+	getResponse := resourceController getPetBasedOn: (self requestToGetResourceIdentifiedBy: anIdentifier accepting: self defaultPetMediaType) within: self newHttpRequestContext.
 	self assert: getResponse isSuccess.
 	^ getResponse headers at: 'ETag'
 ]
 
 { #category : #'private - support' }
-PetsRESTfulWebServiceTest >> requestMissingIfMatchHeaderToUpdatePetIdentifiedBy: anIdentifier nameTo: aName [
+PetsRESTfulControllerTest >> requestMissingIfMatchHeaderToUpdatePetIdentifiedBy: anIdentifier nameTo: aName [
 
 	^ TeaRequest
 		fromZnRequest:
@@ -66,19 +66,19 @@ PetsRESTfulWebServiceTest >> requestMissingIfMatchHeaderToUpdatePetIdentifiedBy:
 ]
 
 { #category : #'private - support' }
-PetsRESTfulWebServiceTest >> requestToCreatePetFrom: json [
+PetsRESTfulControllerTest >> requestToCreatePetFrom: json [
 
 	^ self requestToPOST: json as: self defaultPetMediaType
 ]
 
 { #category : #'private - support' }
-PetsRESTfulWebServiceTest >> requestToDeletePetIdentifiedBy: anIdentifier [
+PetsRESTfulControllerTest >> requestToDeletePetIdentifiedBy: anIdentifier [
 
 	^ TeaRequest fromZnRequest: (ZnRequest delete: (self urlForResourceIdentifiedBy: anIdentifier)) pathParams: {(#identifier -> anIdentifier)} asDictionary
 ]
 
 { #category : #'private - support' }
-PetsRESTfulWebServiceTest >> requestToGet: aUrl accepting: anAcceptHeader [
+PetsRESTfulControllerTest >> requestToGet: aUrl accepting: anAcceptHeader [
 
 	^ TeaRequest
 		fromZnRequest:
@@ -88,19 +88,19 @@ PetsRESTfulWebServiceTest >> requestToGet: aUrl accepting: anAcceptHeader [
 ]
 
 { #category : #'private - support' }
-PetsRESTfulWebServiceTest >> requestToGetPetsAccepting: anAcceptHeader [
+PetsRESTfulControllerTest >> requestToGetPetsAccepting: anAcceptHeader [
 
 	^ self requestToGet: self resourceUrl accepting: anAcceptHeader
 ]
 
 { #category : #'private - support' }
-PetsRESTfulWebServiceTest >> requestToUpdatePetIdentifiedBy: anIdentifier nameTo: aName [
+PetsRESTfulControllerTest >> requestToUpdatePetIdentifiedBy: anIdentifier nameTo: aName [
 
 	^ self requestToUpdatePetIdentifiedBy: anIdentifier nameTo: aName using: (self entityTagOfPetIdentifiedBy: anIdentifier)
 ]
 
 { #category : #'private - support' }
-PetsRESTfulWebServiceTest >> requestToUpdatePetIdentifiedBy: anIdentifier nameTo: aName using: anETag [
+PetsRESTfulControllerTest >> requestToUpdatePetIdentifiedBy: anIdentifier nameTo: aName using: anETag [
 
 	^ TeaRequest
 		fromZnRequest:
@@ -113,7 +113,7 @@ PetsRESTfulWebServiceTest >> requestToUpdatePetIdentifiedBy: anIdentifier nameTo
 ]
 
 { #category : #'private - support' }
-PetsRESTfulWebServiceTest >> requestToUpdatePetIdentifiedBy: anIdentifier statusTo: aStatus [
+PetsRESTfulControllerTest >> requestToUpdatePetIdentifiedBy: anIdentifier statusTo: aStatus [
 
 	^ TeaRequest
 		fromZnRequest:
@@ -126,59 +126,59 @@ PetsRESTfulWebServiceTest >> requestToUpdatePetIdentifiedBy: anIdentifier status
 ]
 
 { #category : #running }
-PetsRESTfulWebServiceTest >> setUp [
+PetsRESTfulControllerTest >> setUp [
 
 	super setUp.
-	self assert: webService pets isEmpty
+	self assert: resourceController pets isEmpty
 ]
 
 { #category : #running }
-PetsRESTfulWebServiceTest >> setUpWebService [
+PetsRESTfulControllerTest >> setUpResourceController [
 
-	webService := PetsRESTfulWebService new
+	resourceController := PetsRESTfulController new
 ]
 
 { #category : #'tests - delete' }
-PetsRESTfulWebServiceTest >> testCantDeleteInvalidPet [
+PetsRESTfulControllerTest >> testCantDeleteInvalidPet [
 
 	self
-		should: [ webService deletePetBasedOn: (self requestToDeletePetIdentifiedBy: 1) within: self newHttpRequestContext ]
+		should: [ resourceController deletePetBasedOn: (self requestToDeletePetIdentifiedBy: 1) within: self newHttpRequestContext ]
 		raise: HTTPClientError
 		withExceptionDo: [ :signal | self assert: signal code equals: 404 ]
 ]
 
 { #category : #'tests - update' }
-PetsRESTfulWebServiceTest >> testCantUpdatePetIfMissingETag [
+PetsRESTfulControllerTest >> testCantUpdatePetIfMissingETag [
 
 	self
 		createPet;
-		should: [ webService updatePetBasedOn: (self requestMissingIfMatchHeaderToUpdatePetIdentifiedBy: 1 nameTo: 'Mendieta') within: self newHttpRequestContext ]
+		should: [ resourceController updatePetBasedOn: (self requestMissingIfMatchHeaderToUpdatePetIdentifiedBy: 1 nameTo: 'Mendieta') within: self newHttpRequestContext ]
 			raise: HTTPClientError
 			withExceptionDo: [ :error | self assert: error code equals: 428 ]
 ]
 
 { #category : #'tests - update' }
-PetsRESTfulWebServiceTest >> testCantUpdatePetWhenETagNotMatching [
+PetsRESTfulControllerTest >> testCantUpdatePetWhenETagNotMatching [
 
 	self
 		createPet;
-		should: [ webService updatePetBasedOn: (self requestToUpdatePetIdentifiedBy: 1 nameTo: 'Mendieta' using: '"Frula"') within: self newHttpRequestContext ]
+		should: [ resourceController updatePetBasedOn: (self requestToUpdatePetIdentifiedBy: 1 nameTo: 'Mendieta' using: '"Frula"') within: self newHttpRequestContext ]
 			raise: HTTPClientError
 			withExceptionDo: [ :error | self assert: error code equals: 412 ]
 ]
 
 { #category : #'tests - get collection' }
-PetsRESTfulWebServiceTest >> testComplexPagination [
+PetsRESTfulControllerTest >> testComplexPagination [
 
 	| response |
 
 	self createSixPets.
 	"Get the 1st page"
-	response := webService getPetsBasedOn: (self requestToGet: 'https://pets.example.com/pets?limit=2' accepting: '*/*') within: self newHttpRequestContext.
+	response := resourceController getPetsBasedOn: (self requestToGet: 'https://pets.example.com/pets?limit=2' accepting: '*/*') within: self newHttpRequestContext.
 	self
 		assert: response isSuccess;
 		assert: response status equals: 200;
-		assert: response contentType asMediaType equals: webService specification petSummaryVersion1dot0dot0MediaType;
+		assert: response contentType asMediaType equals: resourceController specification petSummaryVersion1dot0dot0MediaType;
 		assert: response links size equals: 2;
 		assertUrl: response links first url equals: 'https://pets.example.com/pets?start=3&limit=2';
 		assert: response links first rel equals: 'next';
@@ -193,11 +193,11 @@ PetsRESTfulWebServiceTest >> testComplexPagination [
 				assertUrl: json links last equals: 'https://pets.example.com/pets?start=5&limit=2';
 				assert: json items size equals: 2 ].
 	"Get the 2nd page"
-	response := webService getPetsBasedOn: (self requestToGet: 'https://pets.example.com/pets?start=3&limit=2' accepting: '*/*') within: self newHttpRequestContext.
+	response := resourceController getPetsBasedOn: (self requestToGet: 'https://pets.example.com/pets?start=3&limit=2' accepting: '*/*') within: self newHttpRequestContext.
 	self
 		assert: response isSuccess;
 		assert: response status equals: 200;
-		assert: response contentType asMediaType equals: webService specification petSummaryVersion1dot0dot0MediaType;
+		assert: response contentType asMediaType equals: resourceController specification petSummaryVersion1dot0dot0MediaType;
 		assert: response links size equals: 4;
 		assertUrl: response links first url equals: 'https://pets.example.com/pets?start=1&limit=2';
 		assert: response links first rel equals: 'first';
@@ -220,13 +220,13 @@ PetsRESTfulWebServiceTest >> testComplexPagination [
 ]
 
 { #category : #'tests - delete' }
-PetsRESTfulWebServiceTest >> testDeletePet [
+PetsRESTfulControllerTest >> testDeletePet [
 
 	| response |
 
 	self createPet.
 
-	response := webService deletePetBasedOn: (self requestToDeletePetIdentifiedBy: 1) within: self newHttpRequestContext.
+	response := resourceController deletePetBasedOn: (self requestToDeletePetIdentifiedBy: 1) within: self newHttpRequestContext.
 
 	self
 		assert: response isSuccess;
@@ -235,13 +235,13 @@ PetsRESTfulWebServiceTest >> testDeletePet [
 ]
 
 { #category : #'tests - get individual' }
-PetsRESTfulWebServiceTest >> testGetNotModifiedWhenValidETag [
+PetsRESTfulControllerTest >> testGetNotModifiedWhenValidETag [
 
 	| response |
 
 	self createPet.
 
-	response := webService
+	response := resourceController
 		getPetBasedOn: (self requestToGetResourceIdentifiedBy: 1 accepting: self defaultPetMediaType)
 		within: self newHttpRequestContext.
 
@@ -249,7 +249,7 @@ PetsRESTfulWebServiceTest >> testGetNotModifiedWhenValidETag [
 		assert: response isSuccess;
 		assert: response entityTag equals: '"c051344b8c92c5ed8a2bd0752070c35ed3de3bab"' asETag.
 
-	response := webService
+	response := resourceController
 		getPetBasedOn:
 			(self
 				requestToGetResourceIdentifiedBy: 1
@@ -263,15 +263,15 @@ PetsRESTfulWebServiceTest >> testGetNotModifiedWhenValidETag [
 ]
 
 { #category : #'tests - get individual' }
-PetsRESTfulWebServiceTest >> testGetPetJustCreated [
+PetsRESTfulControllerTest >> testGetPetJustCreated [
 
 	| response |
 
 	self
-		assert: (webService createPetBasedOn: (self requestToCreatePetFrom: '{"name":"Firulais","type":"dog"}') within: self newHttpRequestContext) isSuccess;
-		assert: webService pets size equals: 1.
+		assert: (resourceController createPetBasedOn: (self requestToCreatePetFrom: '{"name":"Firulais","type":"dog"}') within: self newHttpRequestContext) isSuccess;
+		assert: resourceController pets size equals: 1.
 
-	response := webService getPetBasedOn: (self requestToGetResourceIdentifiedBy: 1 accepting: self defaultPetMediaType) within: self newHttpRequestContext.
+	response := resourceController getPetBasedOn: (self requestToGetResourceIdentifiedBy: 1 accepting: self defaultPetMediaType) within: self newHttpRequestContext.
 
 	self
 		assert: response isSuccess;
@@ -290,29 +290,29 @@ PetsRESTfulWebServiceTest >> testGetPetJustCreated [
 ]
 
 { #category : #'tests - get individual' }
-PetsRESTfulWebServiceTest >> testGetPetNotFoundShouldFail [
+PetsRESTfulControllerTest >> testGetPetNotFoundShouldFail [
 
 	self
-		should: [ webService getPetBasedOn: (self requestToGetResourceIdentifiedBy: 1 accepting: '*/*') within: self newHttpRequestContext ]
+		should: [ resourceController getPetBasedOn: (self requestToGetResourceIdentifiedBy: 1 accepting: '*/*') within: self newHttpRequestContext ]
 		raise: HTTPClientError
 		withExceptionDo: [ :error | self assert: error code equals: 404 ]
 ]
 
 { #category : #'tests - get individual' }
-PetsRESTfulWebServiceTest >> testGetPetSummaryJustCreated [
+PetsRESTfulControllerTest >> testGetPetSummaryJustCreated [
 
 	| response |
 
 	self
-		assert: (webService createPetBasedOn: (self requestToCreatePetFrom: '{"name":"Firulais","type":"dog"}') within: self newHttpRequestContext) isSuccess;
-		assert: webService pets size equals: 1.
+		assert: (resourceController createPetBasedOn: (self requestToCreatePetFrom: '{"name":"Firulais","type":"dog"}') within: self newHttpRequestContext) isSuccess;
+		assert: resourceController pets size equals: 1.
 
-	response := webService getPetBasedOn: (self requestToGetResourceIdentifiedBy: 1 accepting: webService specification petSummaryVersion1dot0dot0MediaType) within: self newHttpRequestContext.
+	response := resourceController getPetBasedOn: (self requestToGetResourceIdentifiedBy: 1 accepting: resourceController specification petSummaryVersion1dot0dot0MediaType) within: self newHttpRequestContext.
 
 	self
 		assert: response isSuccess;
 		assert: response status equals: 200;
-		assert: response contentType asMediaType equals: webService specification petSummaryVersion1dot0dot0MediaType;
+		assert: response contentType asMediaType equals: resourceController specification petSummaryVersion1dot0dot0MediaType;
 		assert: response entityTag equals: '"1323cdfb8bb0f9011fbd480c5a87c17d05883214"' asETag.
 
 	self
@@ -326,16 +326,16 @@ PetsRESTfulWebServiceTest >> testGetPetSummaryJustCreated [
 ]
 
 { #category : #'tests - get collection' }
-PetsRESTfulWebServiceTest >> testGetPets [
+PetsRESTfulControllerTest >> testGetPets [
 
 	| response |
 
-	response := webService getPetsBasedOn: (self requestToGetPetsAccepting: '*/*') within: self newHttpRequestContext.
+	response := resourceController getPetsBasedOn: (self requestToGetPetsAccepting: '*/*') within: self newHttpRequestContext.
 
 	self
 		assert: response isSuccess;
 		assert: response status equals: 200;
-		assert: response contentType asMediaType equals: webService specification petSummaryVersion1dot0dot0MediaType.
+		assert: response contentType asMediaType equals: resourceController specification petSummaryVersion1dot0dot0MediaType.
 
 	self
 		withJsonFromContentsIn: response
@@ -346,20 +346,20 @@ PetsRESTfulWebServiceTest >> testGetPets [
 ]
 
 { #category : #'tests - get collection' }
-PetsRESTfulWebServiceTest >> testGetPetsNotEmpty [
+PetsRESTfulControllerTest >> testGetPetsNotEmpty [
 
 	| response |
 
-	webService createPetBasedOn: (self requestToCreatePetFrom: '{"name":"Firulais","type":"dog"}') within: self newHttpRequestContext.
+	resourceController createPetBasedOn: (self requestToCreatePetFrom: '{"name":"Firulais","type":"dog"}') within: self newHttpRequestContext.
 
-	self assert: webService pets notEmpty.
+	self assert: resourceController pets notEmpty.
 
-	response := webService getPetsBasedOn: (self requestToGetPetsAccepting: '*/*') within: self newHttpRequestContext.
+	response := resourceController getPetsBasedOn: (self requestToGetPetsAccepting: '*/*') within: self newHttpRequestContext.
 
 	self
 		assert: response isSuccess;
 		assert: response status equals: 200;
-		assert: response contentType asMediaType equals: webService specification petSummaryVersion1dot0dot0MediaType.
+		assert: response contentType asMediaType equals: resourceController specification petSummaryVersion1dot0dot0MediaType.
 
 	self
 		withJsonFromContentsIn: response
@@ -377,18 +377,18 @@ PetsRESTfulWebServiceTest >> testGetPetsNotEmpty [
 ]
 
 { #category : #'tests - get collection' }
-PetsRESTfulWebServiceTest >> testGetPetsWithPagination [
+PetsRESTfulControllerTest >> testGetPetsWithPagination [
 
 	| response |
 
 	self createSixPets.
 
-	response := webService getPetsBasedOn: (self requestToGetPetsAccepting: '*/*') within: self newHttpRequestContext.
+	response := resourceController getPetsBasedOn: (self requestToGetPetsAccepting: '*/*') within: self newHttpRequestContext.
 
 	self
 		assert: response isSuccess;
 		assert: response status equals: 200;
-		assert: response contentType asMediaType equals: webService specification petSummaryVersion1dot0dot0MediaType;
+		assert: response contentType asMediaType equals: resourceController specification petSummaryVersion1dot0dot0MediaType;
 		assert: response links size equals: 2;
 		assertUrl: response links first url equals: 'https://pets.example.com/pets?start=6&limit=5';
 		assert: response links first rel equals: 'next';
@@ -404,11 +404,11 @@ PetsRESTfulWebServiceTest >> testGetPetsWithPagination [
 				assertUrl: json links last equals: 'https://pets.example.com/pets?start=6&limit=5';
 				assert: json items size equals: 5.
 
-			response := webService getPetsBasedOn: (self requestToGet: json links next accepting: response contentType) within: self newHttpRequestContext.
+			response := resourceController getPetsBasedOn: (self requestToGet: json links next accepting: response contentType) within: self newHttpRequestContext.
 			self
 				assert: response isSuccess;
 				assert: response status equals: 200;
-				assert: response contentType asMediaType equals: webService specification petSummaryVersion1dot0dot0MediaType;
+				assert: response contentType asMediaType equals: resourceController specification petSummaryVersion1dot0dot0MediaType;
 				assert: response links size equals: 2;
 				assertUrl: response links first url equals: 'https://pets.example.com/pets?start=1&limit=5';
 				assert: response links first rel equals: 'first';
@@ -427,39 +427,39 @@ PetsRESTfulWebServiceTest >> testGetPetsWithPagination [
 ]
 
 { #category : #'tests - creation' }
-PetsRESTfulWebServiceTest >> testPetCreation [
+PetsRESTfulControllerTest >> testPetCreation [
 
 	| response |
 
-	response := webService createPetBasedOn: (self requestToCreatePetFrom: '{"name":"Firulais","type":"dog"}') within: self newHttpRequestContext.
+	response := resourceController createPetBasedOn: (self requestToCreatePetFrom: '{"name":"Firulais","type":"dog"}') within: self newHttpRequestContext.
 
 	self
 		assert: response isSuccess;
 		assert: response status equals: 201;
 		assertUrl: response location equals: 'https://pets.example.com/pets/1';
 		assert: response hasEntity;
-		assert: webService pets size equals: 1;
-		assert: webService pets first name equals: 'Firulais'
+		assert: resourceController pets size equals: 1;
+		assert: resourceController pets first name equals: 'Firulais'
 ]
 
 { #category : #'tests - update' }
-PetsRESTfulWebServiceTest >> testUpdatePetName [
+PetsRESTfulControllerTest >> testUpdatePetName [
 
 	| response |
 
 	self
 		createPet;
-		assert: webService pets first name equals: 'Firulais'.
+		assert: resourceController pets first name equals: 'Firulais'.
 
-	response := webService updatePetBasedOn: (self requestToUpdatePetIdentifiedBy: 1 nameTo: 'Mendieta') within: self newHttpRequestContext.
+	response := resourceController updatePetBasedOn: (self requestToUpdatePetIdentifiedBy: 1 nameTo: 'Mendieta') within: self newHttpRequestContext.
 
 	self
 		assert: response isSuccess;
 		assert: response status equals: 200;
 		assert: response hasEntity;
-		assert: webService pets size equals: 1;
-		assert: webService pets first name equals: 'Mendieta';
-		assert: webService pets first status equals: 'new';
+		assert: resourceController pets size equals: 1;
+		assert: resourceController pets first name equals: 'Mendieta';
+		assert: resourceController pets first status equals: 'new';
 		withJsonFromContentsIn: response
 			do: [ :json | 
 			self
@@ -470,23 +470,23 @@ PetsRESTfulWebServiceTest >> testUpdatePetName [
 ]
 
 { #category : #'tests - update' }
-PetsRESTfulWebServiceTest >> testUpdatePetStatus [
+PetsRESTfulControllerTest >> testUpdatePetStatus [
 
 	| response |
 
 	self
 		createPet;
-		assert: webService pets first status equals: 'new'.
+		assert: resourceController pets first status equals: 'new'.
 
-	response := webService updatePetBasedOn: (self requestToUpdatePetIdentifiedBy: 1 statusTo: 'gone') within: self newHttpRequestContext.
+	response := resourceController updatePetBasedOn: (self requestToUpdatePetIdentifiedBy: 1 statusTo: 'gone') within: self newHttpRequestContext.
 
 	self
 		assert: response isSuccess;
 		assert: response status equals: 200;
 		assert: response hasEntity;
-		assert: webService pets size equals: 1;
-		assert: webService pets first name equals: 'Firulais';
-		assert: webService pets first status equals: 'gone';
+		assert: resourceController pets size equals: 1;
+		assert: resourceController pets first name equals: 'Firulais';
+		assert: resourceController pets first status equals: 'gone';
 		withJsonFromContentsIn: response
 			do: [ :json | 
 			self
