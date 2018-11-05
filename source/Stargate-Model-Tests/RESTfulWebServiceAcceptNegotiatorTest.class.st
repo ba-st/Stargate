@@ -7,7 +7,7 @@ Class {
 	#instVars : [
 		'apiMediaTypes'
 	],
-	#category : #'Stargate-Model-Tests-Services'
+	#category : #'Stargate-Model-Tests-Controllers'
 }
 
 { #category : #'private - asserting' }

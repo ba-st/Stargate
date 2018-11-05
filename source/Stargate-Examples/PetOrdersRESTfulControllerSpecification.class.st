@@ -38,7 +38,7 @@ PetOrdersRESTfulControllerSpecification >> addJsonEncoderVersion1dot0dot0Mapping
 							do: [ :mapping | 
 							mapping
 								mapInstVars;
-								mapProperty: #status getter: [ :object | context objectUnder: #status ifNone: [ '' ] ] setter: [ :object :value |  ];
+								mapProperty: #status getter: [ :object | context objectUnder: #status ] setter: [ :object :value |  ];
 								mapHypermediaControlsIn: context ];
 						nextPut: order ] ]
 ]

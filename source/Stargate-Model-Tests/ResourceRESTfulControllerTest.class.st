@@ -7,7 +7,7 @@ Class {
 	#instVars : [
 		'resourceController'
 	],
-	#category : #'Stargate-Model-Tests-Services'
+	#category : #'Stargate-Model-Tests-Controllers'
 }
 
 { #category : #testing }
