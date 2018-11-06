@@ -2,18 +2,18 @@
 Unit test
 "
 Class {
-	#name : #NoHypermediaResourcePolicyTest,
+	#name : #NonHypermediaDrivenRESTfulControllerPolicyTest,
 	#superclass : #TestCase,
 	#category : #'Stargate-Model-Tests-Controllers'
 }
 
 { #category : #tests }
-NoHypermediaResourcePolicyTest >> testBehavior [
+NonHypermediaDrivenRESTfulControllerPolicyTest >> testBehavior [
 
 	| policy context |
 
 	context := HttpRequestContext new.
-	policy := NoHypermediaResourcePolicy new.
+	policy := NonHypermediaDrivenRESTfulControllerPolicy new.
 	policy holdResource: 1 controlsWithin: context.
 	self assert: context hypermediaControls isEmpty.
 

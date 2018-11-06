@@ -1,6 +1,9 @@
+"
+I'm the policy indicating a RESTful controller to support pagination of collections related to the controlled resource.
+"
 Class {
-	#name : #ResourceIsPaginatedPolicy,
-	#superclass : #ResourcePaginationPolicy,
+	#name : #RESTFullControllerPaginateCollectionsPolicy,
+	#superclass : #RESTfulControllerPaginationPolicy,
 	#instVars : [
 		'resourceController',
 		'defaultLimit'
@@ -9,19 +12,19 @@ Class {
 }
 
 { #category : #'instance creation' }
-ResourceIsPaginatedPolicy class >> for: aResourceController with: aPaginationLimit [
+RESTFullControllerPaginateCollectionsPolicy class >> for: aResourceController with: aPaginationLimit [
 
 	^ self new initializeFor: aResourceController with: aPaginationLimit
 ]
 
 { #category : #applying }
-ResourceIsPaginatedPolicy >> addPaginationControlsTo: mediaControls within: aContext [
+RESTFullControllerPaginateCollectionsPolicy >> addPaginationControlsTo: mediaControls within: aContext [
 
 	^ mediaControls , aContext paginationControls
 ]
 
 { #category : #applying }
-ResourceIsPaginatedPolicy >> affect: response within: aContext [
+RESTFullControllerPaginateCollectionsPolicy >> affect: response within: aContext [
 
 	aContext paginationControls
 		do: [ :assoc | 
@@ -33,20 +36,20 @@ ResourceIsPaginatedPolicy >> affect: response within: aContext [
 ]
 
 { #category : #applying }
-ResourceIsPaginatedPolicy >> evaluateQuery: aQueryEvaluationBlock basedOn: anHttpRequest [
+RESTFullControllerPaginateCollectionsPolicy >> evaluateQuery: aQueryEvaluationBlock basedOn: anHttpRequest [
 
 	^ resourceController evaluateQuery: [ aQueryEvaluationBlock cull: (self paginationFrom: anHttpRequest) ]
 ]
 
-{ #category : #'as yet unclassified' }
-ResourceIsPaginatedPolicy >> initializeFor: aResourceController with: aPaginationLimit [
+{ #category : #initialization }
+RESTFullControllerPaginateCollectionsPolicy >> initializeFor: aResourceController with: aPaginationLimit [
 
 	resourceController := aResourceController.
 	defaultLimit := aPaginationLimit
 ]
 
 { #category : #private }
-ResourceIsPaginatedPolicy >> paginationFrom: anHttpRequest [
+RESTFullControllerPaginateCollectionsPolicy >> paginationFrom: anHttpRequest [
 
 	^ PaginationSpec
 		startingAt: (IsInteger parseString: (anHttpRequest at: #start ifAbsent: [ 1 ]))

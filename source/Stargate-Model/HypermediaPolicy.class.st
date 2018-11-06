@@ -1,3 +1,6 @@
+"
+I'm a policy indicating a RESTful controller if it must support or not an hypermedia driven implementation
+"
 Class {
 	#name : #HypermediaPolicy,
 	#superclass : #Object,

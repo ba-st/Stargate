@@ -2,7 +2,7 @@
 I'm a Test Case for AcceptNegotiator
 "
 Class {
-	#name : #RESTfulWebServiceAcceptNegotiatorTest,
+	#name : #RESTfulControllerAcceptNegotiatorTest,
 	#superclass : #TestCase,
 	#instVars : [
 		'apiMediaTypes'
@@ -11,13 +11,13 @@ Class {
 }
 
 { #category : #'private - asserting' }
-RESTfulWebServiceAcceptNegotiatorTest >> assertBestRepresentationFor: anAcceptHeaderContent given: theAvailableMediaTypes is: aMediaType [
+RESTfulControllerAcceptNegotiatorTest >> assertBestRepresentationFor: anAcceptHeaderContent given: theAvailableMediaTypes is: aMediaType [
 
 	self assert: (self bestRepresentationFor: anAcceptHeaderContent given: theAvailableMediaTypes) equals: aMediaType
 ]
 
 { #category : #'private - accessing' }
-RESTfulWebServiceAcceptNegotiatorTest >> bestRepresentationFor: anAcceptHeaderContent given: theAvailableMediaTypes [
+RESTfulControllerAcceptNegotiatorTest >> bestRepresentationFor: anAcceptHeaderContent given: theAvailableMediaTypes [
 
 	^ (RESTfulControllerAcceptNegotiator basedOn: theAvailableMediaTypes)
 		bestRepresentationFor:
@@ -27,19 +27,19 @@ RESTfulWebServiceAcceptNegotiatorTest >> bestRepresentationFor: anAcceptHeaderCo
 ]
 
 { #category : #'private - accessing' }
-RESTfulWebServiceAcceptNegotiatorTest >> pearAcceptHeader [
+RESTfulControllerAcceptNegotiatorTest >> pearAcceptHeader [
 
 	^ 'text/html,application/xhtml+xml,application/xml;q=0.9,text/*;q=0.7,*/*,image/gif; q=0.8, image/jpeg; q=0.6, image/*'
 ]
 
 { #category : #'private - accessing' }
-RESTfulWebServiceAcceptNegotiatorTest >> rfcHeader [
+RESTfulControllerAcceptNegotiatorTest >> rfcHeader [
 
 	^ 'text/*;q=0.3, text/html;q=0.7, text/html;level=1, text/html;level=2;q=0.4, */*;q=0.5'
 ]
 
 { #category : #tests }
-RESTfulWebServiceAcceptNegotiatorTest >> setUp [
+RESTfulControllerAcceptNegotiatorTest >> setUp [
 
 	super setUp.
 	apiMediaTypes := Array
@@ -50,7 +50,7 @@ RESTfulWebServiceAcceptNegotiatorTest >> setUp [
 ]
 
 { #category : #tests }
-RESTfulWebServiceAcceptNegotiatorTest >> testAPIExactMatch [
+RESTfulControllerAcceptNegotiatorTest >> testAPIExactMatch [
 
 	self
 		assertBestRepresentationFor: 'application/vnd.stargate.pet+json;version=1.0.0' given: apiMediaTypes is: 'application/vnd.stargate.pet+json;version=1.0.0' asMediaType;
@@ -58,7 +58,7 @@ RESTfulWebServiceAcceptNegotiatorTest >> testAPIExactMatch [
 ]
 
 { #category : #tests }
-RESTfulWebServiceAcceptNegotiatorTest >> testMissingVersionSelectsTheNewOne [
+RESTfulControllerAcceptNegotiatorTest >> testMissingVersionSelectsTheNewOne [
 
 	self
 		assertBestRepresentationFor: 'application/vnd.stargate.pet+json' given: apiMediaTypes is: 'application/vnd.stargate.pet+json;version=2.0.0' asMediaType;
@@ -66,7 +66,7 @@ RESTfulWebServiceAcceptNegotiatorTest >> testMissingVersionSelectsTheNewOne [
 ]
 
 { #category : #tests }
-RESTfulWebServiceAcceptNegotiatorTest >> testRFC2616Sec14 [
+RESTfulControllerAcceptNegotiatorTest >> testRFC2616Sec14 [
 
 	self
 		assertBestRepresentationFor: self rfcHeader given: {'text/html;level=1' asMediaType} is: 'text/html;level=1' asMediaType;
@@ -78,7 +78,7 @@ RESTfulWebServiceAcceptNegotiatorTest >> testRFC2616Sec14 [
 ]
 
 { #category : #tests }
-RESTfulWebServiceAcceptNegotiatorTest >> testSemanticVersioning [
+RESTfulControllerAcceptNegotiatorTest >> testSemanticVersioning [
 
 	self
 		assertBestRepresentationFor: 'application/vnd.stargate.pet+json;version=2' given: apiMediaTypes is: 'application/vnd.stargate.pet+json;version=2.0.0' asMediaType;

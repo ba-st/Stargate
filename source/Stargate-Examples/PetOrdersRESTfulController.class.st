@@ -136,13 +136,13 @@ PetOrdersRESTfulController >> orders [
 { #category : #'private - accessing' }
 PetOrdersRESTfulController >> provideHypermediaPolicy [
 
-	^ HypermediaDrivenResourcePolicy for: self
+	^ HypermediaDrivenRESTfulControllerPolicy for: self
 ]
 
 { #category : #'private - accessing' }
 PetOrdersRESTfulController >> providePaginationPolicy [
 
-	^ ResourceNotPaginatedPolicy for: self
+	^ RESTFullControllerDoNotPaginateCollectionsPolicy for: self
 ]
 
 { #category : #'private - API' }
