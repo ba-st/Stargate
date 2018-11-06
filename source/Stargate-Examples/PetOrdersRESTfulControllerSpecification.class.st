@@ -2,13 +2,13 @@
 I'm an example RESTful Web Service specification implementing Pet Order resource management
 "
 Class {
-	#name : #PetOrdersRESTfulWebServiceSpecification,
-	#superclass : #RESTFulWebServiceSpecification,
+	#name : #PetOrdersRESTfulControllerSpecification,
+	#superclass : #ResourceRESTFulControllerSpecification,
 	#category : #'Stargate-Examples'
 }
 
 { #category : #'mapping rules' }
-PetOrdersRESTfulWebServiceSpecification >> addJsonDecoderVersion1dot0dot0MappingIn: aBuilder [
+PetOrdersRESTfulControllerSpecification >> addJsonDecoderVersion1dot0dot0MappingIn: aBuilder [
 
 	aBuilder
 		addDefaultRuleToDecode: self orderVersion1dot0dot0MediaType
@@ -24,7 +24,7 @@ PetOrdersRESTfulWebServiceSpecification >> addJsonDecoderVersion1dot0dot0Mapping
 ]
 
 { #category : #'mapping rules' }
-PetOrdersRESTfulWebServiceSpecification >> addJsonEncoderVersion1dot0dot0MappingIn: aBuilder [
+PetOrdersRESTfulControllerSpecification >> addJsonEncoderVersion1dot0dot0MappingIn: aBuilder [
 
 	aBuilder
 		addDefaultRuleToEncode: self orderMappingKey
@@ -38,73 +38,73 @@ PetOrdersRESTfulWebServiceSpecification >> addJsonEncoderVersion1dot0dot0Mapping
 							do: [ :mapping | 
 							mapping
 								mapInstVars;
-								mapProperty: #status getter: [ :object | context objectUnder: #status ifNone: [ '' ] ] setter: [ :object :value |  ];
+								mapProperty: #status getter: [ :object | context objectUnder: #status ] setter: [ :object :value |  ];
 								mapHypermediaControlsIn: context ];
 						nextPut: order ] ]
 ]
 
 { #category : #routes }
-PetOrdersRESTfulWebServiceSpecification >> cancelOrderRoute [
+PetOrdersRESTfulControllerSpecification >> cancelOrderRoute [
 
 	^ RouteSpecification handling: #POST at: self cancelTemplate evaluating: [ :service :httpRequest :context | service cancelOrderBasedOn: httpRequest within: context ]
 ]
 
 { #category : #'private - accessing' }
-PetOrdersRESTfulWebServiceSpecification >> cancelTemplate [
+PetOrdersRESTfulControllerSpecification >> cancelTemplate [
 
 	^ '<1s>/%<<2s>:IsInteger>/cancel' expandMacrosWith: self endpoint with: self identifierKey
 ]
 
 { #category : #routes }
-PetOrdersRESTfulWebServiceSpecification >> completeOrderRoute [
+PetOrdersRESTfulControllerSpecification >> completeOrderRoute [
 
 	^ RouteSpecification handling: #POST at: self completeTemplate evaluating: [ :service :httpRequest :context | service completeOrderBasedOn: httpRequest within: context ]
 ]
 
 { #category : #'private - accessing' }
-PetOrdersRESTfulWebServiceSpecification >> completeTemplate [
+PetOrdersRESTfulControllerSpecification >> completeTemplate [
 
 	^ '<1s>/%<<2s>:IsInteger>/complete' expandMacrosWith: self endpoint with: self identifierKey
 ]
 
 { #category : #routes }
-PetOrdersRESTfulWebServiceSpecification >> createOrderRoute [
+PetOrdersRESTfulControllerSpecification >> createOrderRoute [
 
 	^ RouteSpecification handling: #POST at: self endpoint evaluating: [ :service :httpRequest :context | service createOrderBasedOn: httpRequest within: context ]
 ]
 
 { #category : #'private - accessing' }
-PetOrdersRESTfulWebServiceSpecification >> endpoint [
+PetOrdersRESTfulControllerSpecification >> endpoint [
 
 	^ '/orders'
 ]
 
 { #category : #routes }
-PetOrdersRESTfulWebServiceSpecification >> getOrderRoute [
+PetOrdersRESTfulControllerSpecification >> getOrderRoute [
 
 	^ RouteSpecification handling: #GET at: self idTemplate evaluating: [ :service :httpRequest :context | service getOrderBasedOn: httpRequest within: context ]
 ]
 
 { #category : #'private - accessing' }
-PetOrdersRESTfulWebServiceSpecification >> idTemplate [
+PetOrdersRESTfulControllerSpecification >> idTemplate [
 
 	^ '<1s>/%<<2s>:IsInteger>' expandMacrosWith: self endpoint with: self identifierKey
 ]
 
 { #category : #accessing }
-PetOrdersRESTfulWebServiceSpecification >> identifierKey [
+PetOrdersRESTfulControllerSpecification >> identifierKey [
 
 	^ #identifier
 ]
 
 { #category : #accessing }
-PetOrdersRESTfulWebServiceSpecification >> orderMappingKey [
+PetOrdersRESTfulControllerSpecification >> orderMappingKey [
 
 	^ #order
 ]
 
 { #category : #accessing }
-PetOrdersRESTfulWebServiceSpecification >> orderVersion1dot0dot0MediaType [
+PetOrdersRESTfulControllerSpecification >> orderVersion1dot0dot0MediaType [
 
 	^ 'application/vnd.stargate.order+json;version=1.0.0' asMediaType 
 ]

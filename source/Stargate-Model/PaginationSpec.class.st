@@ -8,7 +8,7 @@ Class {
 		'start',
 		'limit'
 	],
-	#category : #'Stargate-Model-Services'
+	#category : #'Stargate-Model-Pagination'
 }
 
 { #category : #'Instance creation' }

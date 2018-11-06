@@ -4,7 +4,7 @@ I'm a Test Case for PaginationSpec
 Class {
 	#name : #PaginationSpecTest,
 	#superclass : #TestCase,
-	#category : #'Stargate-Model-Tests-Services'
+	#category : #'Stargate-Model-Tests-Pagination'
 }
 
 { #category : #tests }

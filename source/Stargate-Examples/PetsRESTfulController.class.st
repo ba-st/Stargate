@@ -2,8 +2,8 @@
 I'm an example RESTful Web Service implementing Pet resource management
 "
 Class {
-	#name : #PetsRESTfulWebService,
-	#superclass : #RESTfulWebService,
+	#name : #PetsRESTfulController,
+	#superclass : #ResourceRESTfulController,
 	#instVars : [
 		'pets',
 		'nextId',
@@ -14,7 +14,7 @@ Class {
 }
 
 { #category : #'private - accessing' }
-PetsRESTfulWebService >> addPaginationControlsTo: aContext basedOn: url start: start limit: limit end: end count: total [
+PetsRESTfulController >> addPaginationControlsTo: aContext basedOn: url start: start limit: limit end: end count: total [
 
 	start = 1
 		ifFalse: [ aContext addPaginationControl: 'first' -> (self urlFrom: url startingAt: 1 limitedTo: limit) ].
@@ -27,7 +27,7 @@ PetsRESTfulWebService >> addPaginationControlsTo: aContext basedOn: url start: s
 ]
 
 { #category : #API }
-PetsRESTfulWebService >> createPetBasedOn: anHttpRequest within: aContext [
+PetsRESTfulController >> createPetBasedOn: anHttpRequest within: aContext [
 
 	^ self
 		withCreatedResourceDo: [ :resource | 
@@ -44,13 +44,13 @@ PetsRESTfulWebService >> createPetBasedOn: anHttpRequest within: aContext [
 ]
 
 { #category : #'private - accessing' }
-PetsRESTfulWebService >> defaultPaginationLimit [
+PetsRESTfulController >> defaultPaginationLimit [
 
 	^ 5
 ]
 
 { #category : #API }
-PetsRESTfulWebService >> deletePetBasedOn: anHttpRequest within: aContext [
+PetsRESTfulController >> deletePetBasedOn: anHttpRequest within: aContext [
 
 	[ pets remove: (self petIdentifiedUsing: anHttpRequest) ]
 		on: ObjectNotFound
@@ -60,7 +60,7 @@ PetsRESTfulWebService >> deletePetBasedOn: anHttpRequest within: aContext [
 ]
 
 { #category : #'private - accessing' }
-PetsRESTfulWebService >> entityTagOf: aPet encodedAs: mediaType [
+PetsRESTfulController >> entityTagOf: aPet encodedAs: mediaType [
 
 	^ ZnETag
 		with:
@@ -73,7 +73,7 @@ PetsRESTfulWebService >> entityTagOf: aPet encodedAs: mediaType [
 ]
 
 { #category : #API }
-PetsRESTfulWebService >> getPetBasedOn: anHttpRequest within: aContext [
+PetsRESTfulController >> getPetBasedOn: anHttpRequest within: aContext [
 
 	^ self
 		get: [ self petIdentifiedUsing: anHttpRequest ]
@@ -83,7 +83,7 @@ PetsRESTfulWebService >> getPetBasedOn: anHttpRequest within: aContext [
 ]
 
 { #category : #API }
-PetsRESTfulWebService >> getPetsBasedOn: anHttpRequest within: aContext [
+PetsRESTfulController >> getPetsBasedOn: anHttpRequest within: aContext [
 
 	^ self
 		get: [ :pagination | 
@@ -108,13 +108,13 @@ PetsRESTfulWebService >> getPetsBasedOn: anHttpRequest within: aContext [
 ]
 
 { #category : #'private - accessing' }
-PetsRESTfulWebService >> identifierOf: aPet [
+PetsRESTfulController >> identifierOf: aPet [
 
 	^ petById keyAtValue: aPet
 ]
 
 { #category : #initialization }
-PetsRESTfulWebService >> initialize [
+PetsRESTfulController >> initialize [
 
 	super initialize.
 	pets := OrderedCollection new.
@@ -124,13 +124,13 @@ PetsRESTfulWebService >> initialize [
 ]
 
 { #category : #'private - accessing' }
-PetsRESTfulWebService >> lastModificationOf: aPet [
+PetsRESTfulController >> lastModificationOf: aPet [
 
 	^ updateTimestamps at: (self identifierOf: aPet)
 ]
 
 { #category : #'private - accessing' }
-PetsRESTfulWebService >> locationOf: aPet [
+PetsRESTfulController >> locationOf: aPet [
 
 	| baseUrl |
 
@@ -141,19 +141,31 @@ PetsRESTfulWebService >> locationOf: aPet [
 ]
 
 { #category : #'private - accessing' }
-PetsRESTfulWebService >> petIdentifiedUsing: anHttpRequest [
+PetsRESTfulController >> petIdentifiedUsing: anHttpRequest [
 
 	^ petById at: (anHttpRequest at: #identifier) ifAbsent: [ ObjectNotFound signal ]
 ]
 
 { #category : #querying }
-PetsRESTfulWebService >> pets [
+PetsRESTfulController >> pets [
 
 	^ pets
 ]
 
+{ #category : #'private - accessing' }
+PetsRESTfulController >> provideHypermediaPolicy [
+
+	^ HypermediaDrivenRESTfulControllerPolicy for: self
+]
+
+{ #category : #'private - accessing' }
+PetsRESTfulController >> providePaginationPolicy [
+
+	^ RESTFullControllerPaginateCollectionsPolicy for: self with: self defaultPaginationLimit
+]
+
 { #category : #'private - state management' }
-PetsRESTfulWebService >> recordIdAndUpdateTimestampFor: newPet [
+PetsRESTfulController >> recordIdAndUpdateTimestampFor: newPet [
 
 	petById at: nextId put: newPet.
 	"I will simulate a timestamp using a fixed version revision,
@@ -162,13 +174,13 @@ PetsRESTfulWebService >> recordIdAndUpdateTimestampFor: newPet [
 ]
 
 { #category : #accessing }
-PetsRESTfulWebService >> specification [
+PetsRESTfulController >> specification [
 
-	^ PetsRESTfulWebServiceSpecification new
+	^ PetsRESTfulControllerSpecification new
 ]
 
 { #category : #'private - state management' }
-PetsRESTfulWebService >> updatePet: pet with: resource [
+PetsRESTfulController >> updatePet: pet with: resource [
 
 	pet
 		synchronizeWith:
@@ -180,7 +192,7 @@ PetsRESTfulWebService >> updatePet: pet with: resource [
 ]
 
 { #category : #API }
-PetsRESTfulWebService >> updatePetBasedOn: anHttpRequest within: aContext [
+PetsRESTfulController >> updatePetBasedOn: anHttpRequest within: aContext [
 
 	| etag |
 
@@ -204,7 +216,7 @@ PetsRESTfulWebService >> updatePetBasedOn: anHttpRequest within: aContext [
 ]
 
 { #category : #'private - accessing' }
-PetsRESTfulWebService >> urlFrom: url startingAt: start limitedTo: limit [
+PetsRESTfulController >> urlFrom: url startingAt: start limitedTo: limit [
 
 	^ url copy
 		queryAt: 'start' put: start;

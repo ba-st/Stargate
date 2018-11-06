@@ -6,16 +6,16 @@ Class {
 	#superclass : #Object,
 	#instVars : [
 		'teapotServer',
-		'services'
+		'controllers'
 	],
-	#category : #'Stargate-Model-Services'
+	#category : #'Stargate-Model-Controllers'
 }
 
 { #category : #'instance creation' }
-HTTPBasedRESTfulAPI class >> configuredBy: configuration installing: aServicesCollection [
+HTTPBasedRESTfulAPI class >> configuredBy: configuration installing: aRESTfulControllerCollection [
 
-	AssertionChecker enforce: [ aServicesCollection notEmpty ] because: 'An API needs at least to expose one service'.
-	^ self new initializeConfiguredBy: configuration installing: aServicesCollection
+	AssertionChecker enforce: [ aRESTfulControllerCollection notEmpty ] because: 'An API needs at least to expose one resource'.
+	^ self new initializeConfiguredBy: configuration installing: aRESTfulControllerCollection
 ]
 
 { #category : #configuring }
@@ -60,14 +60,14 @@ HTTPBasedRESTfulAPI >> configureRoutes [
 	| configurator |
 
 	configurator := ReflectiveRoutesConfigurator appliedTo: teapotServer.
-	services do: [ :service | configurator addRoutesOf: service ]
+	controllers do: [ :controller | configurator addRoutesOf: controller ]
 ]
 
 { #category : #initialization }
-HTTPBasedRESTfulAPI >> initializeConfiguredBy: configuration installing: aServicesCollection [
+HTTPBasedRESTfulAPI >> initializeConfiguredBy: configuration installing: aRESTfulControllerCollection [
 
 	teapotServer := Teapot configure: configuration.
-	services := aServicesCollection
+	controllers := aRESTfulControllerCollection
 ]
 
 { #category : #actions }

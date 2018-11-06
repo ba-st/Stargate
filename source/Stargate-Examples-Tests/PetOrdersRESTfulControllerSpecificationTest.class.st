@@ -1,18 +1,18 @@
 "
-Test Case for PetOrdersRESTfulWebServiceSpecification
+Test Case for PetOrdersRESTfulControllerSpecification
 "
 Class {
-	#name : #PetOrdersRESTfulWebServiceSpecificationTest,
+	#name : #PetOrdersRESTfulControllerSpecificationTest,
 	#superclass : #TestCase,
 	#category : #'Stargate-Examples-Tests'
 }
 
 { #category : #tests }
-PetOrdersRESTfulWebServiceSpecificationTest >> testTemplate [
+PetOrdersRESTfulControllerSpecificationTest >> testTemplate [
 
 	| spec |
 
-	spec := PetOrdersRESTfulWebServiceSpecification new.
+	spec := PetOrdersRESTfulControllerSpecification new.
 
 	self
 		assert: spec idTemplate equals: '/orders/<identifier:IsInteger>';

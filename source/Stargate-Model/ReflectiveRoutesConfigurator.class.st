@@ -19,12 +19,12 @@ ReflectiveRoutesConfigurator class >> appliedTo: aTeapot [
 ]
 
 { #category : #configuring }
-ReflectiveRoutesConfigurator >> addRoutesOf: aWebService [
+ReflectiveRoutesConfigurator >> addRoutesOf: aResourceRESTfulController [
 
 	| routeConfigurator |
 
-	routeConfigurator := RouteConfigurator appliedTo: teapot sendingMessagesTo: aWebService.
-	aWebService specification routes do: [ :routeSpecification | routeSpecification configureUsing: routeConfigurator ].
+	routeConfigurator := RouteConfigurator appliedTo: teapot sendingMessagesTo: aResourceRESTfulController.
+	aResourceRESTfulController specification routes do: [ :routeSpecification | routeSpecification configureUsing: routeConfigurator ].
 	routeConfigurator configureCrossOriginSharingRoutes
 ]
 

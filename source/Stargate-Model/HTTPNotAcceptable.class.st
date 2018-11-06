@@ -17,7 +17,7 @@ Class {
 	#instVars : [
 		'allowedMediaTypes'
 	],
-	#category : #'Stargate-Model-Services'
+	#category : #'Stargate-Model-Controllers'
 }
 
 { #category : #'instance creation' }

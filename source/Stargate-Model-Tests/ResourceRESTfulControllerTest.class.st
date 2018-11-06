@@ -2,40 +2,40 @@
 I'm an abstract Test Case providing facililties to test RESTfulWebServices
 "
 Class {
-	#name : #RESTfulWebServiceTest,
+	#name : #ResourceRESTfulControllerTest,
 	#superclass : #TestCase,
 	#instVars : [
-		'webService'
+		'resourceController'
 	],
-	#category : #'Stargate-Model-Tests-Services'
+	#category : #'Stargate-Model-Tests-Controllers'
 }
 
 { #category : #testing }
-RESTfulWebServiceTest class >> isAbstract [
+ResourceRESTfulControllerTest class >> isAbstract [
 
-	^ self name = #RESTfulWebServiceTest
+	^ self name = #ResourceRESTfulControllerTest
 ]
 
 { #category : #'private - asserting' }
-RESTfulWebServiceTest >> assertUrl: aStringOrUrl equals: anotherStringOrUrl [
+ResourceRESTfulControllerTest >> assertUrl: aStringOrUrl equals: anotherStringOrUrl [
 
 	self assert: aStringOrUrl asZnUrl equals: anotherStringOrUrl asZnUrl
 ]
 
 { #category : #'private - support' }
-RESTfulWebServiceTest >> baseUrl [
+ResourceRESTfulControllerTest >> baseUrl [
 
 	^ self subclassResponsibility
 ]
 
 { #category : #'private - support' }
-RESTfulWebServiceTest >> newHttpRequestContext [
+ResourceRESTfulControllerTest >> newHttpRequestContext [
 
 	^ HttpRequestContext new
 ]
 
 { #category : #'private - support' }
-RESTfulWebServiceTest >> requestToGetResourceIdentifiedBy: anIdentifier accepting: anAcceptHeader [
+ResourceRESTfulControllerTest >> requestToGetResourceIdentifiedBy: anIdentifier accepting: anAcceptHeader [
 
 	^ TeaRequest
 		fromZnRequest:
@@ -46,7 +46,7 @@ RESTfulWebServiceTest >> requestToGetResourceIdentifiedBy: anIdentifier acceptin
 ]
 
 { #category : #'private - support' }
-RESTfulWebServiceTest >> requestToGetResourceIdentifiedBy: anIdentifier accepting: anAcceptHeader conditionalTo: anETag [
+ResourceRESTfulControllerTest >> requestToGetResourceIdentifiedBy: anIdentifier accepting: anAcceptHeader conditionalTo: anETag [
 
 	^ TeaRequest
 		fromZnRequest:
@@ -58,7 +58,7 @@ RESTfulWebServiceTest >> requestToGetResourceIdentifiedBy: anIdentifier acceptin
 ]
 
 { #category : #'private - support' }
-RESTfulWebServiceTest >> requestToPOST: content as: aMediaType [
+ResourceRESTfulControllerTest >> requestToPOST: content as: aMediaType [
 
 	^ TeaRequest
 		fromZnRequest:
@@ -68,33 +68,33 @@ RESTfulWebServiceTest >> requestToPOST: content as: aMediaType [
 ]
 
 { #category : #'private - support' }
-RESTfulWebServiceTest >> resourceUrl [
+ResourceRESTfulControllerTest >> resourceUrl [
 
-	^ self baseUrl / webService specification endpoint
+	^ self baseUrl / resourceController specification endpoint
 ]
 
 { #category : #running }
-RESTfulWebServiceTest >> setUp [
+ResourceRESTfulControllerTest >> setUp [
 
 	super setUp.
-	self setUpWebService.
-	webService serverUrl: self baseUrl asZnUrl
+	self setUpResourceController.
+	resourceController serverUrl: self baseUrl asZnUrl
 ]
 
 { #category : #running }
-RESTfulWebServiceTest >> setUpWebService [
+ResourceRESTfulControllerTest >> setUpResourceController [
 
 	self subclassResponsibility
 ]
 
 { #category : #'private - support' }
-RESTfulWebServiceTest >> urlForResourceIdentifiedBy: anIdentifier [
+ResourceRESTfulControllerTest >> urlForResourceIdentifiedBy: anIdentifier [
 
 	^ self resourceUrl / anIdentifier printString asZnUrl
 ]
 
 { #category : #'private - support' }
-RESTfulWebServiceTest >> withJsonFromContentsIn: httpResponse do: aBlock [
+ResourceRESTfulControllerTest >> withJsonFromContentsIn: httpResponse do: aBlock [
 
 	aBlock value: (NeoJSONObject fromString: httpResponse contents)
 ]

@@ -38,13 +38,13 @@ PetStoreAPITest >> newClient [
 { #category : #private }
 PetStoreAPITest >> ordersSpec [
 
-	^ PetOrdersRESTfulWebServiceSpecification new
+	^ PetOrdersRESTfulControllerSpecification new
 ]
 
 { #category : #private }
 PetStoreAPITest >> petsSpec [
 
-	^ PetsRESTfulWebServiceSpecification new
+	^ PetsRESTfulControllerSpecification new
 ]
 
 { #category : #private }
@@ -62,8 +62,8 @@ PetStoreAPITest >> setUp [
 			{(#port -> self port).
 			(#serverUrl -> self baseUrl)}
 		installing:
-			{PetsRESTfulWebService new.
-			PetOrdersRESTfulWebService new}.
+			{PetsRESTfulController new.
+			PetOrdersRESTfulController new}.
 
 	api
 		install;
