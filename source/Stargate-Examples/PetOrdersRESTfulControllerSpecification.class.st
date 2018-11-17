@@ -3,7 +3,7 @@ I'm an example RESTful Web Service specification implementing Pet Order resource
 "
 Class {
 	#name : #PetOrdersRESTfulControllerSpecification,
-	#superclass : #ResourceRESTFulControllerSpecification,
+	#superclass : #ResourceRESTfulControllerSpecification,
 	#category : #'Stargate-Examples'
 }
 

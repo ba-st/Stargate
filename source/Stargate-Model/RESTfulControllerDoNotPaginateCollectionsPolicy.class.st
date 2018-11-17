@@ -2,7 +2,7 @@
 I'm the policy indicating a RESTful controller to not support pagination of collections related to the controlled resource.
 "
 Class {
-	#name : #RESTFullControllerDoNotPaginateCollectionsPolicy,
+	#name : #RESTfulControllerDoNotPaginateCollectionsPolicy,
 	#superclass : #RESTfulControllerPaginationPolicy,
 	#instVars : [
 		'resourceController'
@@ -11,29 +11,29 @@ Class {
 }
 
 { #category : #'instance creation' }
-RESTFullControllerDoNotPaginateCollectionsPolicy class >> for: aResourceController [
+RESTfulControllerDoNotPaginateCollectionsPolicy class >> for: aResourceController [
 
 	^ self new initializeFor: aResourceController
 ]
 
 { #category : #applying }
-RESTFullControllerDoNotPaginateCollectionsPolicy >> addPaginationControlsTo: mediaControls within: aContext [
+RESTfulControllerDoNotPaginateCollectionsPolicy >> addPaginationControlsTo: mediaControls within: aContext [
 
 	^ mediaControls 
 ]
 
 { #category : #applying }
-RESTFullControllerDoNotPaginateCollectionsPolicy >> affect: response within: aContext [
+RESTfulControllerDoNotPaginateCollectionsPolicy >> affect: response within: aContext [
 ]
 
 { #category : #applying }
-RESTFullControllerDoNotPaginateCollectionsPolicy >> evaluateQuery: aQueryEvaluationBlock basedOn: anHttpRequest [
+RESTfulControllerDoNotPaginateCollectionsPolicy >> evaluateQuery: aQueryEvaluationBlock basedOn: anHttpRequest [
 
 	^ resourceController evaluateQuery: aQueryEvaluationBlock
 ]
 
 { #category : #initialization }
-RESTFullControllerDoNotPaginateCollectionsPolicy >> initializeFor: aResourceController [
+RESTfulControllerDoNotPaginateCollectionsPolicy >> initializeFor: aResourceController [
 
 	resourceController := aResourceController 
 ]

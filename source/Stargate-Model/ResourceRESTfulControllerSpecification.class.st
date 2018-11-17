@@ -5,25 +5,25 @@ I provide the supported mediaTypes for the service to be used during content neg
 I provide a set of routes to be used to configure Teapot.
 "
 Class {
-	#name : #ResourceRESTFulControllerSpecification,
+	#name : #ResourceRESTfulControllerSpecification,
 	#superclass : #Object,
 	#category : #'Stargate-Model-Controllers'
 }
 
 { #category : #acccessing }
-ResourceRESTFulControllerSpecification >> mappingRuleSet [
+ResourceRESTfulControllerSpecification >> mappingRuleSet [
 
 	^ (ReflectiveMappingRuleSetBuilder for: self) build
 ]
 
 { #category : #acccessing }
-ResourceRESTFulControllerSpecification >> mediaTypes [
+ResourceRESTfulControllerSpecification >> mediaTypes [
 
 	^ (UnaryMessageSendingCollector sendingAllMessagesEndingWith: 'MediaType' to: self) value
 ]
 
 { #category : #acccessing }
-ResourceRESTFulControllerSpecification >> routes [
+ResourceRESTfulControllerSpecification >> routes [
 
 	^ (UnaryMessageSendingCollector sendingAllMessagesEndingWith: 'Route' to: self) value
 ]

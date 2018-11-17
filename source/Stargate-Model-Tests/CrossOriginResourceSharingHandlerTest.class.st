@@ -8,12 +8,12 @@ Class {
 }
 
 { #category : #tests }
-CrossOriginResourceSharingHandlerTest >> testValue [
+CrossOriginResourceSharingHandlerTest >> testEvaluationOnRequest [
 
 	| handler response |
 
 	handler := CrossOriginResourceSharingHandler allowing: #('GET' 'POST').
-	response := handler value: (ZnRequest options: 'url').
+	response := handler teaEvalActionOnRequest: (ZnRequest options: 'url').
 
 	self
 		assert: response code equals: 204;

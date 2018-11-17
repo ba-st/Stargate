@@ -26,7 +26,7 @@ CrossOriginResourceSharingHandler >> initializeAllowing: anHttpMethodsCollection
 ]
 
 { #category : #evaluating }
-CrossOriginResourceSharingHandler >> value: aRequest [
+CrossOriginResourceSharingHandler >> teaEvalActionOnRequest: aRequest [
 
 	| response |
 
