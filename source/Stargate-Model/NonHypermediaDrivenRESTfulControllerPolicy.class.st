@@ -3,7 +3,7 @@ I'm a policy non-supporting hypermedia-driven RESTful controllers.
 "
 Class {
 	#name : #NonHypermediaDrivenRESTfulControllerPolicy,
-	#superclass : #HypermediaPolicy,
+	#superclass : #RESTfulControllerHypermediaPolicy,
 	#category : #'Stargate-Model-HATEOAS'
 }
 

@@ -2,7 +2,7 @@
 I'm a pagination specification, used to know the start index and the expected page size
 "
 Class {
-	#name : #PaginationSpec,
+	#name : #PaginationSpecification,
 	#superclass : #Object,
 	#instVars : [
 		'start',
@@ -12,7 +12,7 @@ Class {
 }
 
 { #category : #'Instance creation' }
-PaginationSpec class >> startingAt: aNumber limitedTo: aLimit [
+PaginationSpecification class >> startingAt: aNumber limitedTo: aLimit [
 
 	AssertionChecker enforce: [ aLimit strictlyPositive ] because: 'The page limit must be positive' raising: InstanceCreationFailed.
 	"We're forgiving with the starting index"
@@ -20,26 +20,26 @@ PaginationSpec class >> startingAt: aNumber limitedTo: aLimit [
 ]
 
 { #category : #accessing }
-PaginationSpec >> end [
+PaginationSpecification >> end [
 
 	^ start + limit - 1 
 ]
 
 { #category : #'initialize - release' }
-PaginationSpec >> initializeStartingAt: anStartIndex limitedTo: aLimitCount [
+PaginationSpecification >> initializeStartingAt: anStartIndex limitedTo: aLimitCount [
 
 	start := anStartIndex.
 	limit := aLimitCount
 ]
 
 { #category : #accessing }
-PaginationSpec >> limit [
+PaginationSpecification >> limit [
 
 	^ limit
 ]
 
 { #category : #printing }
-PaginationSpec >> printOn: aStream [
+PaginationSpecification >> printOn: aStream [
 
 	aStream
 		nextPutAll: 'start=';
@@ -50,7 +50,7 @@ PaginationSpec >> printOn: aStream [
 ]
 
 { #category : #accessing }
-PaginationSpec >> start [
+PaginationSpecification >> start [
 
 	^ start
 ]

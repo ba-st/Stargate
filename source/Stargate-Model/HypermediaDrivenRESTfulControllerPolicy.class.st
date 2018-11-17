@@ -3,7 +3,7 @@ I'm a policy supporting hypermedia-driven RESTful controllers.
 "
 Class {
 	#name : #HypermediaDrivenRESTfulControllerPolicy,
-	#superclass : #HypermediaPolicy,
+	#superclass : #RESTfulControllerHypermediaPolicy,
 	#instVars : [
 		'resourceController'
 	],

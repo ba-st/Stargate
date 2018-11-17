@@ -142,7 +142,7 @@ PetOrdersRESTfulController >> provideHypermediaPolicy [
 { #category : #'private - accessing' }
 PetOrdersRESTfulController >> providePaginationPolicy [
 
-	^ RESTFullControllerDoNotPaginateCollectionsPolicy for: self
+	^ RESTfulControllerDoNotPaginateCollectionsPolicy for: self
 ]
 
 { #category : #'private - API' }

@@ -161,7 +161,7 @@ PetsRESTfulController >> provideHypermediaPolicy [
 { #category : #'private - accessing' }
 PetsRESTfulController >> providePaginationPolicy [
 
-	^ RESTFullControllerPaginateCollectionsPolicy for: self with: self defaultPaginationLimit
+	^ RESTfulControllerPaginateCollectionsPolicy for: self with: self defaultPaginationLimit
 ]
 
 { #category : #'private - state management' }

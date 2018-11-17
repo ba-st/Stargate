@@ -2,19 +2,19 @@
 I'm a policy indicating a RESTful controller if it must support or not an hypermedia driven implementation
 "
 Class {
-	#name : #HypermediaPolicy,
+	#name : #RESTfulControllerHypermediaPolicy,
 	#superclass : #Object,
 	#category : #'Stargate-Model-HATEOAS'
 }
 
 { #category : #configuring }
-HypermediaPolicy >> holdCollection: resourceCollection controlsBasedOn: httpRequest within: context [
+RESTfulControllerHypermediaPolicy >> holdCollection: resourceCollection controlsBasedOn: httpRequest within: context [
 
 	self subclassResponsibility 
 ]
 
 { #category : #configuring }
-HypermediaPolicy >> holdResource: resource controlsWithin: context [
+RESTfulControllerHypermediaPolicy >> holdResource: resource controlsWithin: context [
 
 	self subclassResponsibility 
 ]

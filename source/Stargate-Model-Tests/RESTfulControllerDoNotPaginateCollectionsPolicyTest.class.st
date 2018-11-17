@@ -2,25 +2,25 @@
 Unit Test
 "
 Class {
-	#name : #RESTFullControllerDoNotPaginateCollectionsPolicyTest,
+	#name : #RESTfulControllerDoNotPaginateCollectionsPolicyTest,
 	#superclass : #TestCase,
 	#category : #'Stargate-Model-Tests-Pagination'
 }
 
 { #category : #private }
-RESTFullControllerDoNotPaginateCollectionsPolicyTest >> evaluateQuery: aBlockClosure [
+RESTfulControllerDoNotPaginateCollectionsPolicyTest >> evaluateQuery: aBlockClosure [
 
 	^ aBlockClosure value
 ]
 
 { #category : #tests }
-RESTFullControllerDoNotPaginateCollectionsPolicyTest >> testBehavior [
+RESTfulControllerDoNotPaginateCollectionsPolicyTest >> testBehavior [
 
 	| policy context controls response |
 
 	context := HttpRequestContext new.
 	controls := #().
-	policy := RESTFullControllerDoNotPaginateCollectionsPolicy for: self.
+	policy := RESTfulControllerDoNotPaginateCollectionsPolicy for: self.
 	self assert: (policy addPaginationControlsTo: controls within: context) isEmpty.
 
 	response := ZnResponse noContent.

@@ -2,17 +2,17 @@
 I'm a Test Case for PaginationSpec
 "
 Class {
-	#name : #PaginationSpecTest,
+	#name : #PaginationSpecificationTest,
 	#superclass : #TestCase,
 	#category : #'Stargate-Model-Tests-Pagination'
 }
 
 { #category : #tests }
-PaginationSpecTest >> testAccessing [
+PaginationSpecificationTest >> testAccessing [
 
 	| spec |
 
-	spec := PaginationSpec startingAt: 1 limitedTo: 5.
+	spec := PaginationSpecification startingAt: 1 limitedTo: 5.
 
 	self
 		assert: spec start equals: 1;
@@ -21,10 +21,10 @@ PaginationSpecTest >> testAccessing [
 ]
 
 { #category : #tests }
-PaginationSpecTest >> testPrintString [
+PaginationSpecificationTest >> testPrintString [
 
 	self
-		assert: (PaginationSpec startingAt: 1 limitedTo: 5) printString
+		assert: (PaginationSpecification startingAt: 1 limitedTo: 5) printString
 		equals:
 			'start=1
 limit=5'
