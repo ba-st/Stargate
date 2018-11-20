@@ -16,16 +16,6 @@ PetStoreAPITest >> baseUrl [
 	^ 'http://localhost' asUrl port: self port
 ]
 
-{ #category : #tests }
-PetStoreAPITest >> expectedFailures [
-
-	"This test are Ok but failing due to some problem in Teapot. 
-	See https://github.com/zeroflag/Teapot/issues/4,
-	when this issue is fixed we can remove the expected failure"
-
-	^ #(#testMethodNotAllowed)
-]
-
 { #category : #private }
 PetStoreAPITest >> newClient [
 

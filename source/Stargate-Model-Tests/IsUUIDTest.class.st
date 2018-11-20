@@ -15,7 +15,7 @@ IsUUIDTest >> testMatches [
 		assert: (IsUUID matchesTo: 'e85ae7ba-3ca3-4bae-9f62-cc2ce51c525e');
 		deny: (IsUUID matchesTo: 'ContainsCaps');
 		deny: (IsUUID matchesTo: '-containsInvalidChars');
-		deny: (IsUUID matchesTo: 3)
+		deny: (IsUUID matchesTo: '3')
 ]
 
 { #category : #tests }
