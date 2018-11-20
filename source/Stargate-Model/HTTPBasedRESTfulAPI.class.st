@@ -66,7 +66,8 @@ HTTPBasedRESTfulAPI >> configureRoutes [
 { #category : #initialization }
 HTTPBasedRESTfulAPI >> initializeConfiguredBy: configuration installing: aRESTfulControllerCollection [
 
-	teapotServer := Teapot configure: configuration.
+	teapotServer := Teapot
+		configure: configuration , {(#notFoundHandlerClass -> Tea405AwareNotFoundHandler)}.
 	controllers := aRESTfulControllerCollection
 ]
 
