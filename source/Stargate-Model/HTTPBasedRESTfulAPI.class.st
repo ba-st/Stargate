@@ -47,21 +47,6 @@ HTTPBasedRESTfulAPI >> configureErrorHandlers [
 ]
 
 { #category : #'private - configuring' }
-HTTPBasedRESTfulAPI >> configureHttpClientErrorHandler [
-
-	teapotServer
-		exception:
-			HTTPClientError
-				-> [ :clientError :request | 
-					| json |
-
-					json := NeoJSONWriter toStringPretty: clientError.
-					(ZnResponse statusCode: clientError code)
-						entity: (ZnEntity json: json);
-						yourself ]
-]
-
-{ #category : #'private - configuring' }
 HTTPBasedRESTfulAPI >> configureRoutes [
 
 	| configurator |
@@ -76,7 +61,15 @@ HTTPBasedRESTfulAPI >> initializeConfiguredBy: configuration installing: aRESTfu
 	teapotServer := Teapot
 		configure: configuration , {(#notFoundHandlerClass -> Tea405AwareNotFoundHandler)}.
 	controllers := aRESTfulControllerCollection.
-	errorHandlers := OrderedCollection new
+	errorHandlers := OrderedCollection new.
+	self
+		on: HTTPClientError
+		addErrorHandler: [ :clientError :request | 
+			| json |
+			json := NeoJSONWriter toStringPretty: clientError.
+			(ZnResponse statusCode: clientError code)
+				entity: (ZnEntity json: json);
+				yourself ]
 ]
 
 { #category : #actions }
@@ -84,7 +77,6 @@ HTTPBasedRESTfulAPI >> install [
 
 	self
 		configureRoutes;
-		configureHttpClientErrorHandler;
 		configureErrorHandlers
 ]
 
