@@ -55,6 +55,8 @@ PetStoreAPITest >> setUp [
 			{PetsRESTfulController new.
 			PetOrdersRESTfulController new}.
 
+	api on: Error addErrorHandler: [ :error :request | self fail ].
+
 	api
 		install;
 		start

@@ -6,7 +6,8 @@ Class {
 	#superclass : #Object,
 	#instVars : [
 		'teapotServer',
-		'controllers'
+		'controllers',
+		'errorHandlers'
 	],
 	#category : #'Stargate-Model-Controllers'
 }
@@ -40,18 +41,9 @@ HTTPBasedRESTfulAPI >> beCORSAwareAllowing: origins [
 ]
 
 { #category : #'private - configuring' }
-HTTPBasedRESTfulAPI >> configureHttpClientErrorHandler [
+HTTPBasedRESTfulAPI >> configureErrorHandlers [
 
-	teapotServer
-		exception:
-			HTTPClientError
-				-> [ :clientError :request | 
-					| json |
-
-					json := NeoJSONWriter toStringPretty: clientError.
-					(ZnResponse statusCode: clientError code)
-						entity: (ZnEntity json: json);
-						yourself ]
+	errorHandlers do: [ :errorHandler | teapotServer exception: errorHandler ]
 ]
 
 { #category : #'private - configuring' }
@@ -68,7 +60,16 @@ HTTPBasedRESTfulAPI >> initializeConfiguredBy: configuration installing: aRESTfu
 
 	teapotServer := Teapot
 		configure: configuration , {(#notFoundHandlerClass -> Tea405AwareNotFoundHandler)}.
-	controllers := aRESTfulControllerCollection
+	controllers := aRESTfulControllerCollection.
+	errorHandlers := OrderedCollection new.
+	self
+		on: HTTPClientError
+		addErrorHandler: [ :clientError :request | 
+			| json |
+			json := NeoJSONWriter toStringPretty: clientError.
+			(ZnResponse statusCode: clientError code)
+				entity: (ZnEntity json: json);
+				yourself ]
 ]
 
 { #category : #actions }
@@ -76,13 +77,13 @@ HTTPBasedRESTfulAPI >> install [
 
 	self
 		configureRoutes;
-		configureHttpClientErrorHandler
+		configureErrorHandlers
 ]
 
 { #category : #configuring }
 HTTPBasedRESTfulAPI >> on: exception addErrorHandler: aDyadicBlock [
 
-	teapotServer exception: exception -> aDyadicBlock
+	errorHandlers add: exception -> aDyadicBlock
 ]
 
 { #category : #actions }
