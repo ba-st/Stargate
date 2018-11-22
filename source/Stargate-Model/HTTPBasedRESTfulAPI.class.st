@@ -6,7 +6,8 @@ Class {
 	#superclass : #Object,
 	#instVars : [
 		'teapotServer',
-		'controllers'
+		'controllers',
+		'errorHandlers'
 	],
 	#category : #'Stargate-Model-Controllers'
 }
@@ -40,6 +41,12 @@ HTTPBasedRESTfulAPI >> beCORSAwareAllowing: origins [
 ]
 
 { #category : #'private - configuring' }
+HTTPBasedRESTfulAPI >> configureErrorHandlers [
+
+	errorHandlers do: [ :errorHandler | teapotServer exception: errorHandler ]
+]
+
+{ #category : #'private - configuring' }
 HTTPBasedRESTfulAPI >> configureHttpClientErrorHandler [
 
 	teapotServer
@@ -68,7 +75,8 @@ HTTPBasedRESTfulAPI >> initializeConfiguredBy: configuration installing: aRESTfu
 
 	teapotServer := Teapot
 		configure: configuration , {(#notFoundHandlerClass -> Tea405AwareNotFoundHandler)}.
-	controllers := aRESTfulControllerCollection
+	controllers := aRESTfulControllerCollection.
+	errorHandlers := OrderedCollection new
 ]
 
 { #category : #actions }
@@ -76,13 +84,14 @@ HTTPBasedRESTfulAPI >> install [
 
 	self
 		configureRoutes;
-		configureHttpClientErrorHandler
+		configureHttpClientErrorHandler;
+		configureErrorHandlers
 ]
 
 { #category : #configuring }
 HTTPBasedRESTfulAPI >> on: exception addErrorHandler: aDyadicBlock [
 
-	teapotServer exception: exception -> aDyadicBlock
+	errorHandlers add: exception -> aDyadicBlock
 ]
 
 { #category : #actions }
