@@ -49,6 +49,12 @@ ZnETag >> asETag [
 	^ self
 ]
 
+{ #category : #printing }
+ZnETag >> asString [
+
+	^self printString
+]
+
 { #category : #comparing }
 ZnETag >> hash [
 
