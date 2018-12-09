@@ -1,7 +1,7 @@
 <p align="center"><img src="assets/logos/128x128.png">
  <h1 align="center">Stargate</h1>
   <p align="center">
-    What is this thing? “the motto” and the goals. The vision.
+    Stargate is a library supporting the creation of HTTP based RESTful APIs.
     <br>
     <a href="docs/"><strong>Explore the docs »</strong></a>
     <br>
@@ -16,7 +16,7 @@
 [![Build Status](https://travis-ci.org/ba-st/Stargate.svg?branch=master)](https://travis-ci.org/ba-st/Stargate)
 [![Coverage Status](https://coveralls.io/repos/github/ba-st/Stargate/badge.svg?branch=master)](https://coveralls.io/github/ba-st/Stargate?branch=master)
 
-Why would I care about this thing? When to use, for whom is designed, when not to use.
+It's built on top of Teapot and Zinc, providing a conceptual framework to simplify the creation of RESTful APIs including HATEOAS, content negotiation, API versioning, ETags and pagination.
 
 ## License
 - The code is licensed under [MIT](LICENSE).
@@ -35,3 +35,6 @@ To load the project in a Pharo image, or declare it as a dependency of your own 
 ## Contributing
 
 Check the [Contribution Guidelines](CONTRIBUTING.md)
+
+---
+*Icons by [icons8.com](https://icons8.com)*
