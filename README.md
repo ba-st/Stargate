@@ -13,7 +13,7 @@
 </p>
 
 [![GitHub release](https://img.shields.io/github/release/ba-st/Stargate.svg)](https://github.com/ba-st/Stargate/releases/latest)
-[![Build Status](https://travis-ci.org/ba-st/Stargate.svg?branch=master)](https://travis-ci.org/ba-st/Stargate)
+[![Build Status](https://travis-ci.com/ba-st/Stargate.svg?branch=master)](https://travis-ci.com/ba-st/Stargate)
 [![Coverage Status](https://coveralls.io/repos/github/ba-st/Stargate/badge.svg?branch=master)](https://coveralls.io/github/ba-st/Stargate?branch=master)
 
 It's built on top of Teapot and Zinc, providing a conceptual framework to simplify the creation of RESTful APIs including HATEOAS, content negotiation, API versioning, ETags and pagination.
