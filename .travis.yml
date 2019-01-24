@@ -4,8 +4,8 @@ os:
 - linux
 smalltalk:
 - Pharo64-7.0
-- Pharo-7.0
-- Pharo-6.1
+- Pharo32-7.0
+- Pharo32-6.1
 before_deploy:
 - cp "${SMALLTALK_CI_IMAGE}" "Stargate.image"
 - cp "${SMALLTALK_CI_CHANGES}" "Stargate.changes"

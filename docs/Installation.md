@@ -6,10 +6,10 @@ You can load **Stargate** evaluating:
 ```smalltalk
 Metacello new
 	baseline: 'Stargate';
-	repository: 'github://ba-st/Stargate:master/source';
+	repository: 'github://ba-st/Stargate:release-candidate/source';
 	load.
 ```
->  Change `master` to some released version if you want a pinned version
+>  Change `release-candidate` to some released version if you want a pinned version
 
 ## Using as dependency
 
@@ -36,3 +36,12 @@ baseline: spec
 		do: [ self setUpDependencies: spec.
 			spec package: 'My-Package' with: [ spec requires: #('Stargate') ] ]
 ```
+
+## Provided groups
+
+- `Deployment` will load all the packages needed in a deployed application
+- `Tests` will load the test cases
+- `Dependent-SUnit-Extensions` will load the extensions to the SUnit framework
+- `Tools` will load the extensions to the SUnit framework and development tools (inspector and spotter extensions)
+- `CI` is the group loaded in the continuous integration setup
+- `Development` will load all the needed packages to develop and contribute to the project

@@ -11,7 +11,7 @@ You can report issues [here](https://github.com/ba-st/Stargate/issues/new)
 - This project is MIT licensed, so any code contribution MUST be under the same license.
 - This project uses [Semantic Versioning](http://semver.org/), so keep it in mind when you make backwards-incompatible changes. If some backwards incompatible change is made the major version MUST be increased.
 - The source code is hosted in this repository using the Tonel format in the `source` folder.
-- The master branch contains the latest changes and should always be in a releasable state.
+- The `release-candidate` branch contains the latest changes and should always be in a releasable state.
 - Feel free to send pull requests or fork the project.
 - Code contributions without test cases have a lower probability of being merged into the main branch.
 
@@ -25,7 +25,7 @@ You can report issues [here](https://github.com/ba-st/Stargate/issues/new)
 7. Do the changes
 8. Run the test cases
 9. Commit and push your changes to the branch using the Iceberg UI
-10. Create a Pull Request against the master branch
+10. Create a Pull Request against the `release-candidate` branch
 
 ## Contributing documentation
 
