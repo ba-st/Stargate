@@ -9,32 +9,53 @@ BaselineOfStargate >> baseline: spec [
 
 	<baseline>
 	spec
-		for: #common
-		do: [ self setUpDependencies: spec.
-			spec package: 'Stargate-Model' with: [ spec requires: #('Buoy' 'Teapot') ].
-			spec package: 'Stargate-Examples' with: [ spec requires: 'Stargate-Model' ].
-			spec package: 'Stargate-Model-Tests' with: [ spec requires: #('Stargate-Model') ].
-			spec package: 'Stargate-Examples-Tests' with: [ spec requires: #('Stargate-Model-Tests' 'Stargate-Examples') ].
+		for: #pharo
+		do: [ self
+				setUpDependencies: spec;
+				baselineStargate: spec.
 			spec
-				group: 'Deployment' with: #('Stargate-Model');
+				group: 'CI' with: 'Tests';
 				group: 'Examples' with: #('Deployment' 'Stargate-Examples');
-				group: 'Tests' with: #('Examples' 'Stargate-Examples-Tests' 'Stargate-Model-Tests');
-				group: 'Development' with: #('Tests');
-				group: 'default' with: #('Deployment') ]
+				group: 'Tools' with: #('Buoy-Tools' 'Teapot-Tools');
+				group: 'Development' with: #('Tests' 'Tools')
+			]
+]
+
+{ #category : #baselines }
+BaselineOfStargate >> baselineStargate: spec [
+
+	spec
+		package: 'Stargate-Model' with: [ spec requires: #('Buoy-Deployment' 'Teapot-Deployment') ];
+		group: 'Deployment' with: 'Stargate-Model'.
+	spec
+		package: 'Stargate-Examples' with: [ spec requires: 'Stargate-Model' ];
+		group: 'Examples' with: 'Stargate-Examples'.
+	spec
+		package: 'Stargate-Model-Tests' with: [ spec requires: #('Stargate-Model' 'Stargate-Examples') ];
+		group: 'Tests' with: 'Stargate-Model-Tests'.
+	spec
+		package: 'Stargate-Examples-Tests'
+			with: [ spec requires: #('Stargate-Model-Tests' 'Stargate-Examples') ];
+		group: 'Tests' with: 'Stargate-Examples-Tests'
+]
+
+{ #category : #accessing }
+BaselineOfStargate >> projectClass [
+
+	^ MetacelloCypressBaselineProject
 ]
 
 { #category : #baselines }
 BaselineOfStargate >> setUpDependencies: spec [
 
 	spec
-		baseline: 'Buoy' with: [ spec repository: 'github://ba-st/Buoy:v4/source' ];
-		import: 'Buoy'.
-		
+		baseline: 'Buoy' with: [ spec repository: 'github://ba-st/Buoy:v5/source' ];
+		project: 'Buoy-Deployment' copyFrom: 'Buoy' with: [ spec loads: 'Deployment' ];
+		project: 'Buoy-SUnit' copyFrom: 'Buoy' with: [ spec loads: 'Dependent-SUnit-Extensions' ];
+		project: 'Buoy-Tools' copyFrom: 'Buoy' with: [ spec loads: 'Tools' ].
+
 	spec
-		baseline: 'Teapot' 
-			with: [ 
-			    spec 
-				repository: 'github://zeroflag/Teapot:v2.6.0/source';
-				loads: #( 'Deployment' 'Tools' )];
-		import: 'Teapot'
+		baseline: 'Teapot' with: [ spec repository: 'github://zeroflag/Teapot:v2.6.0/source' ];
+		project: 'Teapot-Deployment' copyFrom: 'Teapot' with: [ spec loads: 'Deployment' ];
+		project: 'Teapot-Tools' copyFrom: 'Teapot' with: [ spec loads: 'Tools' ]
 ]
