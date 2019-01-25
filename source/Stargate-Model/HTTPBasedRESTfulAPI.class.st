@@ -42,12 +42,6 @@ HTTPBasedRESTfulAPI >> configureRoutes [
 	controllers do: [ :controller | configurator addRoutesOf: controller ]
 ]
 
-{ #category : #configuring }
-HTTPBasedRESTfulAPI >> crossOriginResourceSharingAfterFilterHandlerAllowing: origins [
-
-	^ CrossOriginResourceSharingAfterFilter allowing: origins
-]
-
 { #category : #initialization }
 HTTPBasedRESTfulAPI >> initializeConfiguredBy: configuration installing: aRESTfulControllerCollection [
 
