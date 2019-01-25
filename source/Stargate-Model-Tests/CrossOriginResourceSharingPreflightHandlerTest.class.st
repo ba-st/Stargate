@@ -2,17 +2,17 @@
 I'm a test case for CrossOriginResourceSharingHandler
 "
 Class {
-	#name : #CrossOriginResourceSharingHandlerTest,
+	#name : #CrossOriginResourceSharingPreflightHandlerTest,
 	#superclass : #TestCase,
 	#category : #'Stargate-Model-Tests-CORS'
 }
 
 { #category : #tests }
-CrossOriginResourceSharingHandlerTest >> testEvaluationOnRequest [
+CrossOriginResourceSharingPreflightHandlerTest >> testEvaluationOnRequest [
 
 	| handler response |
 
-	handler := CrossOriginResourceSharingHandler allowing: #('GET' 'POST').
+	handler := CrossOriginResourceSharingPreflightHandler allowing: #('GET' 'POST').
 	response := handler teaEvalActionOnRequest: (ZnRequest options: 'url').
 
 	self

@@ -1,5 +1,5 @@
 Class {
-	#name : #CrossOriginResourceSharingHandler,
+	#name : #CrossOriginResourceSharingPreflightHandler,
 	#superclass : #Object,
 	#instVars : [
 		'httpMethods'
@@ -8,25 +8,25 @@ Class {
 }
 
 { #category : #'instance creation' }
-CrossOriginResourceSharingHandler class >> allowing: anHttpMethodsCollection [
+CrossOriginResourceSharingPreflightHandler class >> allowing: anHttpMethodsCollection [
 
 	^ self new initializeAllowing: anHttpMethodsCollection
 ]
 
 { #category : #'private - accessing' }
-CrossOriginResourceSharingHandler >> commaSeparatedHttpMethods [
+CrossOriginResourceSharingPreflightHandler >> commaSeparatedHttpMethods [
 
 	^ (CollectionFormatter separatingWith: ', ') format: httpMethods
 ]
 
 { #category : #initialization }
-CrossOriginResourceSharingHandler >> initializeAllowing: anHttpMethodsCollection [
+CrossOriginResourceSharingPreflightHandler >> initializeAllowing: anHttpMethodsCollection [
 
 	httpMethods := anHttpMethodsCollection
 ]
 
 { #category : #evaluating }
-CrossOriginResourceSharingHandler >> teaEvalActionOnRequest: aRequest [
+CrossOriginResourceSharingPreflightHandler >> teaEvalActionOnRequest: aRequest [
 
 	| response |
 

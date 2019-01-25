@@ -23,20 +23,7 @@ HTTPBasedRESTfulAPI class >> configuredBy: configuration installing: aRESTfulCon
 HTTPBasedRESTfulAPI >> beCORSAwareAllowing: origins [
 
 	teapotServer
-		after:
-			'/*'
-				-> [ :request :response | 
-					| requestOrigin requestOriginUrl |
-
-					requestOrigin := request headers at: 'Origin'.
-					requestOriginUrl := requestOrigin asUrl.
-					origins
-						detect: [ :origin | origin = requestOriginUrl ]
-						ifFound: [ :allowedOrigin | 
-							response headers
-								at: 'Access-Control-Allow-Origin' put: requestOrigin;
-								at: 'Vary' put: 'Origin' ].
-					response ];
+		after: '/*' -> (CrossOriginResourceSharingAfterFilter allowing: origins);
 		when: [ :request | request headers includesKey: 'Origin' ]
 ]
 
@@ -58,16 +45,21 @@ HTTPBasedRESTfulAPI >> configureRoutes [
 { #category : #initialization }
 HTTPBasedRESTfulAPI >> initializeConfiguredBy: configuration installing: aRESTfulControllerCollection [
 
-	teapotServer := Teapot
-		configure: configuration , {(#notFoundHandlerClass -> Tea405AwareNotFoundHandler)}.
+	teapotServer := Teapot configure: configuration , {(#notFoundHandlerClass -> Tea405AwareNotFoundHandler)}.
 	controllers := aRESTfulControllerCollection.
 	errorHandlers := OrderedCollection new.
+	
 	self
 		on: HTTPClientError
 		addErrorHandler: [ :clientError :request | 
 			| json |
+
 			json := NeoJSONWriter toStringPretty: clientError.
 			(ZnResponse statusCode: clientError code)
+				headers:
+							(ZnHeaders defaultResponseHeaders
+								at: 'Access-Control-Allow-Origin' put: '*';
+								yourself);
 				entity: (ZnEntity json: json);
 				yourself ]
 ]
