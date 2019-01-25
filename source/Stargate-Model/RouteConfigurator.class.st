@@ -43,7 +43,7 @@ RouteConfigurator >> configureCrossOriginSharingRoutes [
 			teapot
 				OPTIONS:
 					resourceLocation
-						-> (CrossOriginResourceSharingHandler allowing: (routesAllowingCors at: resourceLocation)) ]
+						-> (CrossOriginResourceSharingPreflightHandler allowing: (routesAllowingCors at: resourceLocation)) ]
 ]
 
 { #category : #'private - configuring' }
