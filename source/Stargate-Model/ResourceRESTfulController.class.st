@@ -13,7 +13,8 @@ Class {
 		'baseUrlOptional',
 		'acceptNegotiator',
 		'paginationPolicy',
-		'hypermediaPolicy'
+		'hypermediaPolicy',
+		'resourceCreationPolicy'
 	],
 	#category : #'Stargate-Model-Controllers'
 }
@@ -181,10 +182,23 @@ ResourceRESTfulController >> providePaginationPolicy [
 	^ self subclassResponsibility
 ]
 
+{ #category : #'private - accessing' }
+ResourceRESTfulController >> provideResourceCreationPolicy [
+
+	^ self subclassResponsibility
+]
+
 { #category : #'private - API' }
 ResourceRESTfulController >> putEntityTagOf: resource encodedAs: mediaType in: response [
 
 	response setEntityTag: (self entityTagOf: resource encodedAs: mediaType)
+]
+
+{ #category : #'private - accessing' }
+ResourceRESTfulController >> resourceCreationPolicy [
+
+	resourceCreationPolicy ifNil: [ resourceCreationPolicy := self provideResourceCreationPolicy ].
+	^ resourceCreationPolicy
 ]
 
 { #category : #configuring }
@@ -218,5 +232,9 @@ ResourceRESTfulController >> withCreatedResourceDo: aBlock decodedUsing: aKey ba
 
 	newResource := self handleConflictsIn: [ aBlock value: decodedRepresentation ].
 
-	^ ZnResponse created: (self locationOf: newResource)
+	^ self resourceCreationPolicy
+		responseFor: newResource
+		decodedUsing: aKey
+		basedOn: anHttpRequest
+		within: aContext
 ]

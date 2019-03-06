@@ -145,6 +145,12 @@ PetOrdersRESTfulController >> providePaginationPolicy [
 	^ RESTfulControllerDoNotPaginateCollectionsPolicy for: self
 ]
 
+{ #category : #'private - accessing' }
+PetOrdersRESTfulController >> provideResourceCreationPolicy [
+
+	^ RESTfulControllerDoNotRespondCreatedEntityPolicy for: self
+]
+
 { #category : #'private - API' }
 PetOrdersRESTfulController >> recordIdAndUpdateTimestampFor: order [
 

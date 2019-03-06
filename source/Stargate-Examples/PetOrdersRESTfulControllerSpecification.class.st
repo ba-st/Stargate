@@ -19,7 +19,7 @@ PetOrdersRESTfulControllerSpecification >> addJsonDecoderVersion1dot0dot0Mapping
 					do: [ :mapping | 
 					mapping
 						mapInstVar: #date;
-						mapProperty: #pet getter: [ :order |  ] setter: [ :order :url | order instVarNamed: 'pet' put: url asUrl ] ];
+						mapProperty: #pet setter: [ :order :url | order instVarNamed: 'pet' put: url asUrl ] ];
 				nextAs: PetOrder ]
 ]
 
@@ -32,15 +32,18 @@ PetOrdersRESTfulControllerSpecification >> addJsonEncoderVersion1dot0dot0Mapping
 		using: [ :order :context | 
 			String
 				streamContents: [ :stream | 
-					(NeoJSONWriter on: stream)
+					( NeoJSONWriter on: stream )
 						for: ZnUrl customDo: [ :mapping | mapping encoder: [ :url | url printString ] ];
 						for: PetOrder
 							do: [ :mapping | 
 							mapping
 								mapInstVars;
-								mapProperty: #status getter: [ :object | context objectUnder: #status ] setter: [ :object :value |  ];
-								mapHypermediaControlsIn: context ];
-						nextPut: order ] ]
+								mapProperty: #status getter: [ :object | context objectUnder: #status ];
+								mapHypermediaControlsIn: context
+							];
+						nextPut: order
+					]
+			]
 ]
 
 { #category : #routes }

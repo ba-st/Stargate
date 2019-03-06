@@ -164,6 +164,12 @@ PetsRESTfulController >> providePaginationPolicy [
 	^ RESTfulControllerPaginateCollectionsPolicy for: self with: self defaultPaginationLimit
 ]
 
+{ #category : #'private - accessing' }
+PetsRESTfulController >> provideResourceCreationPolicy [
+
+	^ RESTfulControllerDoNotRespondCreatedEntityPolicy for: self
+]
+
 { #category : #'private - state management' }
 PetsRESTfulController >> recordIdAndUpdateTimestampFor: newPet [
 
