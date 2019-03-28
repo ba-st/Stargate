@@ -17,6 +17,18 @@ PetStoreAPITest >> baseUrl [
 ]
 
 { #category : #private }
+PetStoreAPITest >> checkPortAvailability [
+
+	[ | socket |
+
+	socket := ZnNetworkingUtils serverSocketOn: self port.
+	socket close
+	]
+		on: Error
+		do: [ :error | self fail: ( 'Port <1p> is not available' expandMacrosWith: self port ) ]
+]
+
+{ #category : #private }
 PetStoreAPITest >> newClient [
 
 	^ ZnClient new
@@ -47,10 +59,11 @@ PetStoreAPITest >> port [
 PetStoreAPITest >> setUp [
 
 	super setUp.
+	self checkPortAvailability.
 	api := HTTPBasedRESTfulAPI
 		configuredBy:
-			{(#port -> self port).
-			(#serverUrl -> self baseUrl)}
+			{( #port -> self port ).
+			( #serverUrl -> self baseUrl )}
 		installing:
 			{PetsRESTfulController new.
 			PetOrdersRESTfulController new}.

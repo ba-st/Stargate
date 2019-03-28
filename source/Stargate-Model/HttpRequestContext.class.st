@@ -67,7 +67,9 @@ HttpRequestContext >> initialize [
 { #category : #accessing }
 HttpRequestContext >> objectUnder: aConcept [
 
-	^ self objectUnder: aConcept ifNone: [ NotFound signal: ('Missing <1s> in the request context' expandMacrosWith: aConcept asString) ]
+	^ self
+		objectUnder: aConcept
+		ifNone: [ NotFound signal: ( 'Missing <1s> in the request context' expandMacrosWith: aConcept asString ) ]
 ]
 
 { #category : #accessing }

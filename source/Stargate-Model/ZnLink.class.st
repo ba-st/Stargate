@@ -29,6 +29,12 @@ ZnLink >> = other [
 	^ self class == other class and: [ self url = other url and: [ self hasSameParametersAs: other ] ]
 ]
 
+{ #category : #converting }
+ZnLink >> asByteArray [
+
+	^ self printString asByteArray
+]
+
 { #category : #testing }
 ZnLink >> hasParameters [
 

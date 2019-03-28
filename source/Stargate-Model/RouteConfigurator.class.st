@@ -30,7 +30,7 @@ RouteConfigurator >> configureCorsAwareRouteFrom: aCorsAwareRouteSpecification [
 	routesAllowingCors
 		at: specification urlTemplate
 		ifPresent: [ :httpMethods | httpMethods add: specification httpMethod ]
-		ifAbsentPut: (OrderedCollection with: specification httpMethod).
+		ifAbsentPut: [ OrderedCollection with: specification httpMethod ].
 
 	specification configureUsing: self
 ]
