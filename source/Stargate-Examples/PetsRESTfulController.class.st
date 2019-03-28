@@ -167,7 +167,7 @@ PetsRESTfulController >> providePaginationPolicy [
 { #category : #'private - accessing' }
 PetsRESTfulController >> provideResourceCreationPolicy [
 
-	^ RESTfulControllerDoNotRespondCreatedEntityPolicy for: self
+	^ RESTfulControllerRespondCreatedEntityPolicy for: self
 ]
 
 { #category : #'private - state management' }

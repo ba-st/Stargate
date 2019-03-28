@@ -156,17 +156,27 @@ PetStoreAPITest >> testConflict [
 { #category : #tests }
 PetStoreAPITest >> testCreatePet [
 
-	| response |
+	| response json |
 
 	response := self newClient
 		url: self baseUrl / 'pets' asUrl;
-		entity: (ZnEntity with: '{"name":"Firulais","type":"dog"}' ofType: self petsSpec petVersion1dot0dot0MediaType);
+		entity:
+			( ZnEntity
+				with: '{"name":"Firulais","type":"dog"}'
+				ofType: self petsSpec petVersion1dot0dot0MediaType );
 		post;
 		response.
 
 	self
 		assert: response isCreated;
-		assert: response location equals: 'http://localhost:9999/pets/1'
+		assert: response location equals: 'http://localhost:9999/pets/1'.
+
+	json := NeoJSONObject fromString: response contents.
+	self
+		assert: json status equals: 'new';
+		assert: json name equals: 'Firulais';
+		assert: json type equals: 'dog';
+		assert: json links self equals: response location
 ]
 
 { #category : #tests }
