@@ -32,6 +32,18 @@ HTTPClientErrorTest >> test409 [
 ]
 
 { #category : #tests }
+HTTPClientErrorTest >> test422 [
+
+	self
+		should: [ HTTPClientError signalUnprocessableEntity: 'Cannot be processed']
+		raise: HTTPClientError
+		withExceptionDo: [ :signal | 
+			self
+				assert: signal code equals: 422;
+				assert: signal messageText equals: 'Cannot be processed' ]
+]
+
+{ #category : #tests }
 HTTPClientErrorTest >> testCode [
 
 	self

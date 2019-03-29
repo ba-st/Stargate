@@ -54,9 +54,8 @@ MappingRuleSet >> defaultEncodingRuleFor: anObjectType withMediaTypeMatching: aM
 MappingRuleSet >> defaultRuleIn: mappingRules for: anObjectType [
 
 	^ mappingRules
-		detect:
-			[ :decodingRule | decodingRule objectType = anObjectType and: [ decodingRule isDefault ] ]
-		ifNone: [ MappingNotFound signal ]
+		detect: [ :decodingRule | decodingRule objectType = anObjectType and: [ decodingRule isDefault ] ]
+		ifNone: [ MappingNotFound signal: 'Mapping rule not found for given media type' ]
 ]
 
 { #category : #'private - testing media type' }
@@ -92,8 +91,7 @@ MappingRuleSet >> isNotVersioned: aMediaType [
 { #category : #'private - testing media type' }
 MappingRuleSet >> isWildcard: aMediaType [
 
-	^ {aMediaType main.
-	aMediaType sub} allSatisfy: [ :part | part = '*' ]
+	^ aMediaType main = '*' and: [ aMediaType sub = '*' ]
 ]
 
 { #category : #'private - querying' }

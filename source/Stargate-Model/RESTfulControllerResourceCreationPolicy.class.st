@@ -1,5 +1,5 @@
 "
-I'm an abstract policy controlling how to respond on the creation of new resources. 
+I'm an abstract policy controlling how to respond on the creation of new resources.
 "
 Class {
 	#name : #RESTfulControllerResourceCreationPolicy,

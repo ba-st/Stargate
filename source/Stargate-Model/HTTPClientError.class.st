@@ -52,6 +52,12 @@ HTTPClientError class >> signalPreconditionRequired: aMessageText [
 ]
 
 { #category : #signaling }
+HTTPClientError class >> signalUnprocessableEntity: aFailureExplanation [
+
+	^ self signal: 422 describedBy: aFailureExplanation
+]
+
+{ #category : #signaling }
 HTTPClientError class >> signalUnsupportedMediaType: aFailureExplanation [
 
 	^ self signal: 415 describedBy: aFailureExplanation
