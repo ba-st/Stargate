@@ -14,9 +14,11 @@ Class {
 { #category : #'Instance creation' }
 PaginationSpecification class >> startingAt: aNumber limitedTo: aLimit [
 
-	AssertionChecker enforce: [ aLimit strictlyPositive ] because: 'The page limit must be positive' raising: InstanceCreationFailed.
-	"We're forgiving with the starting index"
-	^ self new initializeStartingAt: (aNumber max: 1) limitedTo: aLimit
+	AssertionChecker
+		enforce: [ aLimit strictlyPositive ]
+		because: 'The page limit must be positive'
+		raising: InstanceCreationFailed.	"We're forgiving with the starting index"
+	^ self new initializeStartingAt: ( aNumber max: 1 ) limitedTo: aLimit
 ]
 
 { #category : #accessing }

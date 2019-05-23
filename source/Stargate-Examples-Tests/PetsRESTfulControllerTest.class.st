@@ -74,7 +74,9 @@ PetsRESTfulControllerTest >> requestToCreatePetFrom: json [
 { #category : #'private - support' }
 PetsRESTfulControllerTest >> requestToDeletePetIdentifiedBy: anIdentifier [
 
-	^ TeaRequest fromZnRequest: (ZnRequest delete: (self urlForResourceIdentifiedBy: anIdentifier)) pathParams: {(#identifier -> anIdentifier)} asDictionary
+	^ TeaRequest
+		fromZnRequest: ( ZnRequest delete: ( self urlForResourceIdentifiedBy: anIdentifier ) )
+		pathParams: {( #identifier -> anIdentifier )} asDictionary
 ]
 
 { #category : #'private - support' }
@@ -102,27 +104,21 @@ PetsRESTfulControllerTest >> requestToUpdatePetIdentifiedBy: anIdentifier nameTo
 { #category : #'private - support' }
 PetsRESTfulControllerTest >> requestToUpdatePetIdentifiedBy: anIdentifier nameTo: aName using: anETag [
 
-	^ TeaRequest
-		fromZnRequest:
-			((ZnRequest patch: (self urlForResourceIdentifiedBy: anIdentifier))
-				setAccept: self defaultPetMediaType;
-				setIfMatchTo: anETag;
-				entity: (ZnEntity with: ('{"name":"<1s>"}' expandMacrosWith: aName) type: self defaultPetMediaType);
-				yourself)
-		pathParams: {(#identifier -> anIdentifier)} asDictionary
+	^ self
+		requestToPATCHResourceIdentifiedBy: anIdentifier
+		with: ( '{"name":"<1s>"}' expandMacrosWith: aName )
+		accepting: self defaultPetMediaType
+		conditionalTo: anETag
 ]
 
 { #category : #'private - support' }
 PetsRESTfulControllerTest >> requestToUpdatePetIdentifiedBy: anIdentifier statusTo: aStatus [
 
-	^ TeaRequest
-		fromZnRequest:
-			((ZnRequest patch: (self urlForResourceIdentifiedBy: anIdentifier))
-				setAccept: self defaultPetMediaType;
-				setIfMatchTo: (self entityTagOfPetIdentifiedBy: anIdentifier);
-				entity: (ZnEntity with: ('{"status":"<1s>"}' expandMacrosWith: aStatus) type: self defaultPetMediaType);
-				yourself)
-		pathParams: {(#identifier -> anIdentifier)} asDictionary
+	^ self
+		requestToPATCHResourceIdentifiedBy: anIdentifier
+		with: ( '{"status":"<1s>"}' expandMacrosWith: aStatus )
+		accepting: self defaultPetMediaType
+		conditionalTo: ( self entityTagOfPetIdentifiedBy: anIdentifier )
 ]
 
 { #category : #running }

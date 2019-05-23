@@ -44,16 +44,15 @@ ReflectiveRoutesConfiguratorTest >> testConfiguringCrossOriginResourceSharingAwa
 ]
 
 { #category : #tests }
-ReflectiveRoutesConfiguratorTest >> testConfiguringPetsWebServiceRoutes [
+ReflectiveRoutesConfiguratorTest >> testConfiguringPetsControllerRoutes [
 
-	| teapot webService |
+	| teapot controller |
 
 	teapot := Teapot on.
 
-	webService := PetsRESTfulController new.
+	controller := PetsRESTfulController new.
 
-	(ReflectiveRoutesConfigurator appliedTo: teapot) 
-		addRoutesOf: webService.
+	( ReflectiveRoutesConfigurator appliedTo: teapot ) addRoutesOf: controller.
 
 	self assert: teapot routes size equals: 5
 ]

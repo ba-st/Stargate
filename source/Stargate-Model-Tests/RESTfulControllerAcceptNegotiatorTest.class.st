@@ -69,7 +69,9 @@ RESTfulControllerAcceptNegotiatorTest >> testMissingVersionSelectsTheNewOne [
 RESTfulControllerAcceptNegotiatorTest >> testRFC2616Sec14 [
 
 	self
-		assertBestRepresentationFor: self rfcHeader given: {'text/html;level=1' asMediaType} is: 'text/html;level=1' asMediaType;
+		assertBestRepresentationFor: self rfcHeader
+			given: {'text/html;level=1' asMediaType}
+			is: 'text/html;level=1' asMediaType;
 		assertBestRepresentationFor: self pearAcceptHeader
 			given:
 			{'application/xml' asMediaType.

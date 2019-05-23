@@ -25,13 +25,21 @@ RESTfulControllerRespondCreatedEntityPolicy >> initializeFor: aResourceControlle
 { #category : #processing }
 RESTfulControllerRespondCreatedEntityPolicy >> responseFor: aResource decodedUsing: aKey basedOn: anHttpRequest within: aContext [
 
+	| response |
+
 	resourceController hypermediaPolicy holdResource: aResource controlsWithin: aContext.
-	^ ZnResponse
-		created: ( resourceController locationOf: aResource )
+	response := ZnResponse
+		created: ( resourceController locationOf: aResource within: aContext )
 		entity:
 			( resourceController
 				encode: aResource
 				at: aKey
 				to: anHttpRequest contentType
-				within: aContext )
+				within: aContext ).
+	resourceController
+		putEntityTagOf: aResource
+		encodedAs: anHttpRequest contentType
+		in: response
+		within: aContext.
+	^ response
 ]
