@@ -11,7 +11,9 @@ Class {
 PetsRESTfulControllerSpecification >> addJsonDecoderVersion1dot0dot0MappingIn: aBuilder [
 
 	aBuilder
-		addDefaultRuleToDecode: self petVersion1dot0dot0MediaType to: self petMappingKey using: [ :json | NeoJSONObject fromString: json ]
+		addDefaultRuleToDecode: self petVersion1dot0dot0MediaType
+		to: self petMappingKey
+		using: [ :json | NeoJSONObject fromString: json ]
 ]
 
 { #category : #'mapping rules' }

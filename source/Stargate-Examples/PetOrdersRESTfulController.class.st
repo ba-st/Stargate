@@ -41,7 +41,7 @@ PetOrdersRESTfulController >> createOrderBasedOn: anHttpRequest within: aContext
 ]
 
 { #category : #'private - accessing' }
-PetOrdersRESTfulController >> entityTagOf: aPetOrder encodedAs: mediaType [
+PetOrdersRESTfulController >> entityTagOf: aPetOrder encodedAs: mediaType within: aContext [
 
 	^ ZnETag
 		with:
@@ -94,7 +94,7 @@ PetOrdersRESTfulController >> lastModificationOf: aPetOrder [
 ]
 
 { #category : #'private - accessing' }
-PetOrdersRESTfulController >> locationOf: aPetOrder [
+PetOrdersRESTfulController >> locationOf: aPetOrder within: aContext [
 
 	| baseUrl |
 
@@ -105,20 +105,23 @@ PetOrdersRESTfulController >> locationOf: aPetOrder [
 ]
 
 { #category : #'private - accessing' }
-PetOrdersRESTfulController >> mediaControlsFor: order [
+PetOrdersRESTfulController >> mediaControlsFor: order within: aContext [
 
 	| status |
 
-	status := orderStatus at: (orderById keyAtValue: order).
+	status := orderStatus at: ( orderById keyAtValue: order ).	
 	"In the real life you don't do a case. This is a toy example"
 	status = 'registered'
-		ifTrue: [ ^ (super mediaControlsFor: order)
+		ifTrue: [ ^ ( super mediaControlsFor: order within: aContext )
 				,
-					{('cancel' -> ((self locationOf: order) / 'cancel' asUrl)).
-					('complete' -> ((self locationOf: order) / 'complete' asUrl))} ].
+					{( 'cancel' -> ( ( self locationOf: order within: aContext ) / 'cancel' asUrl ) ).
+					( 'complete' -> ( ( self locationOf: order within: aContext ) / 'complete' asUrl ) )}
+			].
 	status = 'completed'
-		ifTrue: [ ^ (super mediaControlsFor: order) , {('cancel' -> ((self locationOf: order) / 'cancel' asUrl))} ].
-	^ super mediaControlsFor: order
+		ifTrue: [ ^ ( super mediaControlsFor: order within: aContext )
+				, {( 'cancel' -> ( ( self locationOf: order within: aContext ) / 'cancel' asUrl ) )}
+			].
+	^ super mediaControlsFor: order within: aContext
 ]
 
 { #category : #'private - accessing' }
@@ -181,7 +184,11 @@ PetOrdersRESTfulController >> updateOrderStatusBasedOn: anHttpRequest within: aC
 
 	self handleConflictsIn: anUpdateBlock.
 	response := ZnResponse noContent.
-	self putEntityTagOf: (self orderIdentifiedUsing: anHttpRequest) encodedAs: self specification orderVersion1dot0dot0MediaType in: response.
+	self
+		putEntityTagOf: ( self orderIdentifiedUsing: anHttpRequest )
+		encodedAs: self specification orderVersion1dot0dot0MediaType
+		in: response
+		within: aContext.
 	^ response
 ]
 

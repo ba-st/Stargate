@@ -19,14 +19,23 @@ HypermediaDrivenRESTfulControllerPolicy class >> for: aResourceController [
 { #category : #configuring }
 HypermediaDrivenRESTfulControllerPolicy >> holdCollection: resourceCollection controlsBasedOn: httpRequest within: context [
 
-	context holdAsHypermediaControls: (resourceController paginationPolicy addPaginationControlsTo: {('self' -> httpRequest absoluteUrl)} within: context).
-	resourceCollection do: [ :resource | context holdAsHypermediaControls: (resourceController mediaControlsFor: resource) forSubresource: resource ]
+	context
+		holdAsHypermediaControls:
+			( resourceController paginationPolicy
+				addPaginationControlsTo: {( 'self' -> httpRequest absoluteUrl )}
+				within: context ).
+	resourceCollection
+		do: [ :resource | 
+			context
+				holdAsHypermediaControls: ( resourceController mediaControlsFor: resource within: context )
+				forSubresource: resource
+			]
 ]
 
 { #category : #configuring }
 HypermediaDrivenRESTfulControllerPolicy >> holdResource: resource controlsWithin: context [
 
-	context holdAsHypermediaControls: (resourceController mediaControlsFor: resource)
+	context holdAsHypermediaControls: ( resourceController mediaControlsFor: resource within: context )
 ]
 
 { #category : #initialization }

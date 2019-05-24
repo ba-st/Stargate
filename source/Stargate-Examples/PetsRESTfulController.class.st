@@ -60,7 +60,7 @@ PetsRESTfulController >> deletePetBasedOn: anHttpRequest within: aContext [
 ]
 
 { #category : #'private - accessing' }
-PetsRESTfulController >> entityTagOf: aPet encodedAs: mediaType [
+PetsRESTfulController >> entityTagOf: aPet encodedAs: mediaType within: aContext [
 
 	^ ZnETag
 		with:
@@ -130,7 +130,7 @@ PetsRESTfulController >> lastModificationOf: aPet [
 ]
 
 { #category : #'private - accessing' }
-PetsRESTfulController >> locationOf: aPet [
+PetsRESTfulController >> locationOf: aPet within: aContext [
 
 	| baseUrl |
 
@@ -208,14 +208,19 @@ PetsRESTfulController >> updatePetBasedOn: anHttpRequest within: aContext [
 		get: [ | resource pet |
 
 			pet := self petIdentifiedUsing: anHttpRequest.
-			self assert: etag matchesEntityTagOf: pet encodedAs: anHttpRequest contentType.
+			self
+				assert: etag
+				matchesEntityTagOf: pet
+				encodedAs: anHttpRequest contentType
+				within: aContext.
 			resource := self
 				decode: anHttpRequest contents
 				at: self specification petMappingKey
 				from: anHttpRequest contentType
 				within: aContext.
 			self updatePet: pet with: resource.
-			pet ]
+			pet
+			]
 		encodedUsing: self specification petMappingKey
 		basedOn: anHttpRequest
 		within: aContext

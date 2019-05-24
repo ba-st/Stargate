@@ -49,7 +49,10 @@ PetOrdersRESTfulControllerSpecification >> addJsonEncoderVersion1dot0dot0Mapping
 { #category : #routes }
 PetOrdersRESTfulControllerSpecification >> cancelOrderRoute [
 
-	^ RouteSpecification handling: #POST at: self cancelTemplate evaluating: [ :service :httpRequest :context | service cancelOrderBasedOn: httpRequest within: context ]
+	^ RouteSpecification
+		handling: #POST
+		at: self cancelTemplate
+		evaluating: [ :controller :httpRequest :context | controller cancelOrderBasedOn: httpRequest within: context ]
 ]
 
 { #category : #'private - accessing' }
@@ -61,7 +64,10 @@ PetOrdersRESTfulControllerSpecification >> cancelTemplate [
 { #category : #routes }
 PetOrdersRESTfulControllerSpecification >> completeOrderRoute [
 
-	^ RouteSpecification handling: #POST at: self completeTemplate evaluating: [ :service :httpRequest :context | service completeOrderBasedOn: httpRequest within: context ]
+	^ RouteSpecification
+		handling: #POST
+		at: self completeTemplate
+		evaluating: [ :controller :httpRequest :context | controller completeOrderBasedOn: httpRequest within: context ]
 ]
 
 { #category : #'private - accessing' }
@@ -73,7 +79,10 @@ PetOrdersRESTfulControllerSpecification >> completeTemplate [
 { #category : #routes }
 PetOrdersRESTfulControllerSpecification >> createOrderRoute [
 
-	^ RouteSpecification handling: #POST at: self endpoint evaluating: [ :service :httpRequest :context | service createOrderBasedOn: httpRequest within: context ]
+	^ RouteSpecification
+		handling: #POST
+		at: self endpoint
+		evaluating: [ :controller :httpRequest :context | controller createOrderBasedOn: httpRequest within: context ]
 ]
 
 { #category : #'private - accessing' }
@@ -85,7 +94,10 @@ PetOrdersRESTfulControllerSpecification >> endpoint [
 { #category : #routes }
 PetOrdersRESTfulControllerSpecification >> getOrderRoute [
 
-	^ RouteSpecification handling: #GET at: self idTemplate evaluating: [ :service :httpRequest :context | service getOrderBasedOn: httpRequest within: context ]
+	^ RouteSpecification
+		handling: #GET
+		at: self idTemplate
+		evaluating: [ :controller :httpRequest :context | controller getOrderBasedOn: httpRequest within: context ]
 ]
 
 { #category : #'private - accessing' }

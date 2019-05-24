@@ -20,9 +20,9 @@ Class {
 }
 
 { #category : #'private - asserting' }
-ResourceRESTfulController >> assert: etag matchesEntityTagOf: entity encodedAs: mediaType [
+ResourceRESTfulController >> assert: etag matchesEntityTagOf: entity encodedAs: mediaType within: aContext [
 
-	(etag = (self entityTagOf: entity encodedAs: mediaType))
+	etag = ( self entityTagOf: entity encodedAs: mediaType within: aContext )
 		ifFalse: [ HTTPClientError signalPreconditionFailed ]
 ]
 
@@ -47,7 +47,7 @@ ResourceRESTfulController >> encode: theResource at: aKey to: targetMediaType wi
 ]
 
 { #category : #'private - accessing' }
-ResourceRESTfulController >> entityTagOf: resource encodedAs: mediaType [
+ResourceRESTfulController >> entityTagOf: resource encodedAs: mediaType within: aContext [
 
 	self subclassResponsibility
 ]
@@ -104,21 +104,28 @@ ResourceRESTfulController >> get: aQueryEvaluationBlock encodedUsing: aKey based
 			self
 				ifNoneMatchHeaderPresentIn: anHttpRequest
 				do: [ :etag | 
-					etag = (self entityTagOf: resource encodedAs: mediaType)
+					etag = ( self entityTagOf: resource encodedAs: mediaType within: aContext )
 						ifTrue: [ ^ ZnResponse notModified
 								setEntityTag: etag;
-								yourself ] ].
+								yourself
+							]
+					].
 
 			self hypermediaPolicy holdResource: resource controlsWithin: aContext.
 			response := ZnResponse
 				ok:
-					(self
+					( self
 						encode: resource
 						at: aKey
 						to: mediaType
-						within: aContext).
-			self putEntityTagOf: resource encodedAs: mediaType in: response.
-			response ]
+						within: aContext ).
+			self
+				putEntityTagOf: resource
+				encodedAs: mediaType
+				in: response
+				within: aContext.
+			response
+			]
 ]
 
 { #category : #'private - transformations' }
@@ -152,15 +159,15 @@ ResourceRESTfulController >> initialize [
 ]
 
 { #category : #'private - accessing' }
-ResourceRESTfulController >> locationOf: resource [
+ResourceRESTfulController >> locationOf: resource within: aContext [
 
 	self subclassResponsibility
 ]
 
 { #category : #'private - accessing' }
-ResourceRESTfulController >> mediaControlsFor: result [
+ResourceRESTfulController >> mediaControlsFor: result within: aContext [
 
-	^ {'self' -> (self locationOf: result)}
+	^ {( 'self' -> ( self locationOf: result within: aContext ) )}
 ]
 
 { #category : #'private - accessing' }
@@ -189,9 +196,9 @@ ResourceRESTfulController >> provideResourceCreationPolicy [
 ]
 
 { #category : #'private - API' }
-ResourceRESTfulController >> putEntityTagOf: resource encodedAs: mediaType in: response [
+ResourceRESTfulController >> putEntityTagOf: resource encodedAs: mediaType in: response within: aContext [
 
-	response setEntityTag: (self entityTagOf: resource encodedAs: mediaType)
+	response setEntityTag: ( self entityTagOf: resource encodedAs: mediaType within: aContext )
 ]
 
 { #category : #'private - accessing' }

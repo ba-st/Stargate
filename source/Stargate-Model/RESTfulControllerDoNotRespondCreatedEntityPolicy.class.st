@@ -25,5 +25,5 @@ RESTfulControllerDoNotRespondCreatedEntityPolicy >> initializeFor: aResourceCont
 { #category : #processing }
 RESTfulControllerDoNotRespondCreatedEntityPolicy >> responseFor: aResource decodedUsing: aKey basedOn: anHttpRequest within: aContext [
 
-	^ ZnResponse created: ( resourceController locationOf: aResource )
+	^ ZnResponse created: ( resourceController locationOf: aResource within: aContext )
 ]

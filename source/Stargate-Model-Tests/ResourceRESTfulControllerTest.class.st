@@ -58,6 +58,36 @@ ResourceRESTfulControllerTest >> requestToGetResourceIdentifiedBy: anIdentifier 
 ]
 
 { #category : #'private - support' }
+ResourceRESTfulControllerTest >> requestToGetSubresource: aSubresourceEndpoint identifiedBy: anIdentifier accepting: anAcceptHeader [
+
+	^ TeaRequest
+		fromZnRequest:
+			( ( ZnRequest get: ( self urlForResourceIdentifiedBy: anIdentifier ) / aSubresourceEndpoint )
+				setAccept: anAcceptHeader;
+				yourself )
+		pathParams:
+			( SmallDictionary new
+				at: #identifier put: anIdentifier;
+				yourself )
+]
+
+{ #category : #'private - support' }
+ResourceRESTfulControllerTest >> requestToPATCHResourceIdentifiedBy: anIdentifier with: aRequestBody accepting: anAcceptHeader conditionalTo: anETag [
+
+	^ TeaRequest
+		fromZnRequest:
+			( ( ZnRequest patch: ( self urlForResourceIdentifiedBy: anIdentifier ) )
+				setAccept: anAcceptHeader;
+				setIfMatchTo: anETag;
+				entity: ( ZnEntity with: aRequestBody type: anAcceptHeader );
+				yourself )
+		pathParams:
+			( SmallDictionary new
+				at: #identifier put: anIdentifier;
+				yourself )
+]
+
+{ #category : #'private - support' }
 ResourceRESTfulControllerTest >> requestToPOST: content as: aMediaType [
 
 	^ TeaRequest
@@ -90,7 +120,7 @@ ResourceRESTfulControllerTest >> setUpResourceController [
 { #category : #'private - support' }
 ResourceRESTfulControllerTest >> urlForResourceIdentifiedBy: anIdentifier [
 
-	^ self resourceUrl / anIdentifier printString asZnUrl
+	^ self resourceUrl / anIdentifier asString asZnUrl
 ]
 
 { #category : #'private - support' }
