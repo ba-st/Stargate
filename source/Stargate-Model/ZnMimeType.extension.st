@@ -19,3 +19,9 @@ ZnMimeType >> quality [
 
 	^ Float readFrom: (self parameterAt: 'q' ifAbsent: [ ^1.0 ])
 ]
+
+{ #category : #'*Stargate-Model' }
+ZnMimeType >> version: aVersionString [
+
+	self parameters at: 'version' put: aVersionString
+]

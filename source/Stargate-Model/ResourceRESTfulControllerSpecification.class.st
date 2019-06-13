@@ -10,6 +10,13 @@ Class {
 	#category : #'Stargate-Model-Controllers'
 }
 
+{ #category : #private }
+ResourceRESTfulControllerSpecification >> jsonMediaType: aSubType vendoredBy: aVendorName version: aVersion [
+
+	^ ( 'application/vnd.<1s>.<2s>+json' expandMacrosWith: aVendorName with: aSubType ) asMediaType
+		version: aVersion
+]
+
 { #category : #acccessing }
 ResourceRESTfulControllerSpecification >> mappingRuleSet [
 

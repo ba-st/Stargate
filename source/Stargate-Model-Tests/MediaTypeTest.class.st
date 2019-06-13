@@ -35,3 +35,13 @@ MediaTypeTest >> testQuality [
 		assert: 'text/html' asMediaType quality equals: 1.0;
 		assert: 'text/html;q=0.8' asMediaType quality equals: 0.8
 ]
+
+{ #category : #tests }
+MediaTypeTest >> testVersion [
+
+	| mediaType |
+
+	mediaType := 'application/vnd.stargate.pet+json' asMediaType version: '1.0.0'.
+
+	self assert: mediaType printString equals: 'application/vnd.stargate.pet+json;version=1.0.0'
+]
