@@ -111,13 +111,13 @@ PetsRESTfulControllerSpecification >> petMappingKey [
 { #category : #'accessing - media types' }
 PetsRESTfulControllerSpecification >> petSummaryVersion1dot0dot0MediaType [
 
-	^ 'application/vnd.stargate.pet.summary+json;version=1.0.0' asMediaType 
+	^ self jsonMediaType: 'pet.summary' vendoredBy: 'stargate' version: '1.0.0'
 ]
 
 { #category : #'accessing - media types' }
 PetsRESTfulControllerSpecification >> petVersion1dot0dot0MediaType [
 
-	^ 'application/vnd.stargate.pet+json;version=1.0.0' asMediaType 
+	^ self jsonMediaType: 'pet' vendoredBy: 'stargate' version: '1.0.0'
 ]
 
 { #category : #accessing }

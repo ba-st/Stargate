@@ -121,5 +121,5 @@ PetOrdersRESTfulControllerSpecification >> orderMappingKey [
 { #category : #accessing }
 PetOrdersRESTfulControllerSpecification >> orderVersion1dot0dot0MediaType [
 
-	^ 'application/vnd.stargate.order+json;version=1.0.0' asMediaType 
+	^ self jsonMediaType: 'order' vendoredBy: 'stargate' version: '1.0.0'
 ]
