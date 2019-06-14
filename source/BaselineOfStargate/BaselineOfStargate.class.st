@@ -33,12 +33,11 @@ BaselineOfStargate >> setUpDependencies: spec [
 	spec
 		baseline: 'Buoy' with: [ spec repository: 'github://ba-st/Buoy:v5/source' ];
 		project: 'Buoy-Deployment' copyFrom: 'Buoy' with: [ spec loads: 'Deployment' ];
-		project: 'Buoy-SUnit' copyFrom: 'Buoy' with: [ spec loads: 'Dependent-SUnit-Extensions' ];
-		project: 'Buoy-Tools' copyFrom: 'Buoy' with: [ spec loads: 'Tools' ].
+		project: 'Buoy-SUnit' copyFrom: 'Buoy' with: [ spec loads: 'Dependent-SUnit-Extensions' ].
 
 	spec
 		baseline: 'Hyperspace'
-			with: [ spec repository: 'github://ba-st/Hyperspace:release-candidate/source' ];
+			with: [ spec repository: 'github://ba-st/Hyperspace:first-re/source' ];
 		project: 'Hyperspace-Deployment' copyFrom: 'Hyperspace' with: [ spec loads: 'Deployment' ].
 
 	spec
