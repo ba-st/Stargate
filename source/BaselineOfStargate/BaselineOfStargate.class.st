@@ -33,8 +33,12 @@ BaselineOfStargate >> setUpDependencies: spec [
 	spec
 		baseline: 'Buoy' with: [ spec repository: 'github://ba-st/Buoy:v5/source' ];
 		project: 'Buoy-Deployment' copyFrom: 'Buoy' with: [ spec loads: 'Deployment' ];
-		project: 'Buoy-SUnit' copyFrom: 'Buoy' with: [ spec loads: 'Dependent-SUnit-Extensions' ];
-		project: 'Buoy-Tools' copyFrom: 'Buoy' with: [ spec loads: 'Tools' ].
+		project: 'Buoy-SUnit' copyFrom: 'Buoy' with: [ spec loads: 'Dependent-SUnit-Extensions' ].
+
+	spec
+		baseline: 'Hyperspace'
+			with: [ spec repository: 'github://ba-st/Hyperspace:v1/source' ];
+		project: 'Hyperspace-Deployment' copyFrom: 'Hyperspace' with: [ spec loads: 'Deployment' ].
 
 	spec
 		baseline: 'Teapot' with: [ spec repository: 'github://zeroflag/Teapot:v2.6.0/source' ];
@@ -46,7 +50,7 @@ BaselineOfStargate >> setUpDependencies: spec [
 BaselineOfStargate >> setUpPackages: spec [
 
 	spec
-		package: 'Stargate-Model' with: [ spec requires: #('Buoy-Deployment' 'Teapot-Deployment') ];
+		package: 'Stargate-Model' with: [ spec requires: #('Buoy-Deployment' 'Hyperspace-Deployment' 'Teapot-Deployment') ];
 		group: 'Deployment' with: 'Stargate-Model'.
 	spec
 		package: 'Stargate-Examples' with: [ spec requires: 'Stargate-Model' ];
