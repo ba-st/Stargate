@@ -23,17 +23,21 @@ Class {
 ResourceRESTfulController >> assert: etag matchesEntityTagOf: entity encodedAs: mediaType within: aContext [
 
 	etag = ( self entityTagOf: entity encodedAs: mediaType within: aContext )
-		ifFalse: [ HTTPClientError signalPreconditionFailed ]
+		ifFalse: [ HTTPClientError preconditionFailed signal ]
 ]
 
 { #category : #'private - transformations' }
 ResourceRESTfulController >> decode: theRepresentation at: aKey from: sourceMediaType within: aContext [
 
-	^ [ [ (mappingRuleSet ruleToDecode: sourceMediaType to: aKey) applyOn: theRepresentation within: aContext ]
+	^ [ [ ( mappingRuleSet ruleToDecode: sourceMediaType to: aKey )
+		applyOn: theRepresentation
+		within: aContext
+	]
 		on: KeyNotFound , NeoJSONParseError
-		do: [ :signal | HTTPClientError signalBadRequest: signal messageText ] ]
+		do: [ :signal | HTTPClientError badRequest signal: signal messageText ]
+	]
 		on: MappingNotFound
-		do: [ :signal | HTTPClientError signalUnsupportedMediaType: signal messageText ]
+		do: [ :signal | HTTPClientError unsupportedMediaType signal: signal messageText ]
 ]
 
 { #category : #'private - transformations' }
@@ -43,7 +47,7 @@ ResourceRESTfulController >> encode: theResource at: aKey to: targetMediaType wi
 		applyOn: theResource
 		within: aContext ]
 		on: MappingNotFound
-		do: [ :signal | HTTPClientError signalUnsupportedMediaType: signal messageText ]
+		do: [ :signal | HTTPClientError unsupportedMediaType signal: signal messageText ]
 ]
 
 { #category : #'private - accessing' }
@@ -55,7 +59,9 @@ ResourceRESTfulController >> entityTagOf: resource encodedAs: mediaType within: 
 { #category : #'private - accessing' }
 ResourceRESTfulController >> entityTagToMatchBasedOn: anHttpRequest [
 
-	^ (anHttpRequest headers at: #'If-Match' ifAbsent: [ HTTPClientError signalPreconditionRequired: 'Missing If-Match header.' ]) asETag
+	^ ( anHttpRequest headers
+		at: #'If-Match'
+		ifAbsent: [ HTTPClientError preconditionRequired signal: 'Missing If-Match header.' ] ) asETag
 ]
 
 { #category : #'private - querying' }
@@ -63,9 +69,10 @@ ResourceRESTfulController >> evaluateQuery: aQueryEvaluationBlock [
 
 	^ [ [ aQueryEvaluationBlock value ]
 		on: TeaNoSuchParam
-		do: [ :signal | HTTPClientError signalBadRequest: signal messageText ] ]
+		do: [ :signal | HTTPClientError badRequest signal: signal messageText ]
+	]
 		on: ObjectNotFound
-		do: [ :signal | HTTPClientError signalNotFound: signal messageText ]
+		do: [ :signal | HTTPClientError notFound signal: signal messageText ]
 ]
 
 { #category : #'private - API' }
@@ -133,7 +140,7 @@ ResourceRESTfulController >> handleConflictsIn: aBlock [
 
 	^ aBlock
 		on: ConflictingObjectFound
-		do: [ :signal | HTTPClientError signalConflict: signal messageText ]
+		do: [ :signal | HTTPClientError conflict signal: signal messageText ]
 ]
 
 { #category : #'private - accessing' }
