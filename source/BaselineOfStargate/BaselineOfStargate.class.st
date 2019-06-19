@@ -37,7 +37,7 @@ BaselineOfStargate >> setUpDependencies: spec [
 
 	spec
 		baseline: 'Hyperspace'
-			with: [ spec repository: 'github://ba-st/Hyperspace:first-re/source' ];
+			with: [ spec repository: 'github://ba-st/Hyperspace:v1/source' ];
 		project: 'Hyperspace-Deployment' copyFrom: 'Hyperspace' with: [ spec loads: 'Deployment' ].
 
 	spec
