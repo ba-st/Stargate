@@ -16,7 +16,7 @@ BaselineOfStargate >> baseline: spec [
 			spec
 				group: 'CI' with: 'Tests';
 				group: 'Examples' with: #('Deployment' 'Stargate-Examples');
-				group: 'Tools' with: #('Buoy-Tools' 'Teapot-Tools');
+				group: 'Tools' with: #('Teapot-Tools');
 				group: 'Development' with: #('Tests' 'Tools')
 			].
 
