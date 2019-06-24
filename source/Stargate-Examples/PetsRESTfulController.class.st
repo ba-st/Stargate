@@ -52,9 +52,9 @@ PetsRESTfulController >> defaultPaginationLimit [
 { #category : #API }
 PetsRESTfulController >> deletePetBasedOn: anHttpRequest within: aContext [
 
-	[ pets remove: (self petIdentifiedUsing: anHttpRequest) ]
+	[ pets remove: ( self petIdentifiedUsing: anHttpRequest ) ]
 		on: ObjectNotFound
-		do: [ :signal | HTTPClientError signalNotFound ].
+		do: [ :signal | HTTPClientError notFound signal ].
 
 	^ ZnResponse noContent
 ]

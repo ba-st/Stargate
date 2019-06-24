@@ -42,7 +42,7 @@ RESTfulControllerPaginateCollectionsPolicy >> evaluateQuery: aQueryEvaluationBlo
 
 	pagination := [ self paginationFrom: anHttpRequest ]
 		on: InstanceCreationFailed
-		do: [ :error | HTTPClientError signalBadRequest: error messageText ].
+		do: [ :error | HTTPClientError badRequest signal: error messageText ].
 	^ resourceController evaluateQuery: [ aQueryEvaluationBlock cull: pagination ]
 ]
 

@@ -20,35 +20,7 @@ Class {
 	#category : #'Stargate-Model-Controllers'
 }
 
-{ #category : #'instance creation' }
-HTTPNotAcceptable class >> messageText: aMessageText accepting: allowedMediaTypes [
-
-	^ self new
-		tag: 406;
-		messageText: aMessageText;
-		allowedMediaTypes: allowedMediaTypes asArray;
-		yourself
-]
-
-{ #category : #signalling }
-HTTPNotAcceptable class >> signal: aMessageText accepting: allowedMediaTypes [
-
-	^ (self messageText: aMessageText accepting: allowedMediaTypes asArray) signal
-]
-
-{ #category : #accessing }
-HTTPNotAcceptable >> allowedMediaTypes [
-
-	^ allowedMediaTypes
-]
-
-{ #category : #accessing }
-HTTPNotAcceptable >> allowedMediaTypes: anArray [
-
-	 allowedMediaTypes := anArray
-]
-
-{ #category : #converting }
+{ #category : #'*Stargate-Model' }
 HTTPNotAcceptable >> neoJsonOn: neoJSONWriter [
 
 	(neoJSONWriter customMappingFor: ZnMimeType) encoder: [ :mediaType | mediaType asString ].
