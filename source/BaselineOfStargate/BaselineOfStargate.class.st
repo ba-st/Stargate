@@ -18,7 +18,19 @@ BaselineOfStargate >> baseline: spec [
 				group: 'Examples' with: #('Deployment' 'Stargate-Examples');
 				group: 'Tools' with: #('Buoy-Tools' 'Teapot-Tools');
 				group: 'Development' with: #('Tests' 'Tools')
-			]
+			].
+
+	spec
+		for: #'pharo6.x'
+		do: [ self initializeHTTPStatusCodes ]
+]
+
+{ #category : #'private - baselines' }
+BaselineOfStargate >> initializeHTTPStatusCodes [
+
+	"Some constants are missing, reinitialize to fix that"
+
+	^ ZnConstants initializeHTTPStatusCodes
 ]
 
 { #category : #accessing }
