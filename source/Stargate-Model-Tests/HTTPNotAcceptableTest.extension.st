@@ -1,14 +1,7 @@
-"
-A HTTPClientErrorTest is a test class for testing the behavior of HTTPClientError
-"
-Class {
-	#name : #HTTPClientErrorTest,
-	#superclass : #TestCase,
-	#category : #'Stargate-Model-Tests-Controllers'
-}
+Extension { #name : #HTTPNotAcceptableTest }
 
 { #category : #'*Stargate-Model-Tests' }
-HTTPClientErrorTest >> testNotAcceptableAsJSON [
+HTTPNotAcceptableTest >> testNotAcceptableAsJSON [
 
 	| error json |
 
