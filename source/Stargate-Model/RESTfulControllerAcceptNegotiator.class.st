@@ -64,7 +64,7 @@ RESTfulControllerAcceptNegotiator >> precedenceFor: aMediaType [
 { #category : #'private - accessing' }
 RESTfulControllerAcceptNegotiator >> sortByPrecedence: mediaTypes [
 
-	^ (mediaTypes sorted: [ :a :b | (self precedenceFor: a) < (self precedenceFor: b) ]) reversed 
+	^ mediaTypes sorted: [ :mediaType | self precedenceFor: mediaType ] descending
 ]
 
 { #category : #'private - accessing' }

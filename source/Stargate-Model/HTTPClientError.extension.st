@@ -5,6 +5,8 @@ HTTPClientError >> neoJsonOn: neoJSONWriter [
 
 	neoJSONWriter
 		writeMap:
-			{(#code -> self code).
-			(#message -> self messageText)} asDictionary
+			( Dictionary new
+				at: #code put: self code;
+				at: #message put: self messageText;
+				yourself )
 ]

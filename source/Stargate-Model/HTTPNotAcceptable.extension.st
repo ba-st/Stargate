@@ -3,10 +3,12 @@ Extension { #name : #HTTPNotAcceptable }
 { #category : #'*Stargate-Model' }
 HTTPNotAcceptable >> neoJsonOn: neoJSONWriter [
 
-	(neoJSONWriter customMappingFor: ZnMimeType) encoder: [ :mediaType | mediaType asString ].
+	( neoJSONWriter customMappingFor: ZnMimeType ) encoder: [ :mediaType | mediaType asString ].
 	neoJSONWriter
 		writeMap:
-			{(#code -> self code).
-			(#message -> self messageText).
-			(#allowedMediaTypes -> self allowedMediaTypes)} asDictionary
+			( Dictionary new
+				at: #code put: self code;
+				at: #message put: self messageText;
+				at: #allowedMediaTypes put: self allowedMediaTypes;
+				yourself )
 ]
