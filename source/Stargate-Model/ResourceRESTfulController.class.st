@@ -1,5 +1,5 @@
 "
-I represent a RESTful Web Service, and provide the base support to easily create specific services.
+I represent a RESTful Controller, and provide the base support to easily create specific services.
 
 I provide a way to encode/decode the resources into the representations produced/consumed by the service.
 I also provide standard error handling and templates for processing the different HTTP verbs.

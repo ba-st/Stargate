@@ -1,5 +1,5 @@
 "
-I represent an abstract RESTful Web Service, and provide the base support to easily create services supporting only GET methods.
+I represent an abstract RESTful Controller, and provide the base support to easily create services supporting only GET methods.
 
 I provide: 
 - A way to encode the resources into the representations produced by the service.
@@ -11,7 +11,7 @@ I provide:
 My subclasses must provide:
 - A controller specification used to gather the supported media types, and enconding rules and mappings 
 - An hypermedia policy controlling the hypermedia support
-- A pagination policy controlling wether or not paginate collections
+- A pagination policy controlling whether or not paginate collections
 - An ETag calculation methodology
 "
 Class {
