@@ -1,19 +1,29 @@
 "
-I'm an example RESTful Web Service implementing Pet resource management
+I'm an example RESTful Controller implementing Pet resource management
 "
 Class {
 	#name : #PetsRESTfulController,
-	#superclass : #ResourceRESTfulController,
+	#superclass : #SingleResourceRESTfulController,
 	#instVars : [
-		'pets',
-		'nextId',
-		'petById',
-		'updateTimestamps'
+		'petsRepository',
+		'requestHandler'
 	],
 	#category : #'Stargate-Examples'
 }
 
-{ #category : #'private - accessing' }
+{ #category : #'instance creation' }
+PetsRESTfulController class >> new [
+
+	^ self using: InMemoryPetRepository new
+]
+
+{ #category : #'instance creation' }
+PetsRESTfulController class >> using: aPetRepository [
+
+	^ self basicNew initializeUsing: aPetRepository
+]
+
+{ #category : #private }
 PetsRESTfulController >> addPaginationControlsTo: aContext basedOn: url start: start limit: limit end: end count: total [
 
 	start = 1
@@ -27,206 +37,193 @@ PetsRESTfulController >> addPaginationControlsTo: aContext basedOn: url start: s
 ]
 
 { #category : #API }
-PetsRESTfulController >> createPetBasedOn: anHttpRequest within: aContext [
+PetsRESTfulController >> createPetBasedOn: httpRequest within: requestContext [
 
-	^ self
-		withCreatedResourceDo: [ :resource | 
-			| newPet |
-
-			newPet := Pet named: resource name ofType: resource type.
-			pets add: newPet.
-			self recordIdAndUpdateTimestampFor: newPet.
-			nextId := nextId + 1.
-			newPet ]
-		decodedUsing: self specification petMappingKey
-		basedOn: anHttpRequest
-		within: aContext
+	^ requestHandler
+		createResourceWith:
+			[ :decodedRepresentation | Pet named: decodedRepresentation name ofType: decodedRepresentation type ]
+		thenDo: [ :pet | petsRepository store: pet ]
+		basedOn: httpRequest
+		within: requestContext
 ]
 
-{ #category : #'private - accessing' }
-PetsRESTfulController >> defaultPaginationLimit [
+{ #category : #routes }
+PetsRESTfulController >> createPetRoute [
 
-	^ 5
+	^ RouteSpecification
+		handling: #POST
+		at: self endpoint
+		evaluating: [ :httpRequest :requestContext | self createPetBasedOn: httpRequest within: requestContext ]
 ]
 
 { #category : #API }
-PetsRESTfulController >> deletePetBasedOn: anHttpRequest within: aContext [
+PetsRESTfulController >> deletePetBasedOn: httpRequest within: requestContext [
 
-	[ pets remove: ( self petIdentifiedUsing: anHttpRequest ) ]
-		on: ObjectNotFound
-		do: [ :signal | HTTPClientError notFound signal ].
-
-	^ ZnResponse noContent
+	^ requestHandler
+		with: [ petsRepository findIdentifiedBy: ( self identifierIn: httpRequest ) ]
+		do: [ :pet | petsRepository purge: pet ]
+		basedOn: httpRequest
+		within: requestContext
 ]
 
-{ #category : #'private - accessing' }
-PetsRESTfulController >> entityTagOf: aPet encodedAs: mediaType within: aContext [
+{ #category : #routes }
+PetsRESTfulController >> deletePetRoute [
 
-	^ ZnETag
-		with:
-			(SHA1 new
-				hashMessage:
-					('<1s>-<2s>-<3s>'
-						expandMacrosWith: (self identifierOf: aPet) asString
-						with: (self lastModificationOf: aPet) asString
-						with: mediaType asString)) hex
+	^ RouteSpecification
+		handling: #DELETE
+		at: self identifierTemplate
+		evaluating: [ :httpRequest :requestContext | self deletePetBasedOn: httpRequest within: requestContext ]
 ]
 
 { #category : #API }
-PetsRESTfulController >> getPetBasedOn: anHttpRequest within: aContext [
+PetsRESTfulController >> getPetBasedOn: httpRequest within: requestContext [
 
-	^ self
-		get: [ self petIdentifiedUsing: anHttpRequest ]
-		encodedUsing: self specification petMappingKey
-		basedOn: anHttpRequest
-		within: aContext
+	^ requestHandler
+		get: [ petsRepository findIdentifiedBy: ( self identifierIn: httpRequest ) ]
+		basedOn: httpRequest
+		within: requestContext
+]
+
+{ #category : #routes }
+PetsRESTfulController >> getPetRoute [
+
+	^ RouteSpecification
+		handling: #GET
+		at: self identifierTemplate
+		evaluating: [ :httpRequest :requestContext | self getPetBasedOn: httpRequest within: requestContext ]
 ]
 
 { #category : #API }
-PetsRESTfulController >> getPetsBasedOn: anHttpRequest within: aContext [
+PetsRESTfulController >> getPetsBasedOn: httpRequest within: requestContext [
 
-	^ self
+	^ requestHandler
 		get: [ :pagination | 
-			self pets
+			petsRepository findAll
 				ifEmpty: [ #() ]
-				ifNotEmpty: [ | start end total |
+				ifNotEmpty: [ :allPets | 
+					| start end total |
 
-					total := self pets size.
+					total := allPets size.
 					start := pagination start min: total.
 					end := pagination end min: total.
 					self
-						addPaginationControlsTo: aContext
-						basedOn: anHttpRequest absoluteUrl
+						addPaginationControlsTo: requestContext
+						basedOn: httpRequest absoluteUrl
 						start: start
 						limit: pagination limit
 						end: end
 						count: total.
-					self pets copyFrom: start to: end ] ]
-		asCollectionEncodedUsing: self specification petsMappingKey
-		basedOn: anHttpRequest
-		within: aContext
+					allPets copyFrom: start to: end
+					]
+			]
+		asCollectionBasedOn: httpRequest
+		within: requestContext
 ]
 
-{ #category : #'private - accessing' }
-PetsRESTfulController >> identifierOf: aPet [
+{ #category : #routes }
+PetsRESTfulController >> getPetsRoute [
 
-	^ petById keyAtValue: aPet
+	^ RouteSpecification
+		handling: #GET
+		at: self endpoint
+		evaluating: [ :httpRequest :requestContext | self getPetsBasedOn: httpRequest within: requestContext ]
 ]
 
 { #category : #initialization }
-PetsRESTfulController >> initialize [
+PetsRESTfulController >> initializeProcessor [
 
-	super initialize.
-	pets := OrderedCollection new.
-	petById := IdentityDictionary new.
-	updateTimestamps := IdentityDictionary new.
-	nextId := 1 
+	requestHandler := RESTfulRequestHandlerBuilder new
+		endpoint: 'pets';
+		calculateLocationUsing: [ :pet :requestContext | petsRepository identifierOf: pet ];
+		beHypermediaDriven;
+		paginateCollectionsWithDefaultLimit: 5;
+		decodeToNeoJSONObject: self petVersion1dot0dot0MediaType;
+		encodeTo: self petVersion1dot0dot0MediaType
+			jsonUsing: [ :resource :requestContext :writer | 
+			writer
+				for: Pet
+				do: [ :mapping | 
+					mapping
+						mapInstVars;
+						mapAsHypermediaControls: [ :pet | requestContext hypermediaControlsFor: pet ]
+					]
+			];
+		encodeTo: self petSummaryVersion1dot0dot0MediaType
+			jsonUsing: [ :resource :requestContext :writer | 
+			writer
+				for: Pet
+				do: [ :mapping | 
+					mapping
+						mapInstVar: #name;
+						mapAsHypermediaControls: [ :pet | requestContext hypermediaControlsFor: pet ]
+					]
+			];
+		createEntityTagHashing: [ :pet :requestContext | 
+			{( petsRepository identifierOf: pet ).
+			( petsRepository lastModificationOf: pet )}
+			];
+		build
 ]
 
-{ #category : #'private - accessing' }
-PetsRESTfulController >> lastModificationOf: aPet [
+{ #category : #initialization }
+PetsRESTfulController >> initializeUsing: aPetRepository [
 
-	^ updateTimestamps at: (self identifierOf: aPet)
+	petsRepository := aPetRepository.
+	self initializeProcessor
 ]
 
-{ #category : #'private - accessing' }
-PetsRESTfulController >> locationOf: aPet within: aContext [
+{ #category : #'accessing - media types' }
+PetsRESTfulController >> petSummaryVersion1dot0dot0MediaType [
 
-	| baseUrl |
-
-	baseUrl := '' asZnUrl.
-	baseUrlOptional withContentDo: [ :theBaseUrl | baseUrl := theBaseUrl ].
-
-	^ baseUrl / self specification endpoint asZnUrl / (self identifierOf: aPet) printString asZnUrl
+	^ self jsonMediaType: 'pet.summary' vendoredBy: 'stargate' version: '1.0.0'
 ]
 
-{ #category : #'private - accessing' }
-PetsRESTfulController >> petIdentifiedUsing: anHttpRequest [
+{ #category : #'accessing - media types' }
+PetsRESTfulController >> petVersion1dot0dot0MediaType [
 
-	^ petById at: (anHttpRequest at: #identifier) ifAbsent: [ ObjectNotFound signal ]
+	^ self jsonMediaType: 'pet' vendoredBy: 'stargate' version: '1.0.0'
 ]
 
-{ #category : #querying }
-PetsRESTfulController >> pets [
+{ #category : #private }
+PetsRESTfulController >> requestHandler [
 
-	^ pets
+	^ requestHandler
 ]
 
-{ #category : #'private - accessing' }
-PetsRESTfulController >> provideHypermediaPolicy [
+{ #category : #private }
+PetsRESTfulController >> typeIdConstraint [
 
-	^ HypermediaDrivenRESTfulControllerPolicy for: self
-]
-
-{ #category : #'private - accessing' }
-PetsRESTfulController >> providePaginationPolicy [
-
-	^ RESTfulControllerPaginateCollectionsPolicy for: self with: self defaultPaginationLimit
-]
-
-{ #category : #'private - accessing' }
-PetsRESTfulController >> provideResourceCreationPolicy [
-
-	^ RESTfulControllerRespondCreatedEntityPolicy for: self
-]
-
-{ #category : #'private - state management' }
-PetsRESTfulController >> recordIdAndUpdateTimestampFor: newPet [
-
-	petById at: nextId put: newPet.
-	"I will simulate a timestamp using a fixed version revision,
-	because for the tests it's easier that using the current datetime"
-	updateTimestamps at: nextId put: 1
-]
-
-{ #category : #accessing }
-PetsRESTfulController >> specification [
-
-	^ PetsRESTfulControllerSpecification new
-]
-
-{ #category : #'private - state management' }
-PetsRESTfulController >> updatePet: pet with: resource [
-
-	pet
-		synchronizeWith:
-			(Pet
-				named: (resource at: #name ifAbsent: [ pet name ])
-				ofType: (resource at: #type ifAbsent: [ pet type ])
-				withStatus: (resource at: #status ifAbsent: [ pet status ])).
-	updateTimestamps at: (self identifierOf: pet) put: (updateTimestamps at: (self identifierOf: pet)) + 1
+	^ IsInteger
 ]
 
 { #category : #API }
-PetsRESTfulController >> updatePetBasedOn: anHttpRequest within: aContext [
+PetsRESTfulController >> updatePetBasedOn: httpRequest within: requestContext [
 
-	| etag |
-
-	etag := self entityTagToMatchBasedOn: anHttpRequest.
-
-	^ self
-		get: [ | resource pet |
-
-			pet := self petIdentifiedUsing: anHttpRequest.
-			self
-				assert: etag
-				matchesEntityTagOf: pet
-				encodedAs: anHttpRequest contentType
-				within: aContext.
-			resource := self
-				decode: anHttpRequest contents
-				at: self specification petMappingKey
-				from: anHttpRequest contentType
-				within: aContext.
-			self updatePet: pet with: resource.
-			pet
+	^ requestHandler
+		update: [ petsRepository findIdentifiedBy: ( self identifierIn: httpRequest ) ]
+		with: [ :pet :decoded | 
+			petsRepository
+				update: pet
+				with:
+					( Pet
+						named: ( decoded at: #name ifAbsent: [ pet name ] )
+						ofType: ( decoded at: #type ifAbsent: [ pet type ] )
+						withStatus: ( decoded at: #status ifAbsent: [ pet status ] ) )
 			]
-		encodedUsing: self specification petMappingKey
-		basedOn: anHttpRequest
-		within: aContext
+		basedOn: httpRequest
+		within: requestContext
 ]
 
-{ #category : #'private - accessing' }
+{ #category : #routes }
+PetsRESTfulController >> updatePetRoute [
+
+	^ RouteSpecification
+		handling: #PATCH
+		at: self identifierTemplate
+		evaluating: [ :httpRequest :requestContext | self updatePetBasedOn: httpRequest within: requestContext ]
+]
+
+{ #category : #private }
 PetsRESTfulController >> urlFrom: url startingAt: start limitedTo: limit [
 
 	^ url copy

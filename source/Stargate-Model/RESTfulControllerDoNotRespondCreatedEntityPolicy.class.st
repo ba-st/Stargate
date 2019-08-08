@@ -5,25 +5,25 @@ Class {
 	#name : #RESTfulControllerDoNotRespondCreatedEntityPolicy,
 	#superclass : #RESTfulControllerResourceCreationPolicy,
 	#instVars : [
-		'resourceController'
+		'requestHandler'
 	],
 	#category : #'Stargate-Model-Controllers'
 }
 
 { #category : #'instance creation' }
-RESTfulControllerDoNotRespondCreatedEntityPolicy class >> for: aResourceController [
+RESTfulControllerDoNotRespondCreatedEntityPolicy class >> for: aRequestHandler [
 
-	^ self new initializeFor: aResourceController
+	^ self new initializeFor: aRequestHandler
 ]
 
 { #category : #initialization }
-RESTfulControllerDoNotRespondCreatedEntityPolicy >> initializeFor: aResourceController [
+RESTfulControllerDoNotRespondCreatedEntityPolicy >> initializeFor: aRequestHandler [
 
-	resourceController := aResourceController
+	requestHandler := aRequestHandler
 ]
 
 { #category : #processing }
-RESTfulControllerDoNotRespondCreatedEntityPolicy >> responseFor: aResource decodedUsing: aKey basedOn: anHttpRequest within: aContext [
+RESTfulControllerDoNotRespondCreatedEntityPolicy >> responseFor: resource basedOn: httpRequest within: requestContext [
 
-	^ ZnResponse created: ( resourceController locationOf: aResource within: aContext )
+	^ ZnResponse created: ( requestHandler locationOf: resource within: requestContext )
 ]

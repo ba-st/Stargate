@@ -19,16 +19,6 @@ RouteSpecification class >> handling: anHttpMethod at: anUrlTemplate evaluating:
 	^ self new initializeHandling: anHttpMethod at: anUrlTemplate evaluating: aBlock
 ]
 
-{ #category : #'instance creation' }
-RouteSpecification class >> handling: anHttpMethod at: aUrlTemplate sending: aMessage [
-
-	^ self
-		handling: anHttpMethod
-		at: aUrlTemplate
-		evaluating:
-			[ :service :httpRequest :context | service perform: aMessage with: httpRequest with: context ]
-]
-
 { #category : #decorating }
 RouteSpecification >> asCorsAware [
 	

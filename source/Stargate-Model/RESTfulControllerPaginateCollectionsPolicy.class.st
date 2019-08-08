@@ -5,28 +5,28 @@ Class {
 	#name : #RESTfulControllerPaginateCollectionsPolicy,
 	#superclass : #RESTfulControllerPaginationPolicy,
 	#instVars : [
-		'resourceController',
-		'defaultLimit'
+		'defaultLimit',
+		'requestHandler'
 	],
 	#category : #'Stargate-Model-Pagination'
 }
 
 { #category : #'instance creation' }
-RESTfulControllerPaginateCollectionsPolicy class >> for: aResourceController with: aPaginationLimit [
+RESTfulControllerPaginateCollectionsPolicy class >> for: aRequestHandler with: aPaginationLimit [
 
-	^ self new initializeFor: aResourceController with: aPaginationLimit
+	^ self new initializeFor: aRequestHandler with: aPaginationLimit
 ]
 
 { #category : #applying }
-RESTfulControllerPaginateCollectionsPolicy >> addPaginationControlsTo: mediaControls within: aContext [
+RESTfulControllerPaginateCollectionsPolicy >> addPaginationControlsTo: mediaControls within: requestContext [
 
-	^ mediaControls , aContext paginationControls
+	^ mediaControls , requestContext paginationControls
 ]
 
 { #category : #applying }
-RESTfulControllerPaginateCollectionsPolicy >> affect: response within: aContext [
+RESTfulControllerPaginateCollectionsPolicy >> affect: response within: requestContext [
 
-	aContext paginationControls
+	requestContext paginationControls
 		do: [ :assoc | 
 			response
 				addLink:
@@ -36,20 +36,20 @@ RESTfulControllerPaginateCollectionsPolicy >> affect: response within: aContext 
 ]
 
 { #category : #applying }
-RESTfulControllerPaginateCollectionsPolicy >> evaluateQuery: aQueryEvaluationBlock basedOn: anHttpRequest [
+RESTfulControllerPaginateCollectionsPolicy >> evaluateQuery: aQueryEvaluationBlock basedOn: httpRequest [
 
 	| pagination |
 
-	pagination := [ self paginationFrom: anHttpRequest ]
+	pagination := [ self paginationFrom: httpRequest ]
 		on: InstanceCreationFailed
 		do: [ :error | HTTPClientError badRequest signal: error messageText ].
-	^ resourceController evaluateQuery: [ aQueryEvaluationBlock cull: pagination ]
+	^ requestHandler evaluateQuery: [ aQueryEvaluationBlock cull: pagination ]
 ]
 
 { #category : #initialization }
-RESTfulControllerPaginateCollectionsPolicy >> initializeFor: aResourceController with: aPaginationLimit [
+RESTfulControllerPaginateCollectionsPolicy >> initializeFor: aRequestHandler with: aPaginationLimit [
 
-	resourceController := aResourceController.
+	requestHandler := aRequestHandler.
 	defaultLimit := aPaginationLimit
 ]
 

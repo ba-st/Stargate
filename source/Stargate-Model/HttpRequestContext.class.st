@@ -28,24 +28,14 @@ HttpRequestContext >> hold: anObject under: aConcept [
 ]
 
 { #category : #hypermedia }
-HttpRequestContext >> holdAsHypermediaControls: aControlCollection [
+HttpRequestContext >> holdAsHypermediaControls: aControlCollection for: aResource [
 
-	self hold: aControlCollection under: #hypermediaControls
-]
+	| resourcesHypermediaControls |
 
-{ #category : #hypermedia }
-HttpRequestContext >> holdAsHypermediaControls: aControlCollection forSubresource: aResource [
-
-	| subResourcesHypermediaControls |
-
-	subResourcesHypermediaControls := self objectUnder: #subResourceHypermediaControls ifNone: [ self hold: IdentityDictionary new under: #subResourceHypermediaControls ].
-	subResourcesHypermediaControls at: aResource put: aControlCollection
-]
-
-{ #category : #hypermedia }
-HttpRequestContext >> hypermediaControls [
-
-	^ self objectUnder: #hypermediaControls ifNone: [ #() ]
+	resourcesHypermediaControls := self
+		objectUnder: #resourceHypermediaControls
+		ifNone: [ self hold: IdentityDictionary new under: #resourceHypermediaControls ].
+	resourcesHypermediaControls at: aResource put: aControlCollection
 ]
 
 { #category : #hypermedia }
@@ -53,7 +43,7 @@ HttpRequestContext >> hypermediaControlsFor: aResource [
 
 	| hypermediaControls |
 
-	hypermediaControls := self objectUnder: #subResourceHypermediaControls ifNone: [ ^ #() ].
+	hypermediaControls := self objectUnder: #resourceHypermediaControls ifNone: [ ^ #() ].
 	^ hypermediaControls at: aResource ifAbsent: [ #() ]
 ]
 

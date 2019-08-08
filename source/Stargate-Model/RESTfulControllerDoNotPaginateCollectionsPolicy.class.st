@@ -17,17 +17,17 @@ RESTfulControllerDoNotPaginateCollectionsPolicy class >> for: aResourceControlle
 ]
 
 { #category : #applying }
-RESTfulControllerDoNotPaginateCollectionsPolicy >> addPaginationControlsTo: mediaControls within: aContext [
+RESTfulControllerDoNotPaginateCollectionsPolicy >> addPaginationControlsTo: mediaControls within: requestContext [
 
 	^ mediaControls 
 ]
 
 { #category : #applying }
-RESTfulControllerDoNotPaginateCollectionsPolicy >> affect: response within: aContext [
+RESTfulControllerDoNotPaginateCollectionsPolicy >> affect: response within: requestContext [
 ]
 
 { #category : #applying }
-RESTfulControllerDoNotPaginateCollectionsPolicy >> evaluateQuery: aQueryEvaluationBlock basedOn: anHttpRequest [
+RESTfulControllerDoNotPaginateCollectionsPolicy >> evaluateQuery: aQueryEvaluationBlock basedOn: httpRequest [
 
 	^ resourceController evaluateQuery: aQueryEvaluationBlock
 ]

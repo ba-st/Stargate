@@ -1,203 +1,200 @@
 "
-I'm an example RESTful Web Service implementing Pet Order resource management
+I'm an example RESTful Controller implementing Pet Order resource management
 "
 Class {
 	#name : #PetOrdersRESTfulController,
-	#superclass : #ResourceRESTfulController,
+	#superclass : #SingleResourceRESTfulController,
 	#instVars : [
-		'orders',
-		'nextId',
-		'orderById',
-		'orderStatus',
-		'updateTimestamps'
+		'ordersRepository',
+		'requestHandler'
 	],
 	#category : #'Stargate-Examples'
 }
 
-{ #category : #API }
-PetOrdersRESTfulController >> cancelOrderBasedOn: anHttpRequest within: aContext [
+{ #category : #'instance creation' }
+PetOrdersRESTfulController class >> new [
 
-	^ self updateOrderStatusBasedOn: anHttpRequest within: aContext with: [ self updateOrderStatusAt: (self identifierIn: anHttpRequest) to: 'canceled' ]
+	^ self using: InMemoryPetOrderRepository  new
+]
+
+{ #category : #'instance creation' }
+PetOrdersRESTfulController class >> using: aRepository [
+
+	^ self basicNew initializeUsing: aRepository
 ]
 
 { #category : #API }
-PetOrdersRESTfulController >> completeOrderBasedOn: anHttpRequest within: aContext [
+PetOrdersRESTfulController >> cancelOrderBasedOn: httpRequest within: requestContext [
 
-	^ self updateOrderStatusBasedOn: anHttpRequest within: aContext with: [ self updateOrderStatusToCompletedBasedOn: anHttpRequest ]
+	^ requestHandler
+		with: [ ordersRepository findIdentifiedBy: ( self identifierIn: httpRequest ) ]
+		do: [ :order | ordersRepository updateStatusOf: order to: 'canceled' ]
+		basedOn: httpRequest
+		within: requestContext
+]
+
+{ #category : #routes }
+PetOrdersRESTfulController >> cancelOrderRoute [
+
+	^ RouteSpecification
+		handling: #POST
+		at: self cancelTemplate
+		evaluating: [ :httpRequest :requestContext | self cancelOrderBasedOn: httpRequest within: requestContext ]
+]
+
+{ #category : #private }
+PetOrdersRESTfulController >> cancelTemplate [
+
+	^ '<1s>/cancel' expandMacrosWith: self identifierTemplate
+]
+
+{ #category : #API }
+PetOrdersRESTfulController >> completeOrderBasedOn: httpRequest within: requestContext [
+
+	^ requestHandler
+		with: [ ordersRepository findIdentifiedBy: ( self identifierIn: httpRequest ) ]
+		do: [ :order | ordersRepository updateStatusOf: order to: 'completed' ]
+		basedOn: httpRequest
+		within: requestContext
+]
+
+{ #category : #routes }
+PetOrdersRESTfulController >> completeOrderRoute [
+
+	^ RouteSpecification
+		handling: #POST
+		at: self completeTemplate
+		evaluating: [ :httpRequest :requestContext | self completeOrderBasedOn: httpRequest within: requestContext ]
+]
+
+{ #category : #private }
+PetOrdersRESTfulController >> completeTemplate [
+
+	^ '<1s>/complete' expandMacrosWith: self identifierTemplate
 ]
 
 { #category : #API }
 PetOrdersRESTfulController >> createOrderBasedOn: anHttpRequest within: aContext [
 
-	^ self
+	^ requestHandler
 		withCreatedResourceDo: [ :order | 
-			orders add: order.
-			self recordIdAndUpdateTimestampFor: order.
-			nextId := nextId + 1.
-			order ]
-		decodedUsing: self specification orderMappingKey
+			ordersRepository store: order.
+			aContext hold: ( ordersRepository statusOf: order ) under: #status.
+			order
+			]
 		basedOn: anHttpRequest
 		within: aContext
 ]
 
-{ #category : #'private - accessing' }
-PetOrdersRESTfulController >> entityTagOf: aPetOrder encodedAs: mediaType within: aContext [
+{ #category : #routes }
+PetOrdersRESTfulController >> createOrderRoute [
 
-	^ ZnETag
-		with:
-			(SHA1 new
-				hashMessage:
-					('<1s>-<2s>-<3s>'
-						expandMacrosWith: (self identifierOf: aPetOrder) asString
-						with: (self lastModificationOf: aPetOrder) asString
-						with: mediaType asString)) hex
+	^ RouteSpecification
+		handling: #POST
+		at: self endpoint
+		evaluating: [ :httpRequest :requestContext | self createOrderBasedOn: httpRequest within: requestContext ]
 ]
 
 { #category : #API }
-PetOrdersRESTfulController >> getOrderBasedOn: anHttpRequest within: aContext [
+PetOrdersRESTfulController >> getOrderBasedOn: httpRequest within: requestContext [
 
-	^ self
-		get: [ aContext hold: (orderStatus at: (self identifierIn: anHttpRequest)) under: #status.
-			self orderIdentifiedUsing: anHttpRequest ]
-		encodedUsing: self specification orderMappingKey
-		basedOn: anHttpRequest
-		within: aContext
+	^ requestHandler
+		get: [ 
+			| order |
+			order := ordersRepository findIdentifiedBy: ( self identifierIn: httpRequest ).
+			requestContext hold: ( ordersRepository statusOf: order ) under: #status.
+			order
+			]
+		basedOn: httpRequest
+		within: requestContext
 ]
 
-{ #category : #'private - accessing' }
-PetOrdersRESTfulController >> identifierIn: anHttpRequest [
+{ #category : #routes }
+PetOrdersRESTfulController >> getOrderRoute [
 
-	^ anHttpRequest at: #identifier
-]
-
-{ #category : #'private - accessing' }
-PetOrdersRESTfulController >> identifierOf: aPetOrder [
-
-	^ orderById keyAtValue: aPetOrder
+	^ RouteSpecification
+		handling: #GET
+		at: self identifierTemplate
+		evaluating: [ :httpRequest :requestContext | self getOrderBasedOn: httpRequest within: requestContext ]
 ]
 
 { #category : #initialization }
-PetOrdersRESTfulController >> initialize [
+PetOrdersRESTfulController >> initializeProcessor [
 
-	super initialize.
-	orders := OrderedCollection new.
-	orderById := IdentityDictionary new.
-	orderStatus := IdentityDictionary new.
-	updateTimestamps := IdentityDictionary new.
-	nextId := 1
+	requestHandler := RESTfulRequestHandlerBuilder new
+		endpoint: 'orders';
+		calculateLocationUsing: [ :order :requestContext | ordersRepository identifierOf: order ];
+		beHypermediaDrivenBy: [ :order :requestContext :orderLocation | self mediaControlsFor: order locatedAt: orderLocation ];
+		decodeFrom: self orderVersion1dot0dot0MediaType
+			jsonUsing: [ :json :reader | 
+			reader
+				for: PetOrder
+					do: [ :mapping | 
+					mapping
+						mapInstVar: #date;
+						mapProperty: #pet setter: [ :order :url | order instVarNamed: 'pet' put: url asUrl ]
+					];
+				nextAs: PetOrder
+			];
+		encodeTo: self orderVersion1dot0dot0MediaType
+			jsonUsing: [ :resource :requestContext :writer | 
+			writer
+				for: ZnUrl customDo: [ :mapping | mapping encoder: [ :url | url printString ] ];
+				for: PetOrder
+					do: [ :mapping | 
+					mapping
+						mapInstVars;
+						mapProperty: #status getter: [ :object | requestContext objectUnder: #status ];
+						mapAsHypermediaControls: [ :pet | requestContext hypermediaControlsFor: pet ]
+					]
+			];
+		createEntityTagHashing: [ :order :requestContext | 
+			{( ordersRepository identifierOf: order ).
+			( ordersRepository lastModificationOf: order )}
+			];
+		build
 ]
 
-{ #category : #'private - accessing' }
-PetOrdersRESTfulController >> lastModificationOf: aPetOrder [
+{ #category : #initialization }
+PetOrdersRESTfulController >> initializeUsing: aPetRepository [
 
-	^ updateTimestamps at: (self identifierOf: aPetOrder)
+	ordersRepository := aPetRepository.
+	self initializeProcessor
 ]
 
-{ #category : #'private - accessing' }
-PetOrdersRESTfulController >> locationOf: aPetOrder within: aContext [
-
-	| baseUrl |
-
-	baseUrl := '' asZnUrl.
-	baseUrlOptional withContentDo: [ :theBaseUrl | baseUrl := theBaseUrl ].
-
-	^ baseUrl / self specification endpoint asZnUrl / (self identifierOf: aPetOrder) printString asZnUrl
-]
-
-{ #category : #'private - accessing' }
-PetOrdersRESTfulController >> mediaControlsFor: order within: aContext [
+{ #category : #initialization }
+PetOrdersRESTfulController >> mediaControlsFor: order locatedAt: location [
 
 	| status |
 
-	status := orderStatus at: ( orderById keyAtValue: order ).	
+	status := ordersRepository statusOf: order.
 	"In the real life you don't do a case. This is a toy example"
 	status = 'registered'
-		ifTrue: [ ^ ( super mediaControlsFor: order within: aContext )
-				,
-					{( 'cancel' -> ( ( self locationOf: order within: aContext ) / 'cancel' asUrl ) ).
-					( 'complete' -> ( ( self locationOf: order within: aContext ) / 'complete' asUrl ) )}
+		ifTrue: [ 
+			^ Array
+				with: 'cancel' -> ( location / 'cancel' asUrl )
+				with: 'complete' -> ( location / 'complete' asUrl )
 			].
 	status = 'completed'
-		ifTrue: [ ^ ( super mediaControlsFor: order within: aContext )
-				, {( 'cancel' -> ( ( self locationOf: order within: aContext ) / 'cancel' asUrl ) )}
-			].
-	^ super mediaControlsFor: order within: aContext
+		ifTrue: [ ^ Array with: 'cancel' -> ( location / 'cancel' asUrl ) ].
+		
+	^ #()
 ]
 
-{ #category : #'private - accessing' }
-PetOrdersRESTfulController >> orderIdentifiedUsing: anHttpRequest [
+{ #category : #private }
+PetOrdersRESTfulController >> orderVersion1dot0dot0MediaType [
 
-	^ orderById at: (self identifierIn: anHttpRequest) ifAbsent: [ ObjectNotFound signal ]
+	^ self jsonMediaType: 'order' vendoredBy: 'stargate' version: '1.0.0'
 ]
 
-{ #category : #accessing }
-PetOrdersRESTfulController >> orders [
+{ #category : #private }
+PetOrdersRESTfulController >> requestHandler [
 
-	^ orders
+	^ requestHandler
 ]
 
-{ #category : #'private - accessing' }
-PetOrdersRESTfulController >> provideHypermediaPolicy [
+{ #category : #private }
+PetOrdersRESTfulController >> typeIdConstraint [
 
-	^ HypermediaDrivenRESTfulControllerPolicy for: self
-]
-
-{ #category : #'private - accessing' }
-PetOrdersRESTfulController >> providePaginationPolicy [
-
-	^ RESTfulControllerDoNotPaginateCollectionsPolicy for: self
-]
-
-{ #category : #'private - accessing' }
-PetOrdersRESTfulController >> provideResourceCreationPolicy [
-
-	^ RESTfulControllerDoNotRespondCreatedEntityPolicy for: self
-]
-
-{ #category : #'private - API' }
-PetOrdersRESTfulController >> recordIdAndUpdateTimestampFor: order [
-
-	orderById at: nextId put: order.
-	orderStatus at: nextId put: 'registered'.
-	"I will simulate a timestamp using a fixed version revision,
-	because for the tests it's easier that using the current datetime"
-	updateTimestamps at: nextId put: 1
-]
-
-{ #category : #specification }
-PetOrdersRESTfulController >> specification [
-
-	^ PetOrdersRESTfulControllerSpecification new
-]
-
-{ #category : #'private - API' }
-PetOrdersRESTfulController >> updateOrderStatusAt: id to: aTargetStatus [
-
-	orderStatus at: id put: aTargetStatus.
-	updateTimestamps at: id put: (updateTimestamps at: id) + 1
-]
-
-{ #category : #API }
-PetOrdersRESTfulController >> updateOrderStatusBasedOn: anHttpRequest within: aContext with: anUpdateBlock [
-
-	| response |
-
-	self handleConflictsIn: anUpdateBlock.
-	response := ZnResponse noContent.
-	self
-		putEntityTagOf: ( self orderIdentifiedUsing: anHttpRequest )
-		encodedAs: self specification orderVersion1dot0dot0MediaType
-		in: response
-		within: aContext.
-	^ response
-]
-
-{ #category : #'private - API' }
-PetOrdersRESTfulController >> updateOrderStatusToCompletedBasedOn: anHttpRequest [
-
-	| orderId |
-
-	orderId := self identifierIn: anHttpRequest.
-	AssertionChecker enforce: [ (orderStatus at: orderId) = 'registered' ] because: 'Non pending orders cannot be completed.' raising: ConflictingObjectFound.
-	self updateOrderStatusAt: orderId to: 'completed'
+	^ IsInteger
 ]

@@ -38,22 +38,19 @@ RouteConfigurator >> configureCorsAwareRouteFrom: aCorsAwareRouteSpecification [
 { #category : #configuring }
 RouteConfigurator >> configureCrossOriginSharingRoutes [
 
-	routesAllowingCors keys
-		do: [ :resourceLocation | 
-			teapot
-				OPTIONS:
-					resourceLocation
-						-> (CrossOriginResourceSharingPreflightHandler allowing: (routesAllowingCors at: resourceLocation)) ]
+	routesAllowingCors
+		keysAndValuesDo:
+			[ :location :httpMethods | teapot OPTIONS: location -> ( CrossOriginResourceSharingPreflightHandler allowing: httpMethods ) ]
 ]
 
 { #category : #'private - configuring' }
 RouteConfigurator >> configureRouteFrom: aRouteSpecification [
 
 	teapot
-		perform: ('<1s>:' expandMacrosWith: aRouteSpecification httpMethod) asSymbol
+		perform: ( '<1s>:' expandMacrosWith: aRouteSpecification httpMethod ) asSymbol
 		with:
 			aRouteSpecification urlTemplate
-				-> [ :request | aRouteSpecification handler value: resourceController value: request value: HttpRequestContext new ]
+				-> [ :request | aRouteSpecification handler value: request value: HttpRequestContext new ]
 ]
 
 { #category : #initialization }
