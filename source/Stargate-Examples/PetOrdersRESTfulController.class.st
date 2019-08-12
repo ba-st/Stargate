@@ -162,7 +162,7 @@ PetOrdersRESTfulController >> getOrderRoute [
 ]
 
 { #category : #initialization }
-PetOrdersRESTfulController >> initializeProcessor [
+PetOrdersRESTfulController >> initializeRequestHandler [
 
 	requestHandler := RESTfulRequestHandlerBuilder new
 		endpoint: 'orders';
@@ -185,7 +185,7 @@ PetOrdersRESTfulController >> initializeProcessor [
 PetOrdersRESTfulController >> initializeUsing: aPetRepository [
 
 	ordersRepository := aPetRepository.
-	self initializeProcessor
+	self initializeRequestHandler
 ]
 
 { #category : #private }

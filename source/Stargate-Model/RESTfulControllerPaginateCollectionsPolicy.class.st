@@ -54,9 +54,9 @@ RESTfulControllerPaginateCollectionsPolicy >> initializeFor: aRequestHandler wit
 ]
 
 { #category : #private }
-RESTfulControllerPaginateCollectionsPolicy >> paginationFrom: anHttpRequest [
+RESTfulControllerPaginateCollectionsPolicy >> paginationFrom: httpRequest [
 
 	^ PaginationSpecification
-		startingAt: (IsInteger parseString: (anHttpRequest at: #start ifAbsent: [ 1 ]))
-		limitedTo: (IsInteger parseString: (anHttpRequest at: #limit ifAbsent: [ defaultLimit ]))
+		startingAt: (IsInteger parseString: (httpRequest at: #start ifAbsent: [ 1 ]))
+		limitedTo: (IsInteger parseString: (httpRequest at: #limit ifAbsent: [ defaultLimit ]))
 ]

@@ -158,7 +158,7 @@ PetsRESTfulController >> getPetsRoute [
 ]
 
 { #category : #initialization }
-PetsRESTfulController >> initializeProcessor [
+PetsRESTfulController >> initializeRequestHandler [
 
 	requestHandler := RESTfulRequestHandlerBuilder new
 		endpoint: 'pets';
@@ -182,7 +182,7 @@ PetsRESTfulController >> initializeProcessor [
 PetsRESTfulController >> initializeUsing: aPetRepository [
 
 	petsRepository := aPetRepository.
-	self initializeProcessor
+	self initializeRequestHandler
 ]
 
 { #category : #'accessing - media types' }

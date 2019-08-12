@@ -32,23 +32,23 @@ HttpRequestContext >> hold: anObject under: aConcept [
 ]
 
 { #category : #hypermedia }
-HttpRequestContext >> holdAsHypermediaControls: aControlCollection for: aResource [
+HttpRequestContext >> holdAsHypermediaControls: aControlCollection for: resource [
 
 	| resourcesHypermediaControls |
 
 	resourcesHypermediaControls := self
 		objectUnder: #resourceHypermediaControls
 		ifNone: [ self hold: IdentityDictionary new under: #resourceHypermediaControls ].
-	resourcesHypermediaControls at: aResource put: aControlCollection
+	resourcesHypermediaControls at: resource put: aControlCollection
 ]
 
 { #category : #hypermedia }
-HttpRequestContext >> hypermediaControlsFor: aResource [
+HttpRequestContext >> hypermediaControlsFor: resource [
 
 	| hypermediaControls |
 
 	hypermediaControls := self objectUnder: #resourceHypermediaControls ifNone: [ ^ #() ].
-	^ hypermediaControls at: aResource ifAbsent: [ #() ]
+	^ hypermediaControls at: resource ifAbsent: [ #() ]
 ]
 
 { #category : #initialization }

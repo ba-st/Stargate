@@ -13,7 +13,7 @@ Class {
 { #category : #'private - support' }
 PetOrdersRESTfulControllerTest >> baseUrl [
 
-	^ 'https://petstore.example.com' asZnUrl 
+	^ 'https://petstore.example.com' asUrl
 ]
 
 { #category : #'private - support' }
@@ -31,12 +31,18 @@ PetOrdersRESTfulControllerTest >> getFirstOrderAndWithJsonDo: aBlock [
 
 	| response |
 
-	response := resourceController getOrderBasedOn: (self requestToGetResourceIdentifiedBy: 1 accepting: resourceController   orderVersion1dot0dot0MediaType) within: self newHttpRequestContext.
+	response := resourceController
+		getOrderBasedOn:
+			( self
+				requestToGetResourceIdentifiedBy: 1
+				accepting: resourceController orderVersion1dot0dot0MediaType )
+		within: self newHttpRequestContext.
 
 	self
 		assert: response isSuccess;
 		assert: response status equals: 200;
-		assert: response contentType asMediaType equals: resourceController   orderVersion1dot0dot0MediaType;
+		assert: response contentType asMediaType
+			equals: resourceController orderVersion1dot0dot0MediaType;
 		withJsonFromContentsIn: response do: aBlock
 ]
 
