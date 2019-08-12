@@ -160,12 +160,14 @@ PetStoreAPITest >> testCreatePet [
 			( ZnEntity
 				with: '{"name":"Firulais","type":"dog"}'
 				ofType: petsController petVersion1dot0dot0MediaType );
+		setAccept: petsController petVersion1dot0dot0MediaType;
 		post;
 		response.
 
 	self
 		assert: response isCreated;
-		assert: response location equals: 'http://localhost:9999/pets/1'.
+		assert: response location equals: 'http://localhost:9999/pets/1';
+		assert: response contentType equals: petsController petVersion1dot0dot0MediaType.
 
 	json := NeoJSONObject fromString: response contents.
 	self

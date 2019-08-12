@@ -11,6 +11,12 @@ Class {
 }
 
 { #category : #'private - support' }
+PetsRESTfulControllerTest >> assert: anObject equals: aSecondObject or: aThirdObject [
+
+	self assert: ( anObject = aSecondObject or: [ anObject = aThirdObject ] )
+]
+
+{ #category : #'private - support' }
 PetsRESTfulControllerTest >> baseUrl [
 
 	^ 'https://pets.example.com' asZnUrl 
@@ -329,7 +335,9 @@ PetsRESTfulControllerTest >> testGetPetJustCreatedWhenNoAcceptHeaderPresentInReq
 	self
 		assert: response isSuccess;
 		assert: response status equals: 200;
-		assert: response contentType asMediaType equals: self defaultPetMediaType;
+		assert: response contentType asMediaType
+			equals: self defaultPetMediaType
+			or: resourceController petSummaryVersion1dot0dot0MediaType;
 		assert: response entityTag equals: '"c051344b8c92c5ed8a2bd0752070c35ed3de3bab"' asETag.
 
 	self
@@ -337,8 +345,6 @@ PetsRESTfulControllerTest >> testGetPetJustCreatedWhenNoAcceptHeaderPresentInReq
 		do: [ :json | 
 			self
 				assert: json name equals: 'Firulais';
-				assert: json type equals: 'dog';
-				assert: json status equals: 'new';
 				assertUrl: json links self equals: 'https://pets.example.com/pets/1'
 			]
 ]
@@ -514,11 +520,12 @@ PetsRESTfulControllerTest >> testGetPetsWithPagination [
 { #category : #'tests - creation' }
 PetsRESTfulControllerTest >> testPetCreation [
 
-	| response |
+	| response request |
 
-	response := resourceController
-		createPetBasedOn: ( self requestToCreatePetFrom: '{"name":"Firulais","type":"dog"}' )
-		within: self newHttpRequestContext.
+	request := self requestToCreatePetFrom: '{"name":"Firulais","type":"dog"}'.
+	request setAccept: resourceController petVersion1dot0dot0MediaType.
+
+	response := resourceController createPetBasedOn: request within: self newHttpRequestContext.
 
 	self
 		assert: response isSuccess;
