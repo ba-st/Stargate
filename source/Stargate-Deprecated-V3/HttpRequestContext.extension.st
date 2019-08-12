@@ -1,6 +1,18 @@
 Extension { #name : #HttpRequestContext }
 
 { #category : #'*Stargate-Deprecated-V3' }
+HttpRequestContext >> addPaginationControl: aControl [
+
+	| controls |
+
+	self deprecated: 'Use addPaginationControls: and the provided media control builder'.
+	controls := self
+		objectUnder: #paginationLinks
+		ifNone: [ self hold: OrderedCollection new under: #paginationLinks ].
+	controls add: aControl
+]
+
+{ #category : #'*Stargate-Deprecated-V3' }
 HttpRequestContext >> holdAsHypermediaControls: aControlCollection [
 
 	self deprecated: 'Use #holdAsHypermediaControls:for:'.

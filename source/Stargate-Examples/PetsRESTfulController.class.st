@@ -24,16 +24,20 @@ PetsRESTfulController class >> using: aPetRepository [
 ]
 
 { #category : #private }
-PetsRESTfulController >> addPaginationControlsTo: aContext basedOn: url start: start limit: limit end: end count: total [
+PetsRESTfulController >> addPaginationControlsTo: requestContext basedOn: url start: start limit: limit end: end count: total [
 
-	start = 1
-		ifFalse: [ aContext addPaginationControl: 'first' -> (self urlFrom: url startingAt: 1 limitedTo: limit) ].
-	start > limit
-		ifTrue: [ aContext addPaginationControl: 'prev' -> (self urlFrom: url startingAt: start - limit limitedTo: limit) ].
-	total > end
-		ifTrue: [ aContext addPaginationControl: 'next' -> (self urlFrom: url startingAt: end + 1 limitedTo: limit) ].
-	total = end
-		ifFalse: [ aContext addPaginationControl: 'last' -> (self urlFrom: url startingAt: (total - 1)// limit * limit + 1 limitedTo: limit) ]
+	requestContext
+		addPaginationControls: [ :builder | 
+			start = 1
+				ifFalse: [ builder addLink: ( self urlFrom: url startingAt: 1 limitedTo: limit ) relatedTo: 'first' ].
+			start > limit
+				ifTrue: [ builder addLink: ( self urlFrom: url startingAt: start - limit limitedTo: limit ) relatedTo: 'prev' ].
+			total > end
+				ifTrue: [ builder addLink: ( self urlFrom: url startingAt: end + 1 limitedTo: limit ) relatedTo: 'next' ].
+			total = end
+				ifFalse: [ builder addLink: ( self urlFrom: url startingAt: ( total - 1 ) // limit * limit + 1 limitedTo: limit ) relatedTo: 'last'
+					]
+			]
 ]
 
 { #category : #API }

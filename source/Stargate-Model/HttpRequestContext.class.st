@@ -12,12 +12,16 @@ Class {
 }
 
 { #category : #pagination }
-HttpRequestContext >> addPaginationControl: aControl [
+HttpRequestContext >> addPaginationControls: aBlock [
 
-	| controls |
+	| controls builder |
 
-	controls := self objectUnder: #paginationLinks ifNone: [ self hold: OrderedCollection new under: #paginationLinks ].
-	controls add: aControl
+	controls := self
+		objectUnder: #paginationLinks
+		ifNone: [ self hold: OrderedCollection new under: #paginationLinks ].
+	builder := MediaControlsBuilder new.
+	aBlock value: builder.
+	controls addAll: builder build
 ]
 
 { #category : #accessing }

@@ -74,6 +74,7 @@ HypermediaDrivenRESTfulRequestHandler >> initializeDrivenBy: aMediaControlsFacto
 HypermediaDrivenRESTfulRequestHandler >> mediaControlsFor: resource within: requestContext [
 
 	^ mediaControlsFactory
+		cull: MediaControlsBuilder new
 		cull: resource
 		cull: requestContext
 		cull: ( self locationOf: resource within: requestContext )

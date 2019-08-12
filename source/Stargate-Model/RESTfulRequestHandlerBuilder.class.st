@@ -19,7 +19,7 @@ Class {
 { #category : #configuring }
 RESTfulRequestHandlerBuilder >> beHypermediaDriven [
 
-	^ self beHypermediaDrivenBy: [ #() ]
+	self beHypermediaDrivenBy: [  ]
 ]
 
 { #category : #configuring }
@@ -33,11 +33,14 @@ RESTfulRequestHandlerBuilder >> beHypermediaDrivenBy: aMediaControlsFactoryBlock
 		encodingRules: encodingRules
 		calculateEntityTagsWith: entityTagFactoryBinding content
 		andLocationWith: locationResolver
-		drivenBy: [ :resource :requestContext :resourceLocation | 
-			OrderedCollection new
-				add: 'self' -> resourceLocation;
-				addAll: ( aMediaControlsFactoryBlock cull: resource cull: requestContext cull: resourceLocation );
-				asArray
+		drivenBy: [ :builder :resource :requestContext :resourceLocation | 
+			builder addAsSelfLink: resourceLocation.
+			aMediaControlsFactoryBlock
+				cull: builder
+				cull: resource
+				cull: requestContext
+				cull: resourceLocation.
+			builder build
 			]
 	]
 ]

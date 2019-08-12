@@ -23,6 +23,22 @@ PetOrdersRESTfulController class >> using: aRepository [
 	^ self basicNew initializeUsing: aRepository
 ]
 
+{ #category : #private }
+PetOrdersRESTfulController >> affect: builder withMediaControlsFor: order locatedAt: location [
+
+	| status |
+
+	status := ordersRepository statusOf: order.
+	"In the real life you don't do a case. This is a toy example"
+	status = 'registered'
+		ifTrue: [ builder
+				addLink: location / 'cancel' asUrl relatedTo: 'cancel';
+				addLink: location / 'complete' asUrl relatedTo: 'complete'
+			].
+	status = 'completed'
+		ifTrue: [ builder addLink: location / 'cancel' asUrl relatedTo: 'cancel' ]
+]
+
 { #category : #API }
 PetOrdersRESTfulController >> cancelOrderBasedOn: httpRequest within: requestContext [
 
@@ -124,7 +140,8 @@ PetOrdersRESTfulController >> initializeProcessor [
 	requestHandler := RESTfulRequestHandlerBuilder new
 		endpoint: 'orders';
 		calculateLocationUsing: [ :order :requestContext | ordersRepository identifierOf: order ];
-		beHypermediaDrivenBy: [ :order :requestContext :orderLocation | self mediaControlsFor: order locatedAt: orderLocation ];
+		beHypermediaDrivenBy:
+				[ :builder :order :requestContext :orderLocation | self affect: builder withMediaControlsFor: order locatedAt: orderLocation ];
 		decodeFrom: self orderVersion1dot0dot0MediaType
 			jsonUsing: [ :json :reader | 
 			reader
@@ -161,25 +178,6 @@ PetOrdersRESTfulController >> initializeUsing: aPetRepository [
 
 	ordersRepository := aPetRepository.
 	self initializeProcessor
-]
-
-{ #category : #initialization }
-PetOrdersRESTfulController >> mediaControlsFor: order locatedAt: location [
-
-	| status |
-
-	status := ordersRepository statusOf: order.
-	"In the real life you don't do a case. This is a toy example"
-	status = 'registered'
-		ifTrue: [ 
-			^ Array
-				with: 'cancel' -> ( location / 'cancel' asUrl )
-				with: 'complete' -> ( location / 'complete' asUrl )
-			].
-	status = 'completed'
-		ifTrue: [ ^ Array with: 'cancel' -> ( location / 'cancel' asUrl ) ].
-		
-	^ #()
 ]
 
 { #category : #private }
