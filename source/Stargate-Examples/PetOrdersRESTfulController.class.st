@@ -89,6 +89,33 @@ PetOrdersRESTfulController >> completeTemplate [
 	^ '<1s>/complete' expandMacrosWith: self identifierTemplate
 ]
 
+{ #category : #private }
+PetOrdersRESTfulController >> configureOrderDecodingOn: reader [
+
+	^ reader
+		for: PetOrder
+			do: [ :mapping | 
+			mapping
+				mapInstVar: #date;
+				mapProperty: #pet setter: [ :order :url | order instVarNamed: 'pet' put: url asUrl ]
+			];
+		nextAs: PetOrder
+]
+
+{ #category : #private }
+PetOrdersRESTfulController >> configureOrderEncodingOn: writer within: requestContext [
+
+	writer
+		for: ZnUrl customDo: [ :mapping | mapping encoder: [ :url | url printString ] ];
+		for: PetOrder
+			do: [ :mapping | 
+			mapping
+				mapInstVars;
+				mapProperty: #status getter: [ :object | requestContext objectUnder: #status ];
+				mapAsHypermediaControls: [ :pet | requestContext hypermediaControlsFor: pet ]
+			]
+]
+
 { #category : #API }
 PetOrdersRESTfulController >> createOrderBasedOn: anHttpRequest within: aContext [
 
@@ -143,28 +170,9 @@ PetOrdersRESTfulController >> initializeProcessor [
 		beHypermediaDrivenBy:
 				[ :builder :order :requestContext :orderLocation | self affect: builder withMediaControlsFor: order locatedAt: orderLocation ];
 		decodeFrom: self orderVersion1dot0dot0MediaType
-			jsonUsing: [ :json :reader | 
-			reader
-				for: PetOrder
-					do: [ :mapping | 
-					mapping
-						mapInstVar: #date;
-						mapProperty: #pet setter: [ :order :url | order instVarNamed: 'pet' put: url asUrl ]
-					];
-				nextAs: PetOrder
-			];
+			jsonUsing: [ :json :reader | self configureOrderDecodingOn: reader ];
 		encodeTo: self orderVersion1dot0dot0MediaType
-			jsonUsing: [ :resource :requestContext :writer | 
-			writer
-				for: ZnUrl customDo: [ :mapping | mapping encoder: [ :url | url printString ] ];
-				for: PetOrder
-					do: [ :mapping | 
-					mapping
-						mapInstVars;
-						mapProperty: #status getter: [ :object | requestContext objectUnder: #status ];
-						mapAsHypermediaControls: [ :pet | requestContext hypermediaControlsFor: pet ]
-					]
-			];
+			jsonUsing: [ :resource :requestContext :writer | self configureOrderEncodingOn: writer within: requestContext ];
 		createEntityTagHashing: [ :hasher :order :requestContext | 
 			hasher
 				include: ( ordersRepository identifierOf: order );

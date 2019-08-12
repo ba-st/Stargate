@@ -40,6 +40,30 @@ PetsRESTfulController >> addPaginationControlsTo: requestContext basedOn: url st
 			]
 ]
 
+{ #category : #private }
+PetsRESTfulController >> configurePetEncodingOn: writer within: requestContext [
+
+	writer
+		for: Pet
+		do: [ :mapping | 
+			mapping
+				mapInstVars;
+				mapAsHypermediaControls: [ :pet | requestContext hypermediaControlsFor: pet ]
+			]
+]
+
+{ #category : #private }
+PetsRESTfulController >> configurePetSummaryEncodingOn: writer within: requestContext [
+
+	writer
+		for: Pet
+		do: [ :mapping | 
+			mapping
+				mapInstVar: #name;
+				mapAsHypermediaControls: [ :pet | requestContext hypermediaControlsFor: pet ]
+			]
+]
+
 { #category : #API }
 PetsRESTfulController >> createPetBasedOn: httpRequest within: requestContext [
 
@@ -143,25 +167,9 @@ PetsRESTfulController >> initializeProcessor [
 		paginateCollectionsWithDefaultLimit: 5;
 		decodeToNeoJSONObject: self petVersion1dot0dot0MediaType;
 		encodeTo: self petVersion1dot0dot0MediaType
-			jsonUsing: [ :resource :requestContext :writer | 
-			writer
-				for: Pet
-				do: [ :mapping | 
-					mapping
-						mapInstVars;
-						mapAsHypermediaControls: [ :pet | requestContext hypermediaControlsFor: pet ]
-					]
-			];
+			jsonUsing: [ :resource :requestContext :writer | self configurePetEncodingOn: writer within: requestContext ];
 		encodeTo: self petSummaryVersion1dot0dot0MediaType
-			jsonUsing: [ :resource :requestContext :writer | 
-			writer
-				for: Pet
-				do: [ :mapping | 
-					mapping
-						mapInstVar: #name;
-						mapAsHypermediaControls: [ :pet | requestContext hypermediaControlsFor: pet ]
-					]
-			];
+			jsonUsing: [ :resource :requestContext :writer | self configurePetSummaryEncodingOn: writer within: requestContext ];
 		createEntityTagHashing: [ :hasher :pet :requestContext | 
 			hasher
 				include: ( petsRepository identifierOf: pet );
