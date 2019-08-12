@@ -308,6 +308,42 @@ PetsRESTfulControllerTest >> testGetPetJustCreated [
 ]
 
 { #category : #'tests - get individual' }
+PetsRESTfulControllerTest >> testGetPetJustCreatedWhenNoAcceptHeaderPresentInRequest [
+
+	| getRequest response |
+
+	self
+		assert:
+			( resourceController
+				createPetBasedOn: ( self requestToCreatePetFrom: '{"name":"Firulais","type":"dog"}' )
+				within: self newHttpRequestContext ) isSuccess;
+		assert: petRepository count equals: 1.
+
+	getRequest := ZnRequest get: ( self urlForResourceIdentifiedBy: 1 ).
+	getRequest headers removeKey: 'Accept'.
+
+	response := resourceController
+		getPetBasedOn: ( TeaRequest fromZnRequest: getRequest pathParams: {( #identifier -> 1 )} asDictionary )
+		within: self newHttpRequestContext.
+
+	self
+		assert: response isSuccess;
+		assert: response status equals: 200;
+		assert: response contentType asMediaType equals: self defaultPetMediaType;
+		assert: response entityTag equals: '"c051344b8c92c5ed8a2bd0752070c35ed3de3bab"' asETag.
+
+	self
+		withJsonFromContentsIn: response
+		do: [ :json | 
+			self
+				assert: json name equals: 'Firulais';
+				assert: json type equals: 'dog';
+				assert: json status equals: 'new';
+				assertUrl: json links self equals: 'https://pets.example.com/pets/1'
+			]
+]
+
+{ #category : #'tests - get individual' }
 PetsRESTfulControllerTest >> testGetPetNotFoundShouldFail [
 
 	self
@@ -489,6 +525,32 @@ PetsRESTfulControllerTest >> testPetCreation [
 		assert: response status equals: 201;
 		assertUrl: response location equals: 'https://pets.example.com/pets/1';
 		assert: response hasEntity;
+		assert: response contentType equals: resourceController petVersion1dot0dot0MediaType;
+		assert: petRepository count equals: 1;
+		assert: petRepository findAll first name equals: 'Firulais'
+]
+
+{ #category : #'tests - creation' }
+PetsRESTfulControllerTest >> testPetCreationWhenNoAcceptHeaderPresentInRequest [
+
+	| request response |
+
+	request := ( ZnRequest post: self resourceUrl )
+		entity: ( ZnEntity with: '{"name":"Firulais","type":"dog"}' type: self defaultPetMediaType );
+		yourself.
+	request headers removeKey: 'Accept'.
+
+	response := resourceController
+		createPetBasedOn: ( TeaRequest fromZnRequest: request )
+		within: self newHttpRequestContext.
+
+	self
+		assert: response isSuccess;
+		assert: response status equals: 201;
+		assertUrl: response location equals: 'https://pets.example.com/pets/1';
+		assert: response hasEntity;
+		assert: response contentType equals: ZnMimeType textPlain;
+		assert: response contents trimBoth equals: 'Created https://pets.example.com/pets/1';
 		assert: petRepository count equals: 1;
 		assert: petRepository findAll first name equals: 'Firulais'
 ]

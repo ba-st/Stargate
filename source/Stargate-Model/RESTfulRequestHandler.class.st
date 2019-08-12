@@ -225,12 +225,13 @@ RESTfulRequestHandler >> putEntityTagOf: resource encodedAs: mediaType in: respo
 { #category : #private }
 RESTfulRequestHandler >> resourceCreationPolicyBasedOn: httpRequest [
 
-	^ httpRequest accept
-		ifNil: [ RESTfulControllerDoNotRespondCreatedEntityPolicy for: self ]
-		ifNotNil: [ RESTfulControllerRespondCreatedEntityPolicy
-				for: self
-				encodedAs: ( self targetMediaTypeFrom: httpRequest )
-			]
+	[ httpRequest accept ]
+		on: KeyNotFound
+		do: [ :signal | ^ RESTfulControllerDoNotRespondCreatedEntityPolicy for: self ].
+
+	^ RESTfulControllerRespondCreatedEntityPolicy
+		for: self
+		encodedAs: ( self targetMediaTypeFrom: httpRequest )
 ]
 
 { #category : #accessing }

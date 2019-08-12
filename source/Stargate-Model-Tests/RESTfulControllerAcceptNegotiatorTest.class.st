@@ -58,6 +58,15 @@ RESTfulControllerAcceptNegotiatorTest >> testAPIExactMatch [
 ]
 
 { #category : #tests }
+RESTfulControllerAcceptNegotiatorTest >> testAcceptingAnything [
+
+	self
+		assertBestRepresentationFor: '*/*'
+		given: apiMediaTypes
+		is: 'application/vnd.stargate.pet+json;version=2.0.0' asMediaType
+]
+
+{ #category : #tests }
 RESTfulControllerAcceptNegotiatorTest >> testMissingVersionSelectsTheNewOne [
 
 	self

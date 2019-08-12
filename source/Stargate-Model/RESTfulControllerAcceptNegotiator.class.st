@@ -16,6 +16,19 @@ RESTfulControllerAcceptNegotiator class >> basedOn: aMediaTypeCollection [
 	^ self new initializeBasedOn: aMediaTypeCollection
 ]
 
+{ #category : #'private - accessing' }
+RESTfulControllerAcceptNegotiator >> acceptableMediaTypesIn: anHttpRequest [
+
+	| acceptHeaderContent |
+
+	"Per RFC 2616: If no Accept header field is present, then it is assumed that the client accepts all media types."
+	acceptHeaderContent := [ anHttpRequest accept ]
+		on: KeyNotFound
+		do: [ :signal | signal return: '*/*' ].
+
+	^ ( acceptHeaderContent splitOn: ',' ) collect: [ :type | type asMediaType ]
+]
+
 { #category : #querying }
 RESTfulControllerAcceptNegotiator >> bestRepresentationFor: anHttpRequest [
 
@@ -91,9 +104,10 @@ RESTfulControllerAcceptNegotiator >> withAcceptableMediaTypesIn: anHttpRequest d
 	| acceptable grouped |
 
 	"Parse accept header"
-	acceptable := (anHttpRequest accept splitOn: ',') collect: [ :type | type asMediaType ].
+	acceptable := self acceptableMediaTypesIn: anHttpRequest.	
 	"Group it by quality"
-	grouped := acceptable groupedBy: [ :mediaType | mediaType quality ].
+	grouped := acceptable groupedBy: [ :mediaType | mediaType quality ].	
 	"Iterate it by max to minimum quality and for each quality group by precedence"
-	grouped keys sorted reverse do: [ :quality | (self sortByPrecedence: (grouped at: quality)) do: aBlock ]
+	grouped keys sorted reverse
+		do: [ :quality | ( self sortByPrecedence: ( grouped at: quality ) ) do: aBlock ]
 ]
