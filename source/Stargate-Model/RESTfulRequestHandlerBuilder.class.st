@@ -61,20 +61,12 @@ RESTfulRequestHandlerBuilder >> createEntityTagHashing: aBlockClosure [
 
 	self
 		createEntityTagWith: [ :resource :mediaType :requestContext | 
-			| toHash message |
-
-			toHash := aBlockClosure cull: resource cull: requestContext.
-			message := String
-				streamContents: [ :stream | 
-					toHash
-						do: [ :object | 
-							stream
-								nextPutAll: object asString;
-								nextPut: $-
-							].
-					stream nextPutAll: mediaType asString
-					].
-			( SHA1 new hashMessage: message ) hex
+			| hasher |
+			hasher := EntityTagHasher new.
+			aBlockClosure cull: hasher cull: resource cull: requestContext.
+			hasher
+				include: mediaType;
+				calculateHash
 			]
 ]
 

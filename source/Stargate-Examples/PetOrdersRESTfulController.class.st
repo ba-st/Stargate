@@ -148,9 +148,10 @@ PetOrdersRESTfulController >> initializeProcessor [
 						mapAsHypermediaControls: [ :pet | requestContext hypermediaControlsFor: pet ]
 					]
 			];
-		createEntityTagHashing: [ :order :requestContext | 
-			{( ordersRepository identifierOf: order ).
-			( ordersRepository lastModificationOf: order )}
+		createEntityTagHashing: [ :hasher :order :requestContext | 
+			hasher
+				include: ( ordersRepository identifierOf: order );
+				include: ( ordersRepository lastModificationOf: order )
 			];
 		build
 ]
