@@ -340,7 +340,7 @@ PetsRESTfulControllerTest >> testGetPetJustCreatedWhenNoAcceptHeaderPresentInReq
 			or: resourceController petSummaryVersion1dot0dot0MediaType;
 		assert: response entityTag
 			equals: '"c051344b8c92c5ed8a2bd0752070c35ed3de3bab"' asETag
-			or: '"1323cdfb8bb0f9011fbd480c5a87c17d05883214"'.
+			or: '"1323cdfb8bb0f9011fbd480c5a87c17d05883214"' asETag.
 
 	self
 		withJsonFromContentsIn: response
