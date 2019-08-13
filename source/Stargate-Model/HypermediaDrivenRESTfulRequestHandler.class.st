@@ -3,7 +3,7 @@ I represent a RESTful handler supporting hypermedia driven controllers.
 "
 Class {
 	#name : #HypermediaDrivenRESTfulRequestHandler,
-	#superclass : #RESTfulRequestHandler,
+	#superclass : #RESTfulRequestHandlerBehavior,
 	#instVars : [
 		'mediaControlsFactory'
 	],
@@ -20,14 +20,14 @@ HypermediaDrivenRESTfulRequestHandler class >> endpoint: aString
 	drivenBy: aMediaControlsFactory [
 
 
-	^ ( self
-		endpoint: aString
+	^ self new
+		initializeEndpoint: aString
 		paginationPolicy: aPaginationPolicy
 		decodingRules: theDecodingRules
 		encodingRules: theEncodingRules
 		calculateEntityTagsWith: entityTagCalculator
-		andLocationWith: aLocationResolverOptional )
-		initializeDrivenBy: aMediaControlsFactory
+		andLocationWith: aLocationResolverOptional
+		drivenBy: aMediaControlsFactory
 ]
 
 { #category : #private }
@@ -65,7 +65,22 @@ HypermediaDrivenRESTfulRequestHandler >> holdResource: resource controlsWithin: 
 ]
 
 { #category : #initialization }
-HypermediaDrivenRESTfulRequestHandler >> initializeDrivenBy: aMediaControlsFactory [
+HypermediaDrivenRESTfulRequestHandler >> initializeEndpoint: aString
+	paginationPolicy: aPaginationPolicy
+	decodingRules: theDecodingRules
+	encodingRules: theEncodingRules
+	calculateEntityTagsWith: anEntityTagCalculator
+	andLocationWith: aLocationResolverOptional
+	drivenBy: aMediaControlsFactory [
+
+
+	self
+		initializeEndpoint: aString
+		paginationPolicy: aPaginationPolicy
+		decodingRules: theDecodingRules
+		encodingRules: theEncodingRules
+		calculateEntityTagsWith: anEntityTagCalculator
+		andLocationWith: aLocationResolverOptional.
 
 	mediaControlsFactory := aMediaControlsFactory
 ]

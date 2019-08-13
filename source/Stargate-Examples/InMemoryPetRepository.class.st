@@ -61,7 +61,7 @@ InMemoryPetRepository >> recordIdAndUpdateTimestampFor: newPet [
 
 	petById at: nextId put: newPet.
 	"I will simulate a timestamp using a fixed version revision,
-	because for the tests it's easier that using the current datetime"
+	because for the tests it's easier than using the current datetime"
 	updateTimestamps at: nextId put: 1
 ]
 

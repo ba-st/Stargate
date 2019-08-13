@@ -75,7 +75,7 @@ PetOrdersRESTfulControllerTest >> setUp [
 { #category : #running }
 PetOrdersRESTfulControllerTest >> setUpResourceController [
 
-	resourceController := PetOrdersRESTfulController using: orderRepository 
+	resourceController := PetOrdersRESTfulController persistingTo: orderRepository 
 ]
 
 { #category : #tests }

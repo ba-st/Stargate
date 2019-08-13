@@ -141,7 +141,7 @@ PetsRESTfulControllerTest >> setUp [
 { #category : #running }
 PetsRESTfulControllerTest >> setUpResourceController [
 
-	resourceController := PetsRESTfulController using: petRepository
+	resourceController := PetsRESTfulController persistingTo: petRepository
 ]
 
 { #category : #'tests - delete' }

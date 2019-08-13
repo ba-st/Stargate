@@ -14,29 +14,37 @@ Class {
 { #category : #'instance creation' }
 PetsRESTfulController class >> new [
 
-	^ self using: InMemoryPetRepository new
+	^ self persistingTo: InMemoryPetRepository new
 ]
 
 { #category : #'instance creation' }
-PetsRESTfulController class >> using: aPetRepository [
+PetsRESTfulController class >> persistingTo: aPetRepository [
 
-	^ self basicNew initializeUsing: aPetRepository
+	^ self basicNew initializePersistingTo: aPetRepository
 ]
 
 { #category : #private }
 PetsRESTfulController >> addPaginationControlsTo: requestContext basedOn: url start: start limit: limit end: end count: total [
 
-	requestContext
-		addPaginationControls: [ :builder | 
-			start = 1
-				ifFalse: [ builder addLink: ( self urlFrom: url startingAt: 1 limitedTo: limit ) relatedTo: 'first' ].
-			start > limit
-				ifTrue: [ builder addLink: ( self urlFrom: url startingAt: start - limit limitedTo: limit ) relatedTo: 'prev' ].
-			total > end
-				ifTrue: [ builder addLink: ( self urlFrom: url startingAt: end + 1 limitedTo: limit ) relatedTo: 'next' ].
-			total = end
-				ifFalse: [ builder addLink: ( self urlFrom: url startingAt: ( total - 1 ) // limit * limit + 1 limitedTo: limit ) relatedTo: 'last'
-					]
+	start = 1
+		ifFalse: [ requestContext
+				addPaginationLink: ( self urlFrom: url startingAt: 1 limitedTo: limit )
+				relatedTo: 'first'
+			].
+	start > limit
+		ifTrue: [ requestContext
+				addPaginationLink: ( self urlFrom: url startingAt: start - limit limitedTo: limit )
+				relatedTo: 'prev'
+			].
+	total > end
+		ifTrue: [ requestContext
+				addPaginationLink: ( self urlFrom: url startingAt: end + 1 limitedTo: limit )
+				relatedTo: 'next'
+			].
+	total = end
+		ifFalse: [ requestContext
+				addPaginationLink: ( self urlFrom: url startingAt: ( total - 1 ) // limit * limit + 1 limitedTo: limit )
+				relatedTo: 'last'
 			]
 ]
 
@@ -158,6 +166,13 @@ PetsRESTfulController >> getPetsRoute [
 ]
 
 { #category : #initialization }
+PetsRESTfulController >> initializePersistingTo: aPetRepository [
+
+	petsRepository := aPetRepository.
+	self initializeRequestHandler
+]
+
+{ #category : #initialization }
 PetsRESTfulController >> initializeRequestHandler [
 
 	requestHandler := RESTfulRequestHandlerBuilder new
@@ -165,24 +180,17 @@ PetsRESTfulController >> initializeRequestHandler [
 		calculateLocationUsing: [ :pet :requestContext | petsRepository identifierOf: pet ];
 		beHypermediaDriven;
 		paginateCollectionsWithDefaultLimit: 5;
-		decodeToNeoJSONObject: self petVersion1dot0dot0MediaType;
-		encodeTo: self petVersion1dot0dot0MediaType
-			jsonUsing: [ :resource :requestContext :writer | self configurePetEncodingOn: writer within: requestContext ];
-		encodeTo: self petSummaryVersion1dot0dot0MediaType
-			jsonUsing: [ :resource :requestContext :writer | self configurePetSummaryEncodingOn: writer within: requestContext ];
+		decodeToNeoJSONObjectWhenAccepting: self petVersion1dot0dot0MediaType;
+		whenResponding: self petVersion1dot0dot0MediaType
+			encodeToJsonApplying: [ :resource :requestContext :writer | self configurePetEncodingOn: writer within: requestContext ];
+		whenResponding: self petSummaryVersion1dot0dot0MediaType
+			encodeToJsonApplying: [ :resource :requestContext :writer | self configurePetSummaryEncodingOn: writer within: requestContext ];
 		createEntityTagHashing: [ :hasher :pet :requestContext | 
 			hasher
 				include: ( petsRepository identifierOf: pet );
 				include: ( petsRepository lastModificationOf: pet )
 			];
 		build
-]
-
-{ #category : #initialization }
-PetsRESTfulController >> initializeUsing: aPetRepository [
-
-	petsRepository := aPetRepository.
-	self initializeRequestHandler
 ]
 
 { #category : #'accessing - media types' }

@@ -80,61 +80,9 @@ RESTfulRequestHandlerBuilder >> createEntityTagWith: aBlock [
 ]
 
 { #category : #decoding }
-RESTfulRequestHandlerBuilder >> decodeFrom: aMediaType jsonUsing: aBlock [
+RESTfulRequestHandlerBuilder >> decodeToNeoJSONObjectWhenAccepting: aMediaType [
 
-	self
-		decodeFrom: aMediaType
-		using: [ :json | aBlock value: json value: ( NeoJSONReader on: json readStream ) ]
-]
-
-{ #category : #decoding }
-RESTfulRequestHandlerBuilder >> decodeFrom: aMediaType using: aDecodingBlock [
-
-	"aDecodingBlock will be evaluated with the request contents and optionally the request context"
-
-	decodingRules
-		at: aMediaType
-		ifPresent: [ :rule | 'Decoding rule for media type already configured' expandMacrosWith: aMediaType ]
-		ifAbsentPut: [ aDecodingBlock ]
-]
-
-{ #category : #decoding }
-RESTfulRequestHandlerBuilder >> decodeToNeoJSONObject: aMediaType [
-
-	self decodeFrom: aMediaType using: [ :json | NeoJSONObject fromString: json ]
-]
-
-{ #category : #encoding }
-RESTfulRequestHandlerBuilder >> encodeTo: aMediaType jsonUsing: aBlock [
-
-	self
-		encodeTo: aMediaType
-		using: [ :resource :requestContext | 
-			String
-				streamContents: [ :stream | 
-					| writer |
-
-					writer := NeoJSONWriter on: stream.
-					aBlock value: resource value: requestContext value: writer.
-					writer
-						for: ResourceCollection
-						do: [ :mapping | 
-							mapping
-								mapInstVar: #items;
-								mapAsHypermediaControls: [ :collection | requestContext hypermediaControlsFor: collection items ]
-							].
-					writer nextPut: resource
-					]
-			]
-]
-
-{ #category : #encoding }
-RESTfulRequestHandlerBuilder >> encodeTo: aMediaType using: anEncodingBlock [
-
-	encodingRules
-		at: aMediaType
-		ifPresent: [ self error: 'Encoding rule for media type already configured' ]
-		ifAbsentPut: [ ResourceEncodingRule encoding: aMediaType using: anEncodingBlock ]
+	self whenAccepting: aMediaType decodeApplying: [ :json | NeoJSONObject fromString: json ]
 ]
 
 { #category : #configuring }
@@ -168,4 +116,56 @@ RESTfulRequestHandlerBuilder >> initialize [
 RESTfulRequestHandlerBuilder >> paginateCollectionsWithDefaultLimit: anInteger [
 
 	paginationPolicyFactory := [ :processor | RESTfulControllerPaginateCollectionsPolicy for: processor with: anInteger ]
+]
+
+{ #category : #decoding }
+RESTfulRequestHandlerBuilder >> whenAccepting: aMediaType decodeApplying: aDecodingBlock [
+
+	"aDecodingBlock will be evaluated with the request contents and optionally the request context"
+
+	decodingRules
+		at: aMediaType
+		ifPresent: [ :rule | 'Decoding rule for media type already configured' expandMacrosWith: aMediaType ]
+		ifAbsentPut: [ aDecodingBlock ]
+]
+
+{ #category : #decoding }
+RESTfulRequestHandlerBuilder >> whenAccepting: aMediaType decodeFromJsonApplying: aBlock [
+
+	self
+		whenAccepting: aMediaType
+		decodeApplying: [ :json | aBlock value: json value: ( NeoJSONReader on: json readStream ) ]
+]
+
+{ #category : #encoding }
+RESTfulRequestHandlerBuilder >> whenResponding: aMediaType encodeApplying: anEncodingBlock [
+
+	encodingRules
+		at: aMediaType
+		ifPresent: [ self error: 'Encoding rule for media type already configured' ]
+		ifAbsentPut: [ ResourceEncodingRule encoding: aMediaType using: anEncodingBlock ]
+]
+
+{ #category : #encoding }
+RESTfulRequestHandlerBuilder >> whenResponding: aMediaType encodeToJsonApplying: aBlock [
+
+	self
+		whenResponding: aMediaType
+		encodeApplying: [ :resource :requestContext | 
+			String
+				streamContents: [ :stream | 
+					| writer |
+
+					writer := NeoJSONWriter on: stream.
+					aBlock value: resource value: requestContext value: writer.
+					writer
+						for: ResourceCollection
+						do: [ :mapping | 
+							mapping
+								mapInstVar: #items;
+								mapAsHypermediaControls: [ :collection | requestContext hypermediaControlsFor: collection items ]
+							].
+					writer nextPut: resource
+					]
+			]
 ]

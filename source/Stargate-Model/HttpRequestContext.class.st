@@ -12,16 +12,18 @@ Class {
 }
 
 { #category : #pagination }
-HttpRequestContext >> addPaginationControls: aBlock [
+HttpRequestContext >> addPaginationLink: aUrl relatedTo: aRelationType [
 
-	| controls builder |
+	| controls |
 
 	controls := self
 		objectUnder: #paginationLinks
 		ifNone: [ self hold: OrderedCollection new under: #paginationLinks ].
-	builder := MediaControlsBuilder new.
-	aBlock value: builder.
-	controls addAll: builder build
+	controls
+		addAll:
+			( MediaControlsBuilder new
+				addLink: aUrl relatedTo: aRelationType;
+				build )
 ]
 
 { #category : #accessing }

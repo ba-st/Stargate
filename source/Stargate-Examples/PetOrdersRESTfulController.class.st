@@ -14,13 +14,13 @@ Class {
 { #category : #'instance creation' }
 PetOrdersRESTfulController class >> new [
 
-	^ self using: InMemoryPetOrderRepository  new
+	^ self persistingTo: InMemoryPetOrderRepository  new
 ]
 
 { #category : #'instance creation' }
-PetOrdersRESTfulController class >> using: aRepository [
+PetOrdersRESTfulController class >> persistingTo: aRepository [
 
-	^ self basicNew initializeUsing: aRepository
+	^ self basicNew initializePersistingTo: aRepository
 ]
 
 { #category : #private }
@@ -162,6 +162,13 @@ PetOrdersRESTfulController >> getOrderRoute [
 ]
 
 { #category : #initialization }
+PetOrdersRESTfulController >> initializePersistingTo: aPetRepository [
+
+	ordersRepository := aPetRepository.
+	self initializeRequestHandler
+]
+
+{ #category : #initialization }
 PetOrdersRESTfulController >> initializeRequestHandler [
 
 	requestHandler := RESTfulRequestHandlerBuilder new
@@ -169,23 +176,16 @@ PetOrdersRESTfulController >> initializeRequestHandler [
 		calculateLocationUsing: [ :order :requestContext | ordersRepository identifierOf: order ];
 		beHypermediaDrivenBy:
 				[ :builder :order :requestContext :orderLocation | self affect: builder withMediaControlsFor: order locatedAt: orderLocation ];
-		decodeFrom: self orderVersion1dot0dot0MediaType
-			jsonUsing: [ :json :reader | self configureOrderDecodingOn: reader ];
-		encodeTo: self orderVersion1dot0dot0MediaType
-			jsonUsing: [ :resource :requestContext :writer | self configureOrderEncodingOn: writer within: requestContext ];
+		whenAccepting: self orderVersion1dot0dot0MediaType
+			decodeFromJsonApplying: [ :json :reader | self configureOrderDecodingOn: reader ];
+		whenResponding: self orderVersion1dot0dot0MediaType
+			encodeToJsonApplying: [ :resource :requestContext :writer | self configureOrderEncodingOn: writer within: requestContext ];
 		createEntityTagHashing: [ :hasher :order :requestContext | 
 			hasher
 				include: ( ordersRepository identifierOf: order );
 				include: ( ordersRepository lastModificationOf: order )
 			];
 		build
-]
-
-{ #category : #initialization }
-PetOrdersRESTfulController >> initializeUsing: aPetRepository [
-
-	ordersRepository := aPetRepository.
-	self initializeRequestHandler
 ]
 
 { #category : #private }
