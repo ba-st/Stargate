@@ -43,10 +43,10 @@ PetOrdersRESTfulController >> affect: builder withMediaControlsFor: order locate
 PetOrdersRESTfulController >> cancelOrderBasedOn: httpRequest within: requestContext [
 
 	^ requestHandler
-		with: [ ordersRepository findIdentifiedBy: ( self identifierIn: httpRequest ) ]
-		do: [ :order | ordersRepository updateStatusOf: order to: 'canceled' ]
-		basedOn: httpRequest
+		from: httpRequest
 		within: requestContext
+		get: [ ordersRepository findIdentifiedBy: ( self identifierIn: httpRequest ) ]
+		thenDo: [ :order | ordersRepository updateStatusOf: order to: 'canceled' ]
 ]
 
 { #category : #private }
@@ -59,10 +59,10 @@ PetOrdersRESTfulController >> cancelTemplate [
 PetOrdersRESTfulController >> completeOrderBasedOn: httpRequest within: requestContext [
 
 	^ requestHandler
-		with: [ ordersRepository findIdentifiedBy: ( self identifierIn: httpRequest ) ]
-		do: [ :order | ordersRepository updateStatusOf: order to: 'completed' ]
-		basedOn: httpRequest
+		from: httpRequest
 		within: requestContext
+		get: [ ordersRepository findIdentifiedBy: ( self identifierIn: httpRequest ) ]
+		thenDo: [ :order | ordersRepository updateStatusOf: order to: 'completed' ]
 ]
 
 { #category : #private }
@@ -99,16 +99,16 @@ PetOrdersRESTfulController >> configureOrderEncodingOn: writer within: requestCo
 ]
 
 { #category : #API }
-PetOrdersRESTfulController >> createOrderBasedOn: anHttpRequest within: aContext [
+PetOrdersRESTfulController >> createOrderBasedOn: httpRequest within: requestContext [
 
 	^ requestHandler
-		withCreatedResourceDo: [ :order | 
+		withResourceCreatedFrom: httpRequest
+		within: requestContext
+		do: [ :order | 
 			ordersRepository store: order.
-			aContext hold: ( ordersRepository statusOf: order ) under: #status.
+			requestContext hold: ( ordersRepository statusOf: order ) under: #status.
 			order
 			]
-		basedOn: anHttpRequest
-		within: aContext
 ]
 
 { #category : #routes }
@@ -151,14 +151,14 @@ PetOrdersRESTfulController >> declareGetOrderRoute [
 PetOrdersRESTfulController >> getOrderBasedOn: httpRequest within: requestContext [
 
 	^ requestHandler
-		get: [ 
-			| order |
+		from: httpRequest
+		within: requestContext
+		get: [ | order |
+
 			order := ordersRepository findIdentifiedBy: ( self identifierIn: httpRequest ).
 			requestContext hold: ( ordersRepository statusOf: order ) under: #status.
 			order
 			]
-		basedOn: httpRequest
-		within: requestContext
 ]
 
 { #category : #initialization }

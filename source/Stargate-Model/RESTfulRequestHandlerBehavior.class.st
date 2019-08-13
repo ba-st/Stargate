@@ -25,15 +25,6 @@ RESTfulRequestHandlerBehavior >> assert: etag matchesEntityTagOf: entity encoded
 		ifFalse: [ HTTPClientError preconditionFailed signal ]
 ]
 
-{ #category : #API }
-RESTfulRequestHandlerBehavior >> createResourceWith: aCreationBlock thenDo: aBlock basedOn: httpRequest within: requestContext [
-
-	^ self
-		withCreatedResourceDo: [ :representation | aBlock value: ( aCreationBlock value: representation ) ]
-		basedOn: httpRequest
-		within: requestContext
-]
-
 { #category : #'decoding/encoding' }
 RESTfulRequestHandlerBehavior >> decode: httpRequest within: requestContext [
 
@@ -104,24 +95,7 @@ RESTfulRequestHandlerBehavior >> evaluateQuery: aQueryEvaluationBlock [
 ]
 
 { #category : #API }
-RESTfulRequestHandlerBehavior >> get: aQueryEvaluationBlock asCollectionBasedOn: httpRequest within: requestContext [
-
-	| mediaType resourceCollection encodedResourceCollection response |
-
-	mediaType := self targetMediaTypeFrom: httpRequest.
-	resourceCollection := paginationPolicy evaluateQuery: aQueryEvaluationBlock basedOn: httpRequest.
-	encodedResourceCollection := self
-		encodeResourceCollection: resourceCollection
-		to: mediaType
-		basedOn: httpRequest
-		within: requestContext.
-	response := ZnResponse ok: encodedResourceCollection.
-	self paginationPolicy affect: response within: requestContext.
-	^ response
-]
-
-{ #category : #API }
-RESTfulRequestHandlerBehavior >> get: aQueryEvaluationBlock basedOn: httpRequest within: requestContext [
+RESTfulRequestHandlerBehavior >> from: httpRequest within: requestContext get: aQueryEvaluationBlock [
 
 	| mediaType resource response |
 
@@ -142,6 +116,58 @@ RESTfulRequestHandlerBehavior >> get: aQueryEvaluationBlock basedOn: httpRequest
 		encodedAs: mediaType
 		in: response
 		within: requestContext.
+	^ response
+]
+
+{ #category : #API }
+RESTfulRequestHandlerBehavior >> from: httpRequest within: requestContext get: findBlock thenDo: actionBlock [
+
+	| resource |
+
+	resource := self evaluateQuery: findBlock.
+	self handleConflictsIn: [ actionBlock value: resource ].
+	^ ZnResponse noContent
+]
+
+{ #category : #API }
+RESTfulRequestHandlerBehavior >> from: httpRequest within: requestContext get: findBlock thenUpdateWith: updateBlock [
+
+	| etag |
+
+	etag := self entityTagToMatchBasedOn: httpRequest.
+
+	^ self
+		from: httpRequest
+		within: requestContext
+		get: [ | resourceToUpdate updatedResource |
+
+			resourceToUpdate := findBlock value.
+			self
+				assert: etag
+				matchesEntityTagOf: resourceToUpdate
+				encodedAs: httpRequest contentType
+				within: requestContext.
+
+			updatedResource := self decode: httpRequest within: requestContext.
+			self handleConflictsIn: [ updateBlock value: resourceToUpdate value: updatedResource ].
+			resourceToUpdate
+			]
+]
+
+{ #category : #API }
+RESTfulRequestHandlerBehavior >> from: httpRequest within: requestContext getCollection: aQueryEvaluationBlock [
+
+	| mediaType resourceCollection encodedResourceCollection response |
+
+	mediaType := self targetMediaTypeFrom: httpRequest.
+	resourceCollection := paginationPolicy evaluateQuery: aQueryEvaluationBlock basedOn: httpRequest.
+	encodedResourceCollection := self
+		encodeResourceCollection: resourceCollection
+		to: mediaType
+		basedOn: httpRequest
+		within: requestContext.
+	response := ZnResponse ok: encodedResourceCollection.
+	self paginationPolicy affect: response within: requestContext.
 	^ response
 ]
 
@@ -229,42 +255,16 @@ RESTfulRequestHandlerBehavior >> targetMediaTypeFrom: httpRequest [
 ]
 
 { #category : #API }
-RESTfulRequestHandlerBehavior >> update: findBlock with: updateBlock basedOn: httpRequest within: requestContext [
-
-	| etag |
-
-	etag := self entityTagToMatchBasedOn: httpRequest.
+RESTfulRequestHandlerBehavior >> withRepresentationIn: httpRequest within: requestContext createResourceWith: aCreationBlock thenDo: aBlock [
 
 	^ self
-		get: [ | resourceToUpdate updatedResource |
-
-			resourceToUpdate := findBlock value.
-			self
-				assert: etag
-				matchesEntityTagOf: resourceToUpdate
-				encodedAs: httpRequest contentType
-				within: requestContext.
-				
-			updatedResource := self decode: httpRequest within: requestContext.
-			self handleConflictsIn: [ updateBlock value: resourceToUpdate value: updatedResource ].
-			resourceToUpdate
-			]
-		basedOn: httpRequest
+		withResourceCreatedFrom: httpRequest
 		within: requestContext
+		do: [ :representation | aBlock value: ( aCreationBlock value: representation ) ]
 ]
 
 { #category : #API }
-RESTfulRequestHandlerBehavior >> with: findBlock do: actionBlock basedOn: httpRequest within: requestContext [
-
-	| resource |
-
-	resource := self evaluateQuery: findBlock.
-	self handleConflictsIn: [ actionBlock value: resource ].
-	^ ZnResponse noContent
-]
-
-{ #category : #API }
-RESTfulRequestHandlerBehavior >> withCreatedResourceDo: aBlock basedOn: httpRequest within: requestContext [
+RESTfulRequestHandlerBehavior >> withResourceCreatedFrom: httpRequest within: requestContext do: aBlock [
 
 	| creationPolicy decodedRepresentation newResource |
 

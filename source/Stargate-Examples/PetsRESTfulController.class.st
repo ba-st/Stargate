@@ -76,11 +76,11 @@ PetsRESTfulController >> configurePetSummaryEncodingOn: writer within: requestCo
 PetsRESTfulController >> createPetBasedOn: httpRequest within: requestContext [
 
 	^ requestHandler
+		withRepresentationIn: httpRequest
+		within: requestContext
 		createResourceWith:
 			[ :decodedRepresentation | Pet named: decodedRepresentation name ofType: decodedRepresentation type ]
 		thenDo: [ :pet | petsRepository store: pet ]
-		basedOn: httpRequest
-		within: requestContext
 ]
 
 { #category : #routes }
@@ -132,26 +132,28 @@ PetsRESTfulController >> declareUpdatePetRoute [
 PetsRESTfulController >> deletePetBasedOn: httpRequest within: requestContext [
 
 	^ requestHandler
-		with: [ petsRepository findIdentifiedBy: ( self identifierIn: httpRequest ) ]
-		do: [ :pet | petsRepository purge: pet ]
-		basedOn: httpRequest
+		from: httpRequest
 		within: requestContext
+		get: [ petsRepository findIdentifiedBy: ( self identifierIn: httpRequest ) ]
+		thenDo: [ :pet | petsRepository purge: pet ]
 ]
 
 { #category : #API }
 PetsRESTfulController >> getPetBasedOn: httpRequest within: requestContext [
 
 	^ requestHandler
-		get: [ petsRepository findIdentifiedBy: ( self identifierIn: httpRequest ) ]
-		basedOn: httpRequest
+		from: httpRequest
 		within: requestContext
+		get: [ petsRepository findIdentifiedBy: ( self identifierIn: httpRequest ) ]
 ]
 
 { #category : #API }
 PetsRESTfulController >> getPetsBasedOn: httpRequest within: requestContext [
 
 	^ requestHandler
-		get: [ :pagination | 
+		from: httpRequest
+		within: requestContext
+		getCollection: [ :pagination | 
 			petsRepository findAll
 				ifEmpty: [ #() ]
 				ifNotEmpty: [ :allPets | 
@@ -170,8 +172,6 @@ PetsRESTfulController >> getPetsBasedOn: httpRequest within: requestContext [
 					allPets copyFrom: start to: end
 					]
 			]
-		asCollectionBasedOn: httpRequest
-		within: requestContext
 ]
 
 { #category : #initialization }
@@ -230,8 +230,10 @@ PetsRESTfulController >> typeIdConstraint [
 PetsRESTfulController >> updatePetBasedOn: httpRequest within: requestContext [
 
 	^ requestHandler
-		update: [ petsRepository findIdentifiedBy: ( self identifierIn: httpRequest ) ]
-		with: [ :pet :decoded | 
+		from: httpRequest
+		within: requestContext
+		get: [ petsRepository findIdentifiedBy: ( self identifierIn: httpRequest ) ]
+		thenUpdateWith: [ :pet :decoded | 
 			petsRepository
 				update: pet
 				with:
@@ -240,8 +242,6 @@ PetsRESTfulController >> updatePetBasedOn: httpRequest within: requestContext [
 						ofType: ( decoded at: #type ifAbsent: [ pet type ] )
 						withStatus: ( decoded at: #status ifAbsent: [ pet status ] ) )
 			]
-		basedOn: httpRequest
-		within: requestContext
 ]
 
 { #category : #private }
