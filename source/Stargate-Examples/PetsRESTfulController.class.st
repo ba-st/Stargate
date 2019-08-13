@@ -84,12 +84,48 @@ PetsRESTfulController >> createPetBasedOn: httpRequest within: requestContext [
 ]
 
 { #category : #routes }
-PetsRESTfulController >> createPetRoute [
+PetsRESTfulController >> declareCreatePetRoute [
 
 	^ RouteSpecification
 		handling: #POST
 		at: self endpoint
 		evaluating: [ :httpRequest :requestContext | self createPetBasedOn: httpRequest within: requestContext ]
+]
+
+{ #category : #routes }
+PetsRESTfulController >> declareDeletePetRoute [
+
+	^ RouteSpecification
+		handling: #DELETE
+		at: self identifierTemplate
+		evaluating: [ :httpRequest :requestContext | self deletePetBasedOn: httpRequest within: requestContext ]
+]
+
+{ #category : #routes }
+PetsRESTfulController >> declareGetPetRoute [
+
+	^ RouteSpecification
+		handling: #GET
+		at: self identifierTemplate
+		evaluating: [ :httpRequest :requestContext | self getPetBasedOn: httpRequest within: requestContext ]
+]
+
+{ #category : #routes }
+PetsRESTfulController >> declareGetPetsRoute [
+
+	^ RouteSpecification
+		handling: #GET
+		at: self endpoint
+		evaluating: [ :httpRequest :requestContext | self getPetsBasedOn: httpRequest within: requestContext ]
+]
+
+{ #category : #routes }
+PetsRESTfulController >> declareUpdatePetRoute [
+
+	^ RouteSpecification
+		handling: #PATCH
+		at: self identifierTemplate
+		evaluating: [ :httpRequest :requestContext | self updatePetBasedOn: httpRequest within: requestContext ]
 ]
 
 { #category : #API }
@@ -102,15 +138,6 @@ PetsRESTfulController >> deletePetBasedOn: httpRequest within: requestContext [
 		within: requestContext
 ]
 
-{ #category : #routes }
-PetsRESTfulController >> deletePetRoute [
-
-	^ RouteSpecification
-		handling: #DELETE
-		at: self identifierTemplate
-		evaluating: [ :httpRequest :requestContext | self deletePetBasedOn: httpRequest within: requestContext ]
-]
-
 { #category : #API }
 PetsRESTfulController >> getPetBasedOn: httpRequest within: requestContext [
 
@@ -118,15 +145,6 @@ PetsRESTfulController >> getPetBasedOn: httpRequest within: requestContext [
 		get: [ petsRepository findIdentifiedBy: ( self identifierIn: httpRequest ) ]
 		basedOn: httpRequest
 		within: requestContext
-]
-
-{ #category : #routes }
-PetsRESTfulController >> getPetRoute [
-
-	^ RouteSpecification
-		handling: #GET
-		at: self identifierTemplate
-		evaluating: [ :httpRequest :requestContext | self getPetBasedOn: httpRequest within: requestContext ]
 ]
 
 { #category : #API }
@@ -154,15 +172,6 @@ PetsRESTfulController >> getPetsBasedOn: httpRequest within: requestContext [
 			]
 		asCollectionBasedOn: httpRequest
 		within: requestContext
-]
-
-{ #category : #routes }
-PetsRESTfulController >> getPetsRoute [
-
-	^ RouteSpecification
-		handling: #GET
-		at: self endpoint
-		evaluating: [ :httpRequest :requestContext | self getPetsBasedOn: httpRequest within: requestContext ]
 ]
 
 { #category : #initialization }
@@ -233,15 +242,6 @@ PetsRESTfulController >> updatePetBasedOn: httpRequest within: requestContext [
 			]
 		basedOn: httpRequest
 		within: requestContext
-]
-
-{ #category : #routes }
-PetsRESTfulController >> updatePetRoute [
-
-	^ RouteSpecification
-		handling: #PATCH
-		at: self identifierTemplate
-		evaluating: [ :httpRequest :requestContext | self updatePetBasedOn: httpRequest within: requestContext ]
 ]
 
 { #category : #private }

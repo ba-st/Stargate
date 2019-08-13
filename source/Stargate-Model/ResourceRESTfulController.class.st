@@ -20,7 +20,10 @@ ResourceRESTfulController >> jsonMediaType: aSubType vendoredBy: aVendorName ver
 { #category : #accessing }
 ResourceRESTfulController >> routes [
 
-	^ (UnaryMessageSendingCollector sendingAllMessagesEndingWith: 'Route' to: self) value
+	^ ( UnaryMessageSendingCollector
+		sendingAllMessagesBeginningWith: 'declare'
+		andEndingWith: 'Route'
+		to: self ) value
 ]
 
 { #category : #configuring }

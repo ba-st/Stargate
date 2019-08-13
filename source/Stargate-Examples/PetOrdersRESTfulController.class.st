@@ -49,15 +49,6 @@ PetOrdersRESTfulController >> cancelOrderBasedOn: httpRequest within: requestCon
 		within: requestContext
 ]
 
-{ #category : #routes }
-PetOrdersRESTfulController >> cancelOrderRoute [
-
-	^ RouteSpecification
-		handling: #POST
-		at: self cancelTemplate
-		evaluating: [ :httpRequest :requestContext | self cancelOrderBasedOn: httpRequest within: requestContext ]
-]
-
 { #category : #private }
 PetOrdersRESTfulController >> cancelTemplate [
 
@@ -72,15 +63,6 @@ PetOrdersRESTfulController >> completeOrderBasedOn: httpRequest within: requestC
 		do: [ :order | ordersRepository updateStatusOf: order to: 'completed' ]
 		basedOn: httpRequest
 		within: requestContext
-]
-
-{ #category : #routes }
-PetOrdersRESTfulController >> completeOrderRoute [
-
-	^ RouteSpecification
-		handling: #POST
-		at: self completeTemplate
-		evaluating: [ :httpRequest :requestContext | self completeOrderBasedOn: httpRequest within: requestContext ]
 ]
 
 { #category : #private }
@@ -130,12 +112,39 @@ PetOrdersRESTfulController >> createOrderBasedOn: anHttpRequest within: aContext
 ]
 
 { #category : #routes }
-PetOrdersRESTfulController >> createOrderRoute [
+PetOrdersRESTfulController >> declareCancelOrderRoute [
+
+	^ RouteSpecification
+		handling: #POST
+		at: self cancelTemplate
+		evaluating: [ :httpRequest :requestContext | self cancelOrderBasedOn: httpRequest within: requestContext ]
+]
+
+{ #category : #routes }
+PetOrdersRESTfulController >> declareCompleteOrderRoute [
+
+	^ RouteSpecification
+		handling: #POST
+		at: self completeTemplate
+		evaluating: [ :httpRequest :requestContext | self completeOrderBasedOn: httpRequest within: requestContext ]
+]
+
+{ #category : #routes }
+PetOrdersRESTfulController >> declareCreateOrderRoute [
 
 	^ RouteSpecification
 		handling: #POST
 		at: self endpoint
 		evaluating: [ :httpRequest :requestContext | self createOrderBasedOn: httpRequest within: requestContext ]
+]
+
+{ #category : #routes }
+PetOrdersRESTfulController >> declareGetOrderRoute [
+
+	^ RouteSpecification
+		handling: #GET
+		at: self identifierTemplate
+		evaluating: [ :httpRequest :requestContext | self getOrderBasedOn: httpRequest within: requestContext ]
 ]
 
 { #category : #API }
@@ -150,15 +159,6 @@ PetOrdersRESTfulController >> getOrderBasedOn: httpRequest within: requestContex
 			]
 		basedOn: httpRequest
 		within: requestContext
-]
-
-{ #category : #routes }
-PetOrdersRESTfulController >> getOrderRoute [
-
-	^ RouteSpecification
-		handling: #GET
-		at: self identifierTemplate
-		evaluating: [ :httpRequest :requestContext | self getOrderBasedOn: httpRequest within: requestContext ]
 ]
 
 { #category : #initialization }
