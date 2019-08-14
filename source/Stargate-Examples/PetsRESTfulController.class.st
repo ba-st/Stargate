@@ -8,7 +8,7 @@ Class {
 		'petsRepository',
 		'requestHandler'
 	],
-	#category : #'Stargate-Examples'
+	#category : #'Stargate-Examples-PetStore'
 }
 
 { #category : #'instance creation' }

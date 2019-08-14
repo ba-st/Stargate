@@ -8,7 +8,7 @@ Class {
 		'orderStatus',
 		'updateTimestamps'
 	],
-	#category : #'Stargate-Examples'
+	#category : #'Stargate-Examples-PetStore'
 }
 
 { #category : #querying }

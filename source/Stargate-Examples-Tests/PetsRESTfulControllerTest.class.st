@@ -7,7 +7,7 @@ Class {
 	#instVars : [
 		'petRepository'
 	],
-	#category : #'Stargate-Examples-Tests'
+	#category : #'Stargate-Examples-Tests-PetStore'
 }
 
 { #category : #'private - support' }
@@ -86,16 +86,6 @@ PetsRESTfulControllerTest >> requestToDeletePetIdentifiedBy: anIdentifier [
 	^ TeaRequest
 		fromZnRequest: ( ZnRequest delete: ( self urlForResourceIdentifiedBy: anIdentifier ) )
 		pathParams: {( #identifier -> anIdentifier )} asDictionary
-]
-
-{ #category : #'private - support' }
-PetsRESTfulControllerTest >> requestToGet: aUrl accepting: anAcceptHeader [
-
-	^ TeaRequest
-		fromZnRequest:
-			((ZnRequest get: aUrl)
-				setAccept: anAcceptHeader;
-				yourself)
 ]
 
 { #category : #'private - support' }

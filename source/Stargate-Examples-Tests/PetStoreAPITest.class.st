@@ -9,7 +9,7 @@ Class {
 		'petsController',
 		'ordersController'
 	],
-	#category : #'Stargate-Examples-Tests'
+	#category : #'Stargate-Examples-Tests-PetStore'
 }
 
 { #category : #private }

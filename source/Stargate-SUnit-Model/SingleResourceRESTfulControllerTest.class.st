@@ -20,6 +20,16 @@ SingleResourceRESTfulControllerTest >> endpoint [
 ]
 
 { #category : #'private - support' }
+SingleResourceRESTfulControllerTest >> requestToGet: aUrl accepting: anAcceptHeader [
+
+	^ TeaRequest
+		fromZnRequest:
+			((ZnRequest get: aUrl)
+				setAccept: anAcceptHeader;
+				yourself)
+]
+
+{ #category : #'private - support' }
 SingleResourceRESTfulControllerTest >> requestToGetResourceIdentifiedBy: anIdentifier accepting: anAcceptHeader [
 
 	^ TeaRequest

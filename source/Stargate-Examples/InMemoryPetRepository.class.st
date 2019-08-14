@@ -7,7 +7,7 @@ Class {
 		'updateTimestamps',
 		'nextId'
 	],
-	#category : #'Stargate-Examples'
+	#category : #'Stargate-Examples-PetStore'
 }
 
 { #category : #querying }

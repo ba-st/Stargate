@@ -9,7 +9,7 @@ Class {
 		'type',
 		'status'
 	],
-	#category : #'Stargate-Examples'
+	#category : #'Stargate-Examples-PetStore'
 }
 
 { #category : #'instance creation' }
