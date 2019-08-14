@@ -147,3 +147,17 @@ SouthAmericanCurrenciesRESTfulControllerTest >> testGetNotModifiedWhenValidETag 
 		assert: response code equals: 304;
 		assert: response entityTag equals: '"5dd07a40a75ea23fa44e641a92a6dd1ec7999a36"' asETag
 ]
+
+{ #category : #tests }
+SouthAmericanCurrenciesRESTfulControllerTest >> testTemplates [
+
+	| routes |
+
+	routes := resourceController routes.
+
+	self
+		assertCollection: ( routes collect: #urlTemplate )
+		hasSameElements: #('/currencies' '/currencies/<identifier:IsObject>').
+
+	routes do: [ :route | self assert: route httpMethod equals: #GET ]
+]
