@@ -45,7 +45,7 @@ PetOrdersRESTfulController >> cancelOrderBasedOn: httpRequest within: requestCon
 	^ requestHandler
 		from: httpRequest
 		within: requestContext
-		get: [ ordersRepository findIdentifiedBy: ( self identifierIn: httpRequest ) ]
+		get: [ :id | ordersRepository findIdentifiedBy: id ]
 		thenDo: [ :order | ordersRepository updateStatusOf: order to: 'canceled' ]
 ]
 
@@ -61,7 +61,7 @@ PetOrdersRESTfulController >> completeOrderBasedOn: httpRequest within: requestC
 	^ requestHandler
 		from: httpRequest
 		within: requestContext
-		get: [ ordersRepository findIdentifiedBy: ( self identifierIn: httpRequest ) ]
+		get: [ :id | ordersRepository findIdentifiedBy: id ]
 		thenDo: [ :order | ordersRepository updateStatusOf: order to: 'completed' ]
 ]
 
@@ -153,9 +153,9 @@ PetOrdersRESTfulController >> getOrderBasedOn: httpRequest within: requestContex
 	^ requestHandler
 		from: httpRequest
 		within: requestContext
-		get: [ | order |
-
-			order := ordersRepository findIdentifiedBy: ( self identifierIn: httpRequest ).
+		get: [ :id | 
+			| order |
+			order := ordersRepository findIdentifiedBy: id.
 			requestContext hold: ( ordersRepository statusOf: order ) under: #status.
 			order
 			]
@@ -172,8 +172,9 @@ PetOrdersRESTfulController >> initializePersistingTo: aPetRepository [
 PetOrdersRESTfulController >> initializeRequestHandler [
 
 	requestHandler := RESTfulRequestHandlerBuilder new
-		endpoint: 'orders';
-		calculateLocationUsing: [ :order :requestContext | ordersRepository identifierOf: order ];
+		handling: 'orders'
+			locatingResourcesWith: [ :order :requestContext | ordersRepository identifierOf: order ]
+			extractingIdentifierWith: [ :httpRequest | self identifierIn: httpRequest ];
 		beHypermediaDrivenBy:
 				[ :builder :order :requestContext :orderLocation | self affect: builder withMediaControlsFor: order locatedAt: orderLocation ];
 		whenAccepting: self orderVersion1dot0dot0MediaType

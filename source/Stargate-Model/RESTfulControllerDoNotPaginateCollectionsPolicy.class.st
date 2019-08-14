@@ -5,15 +5,15 @@ Class {
 	#name : #RESTfulControllerDoNotPaginateCollectionsPolicy,
 	#superclass : #RESTfulControllerPaginationPolicy,
 	#instVars : [
-		'resourceController'
+		'requestHandler'
 	],
 	#category : #'Stargate-Model-Pagination'
 }
 
 { #category : #'instance creation' }
-RESTfulControllerDoNotPaginateCollectionsPolicy class >> for: aResourceController [
+RESTfulControllerDoNotPaginateCollectionsPolicy class >> for: aRequestHandler [
 
-	^ self new initializeFor: aResourceController
+	^ self new initializeFor: aRequestHandler
 ]
 
 { #category : #applying }
@@ -29,11 +29,11 @@ RESTfulControllerDoNotPaginateCollectionsPolicy >> affect: response within: requ
 { #category : #applying }
 RESTfulControllerDoNotPaginateCollectionsPolicy >> evaluateQuery: aQueryEvaluationBlock basedOn: httpRequest [
 
-	^ resourceController evaluateQuery: aQueryEvaluationBlock
+	^ requestHandler evaluateCollectionQuery: aQueryEvaluationBlock
 ]
 
 { #category : #initialization }
-RESTfulControllerDoNotPaginateCollectionsPolicy >> initializeFor: aResourceController [
+RESTfulControllerDoNotPaginateCollectionsPolicy >> initializeFor: aRequestHandler [
 
-	resourceController := aResourceController 
+	requestHandler := aRequestHandler 
 ]

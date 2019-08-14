@@ -5,13 +5,12 @@ Class {
 	#name : #RESTfulRequestHandlerBuilder,
 	#superclass : #Object,
 	#instVars : [
-		'endpointBinding',
 		'decodingRules',
 		'encodingRules',
-		'locationResolver',
 		'paginationPolicyFactory',
 		'entityTagFactoryBinding',
-		'handlerFactory'
+		'handlerFactory',
+		'resourceLocator'
 	],
 	#category : #'Stargate-Model-Controllers'
 }
@@ -25,14 +24,15 @@ RESTfulRequestHandlerBuilder >> beHypermediaDriven [
 { #category : #configuring }
 RESTfulRequestHandlerBuilder >> beHypermediaDrivenBy: aMediaControlsFactoryBlock [
 
-	locationResolver withContentDo: [  ] ifUnused: [ self error: 'Missing location resolution.' ].
+	AssertionChecker
+		enforce: [ resourceLocator canLookupResources ]
+		because: 'Missing location resolution.'.
 	handlerFactory := [ HypermediaDrivenRESTfulRequestHandler
-		endpoint: endpointBinding content
+		resourceLocator: resourceLocator
 		paginationPolicy: paginationPolicyFactory
 		decodingRules: decodingRules
 		encodingRules: encodingRules
 		calculateEntityTagsWith: entityTagFactoryBinding content
-		andLocationWith: locationResolver
 		drivenBy: [ :builder :resource :requestContext :resourceLocation | 
 			builder addAsSelfLink: resourceLocation.
 			aMediaControlsFactoryBlock
@@ -49,14 +49,6 @@ RESTfulRequestHandlerBuilder >> beHypermediaDrivenBy: aMediaControlsFactoryBlock
 RESTfulRequestHandlerBuilder >> build [
 
 	^  handlerFactory value
-]
-
-{ #category : #configuring }
-RESTfulRequestHandlerBuilder >> calculateLocationUsing: aBlockClosure [
-
-	locationResolver := Optional
-		containing:
-			[ :baseUrl :endpoint :resource :requestContext | baseUrl / endpoint asUrl / ( aBlockClosure cull: resource cull: requestContext ) asString asUrl ]
 ]
 
 { #category : #configuring }
@@ -86,9 +78,18 @@ RESTfulRequestHandlerBuilder >> decodeToNeoJSONObjectWhenAccepting: aMediaType [
 ]
 
 { #category : #configuring }
-RESTfulRequestHandlerBuilder >> endpoint: aStringOrSymbol [
+RESTfulRequestHandlerBuilder >> handling: anEndpoint extractingIdentifierWith: aBlock [
 
-	endpointBinding := Binding to: ( '/<1s>' expandMacrosWith: aStringOrSymbol asString )
+	resourceLocator := ResourceLocator handling: anEndpoint extractingIdentifierWith: aBlock
+]
+
+{ #category : #configuring }
+RESTfulRequestHandlerBuilder >> handling: anEndpoint locatingResourcesWith: aLocationBlock extractingIdentifierWith: aBlock [
+
+	resourceLocator := ResourceLocator
+		handling: anEndpoint
+		calculatingLocationWith: aLocationBlock
+		andIdentifierBy: aBlock
 ]
 
 { #category : #initialization }
@@ -97,18 +98,14 @@ RESTfulRequestHandlerBuilder >> initialize [
 	super initialize.
 	decodingRules := Dictionary new.
 	encodingRules := Dictionary new.
-	endpointBinding := Binding undefinedExplainedBy: 'Missing endpoint'.
 	entityTagFactoryBinding := Binding undefinedExplainedBy: 'Missing ETag calculation'.
-	paginationPolicyFactory := [ :requestHandler | RESTfulControllerDoNotPaginateCollectionsPolicy for: requestHandler ].	"Location don't need to be resolved unless we're using an hypermedia policy or we intend to create new resources.
-	For read-only controllers it's useless"
-	locationResolver := Optional unused. 
+	paginationPolicyFactory := [ :requestHandler | RESTfulControllerDoNotPaginateCollectionsPolicy for: requestHandler ].
 	handlerFactory := [ RESTfulRequestHandler
-		endpoint: endpointBinding content
+		resourceLocator: resourceLocator
 		paginationPolicy: paginationPolicyFactory
 		decodingRules: decodingRules
 		encodingRules: encodingRules
 		calculateEntityTagsWith: entityTagFactoryBinding content
-		andLocationWith: locationResolver
 	]
 ]
 

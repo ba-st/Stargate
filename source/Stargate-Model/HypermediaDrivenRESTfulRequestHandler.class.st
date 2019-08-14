@@ -11,22 +11,14 @@ Class {
 }
 
 { #category : #'instance creation' }
-HypermediaDrivenRESTfulRequestHandler class >> endpoint: aString
-	paginationPolicy: aPaginationPolicy
-	decodingRules: theDecodingRules
-	encodingRules: theEncodingRules
-	calculateEntityTagsWith: entityTagCalculator
-	andLocationWith: aLocationResolverOptional
-	drivenBy: aMediaControlsFactory [
-
+HypermediaDrivenRESTfulRequestHandler class >> resourceLocator: aResouceLocator paginationPolicy: aPaginationPolicy decodingRules: theDecodingRules encodingRules: theEncodingRules calculateEntityTagsWith: entityTagCalculator drivenBy: aMediaControlsFactory [
 
 	^ self new
-		initializeEndpoint: aString
+		initializeResourceLocator: aResouceLocator
 		paginationPolicy: aPaginationPolicy
 		decodingRules: theDecodingRules
 		encodingRules: theEncodingRules
 		calculateEntityTagsWith: entityTagCalculator
-		andLocationWith: aLocationResolverOptional
 		drivenBy: aMediaControlsFactory
 ]
 
@@ -65,22 +57,19 @@ HypermediaDrivenRESTfulRequestHandler >> holdResource: resource controlsWithin: 
 ]
 
 { #category : #initialization }
-HypermediaDrivenRESTfulRequestHandler >> initializeEndpoint: aString
+HypermediaDrivenRESTfulRequestHandler >> initializeResourceLocator: aResouceLocator
 	paginationPolicy: aPaginationPolicy
 	decodingRules: theDecodingRules
 	encodingRules: theEncodingRules
 	calculateEntityTagsWith: anEntityTagCalculator
-	andLocationWith: aLocationResolverOptional
 	drivenBy: aMediaControlsFactory [
 
-
 	self
-		initializeEndpoint: aString
+		initializeResourceLocator: aResouceLocator
 		paginationPolicy: aPaginationPolicy
 		decodingRules: theDecodingRules
 		encodingRules: theEncodingRules
-		calculateEntityTagsWith: anEntityTagCalculator
-		andLocationWith: aLocationResolverOptional.
+		calculateEntityTagsWith: anEntityTagCalculator.
 
 	mediaControlsFactory := aMediaControlsFactory
 ]

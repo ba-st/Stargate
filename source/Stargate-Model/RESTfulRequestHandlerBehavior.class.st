@@ -6,14 +6,12 @@ Class {
 	#name : #RESTfulRequestHandlerBehavior,
 	#superclass : #Object,
 	#instVars : [
-		'endpoint',
 		'paginationPolicy',
 		'decodingRules',
 		'encodingRules',
 		'entityTagCalculator',
-		'locationResolverOptional',
-		'baseUrl',
-		'acceptNegotiator'
+		'acceptNegotiator',
+		'resourceLocator'
 	],
 	#category : #'Stargate-Model-Controllers'
 }
@@ -66,7 +64,7 @@ RESTfulRequestHandlerBehavior >> encodeResourceCollection: resourceCollection to
 { #category : #accessing }
 RESTfulRequestHandlerBehavior >> endpoint [
 
-	^ endpoint
+	^ resourceLocator endpoint
 ]
 
 { #category : #private }
@@ -84,14 +82,11 @@ RESTfulRequestHandlerBehavior >> entityTagToMatchBasedOn: httpRequest [
 ]
 
 { #category : #private }
-RESTfulRequestHandlerBehavior >> evaluateQuery: aQueryEvaluationBlock [
+RESTfulRequestHandlerBehavior >> evaluateCollectionQuery: aQueryEvaluationBlock [
 
-	^ [ [ aQueryEvaluationBlock value ]
+	^ [ aQueryEvaluationBlock value ]
 		on: TeaNoSuchParam
 		do: [ :signal | HTTPClientError badRequest signal: signal messageText ]
-	]
-		on: ObjectNotFound
-		do: [ :signal | HTTPClientError notFound signal: signal messageText ]
 ]
 
 { #category : #API }
@@ -100,7 +95,9 @@ RESTfulRequestHandlerBehavior >> from: httpRequest within: requestContext get: a
 	| mediaType resource response |
 
 	mediaType := self targetMediaTypeFrom: httpRequest.
-	resource := self evaluateQuery: aQueryEvaluationBlock.
+	resource := resourceLocator
+		lookupResouceIdentifiedBy: httpRequest
+		evaluating: aQueryEvaluationBlock.
 	self
 		ifNoneMatchHeaderPresentIn: httpRequest
 		do: [ :etag | 
@@ -120,11 +117,13 @@ RESTfulRequestHandlerBehavior >> from: httpRequest within: requestContext get: a
 ]
 
 { #category : #API }
-RESTfulRequestHandlerBehavior >> from: httpRequest within: requestContext get: findBlock thenDo: actionBlock [
+RESTfulRequestHandlerBehavior >> from: httpRequest within: requestContext get: aQueryEvaluationBlock thenDo: actionBlock [
 
 	| resource |
 
-	resource := self evaluateQuery: findBlock.
+	resource := resourceLocator
+		lookupResouceIdentifiedBy: httpRequest
+		evaluating: aQueryEvaluationBlock.
 	self handleConflictsIn: [ actionBlock value: resource ].
 	^ ZnResponse noContent
 ]
@@ -139,9 +138,10 @@ RESTfulRequestHandlerBehavior >> from: httpRequest within: requestContext get: f
 	^ self
 		from: httpRequest
 		within: requestContext
-		get: [ | resourceToUpdate updatedResource |
+		get: [ :id | 
+			| resourceToUpdate updatedResource |
 
-			resourceToUpdate := findBlock value.
+			resourceToUpdate := findBlock cull: id.
 			self
 				assert: etag
 				matchesEntityTagOf: resourceToUpdate
@@ -186,36 +186,24 @@ RESTfulRequestHandlerBehavior >> ifNoneMatchHeaderPresentIn: httpRequest do: aMo
 ]
 
 { #category : #initialization }
-RESTfulRequestHandlerBehavior >> initializeEndpoint: aString
+RESTfulRequestHandlerBehavior >> initializeResourceLocator: aResouceLocator
 	paginationPolicy: aPaginationPolicy
 	decodingRules: theDecodingRules
 	encodingRules: theEncodingRules
-	calculateEntityTagsWith: anEntityTagCalculator
-	andLocationWith: aLocationResolverOptional [
+	calculateEntityTagsWith: anEntityTagCalculator [
 
-
-	baseUrl := '' asUrl.
-	endpoint := aString.
+	resourceLocator := aResouceLocator.
 	paginationPolicy := aPaginationPolicy cull: self.
 	decodingRules := theDecodingRules.
 	encodingRules := theEncodingRules.
 	acceptNegotiator := RESTfulControllerAcceptNegotiator basedOn: encodingRules keys.
 	entityTagCalculator := anEntityTagCalculator.
-	locationResolverOptional := aLocationResolverOptional
 ]
 
 { #category : #private }
 RESTfulRequestHandlerBehavior >> locationOf: resource within: requestContext [
 
-	^ locationResolverOptional
-		withContentDo: [ :resolver | 
-			( resolver
-				value: baseUrl
-				value: endpoint
-				value: resource
-				value: requestContext ) asUrl
-			]
-		ifUnused: [ self error: 'Missing location resolution policy.' ]
+	^ resourceLocator locationOf: resource within: requestContext
 ]
 
 { #category : #private }
@@ -245,7 +233,7 @@ RESTfulRequestHandlerBehavior >> resourceCreationPolicyBasedOn: httpRequest [
 { #category : #accessing }
 RESTfulRequestHandlerBehavior >> serverUrl: aServerUrl [
 
-	baseUrl := aServerUrl asUrl 
+	resourceLocator baseUrl: aServerUrl
 ]
 
 { #category : #private }

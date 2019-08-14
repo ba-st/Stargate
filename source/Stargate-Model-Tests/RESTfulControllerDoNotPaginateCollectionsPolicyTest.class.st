@@ -8,7 +8,7 @@ Class {
 }
 
 { #category : #private }
-RESTfulControllerDoNotPaginateCollectionsPolicyTest >> evaluateQuery: aBlockClosure [
+RESTfulControllerDoNotPaginateCollectionsPolicyTest >> evaluateCollectionQuery: aBlockClosure [
 
 	^ aBlockClosure value
 ]

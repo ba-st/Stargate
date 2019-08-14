@@ -9,19 +9,12 @@ Class {
 }
 
 { #category : #'instance creation' }
-RESTfulRequestHandler class >> endpoint: aString
-	paginationPolicy: aPaginationPolicy
-	decodingRules: theDecodingRules
-	encodingRules: theEncodingRules
-	calculateEntityTagsWith: entityTagCalculator
-	andLocationWith: aLocationResolverOptional [
-
+RESTfulRequestHandler class >> resourceLocator: aResouceLocator paginationPolicy: aPaginationPolicy decodingRules: theDecodingRules encodingRules: theEncodingRules calculateEntityTagsWith: entityTagCalculator [
 
 	^ self new
-		initializeEndpoint: aString
+		initializeResourceLocator: aResouceLocator
 		paginationPolicy: aPaginationPolicy
 		decodingRules: theDecodingRules
 		encodingRules: theEncodingRules
 		calculateEntityTagsWith: entityTagCalculator
-		andLocationWith: aLocationResolverOptional
 ]

@@ -134,7 +134,7 @@ PetsRESTfulController >> deletePetBasedOn: httpRequest within: requestContext [
 	^ requestHandler
 		from: httpRequest
 		within: requestContext
-		get: [ petsRepository findIdentifiedBy: ( self identifierIn: httpRequest ) ]
+		get: [ :id | petsRepository findIdentifiedBy: id ]
 		thenDo: [ :pet | petsRepository purge: pet ]
 ]
 
@@ -144,7 +144,7 @@ PetsRESTfulController >> getPetBasedOn: httpRequest within: requestContext [
 	^ requestHandler
 		from: httpRequest
 		within: requestContext
-		get: [ petsRepository findIdentifiedBy: ( self identifierIn: httpRequest ) ]
+		get: [ :id | petsRepository findIdentifiedBy: id ]
 ]
 
 { #category : #API }
@@ -185,15 +185,17 @@ PetsRESTfulController >> initializePersistingTo: aPetRepository [
 PetsRESTfulController >> initializeRequestHandler [
 
 	requestHandler := RESTfulRequestHandlerBuilder new
-		endpoint: 'pets';
-		calculateLocationUsing: [ :pet :requestContext | petsRepository identifierOf: pet ];
+		handling: 'pets'
+			locatingResourcesWith: [ :pet :requestContext | petsRepository identifierOf: pet ]
+			extractingIdentifierWith: [ :httpRequest | self identifierIn: httpRequest ];
 		beHypermediaDriven;
 		paginateCollectionsWithDefaultLimit: 5;
 		decodeToNeoJSONObjectWhenAccepting: self petVersion1dot0dot0MediaType;
 		whenResponding: self petVersion1dot0dot0MediaType
 			encodeToJsonApplying: [ :resource :requestContext :writer | self configurePetEncodingOn: writer within: requestContext ];
 		whenResponding: self petSummaryVersion1dot0dot0MediaType
-			encodeToJsonApplying: [ :resource :requestContext :writer | self configurePetSummaryEncodingOn: writer within: requestContext ];
+			encodeToJsonApplying:
+				[ :resource :requestContext :writer | self configurePetSummaryEncodingOn: writer within: requestContext ];
 		createEntityTagHashing: [ :hasher :pet :requestContext | 
 			hasher
 				include: ( petsRepository identifierOf: pet );
@@ -232,7 +234,7 @@ PetsRESTfulController >> updatePetBasedOn: httpRequest within: requestContext [
 	^ requestHandler
 		from: httpRequest
 		within: requestContext
-		get: [ petsRepository findIdentifiedBy: ( self identifierIn: httpRequest ) ]
+		get: [ :id | petsRepository findIdentifiedBy: id ]
 		thenUpdateWith: [ :pet :decoded | 
 			petsRepository
 				update: pet
