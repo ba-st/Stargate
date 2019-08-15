@@ -27,7 +27,7 @@ SouthAmericanCurrenciesRESTfulController >> currencyBasedOn: httpRequest within:
 		from: httpRequest
 		within: requestContext
 		get:
-			[ :isoCode | currencies detect: [ :currency | currency isoCode = isoCode ] ifNone: [ ObjectNotFound signal ] ]
+			[ :isoCode | currencies detect: [ :currency | currency isoCode = isoCode ] ifNone: [ NotFound signal ] ]
 ]
 
 { #category : #private }
@@ -108,6 +108,7 @@ SouthAmericanCurrenciesRESTfulController >> initializeRequestHandler [
 				include: currency symbol;
 				include: currency isoCode
 			];
+		handleExceptionsApplying: [ :handler | handler addAsNotFoundError: NotFound ];
 		build
 ]
 

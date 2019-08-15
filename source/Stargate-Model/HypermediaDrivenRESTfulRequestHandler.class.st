@@ -11,7 +11,7 @@ Class {
 }
 
 { #category : #'instance creation' }
-HypermediaDrivenRESTfulRequestHandler class >> resourceLocator: aResouceLocator paginationPolicy: aPaginationPolicy decodingRules: theDecodingRules encodingRules: theEncodingRules calculateEntityTagsWith: entityTagCalculator drivenBy: aMediaControlsFactory [
+HypermediaDrivenRESTfulRequestHandler class >> resourceLocator: aResouceLocator paginationPolicy: aPaginationPolicy decodingRules: theDecodingRules encodingRules: theEncodingRules calculateEntityTagsWith: entityTagCalculator drivenBy: aMediaControlsFactory handleErrorsWith: anExceptionHandler [
 
 	^ self new
 		initializeResourceLocator: aResouceLocator
@@ -20,6 +20,7 @@ HypermediaDrivenRESTfulRequestHandler class >> resourceLocator: aResouceLocator 
 		encodingRules: theEncodingRules
 		calculateEntityTagsWith: entityTagCalculator
 		drivenBy: aMediaControlsFactory
+		handleErrorsWith: anExceptionHandler
 ]
 
 { #category : #private }
@@ -62,14 +63,17 @@ HypermediaDrivenRESTfulRequestHandler >> initializeResourceLocator: aResouceLoca
 	decodingRules: theDecodingRules
 	encodingRules: theEncodingRules
 	calculateEntityTagsWith: anEntityTagCalculator
-	drivenBy: aMediaControlsFactory [
+	drivenBy: aMediaControlsFactory
+	handleErrorsWith: anExceptionHandler [
+
 
 	self
 		initializeResourceLocator: aResouceLocator
 		paginationPolicy: aPaginationPolicy
 		decodingRules: theDecodingRules
 		encodingRules: theEncodingRules
-		calculateEntityTagsWith: anEntityTagCalculator.
+		calculateEntityTagsWith: anEntityTagCalculator
+		handleErrorsWith: anExceptionHandler.
 
 	mediaControlsFactory := aMediaControlsFactory
 ]

@@ -1,3 +1,6 @@
+"
+I'm responsible for locating specific resource instances and generating location urls from them
+"
 Class {
 	#name : #ResourceLocator,
 	#superclass : #Object,
@@ -5,7 +8,8 @@ Class {
 		'baseUrl',
 		'endpoint',
 		'identifierLookupAction',
-		'locationResolverBinding'
+		'locationResolverBinding',
+		'exceptionHandler'
 	],
 	#category : #'Stargate-Model-Controllers'
 }
@@ -55,13 +59,20 @@ ResourceLocator >> endpoint [
 	^ endpoint
 ]
 
+{ #category : #accessing }
+ResourceLocator >> handleExceptionsWith: anExceptionHandler [
+
+	exceptionHandler := anExceptionHandler
+]
+
 { #category : #initialization }
 ResourceLocator >> initializeHandling: aStringOrSymbol resolvingLocationWith: aLocationResolverBinding andIdentifierBy: aBlock [
 
 	baseUrl := '' asUrl.
 	endpoint := '/<1s>' expandMacrosWith: aStringOrSymbol asString.
 	locationResolverBinding := aLocationResolverBinding.
-	identifierLookupAction := aBlock
+	identifierLookupAction := aBlock.
+	exceptionHandler := RESTfulRequestExceptionHandler new
 ]
 
 { #category : #querying }
@@ -74,14 +85,10 @@ ResourceLocator >> locationOf: resource within: requestContext [
 { #category : #querying }
 ResourceLocator >> lookupResouceIdentifiedBy: httpRequest evaluating: aQueryBlock [
 
-	^ [ [ 
+	^ exceptionHandler
+		handleNotFoundAndMissingParametersDuring: [ 
 			| identifier |
 			identifier := identifierLookupAction cull: httpRequest.
 			aQueryBlock cull: identifier
-		]
-			on: TeaNoSuchParam
-			do: [ :signal | HTTPClientError badRequest signal: signal messageText ]
-		]
-			on: ObjectNotFound
-			do: [ :signal | HTTPClientError notFound signal: signal messageText ]
+			]
 ]
