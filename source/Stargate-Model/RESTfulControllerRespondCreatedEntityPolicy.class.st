@@ -5,41 +5,37 @@ Class {
 	#name : #RESTfulControllerRespondCreatedEntityPolicy,
 	#superclass : #RESTfulControllerResourceCreationPolicy,
 	#instVars : [
-		'resourceController'
+		'requestHandler',
+		'targetMediaType'
 	],
 	#category : #'Stargate-Model-Controllers'
 }
 
 { #category : #'instance creation' }
-RESTfulControllerRespondCreatedEntityPolicy class >> for: aResourceController [
+RESTfulControllerRespondCreatedEntityPolicy class >> for: aRequestHandler encodedAs: aTargetMediaType [
 
-	^ self new initializeFor: aResourceController
+	^ self new initializeFor: aRequestHandler encodedAs: aTargetMediaType
 ]
 
 { #category : #initialization }
-RESTfulControllerRespondCreatedEntityPolicy >> initializeFor: aResourceController [
+RESTfulControllerRespondCreatedEntityPolicy >> initializeFor: aRequestHandler encodedAs: aTargetMediaType [
 
-	resourceController := aResourceController
+	requestHandler := aRequestHandler.
+	targetMediaType := aTargetMediaType
 ]
 
 { #category : #processing }
-RESTfulControllerRespondCreatedEntityPolicy >> responseFor: aResource decodedUsing: aKey basedOn: anHttpRequest within: aContext [
+RESTfulControllerRespondCreatedEntityPolicy >> responseFor: resource basedOn: httpRequest within: requestContext [
 
 	| response |
 
-	resourceController hypermediaPolicy holdResource: aResource controlsWithin: aContext.
 	response := ZnResponse
-		created: ( resourceController locationOf: aResource within: aContext )
-		entity:
-			( resourceController
-				encode: aResource
-				at: aKey
-				to: anHttpRequest contentType
-				within: aContext ).
-	resourceController
-		putEntityTagOf: aResource
-		encodedAs: anHttpRequest contentType
+		created: ( requestHandler locationOf: resource within: requestContext )
+		entity: ( requestHandler encodeResource: resource to: targetMediaType within: requestContext ).
+	requestHandler
+		putEntityTagOf: resource
+		encodedAs: targetMediaType
 		in: response
-		within: aContext.
+		within: requestContext.
 	^ response
 ]

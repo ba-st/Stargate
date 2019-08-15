@@ -4,5 +4,11 @@ I'm an exception expecting to be raised when someone seeks a mapping and cannot 
 Class {
 	#name : #MappingNotFound,
 	#superclass : #Error,
-	#category : #'Stargate-Model-Mapping'
+	#category : #'Stargate-Deprecated-V3'
 }
+
+{ #category : #deprecation }
+MappingNotFound class >> isDeprecated [
+
+	^ true
+]

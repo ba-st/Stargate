@@ -5,9 +5,11 @@ Class {
 	#name : #PetStoreAPITest,
 	#superclass : #TestCase,
 	#instVars : [
-		'api'
+		'api',
+		'petsController',
+		'ordersController'
 	],
-	#category : #'Stargate-Examples-Tests'
+	#category : #'Stargate-Examples-Tests-PetStore'
 }
 
 { #category : #private }
@@ -38,18 +40,6 @@ PetStoreAPITest >> newClient [
 ]
 
 { #category : #private }
-PetStoreAPITest >> ordersSpec [
-
-	^ PetOrdersRESTfulControllerSpecification new
-]
-
-{ #category : #private }
-PetStoreAPITest >> petsSpec [
-
-	^ PetsRESTfulControllerSpecification new
-]
-
-{ #category : #private }
 PetStoreAPITest >> port [
 
 	^ 9999
@@ -60,13 +50,13 @@ PetStoreAPITest >> setUp [
 
 	super setUp.
 	self checkPortAvailability.
+	petsController := PetsRESTfulController new.
+	ordersController := PetOrdersRESTfulController new.
 	api := HTTPBasedRESTfulAPI
 		configuredBy:
 			{( #port -> self port ).
 			( #serverUrl -> self baseUrl )}
-		installing:
-			{PetsRESTfulController new.
-			PetOrdersRESTfulController new}.
+		installing: {petsController. ordersController}.
 
 	api on: Error addErrorHandler: [ :error :request | self fail ].
 
@@ -89,9 +79,10 @@ PetStoreAPITest >> testBadRequest [
 	self
 		should: [ self newClient
 				url: self baseUrl / 'orders' asUrl;
-				entity: (ZnEntity with: '{xxxx}' ofType: self ordersSpec orderVersion1dot0dot0MediaType);
+				entity: ( ZnEntity with: '{xxxx}' ofType: ordersController orderVersion1dot0dot0MediaType );
 				post;
-				response ]
+				response
+			]
 		raise: ZnHttpUnsuccessful
 		withExceptionDo: [ :error | self assert: error response isBadRequest ]
 ]
@@ -138,7 +129,7 @@ PetStoreAPITest >> testConflict [
 		entity:
 			( ZnEntity
 				with: '{"date":"2018-10-24T18:05:46.418Z","pet":"https://api.example.com/pets/1"}'
-				ofType: self ordersSpec orderVersion1dot0dot0MediaType );
+				ofType: ordersController orderVersion1dot0dot0MediaType );
 		post.
 
 	self newClient
@@ -168,13 +159,15 @@ PetStoreAPITest >> testCreatePet [
 		entity:
 			( ZnEntity
 				with: '{"name":"Firulais","type":"dog"}'
-				ofType: self petsSpec petVersion1dot0dot0MediaType );
+				ofType: petsController petVersion1dot0dot0MediaType );
+		setAccept: petsController petVersion1dot0dot0MediaType;
 		post;
 		response.
 
 	self
 		assert: response isCreated;
-		assert: response location equals: 'http://localhost:9999/pets/1'.
+		assert: response location equals: 'http://localhost:9999/pets/1';
+		assert: response contentType equals: petsController petVersion1dot0dot0MediaType.
 
 	json := NeoJSONObject fromString: response contents.
 	self
@@ -201,7 +194,10 @@ PetStoreAPITest >> testMethodNotAllowed [
 
 	self newClient
 		url: self baseUrl / 'pets' asUrl;
-		entity: (ZnEntity with: '{"name":"Firulais","type":"dog"}' ofType: self petsSpec petVersion1dot0dot0MediaType);
+		entity:
+			( ZnEntity
+				with: '{"name":"Firulais","type":"dog"}'
+				ofType: petsController petVersion1dot0dot0MediaType );
 		post.
 
 	self
@@ -210,7 +206,8 @@ PetStoreAPITest >> testMethodNotAllowed [
 		withExceptionDo: [ :error | 
 			self
 				assert: error response isError;
-				assert: error response code equals: 405 ]
+				assert: error response code equals: 405
+			]
 ]
 
 { #category : #'tests - client errors' }

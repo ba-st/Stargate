@@ -23,8 +23,11 @@ ReflectiveRoutesConfigurator >> addRoutesOf: aResourceRESTfulController [
 
 	| routeConfigurator |
 
-	routeConfigurator := RouteConfigurator appliedTo: teapot sendingMessagesTo: aResourceRESTfulController.
-	aResourceRESTfulController specification routes do: [ :routeSpecification | routeSpecification configureUsing: routeConfigurator ].
+	routeConfigurator := RouteConfigurator
+		appliedTo: teapot
+		sendingMessagesTo: aResourceRESTfulController.
+	aResourceRESTfulController routes
+		do: [ :routeSpecification | routeSpecification configureUsing: routeConfigurator ].
 	routeConfigurator configureCrossOriginSharingRoutes
 ]
 

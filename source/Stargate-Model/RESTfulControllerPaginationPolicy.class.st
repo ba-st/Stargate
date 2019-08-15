@@ -8,19 +8,19 @@ Class {
 }
 
 { #category : #applying }
-RESTfulControllerPaginationPolicy >> addPaginationControlsTo: mediaControls within: aContext [
+RESTfulControllerPaginationPolicy >> addPaginationControlsTo: mediaControls within: httpRequest [
 
 	^ self subclassResponsibility 
 ]
 
 { #category : #applying }
-RESTfulControllerPaginationPolicy >> affect: response within: aContext [
+RESTfulControllerPaginationPolicy >> affect: response within: requestContext [
 
 	self subclassResponsibility 
 ]
 
 { #category : #applying }
-RESTfulControllerPaginationPolicy >> evaluateQuery: aQueryEvaluationBlock basedOn: anHttpRequest [
+RESTfulControllerPaginationPolicy >> evaluateQuery: aQueryEvaluationBlock basedOn: httpRequest [
 
 	self subclassResponsibility
 ]

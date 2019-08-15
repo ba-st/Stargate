@@ -1,5 +1,5 @@
 "
-I'm an abstract Test Case providing facililties to test RESTfulWebServices
+I'm an abstract Test Case providing facililties to test RESTfulControllers
 "
 Class {
 	#name : #ResourceRESTfulControllerTest,
@@ -34,75 +34,6 @@ ResourceRESTfulControllerTest >> newHttpRequestContext [
 	^ HttpRequestContext new
 ]
 
-{ #category : #'private - support' }
-ResourceRESTfulControllerTest >> requestToGetResourceIdentifiedBy: anIdentifier accepting: anAcceptHeader [
-
-	^ TeaRequest
-		fromZnRequest:
-			((ZnRequest get: (self urlForResourceIdentifiedBy: anIdentifier))
-				setAccept: anAcceptHeader;
-				yourself)
-		pathParams: {(#identifier -> anIdentifier)} asDictionary
-]
-
-{ #category : #'private - support' }
-ResourceRESTfulControllerTest >> requestToGetResourceIdentifiedBy: anIdentifier accepting: anAcceptHeader conditionalTo: anETag [
-
-	^ TeaRequest
-		fromZnRequest:
-			((ZnRequest get: (self urlForResourceIdentifiedBy: anIdentifier))
-				setAccept: anAcceptHeader;
-				setIfNoneMatchTo: anETag;
-				yourself)
-		pathParams: {(#identifier -> anIdentifier)} asDictionary
-]
-
-{ #category : #'private - support' }
-ResourceRESTfulControllerTest >> requestToGetSubresource: aSubresourceEndpoint identifiedBy: anIdentifier accepting: anAcceptHeader [
-
-	^ TeaRequest
-		fromZnRequest:
-			( ( ZnRequest get: ( self urlForResourceIdentifiedBy: anIdentifier ) / aSubresourceEndpoint )
-				setAccept: anAcceptHeader;
-				yourself )
-		pathParams:
-			( SmallDictionary new
-				at: #identifier put: anIdentifier;
-				yourself )
-]
-
-{ #category : #'private - support' }
-ResourceRESTfulControllerTest >> requestToPATCHResourceIdentifiedBy: anIdentifier with: aRequestBody accepting: anAcceptHeader conditionalTo: anETag [
-
-	^ TeaRequest
-		fromZnRequest:
-			( ( ZnRequest patch: ( self urlForResourceIdentifiedBy: anIdentifier ) )
-				setAccept: anAcceptHeader;
-				setIfMatchTo: anETag;
-				entity: ( ZnEntity with: aRequestBody type: anAcceptHeader );
-				yourself )
-		pathParams:
-			( SmallDictionary new
-				at: #identifier put: anIdentifier;
-				yourself )
-]
-
-{ #category : #'private - support' }
-ResourceRESTfulControllerTest >> requestToPOST: content as: aMediaType [
-
-	^ TeaRequest
-		fromZnRequest:
-			((ZnRequest post: self resourceUrl)
-				entity: (ZnEntity with: content type: aMediaType);
-				yourself)
-]
-
-{ #category : #'private - support' }
-ResourceRESTfulControllerTest >> resourceUrl [
-
-	^ self baseUrl / resourceController specification endpoint
-]
-
 { #category : #running }
 ResourceRESTfulControllerTest >> setUp [
 
@@ -115,12 +46,6 @@ ResourceRESTfulControllerTest >> setUp [
 ResourceRESTfulControllerTest >> setUpResourceController [
 
 	self subclassResponsibility
-]
-
-{ #category : #'private - support' }
-ResourceRESTfulControllerTest >> urlForResourceIdentifiedBy: anIdentifier [
-
-	^ self resourceUrl / anIdentifier asString asZnUrl
 ]
 
 { #category : #'private - support' }

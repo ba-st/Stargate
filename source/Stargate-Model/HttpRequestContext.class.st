@@ -12,12 +12,18 @@ Class {
 }
 
 { #category : #pagination }
-HttpRequestContext >> addPaginationControl: aControl [
+HttpRequestContext >> addPaginationLink: aUrl relatedTo: aRelationType [
 
 	| controls |
 
-	controls := self objectUnder: #paginationLinks ifNone: [ self hold: OrderedCollection new under: #paginationLinks ].
-	controls add: aControl
+	controls := self
+		objectUnder: #paginationLinks
+		ifNone: [ self hold: OrderedCollection new under: #paginationLinks ].
+	controls
+		addAll:
+			( MediaControlsBuilder new
+				addLink: aUrl relatedTo: aRelationType;
+				build )
 ]
 
 { #category : #accessing }
@@ -28,33 +34,23 @@ HttpRequestContext >> hold: anObject under: aConcept [
 ]
 
 { #category : #hypermedia }
-HttpRequestContext >> holdAsHypermediaControls: aControlCollection [
+HttpRequestContext >> holdAsHypermediaControls: aControlCollection for: resource [
 
-	self hold: aControlCollection under: #hypermediaControls
+	| resourcesHypermediaControls |
+
+	resourcesHypermediaControls := self
+		objectUnder: #resourceHypermediaControls
+		ifNone: [ self hold: IdentityDictionary new under: #resourceHypermediaControls ].
+	resourcesHypermediaControls at: resource put: aControlCollection
 ]
 
 { #category : #hypermedia }
-HttpRequestContext >> holdAsHypermediaControls: aControlCollection forSubresource: aResource [
-
-	| subResourcesHypermediaControls |
-
-	subResourcesHypermediaControls := self objectUnder: #subResourceHypermediaControls ifNone: [ self hold: IdentityDictionary new under: #subResourceHypermediaControls ].
-	subResourcesHypermediaControls at: aResource put: aControlCollection
-]
-
-{ #category : #hypermedia }
-HttpRequestContext >> hypermediaControls [
-
-	^ self objectUnder: #hypermediaControls ifNone: [ #() ]
-]
-
-{ #category : #hypermedia }
-HttpRequestContext >> hypermediaControlsFor: aResource [
+HttpRequestContext >> hypermediaControlsFor: resource [
 
 	| hypermediaControls |
 
-	hypermediaControls := self objectUnder: #subResourceHypermediaControls ifNone: [ ^ #() ].
-	^ hypermediaControls at: aResource ifAbsent: [ #() ]
+	hypermediaControls := self objectUnder: #resourceHypermediaControls ifNone: [ ^ #() ].
+	^ hypermediaControls at: resource ifAbsent: [ #() ]
 ]
 
 { #category : #initialization }

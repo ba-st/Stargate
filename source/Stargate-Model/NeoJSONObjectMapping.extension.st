@@ -9,12 +9,6 @@ NeoJSONObjectMapping >> mapAsHypermediaControls: aBlock [
 ]
 
 { #category : #'*Stargate-Model' }
-NeoJSONObjectMapping >> mapHypermediaControlsIn: aContext [
-
-	self mapAsHypermediaControls: [ aContext hypermediaControls ]
-]
-
-{ #category : #'*Stargate-Model' }
 NeoJSONObjectMapping >> mapProperty: propertyName getter: readBlock [
 
 	self mapProperty: propertyName getter: readBlock setter: [:object :value | ]

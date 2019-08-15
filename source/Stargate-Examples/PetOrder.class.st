@@ -8,7 +8,7 @@ Class {
 		'pet',
 		'date'
 	],
-	#category : #'Stargate-Examples'
+	#category : #'Stargate-Examples-PetStore'
 }
 
 { #category : #'instance creation' }

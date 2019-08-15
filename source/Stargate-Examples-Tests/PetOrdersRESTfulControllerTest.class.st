@@ -3,20 +3,27 @@ I'm a user stoty test testing the service providing the Pet Order resource, in t
 "
 Class {
 	#name : #PetOrdersRESTfulControllerTest,
-	#superclass : #ResourceRESTfulControllerTest,
-	#category : #'Stargate-Examples-Tests'
+	#superclass : #SingleResourceRESTfulControllerTest,
+	#instVars : [
+		'orderRepository'
+	],
+	#category : #'Stargate-Examples-Tests-PetStore'
 }
 
 { #category : #'private - support' }
 PetOrdersRESTfulControllerTest >> baseUrl [
 
-	^ 'https://petstore.example.com' asZnUrl 
+	^ 'https://petstore.example.com' asUrl
 ]
 
 { #category : #'private - support' }
 PetOrdersRESTfulControllerTest >> createOrder [
 
-	^ resourceController createOrderBasedOn: (self requestToCreateOrderFrom: ('{"date":"2018-10-24T18:05:46.418Z","pet":"<1p>"}' expandMacrosWith: self petUrl)) within: self newHttpRequestContext
+	^ resourceController
+		createOrderBasedOn:
+			( self
+				requestToCreateOrderFrom: ( '{"date":"2018-10-24T18:05:46.418Z","pet":"<1p>"}' expandMacrosWith: self petUrl ) )
+		within: self newHttpRequestContext
 ]
 
 { #category : #'private - support' }
@@ -24,12 +31,18 @@ PetOrdersRESTfulControllerTest >> getFirstOrderAndWithJsonDo: aBlock [
 
 	| response |
 
-	response := resourceController getOrderBasedOn: (self requestToGetResourceIdentifiedBy: 1 accepting: resourceController specification orderVersion1dot0dot0MediaType) within: self newHttpRequestContext.
+	response := resourceController
+		getOrderBasedOn:
+			( self
+				requestToGetResourceIdentifiedBy: 1
+				accepting: resourceController orderVersion1dot0dot0MediaType )
+		within: self newHttpRequestContext.
 
 	self
 		assert: response isSuccess;
 		assert: response status equals: 200;
-		assert: response contentType asMediaType equals: resourceController specification orderVersion1dot0dot0MediaType;
+		assert: response contentType asMediaType
+			equals: resourceController orderVersion1dot0dot0MediaType;
 		withJsonFromContentsIn: response do: aBlock
 ]
 
@@ -42,7 +55,7 @@ PetOrdersRESTfulControllerTest >> petUrl [
 { #category : #'private - support' }
 PetOrdersRESTfulControllerTest >> requestToCreateOrderFrom: json [
 
-	^ self requestToPOST: json as: resourceController specification orderVersion1dot0dot0MediaType
+	^ self requestToPOST: json as: resourceController orderVersion1dot0dot0MediaType
 ]
 
 { #category : #'private - support' }
@@ -54,16 +67,15 @@ PetOrdersRESTfulControllerTest >> requestToPOST: url identifiedBy: anIdentifier 
 { #category : #running }
 PetOrdersRESTfulControllerTest >> setUp [
 
+	orderRepository := InMemoryPetOrderRepository new.
 	super setUp.
-	self setUpResourceController.
-	resourceController serverUrl: self baseUrl asZnUrl.
-	self assert: resourceController orders isEmpty
+	self assert: orderRepository findAll isEmpty
 ]
 
 { #category : #running }
 PetOrdersRESTfulControllerTest >> setUpResourceController [
 
-	resourceController := PetOrdersRESTfulController new
+	resourceController := PetOrdersRESTfulController persistingTo: orderRepository 
 ]
 
 { #category : #tests }
@@ -166,6 +178,19 @@ PetOrdersRESTfulControllerTest >> testOrderCreation [
 		assert: response status equals: 201;
 		assertUrl: response location equals: 'https://petstore.example.com/orders/1';
 		assert: response hasEntity;
-		assert: resourceController orders size equals: 1;
-		assert: resourceController orders first pet equals: self petUrl
+		assert: orderRepository count equals: 1;
+		assert: orderRepository findAll first pet equals: self petUrl
+]
+
+{ #category : #tests }
+PetOrdersRESTfulControllerTest >> testTemplate [
+
+	| controller |
+
+	controller := PetOrdersRESTfulController new.
+
+	self
+		assert: controller identifierTemplate equals: '/orders/<identifier:IsInteger>';
+		assert: controller cancelTemplate equals: '/orders/<identifier:IsInteger>/cancel';
+		assert: controller completeTemplate equals: '/orders/<identifier:IsInteger>/complete'
 ]

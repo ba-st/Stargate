@@ -10,25 +10,25 @@ Class {
 { #category : #accessing }
 ReflectiveRoutesConfiguratorTest >> createTestRoute [
 
-	^ (RouteSpecification handling: #POST at: '/tests' sending: #createTestBasedOn:) asCorsAware
+	^ ( RouteSpecification
+		handling: #POST
+		at: '/tests'
+		evaluating: [ :httpRequest :requestContext | self fail ] ) asCorsAware
 ]
 
 { #category : #accessing }
 ReflectiveRoutesConfiguratorTest >> getTestsRoute [
 
-	^ (RouteSpecification handling: #GET at: '/tests' sending: #getTestsBasedOn:) asCorsAware
+	^ ( RouteSpecification
+		handling: #GET
+		at: '/tests'
+		evaluating: [ :httpRequest :requestContext | self fail ] ) asCorsAware
 ]
 
 { #category : #accessing }
 ReflectiveRoutesConfiguratorTest >> routes [
 
 	^ (UnaryMessageSendingCollector sendingAllMessagesEndingWith: 'Route' to: self) value
-]
-
-{ #category : #accessing }
-ReflectiveRoutesConfiguratorTest >> specification [
-	
-	^ self
 ]
 
 { #category : #tests }

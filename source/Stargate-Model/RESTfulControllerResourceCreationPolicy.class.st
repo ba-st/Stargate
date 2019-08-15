@@ -8,7 +8,7 @@ Class {
 }
 
 { #category : #processing }
-RESTfulControllerResourceCreationPolicy >> responseFor: aResource decodedUsing: aKey basedOn: anHttpRequest within: aContext [
+RESTfulControllerResourceCreationPolicy >> responseFor: resource basedOn: httpRequest within: requestContext [
 
 	self subclassResponsibility
 ]
