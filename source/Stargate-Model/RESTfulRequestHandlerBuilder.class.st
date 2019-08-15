@@ -80,7 +80,7 @@ RESTfulRequestHandlerBuilder >> decodeToNeoJSONObjectWhenAccepting: aMediaType [
 ]
 
 { #category : #configuring }
-RESTfulRequestHandlerBuilder >> exceptionHandlingAdvice: aBlock [
+RESTfulRequestHandlerBuilder >> handleExceptionsApplying: aBlock [
 
 	aBlock value: exceptionHandler
 ]

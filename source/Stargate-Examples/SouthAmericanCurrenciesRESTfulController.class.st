@@ -108,7 +108,7 @@ SouthAmericanCurrenciesRESTfulController >> initializeRequestHandler [
 				include: currency symbol;
 				include: currency isoCode
 			];
-		exceptionHandlingAdvice: [ :handler | handler addAsNotFoundError: NotFound ];
+		handleExceptionsApplying: [ :handler | handler addAsNotFoundError: NotFound ];
 		build
 ]
 
