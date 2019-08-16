@@ -60,12 +60,6 @@ ResourceLocator >> endpoint [
 ]
 
 { #category : #accessing }
-ResourceLocator >> exceptionHandler [
-
-	^ exceptionHandler
-]
-
-{ #category : #accessing }
 ResourceLocator >> handleExceptionsWith: anExceptionHandler [
 
 	exceptionHandler := anExceptionHandler

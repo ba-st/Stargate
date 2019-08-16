@@ -69,12 +69,6 @@ SubresourceLocator >> endpoint [
 ]
 
 { #category : #accessing }
-SubresourceLocator >> exceptionHandler [
-
-	^ exceptionHandler
-]
-
-{ #category : #accessing }
 SubresourceLocator >> handleExceptionsWith: anExceptionHandler [
 
 	exceptionHandler := anExceptionHandler

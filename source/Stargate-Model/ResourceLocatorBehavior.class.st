@@ -23,12 +23,6 @@ ResourceLocatorBehavior >> endpoint [
 ]
 
 { #category : #accessing }
-ResourceLocatorBehavior >> exceptionHandler [
-
-	^ self subclassResponsibility
-]
-
-{ #category : #accessing }
 ResourceLocatorBehavior >> handleExceptionsWith: anExceptionHandler [
 
 	self subclassResponsibility
