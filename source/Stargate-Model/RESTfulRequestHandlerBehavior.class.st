@@ -225,6 +225,12 @@ RESTfulRequestHandlerBehavior >> resourceCreationPolicyBasedOn: httpRequest [
 ]
 
 { #category : #accessing }
+RESTfulRequestHandlerBehavior >> resourceLocator [
+
+	^ resourceLocator
+]
+
+{ #category : #accessing }
 RESTfulRequestHandlerBehavior >> serverUrl: aServerUrl [
 
 	resourceLocator baseUrl: aServerUrl

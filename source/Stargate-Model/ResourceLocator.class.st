@@ -3,7 +3,7 @@ I'm responsible for locating specific resource instances and generating location
 "
 Class {
 	#name : #ResourceLocator,
-	#superclass : #Object,
+	#superclass : #ResourceLocatorBehavior,
 	#instVars : [
 		'baseUrl',
 		'endpoint',

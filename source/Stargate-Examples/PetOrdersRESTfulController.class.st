@@ -6,7 +6,9 @@ Class {
 	#superclass : #SingleResourceRESTfulController,
 	#instVars : [
 		'ordersRepository',
-		'requestHandler'
+		'requestHandler',
+		'commentsRequestHandler',
+		'commentsByOrderId'
 	],
 	#category : #'Stargate-Examples-PetStore'
 }
@@ -28,7 +30,7 @@ PetOrdersRESTfulController >> affect: builder withMediaControlsFor: order locate
 
 	| status |
 
-	status := ordersRepository statusOf: order.
+	status := ordersRepository statusOf: order.	
 	"In the real life you don't do a case. This is a toy example"
 	status = 'registered'
 		ifTrue: [ builder
@@ -36,10 +38,12 @@ PetOrdersRESTfulController >> affect: builder withMediaControlsFor: order locate
 				addLink: location / 'complete' asUrl relatedTo: 'complete'
 			].
 	status = 'completed'
-		ifTrue: [ builder addLink: location / 'cancel' asUrl relatedTo: 'cancel' ]
+		ifTrue: [ builder addLink: location / 'cancel' asUrl relatedTo: 'cancel' ].
+
+	builder addLink: location / 'comments' asUrl relatedTo: 'comments'
 ]
 
-{ #category : #API }
+{ #category : #'API - orders' }
 PetOrdersRESTfulController >> cancelOrderBasedOn: httpRequest within: requestContext [
 
 	^ requestHandler
@@ -55,7 +59,34 @@ PetOrdersRESTfulController >> cancelTemplate [
 	^ '<1s>/cancel' expandMacrosWith: self identifierTemplate
 ]
 
-{ #category : #API }
+{ #category : #private }
+PetOrdersRESTfulController >> commentIdentifierIn: httpRequest [
+
+	^ httpRequest at: self commentIdentifierKey
+]
+
+{ #category : #private }
+PetOrdersRESTfulController >> commentIdentifierKey [
+
+	^ #commentIdentifier
+]
+
+{ #category : #private }
+PetOrdersRESTfulController >> commentIdentifierTemplate [
+
+	^ '<1s>/%<<2s>:<3s>>'
+		expandMacrosWith: self commentsTemplate
+		with: self commentIdentifierKey
+		with: self typeIdConstraint asString
+]
+
+{ #category : #private }
+PetOrdersRESTfulController >> commentsTemplate [
+
+	^ '<1s><2s>' expandMacrosWith: self identifierTemplate with: commentsRequestHandler endpoint
+]
+
+{ #category : #'API - orders' }
 PetOrdersRESTfulController >> completeOrderBasedOn: httpRequest within: requestContext [
 
 	^ requestHandler
@@ -98,7 +129,24 @@ PetOrdersRESTfulController >> configureOrderEncodingOn: writer within: requestCo
 			]
 ]
 
-{ #category : #API }
+{ #category : #'API - comments' }
+PetOrdersRESTfulController >> createCommentBasedOn: httpRequest within: requestContext [
+
+	^ commentsRequestHandler
+		withResourceCreatedFrom: httpRequest
+		within: requestContext
+		do: [ :comment | 
+			| orderId order comments |
+			orderId := self identifierIn: httpRequest.
+			order := ordersRepository findIdentifiedBy: orderId.
+			requestContext parentResource: order.
+			comments := commentsByOrderId at: orderId ifAbsentPut: [ OrderedCollection new ].
+			comments add: comment.
+			comment
+			]
+]
+
+{ #category : #'API - orders' }
 PetOrdersRESTfulController >> createOrderBasedOn: httpRequest within: requestContext [
 
 	^ requestHandler
@@ -130,6 +178,15 @@ PetOrdersRESTfulController >> declareCompleteOrderRoute [
 ]
 
 { #category : #routes }
+PetOrdersRESTfulController >> declareCreateOrderCommentRoute [
+
+	^ RouteSpecification
+		handling: #POST
+		at: self commentsTemplate
+		evaluating: [ :httpRequest :requestContext | self createCommentBasedOn: httpRequest within: requestContext ]
+]
+
+{ #category : #routes }
 PetOrdersRESTfulController >> declareCreateOrderRoute [
 
 	^ RouteSpecification
@@ -147,7 +204,7 @@ PetOrdersRESTfulController >> declareGetOrderRoute [
 		evaluating: [ :httpRequest :requestContext | self getOrderBasedOn: httpRequest within: requestContext ]
 ]
 
-{ #category : #API }
+{ #category : #'API - orders' }
 PetOrdersRESTfulController >> getOrderBasedOn: httpRequest within: requestContext [
 
 	^ requestHandler
@@ -162,10 +219,30 @@ PetOrdersRESTfulController >> getOrderBasedOn: httpRequest within: requestContex
 ]
 
 { #category : #initialization }
+PetOrdersRESTfulController >> initializeCommentsRequestHandler [
+
+	commentsRequestHandler := RESTfulRequestHandlerBuilder new
+		handling: 'comments'
+			locatingSubresourcesWith: [ :comment :requestContext | 
+				( commentsByOrderId at: ( ordersRepository identifierOf: requestContext parentResource ) )
+					indexOf: comment
+				]
+			extractingIdentifierWith: [ :httpRequest | self commentIdentifierIn: httpRequest ]
+			locatingParentResourceWith: requestHandler resourceLocator;
+		whenAccepting: ZnMimeType textPlain decodeApplying: [ :comment | comment ];
+		whenResponding: ZnMimeType textPlain encodeApplying: [ :comment | comment ];
+		createEntityTagHashing: [ :hasher :comment :requestContext | hasher include: comment ];
+		build
+]
+
+{ #category : #initialization }
 PetOrdersRESTfulController >> initializePersistingTo: aPetRepository [
 
 	ordersRepository := aPetRepository.
-	self initializeRequestHandler
+	commentsByOrderId := Dictionary new.
+	self
+		initializeRequestHandler;
+		initializeCommentsRequestHandler
 ]
 
 { #category : #initialization }
@@ -199,6 +276,13 @@ PetOrdersRESTfulController >> orderVersion1dot0dot0MediaType [
 PetOrdersRESTfulController >> requestHandler [
 
 	^ requestHandler
+]
+
+{ #category : #configuring }
+PetOrdersRESTfulController >> serverUrl: aServerUrl [
+
+	super serverUrl: aServerUrl.
+	commentsRequestHandler serverUrl: aServerUrl
 ]
 
 { #category : #private }

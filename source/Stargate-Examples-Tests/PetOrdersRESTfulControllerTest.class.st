@@ -17,6 +17,17 @@ PetOrdersRESTfulControllerTest >> baseUrl [
 ]
 
 { #category : #'private - support' }
+PetOrdersRESTfulControllerTest >> createCommentFor: order identifiedBy: anId withContent: aComment [
+
+	| request |
+
+	request := self requestToPOST: order links self asUrl / 'comments' identifiedBy: anId.
+	request entity: ( ZnEntity with: aComment type: ZnMimeType textPlain ).
+
+	^ resourceController createCommentBasedOn: request within: self newHttpRequestContext
+]
+
+{ #category : #'private - support' }
 PetOrdersRESTfulControllerTest >> createOrder [
 
 	^ resourceController
@@ -78,7 +89,7 @@ PetOrdersRESTfulControllerTest >> setUpResourceController [
 	resourceController := PetOrdersRESTfulController persistingTo: orderRepository 
 ]
 
-{ #category : #tests }
+{ #category : #'tests - orders' }
 PetOrdersRESTfulControllerTest >> testGetCanceledOrder [
 
 	self
@@ -98,7 +109,38 @@ PetOrdersRESTfulControllerTest >> testGetCanceledOrder [
 				assertUrl: json links self equals: 'https://petstore.example.com/orders/1' ]
 ]
 
-{ #category : #tests }
+{ #category : #'tests - comments' }
+PetOrdersRESTfulControllerTest >> testGetCommentsForJustCreatedOrder [
+
+	| response orderCreationResponse |
+
+	orderCreationResponse := self createOrder.
+	self assert: orderCreationResponse isSuccess.
+
+	self
+		withJsonFromContentsIn: orderCreationResponse
+		do: [ :order | 
+			response := self createCommentFor: order identifiedBy: 1 withContent: 'First comment!'.
+
+			self
+				assert: response isSuccess;
+				assert: response isCreated;
+				assert: response contentType equals: ZnMimeType textPlain;
+				assert: response contents equals: 'First comment!';
+				assertUrl: response location equals: 'https://petstore.example.com/orders/1/comments/1'.
+
+			response := self createCommentFor: order identifiedBy: 1 withContent: 'Second'.
+
+			self
+				assert: response isSuccess;
+				assert: response isCreated;
+				assert: response contentType equals: ZnMimeType textPlain;
+				assert: response contents equals: 'Second';
+				assertUrl: response location equals: 'https://petstore.example.com/orders/1/comments/2'
+			]
+]
+
+{ #category : #'tests - orders' }
 PetOrdersRESTfulControllerTest >> testGetOrderJustCreated [
 
 	self
@@ -112,7 +154,7 @@ PetOrdersRESTfulControllerTest >> testGetOrderJustCreated [
 				assertUrl: json links complete equals: 'https://petstore.example.com/orders/1/complete' ]
 ]
 
-{ #category : #tests }
+{ #category : #'tests - orders' }
 PetOrdersRESTfulControllerTest >> testHATEOAS [
 
 	"This case will transition an order from registered to completed to canceled, using the hypermedia controls provided
@@ -145,7 +187,7 @@ PetOrdersRESTfulControllerTest >> testHATEOAS [
 				assert: json links complete isNil ]
 ]
 
-{ #category : #tests }
+{ #category : #'tests - orders' }
 PetOrdersRESTfulControllerTest >> testInvalidStateTransition [
 
 	| completeOrderLink |
@@ -166,7 +208,38 @@ PetOrdersRESTfulControllerTest >> testInvalidStateTransition [
 			withExceptionDo: [ :error | self assert: error code equals: 409 ]
 ]
 
-{ #category : #tests }
+{ #category : #'tests - comments' }
+PetOrdersRESTfulControllerTest >> testOrderCommentCreation [
+
+	| response orderCreationResponse |
+
+	orderCreationResponse := self createOrder.
+	self assert: orderCreationResponse isSuccess.
+
+	self
+		withJsonFromContentsIn: orderCreationResponse
+		do: [ :order | 
+			response := self createCommentFor: order identifiedBy: 1 withContent: 'First comment!'.
+
+			self
+				assert: response isSuccess;
+				assert: response isCreated;
+				assert: response contentType equals: ZnMimeType textPlain;
+				assert: response contents equals: 'First comment!';
+				assertUrl: response location equals: 'https://petstore.example.com/orders/1/comments/1'.
+
+			response := self createCommentFor: order identifiedBy: 1 withContent: 'Second'.
+
+			self
+				assert: response isSuccess;
+				assert: response isCreated;
+				assert: response contentType equals: ZnMimeType textPlain;
+				assert: response contents equals: 'Second';
+				assertUrl: response location equals: 'https://petstore.example.com/orders/1/comments/2'
+			]
+]
+
+{ #category : #'tests - orders' }
 PetOrdersRESTfulControllerTest >> testOrderCreation [
 
 	| response |
@@ -192,5 +265,8 @@ PetOrdersRESTfulControllerTest >> testTemplate [
 	self
 		assert: controller identifierTemplate equals: '/orders/<identifier:IsInteger>';
 		assert: controller cancelTemplate equals: '/orders/<identifier:IsInteger>/cancel';
-		assert: controller completeTemplate equals: '/orders/<identifier:IsInteger>/complete'
+		assert: controller completeTemplate equals: '/orders/<identifier:IsInteger>/complete';
+		assert: controller commentsTemplate equals: '/orders/<identifier:IsInteger>/comments';
+		assert: controller commentIdentifierTemplate
+			equals: '/orders/<identifier:IsInteger>/comments/<commentIdentifier:IsInteger>'
 ]

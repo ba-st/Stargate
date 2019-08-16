@@ -100,6 +100,16 @@ RESTfulRequestHandlerBuilder >> handling: anEndpoint locatingResourcesWith: aLoc
 		andIdentifierBy: aBlock
 ]
 
+{ #category : #configuring }
+RESTfulRequestHandlerBuilder >> handling: anEndpoint locatingSubresourcesWith: aLocationBlock extractingIdentifierWith: aBlock locatingParentResourceWith: aResourceLocator [
+
+	resourceLocator := SubresourceLocator
+		handling: anEndpoint
+		calculatingLocationWith: aLocationBlock
+		andIdentifierBy: aBlock
+		locatingParentResourceWith: aResourceLocator
+]
+
 { #category : #initialization }
 RESTfulRequestHandlerBuilder >> initialize [
 
