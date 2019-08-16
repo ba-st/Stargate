@@ -50,6 +50,29 @@ SouthAmericanCurrenciesRESTfulControllerTest >> testGetArgentinePeso [
 ]
 
 { #category : #tests }
+SouthAmericanCurrenciesRESTfulControllerTest >> testGetArgentinePesoBanknotes [
+
+	| response |
+
+	response := resourceController
+		currencyBanknotesBasedOn:
+			( self
+				requestToGetSubresource: 'banknotes'
+				identifiedBy: 'ARS'
+				accepting: ZnMimeType applicationJson )
+		within: self newHttpRequestContext.
+
+	self
+		assert: response isSuccess;
+		assert: response status equals: 200;
+		assert: response contentType asMediaType equals: ZnMimeType applicationJson.
+
+	self
+		withJsonFromContentsIn: response
+		do: [ :banknotes | self assertCollection: banknotes hasSameElements: #(5 10 20 50 100 200 500 1000) ]
+]
+
+{ #category : #tests }
 SouthAmericanCurrenciesRESTfulControllerTest >> testGetBrazilianReal [
 
 	| response |
@@ -157,7 +180,7 @@ SouthAmericanCurrenciesRESTfulControllerTest >> testTemplates [
 
 	self
 		assertCollection: ( routes collect: #urlTemplate )
-		hasSameElements: #('/currencies' '/currencies/<identifier:IsObject>').
+		hasSameElements: #('/currencies' '/currencies/<identifier:IsObject>' '/currencies/<identifier:IsObject>/banknotes').
 
 	routes do: [ :route | self assert: route httpMethod equals: #GET ]
 ]

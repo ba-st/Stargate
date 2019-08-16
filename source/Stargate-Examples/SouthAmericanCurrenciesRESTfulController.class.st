@@ -9,21 +9,38 @@ Class {
 	#superclass : #SingleResourceRESTfulController,
 	#instVars : [
 		'currencies',
-		'requestHandler'
+		'banknotesByCurrency',
+		'banknotesRequestHandler',
+		'currenciesRequestHandler'
 	],
 	#category : #'Stargate-Examples-Currencies'
 }
 
+{ #category : #private }
+SouthAmericanCurrenciesRESTfulController >> banknotesTemplate [
+
+	^ '<1s><2s>' expandMacrosWith: self identifierTemplate with: banknotesRequestHandler endpoint
+]
+
 { #category : #API }
 SouthAmericanCurrenciesRESTfulController >> currenciesBasedOn: httpRequest within: requestContext [
 
-	^ requestHandler from: httpRequest within: requestContext getCollection: [ currencies ]
+	^ currenciesRequestHandler from: httpRequest within: requestContext getCollection: [ currencies ]
+]
+
+{ #category : #API }
+SouthAmericanCurrenciesRESTfulController >> currencyBanknotesBasedOn: httpRequest within: requestContext [
+
+	^ banknotesRequestHandler
+		from: httpRequest
+		within: requestContext
+		getCollection: [ banknotesByCurrency at: ( self identifierIn: httpRequest ) ]
 ]
 
 { #category : #API }
 SouthAmericanCurrenciesRESTfulController >> currencyBasedOn: httpRequest within: requestContext [
 
-	^ requestHandler
+	^ currenciesRequestHandler
 		from: httpRequest
 		within: requestContext
 		get:
@@ -52,6 +69,15 @@ SouthAmericanCurrenciesRESTfulController >> declareGetCurrenciesRoute [
 ]
 
 { #category : #routes }
+SouthAmericanCurrenciesRESTfulController >> declareGetCurrencyBanknotesRoute [
+
+	^ RouteSpecification
+		handling: #GET
+		at: self banknotesTemplate
+		evaluating: [ :httpRequest :requestContext | self currencyBanknotesBasedOn: httpRequest within: requestContext ]
+]
+
+{ #category : #routes }
 SouthAmericanCurrenciesRESTfulController >> declareGetCurrencyRoute [
 
 	^ RouteSpecification
@@ -66,7 +92,40 @@ SouthAmericanCurrenciesRESTfulController >> initialize [
 	super initialize.
 	self
 		initializeCurrencies;
-		initializeRequestHandler
+		initializeBanknotesByCurrency;
+		initializeCurrenciesRequestHandler;
+		initializeBanknotesRequestHandler
+]
+
+{ #category : #initialization }
+SouthAmericanCurrenciesRESTfulController >> initializeBanknotesByCurrency [
+
+	banknotesByCurrency := Dictionary new
+		at: 'ARS' put: #(5 10 20 50 100 200 500 1000);
+		at: 'BOB' put: #(10 20 50 100 200);
+		at: 'BRL' put: #(2 5 10 20 50 100);
+		at: 'CLP' put: #(1000 2000 5000 10000 20000);
+		at: 'COP' put: #(1000 2000 5000 10000 20000 50000 100000);
+		at: 'GYD' put: #(20 50 100 500 1000 5000);
+		at: 'PYG' put: #(2000 5000 10000 20000 50000 100000);
+		at: 'PEN' put: #(10 20 50 100);
+		at: 'SRD' put: #(5 10 20 50 100);
+		at: 'UYU' put: #(20 50 100 200 500 1000 2000);
+		at: 'VES' put: #(2 5 10 20 50 100 200 500 10000 20000 50000);
+		yourself
+]
+
+{ #category : #initialization }
+SouthAmericanCurrenciesRESTfulController >> initializeBanknotesRequestHandler [
+
+	banknotesRequestHandler := RESTfulRequestHandlerBuilder new
+		handling: 'banknotes'
+			extractingIdentifierWith: [ :httpRequest | self identifierIn: httpRequest ]
+			locatingParentResourceWith: currenciesRequestHandler resourceLocator;
+		whenResponding: ZnMimeType applicationJson
+			encodeToJsonApplying: [ :resource :requestContext :writer |  ];
+		createEntityTagHashing: [ :hasher :banknote :requestContext | hasher include: banknote ];
+		build
 ]
 
 { #category : #initialization }
@@ -88,17 +147,11 @@ SouthAmericanCurrenciesRESTfulController >> initializeCurrencies [
 ]
 
 { #category : #initialization }
-SouthAmericanCurrenciesRESTfulController >> initializeRequestHandler [
+SouthAmericanCurrenciesRESTfulController >> initializeCurrenciesRequestHandler [
 
-	requestHandler := RESTfulRequestHandlerBuilder new
+	currenciesRequestHandler := RESTfulRequestHandlerBuilder new
 		handling: 'currencies'
 			extractingIdentifierWith: [ :httpRequest | self identifierIn: httpRequest ];
-		whenAccepting: self currencyVersion1dot0dot0MediaType
-			decodeFromJsonApplying: [ :json :reader | 
-			reader
-				for: StargateCurrency do: [ :mapping | mapping mapInstVars ];
-				nextAs: StargateCurrency
-			];
 		whenResponding: self currencyVersion1dot0dot0MediaType
 			encodeToJsonApplying:
 				[ :resource :requestContext :writer | writer for: StargateCurrency do: [ :mapping | mapping mapInstVars ] ];
@@ -115,7 +168,7 @@ SouthAmericanCurrenciesRESTfulController >> initializeRequestHandler [
 { #category : #private }
 SouthAmericanCurrenciesRESTfulController >> requestHandler [
 
-	^ requestHandler 
+	^ currenciesRequestHandler 
 ]
 
 { #category : #private }

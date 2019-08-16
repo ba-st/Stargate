@@ -8,7 +8,8 @@ Class {
 		'endpoint',
 		'identifierLookupAction',
 		'locationResolverBinding',
-		'resourceLocator'
+		'resourceLocator',
+		'exceptionHandler'
 	],
 	#category : #'Stargate-Model-Controllers'
 }
@@ -68,9 +69,15 @@ SubresourceLocator >> endpoint [
 ]
 
 { #category : #accessing }
+SubresourceLocator >> exceptionHandler [
+
+	^ exceptionHandler
+]
+
+{ #category : #accessing }
 SubresourceLocator >> handleExceptionsWith: anExceptionHandler [
 
-	resourceLocator handleExceptionsWith: anExceptionHandler
+	exceptionHandler := anExceptionHandler
 ]
 
 { #category : #initialization }
@@ -82,7 +89,8 @@ SubresourceLocator >> initializeHandling: aStringOrSymbol
 	resourceLocator := aResourceLocator.
 	endpoint := '/<1s>' expandMacrosWith: aStringOrSymbol asString.
 	locationResolverBinding := aLocationResolverBinding.
-	identifierLookupAction := aBlock
+	identifierLookupAction := aBlock.
+	exceptionHandler := RESTfulRequestExceptionHandler new
 ]
 
 { #category : #querying }
@@ -96,7 +104,7 @@ SubresourceLocator >> locationOf: resource within: requestContext [
 { #category : #querying }
 SubresourceLocator >> lookupResouceIdentifiedBy: httpRequest evaluating: aQueryBlock [
 
-	^ resourceLocator exceptionHandler
+	^ exceptionHandler
 		handleNotFoundAndMissingParametersDuring: [ 
 			| identifier |
 			identifier := identifierLookupAction cull: httpRequest.
