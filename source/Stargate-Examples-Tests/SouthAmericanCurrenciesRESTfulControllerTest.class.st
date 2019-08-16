@@ -27,7 +27,7 @@ SouthAmericanCurrenciesRESTfulControllerTest >> testGetArgentinePeso [
 	response := resourceController
 		currencyBasedOn:
 			( self
-				requestToGetResourceIdentifiedBy: 'ARS'
+				requestToGETResourceIdentifiedBy: 'ARS'
 				accepting: resourceController currencyVersion1dot0dot0MediaType )
 		within: self newHttpRequestContext.
 
@@ -57,7 +57,7 @@ SouthAmericanCurrenciesRESTfulControllerTest >> testGetArgentinePesoBanknotes [
 	response := resourceController
 		currencyBanknotesBasedOn:
 			( self
-				requestToGetSubresource: 'banknotes'
+				requestToGETSubresource: 'banknotes'
 				identifiedBy: 'ARS'
 				accepting: ZnMimeType applicationJson )
 		within: self newHttpRequestContext.
@@ -80,7 +80,7 @@ SouthAmericanCurrenciesRESTfulControllerTest >> testGetBrazilianReal [
 	response := resourceController
 		currencyBasedOn:
 			( self
-				requestToGetResourceIdentifiedBy: 'BRL'
+				requestToGETResourceIdentifiedBy: 'BRL'
 				accepting: resourceController currencyVersion1dot0dot0MediaType )
 		within: self newHttpRequestContext.
 
@@ -110,7 +110,7 @@ SouthAmericanCurrenciesRESTfulControllerTest >> testGetCurrencies [
 	response := resourceController
 		currenciesBasedOn:
 			( self
-				requestToGet: self resourceUrl
+				requestToGET: self resourceUrl
 				accepting: resourceController currencyVersion1dot0dot0MediaType )
 		within: self newHttpRequestContext.
 
@@ -135,7 +135,7 @@ SouthAmericanCurrenciesRESTfulControllerTest >> testGetCurrencyNotFoundShouldFai
 
 	self
 		should: [ resourceController
-				currencyBasedOn: ( self requestToGetResourceIdentifiedBy: 'ZZZ' accepting: '*/*' )
+				currencyBasedOn: ( self requestToGETResourceIdentifiedBy: 'ZZZ' accepting: '*/*' )
 				within: self newHttpRequestContext
 			]
 		raise: HTTPClientError
@@ -150,7 +150,7 @@ SouthAmericanCurrenciesRESTfulControllerTest >> testGetNotModifiedWhenValidETag 
 	response := resourceController
 		currencyBasedOn:
 			( self
-				requestToGetResourceIdentifiedBy: 'ARS'
+				requestToGETResourceIdentifiedBy: 'ARS'
 				accepting: resourceController currencyVersion1dot0dot0MediaType )
 		within: self newHttpRequestContext.
 
@@ -161,7 +161,7 @@ SouthAmericanCurrenciesRESTfulControllerTest >> testGetNotModifiedWhenValidETag 
 	response := resourceController
 		currencyBasedOn:
 			( self
-				requestToGetResourceIdentifiedBy: 'ARS'
+				requestToGETResourceIdentifiedBy: 'ARS'
 				accepting: resourceController currencyVersion1dot0dot0MediaType
 				conditionalTo: response entityTag )
 		within: self newHttpRequestContext.

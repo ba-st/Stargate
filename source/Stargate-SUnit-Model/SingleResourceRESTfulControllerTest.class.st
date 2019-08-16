@@ -27,7 +27,7 @@ SingleResourceRESTfulControllerTest >> parametersWith: anIdentifier [
 		yourself
 ]
 
-{ #category : #'private - support' }
+{ #category : #'private - HTTP requests' }
 SingleResourceRESTfulControllerTest >> requestToDELETEResourceIdentifiedBy: anIdentifier [
 
 	^ TeaRequest
@@ -35,8 +35,8 @@ SingleResourceRESTfulControllerTest >> requestToDELETEResourceIdentifiedBy: anId
 		pathParams: ( self parametersWith: anIdentifier )
 ]
 
-{ #category : #'private - support' }
-SingleResourceRESTfulControllerTest >> requestToGet: aUrl accepting: anAcceptHeader [
+{ #category : #'private - HTTP requests' }
+SingleResourceRESTfulControllerTest >> requestToGET: aUrl accepting: anAcceptHeader [
 
 	^ TeaRequest
 		fromZnRequest:
@@ -45,8 +45,8 @@ SingleResourceRESTfulControllerTest >> requestToGet: aUrl accepting: anAcceptHea
 				yourself)
 ]
 
-{ #category : #'private - support' }
-SingleResourceRESTfulControllerTest >> requestToGetResourceIdentifiedBy: anIdentifier accepting: anAcceptHeader [
+{ #category : #'private - HTTP requests' }
+SingleResourceRESTfulControllerTest >> requestToGETResourceIdentifiedBy: anIdentifier accepting: anAcceptHeader [
 
 	^ TeaRequest
 		fromZnRequest:
@@ -56,8 +56,8 @@ SingleResourceRESTfulControllerTest >> requestToGetResourceIdentifiedBy: anIdent
 		pathParams: ( self parametersWith: anIdentifier )
 ]
 
-{ #category : #'private - support' }
-SingleResourceRESTfulControllerTest >> requestToGetResourceIdentifiedBy: anIdentifier accepting: anAcceptHeader conditionalTo: anETag [
+{ #category : #'private - HTTP requests' }
+SingleResourceRESTfulControllerTest >> requestToGETResourceIdentifiedBy: anIdentifier accepting: anAcceptHeader conditionalTo: anETag [
 
 	^ TeaRequest
 		fromZnRequest:
@@ -68,18 +68,18 @@ SingleResourceRESTfulControllerTest >> requestToGetResourceIdentifiedBy: anIdent
 		pathParams: ( self parametersWith: anIdentifier )
 ]
 
-{ #category : #'private - support' }
-SingleResourceRESTfulControllerTest >> requestToGetSubresource: aSubResourceUrl identifiedBy: anIdentifier accepting: anAcceptHeader [
+{ #category : #'private - HTTP requests' }
+SingleResourceRESTfulControllerTest >> requestToGETSubresource: aSubresourceUrl identifiedBy: anIdentifier accepting: anAcceptHeader [
 
 	^ TeaRequest
 		fromZnRequest:
-			( ( ZnRequest get: aSubResourceUrl )
+			( ( ZnRequest get: aSubresourceUrl )
 				setAccept: anAcceptHeader;
 				yourself )
 		pathParams: ( self parametersWith: anIdentifier )
 ]
 
-{ #category : #'private - support' }
+{ #category : #'private - HTTP requests' }
 SingleResourceRESTfulControllerTest >> requestToPATCHResourceIdentifiedBy: anIdentifier with: aRequestBody accepting: anAcceptHeader conditionalTo: anETag [
 
 	^ TeaRequest
@@ -92,7 +92,7 @@ SingleResourceRESTfulControllerTest >> requestToPATCHResourceIdentifiedBy: anIde
 		pathParams: ( self parametersWith: anIdentifier )
 ]
 
-{ #category : #'private - support' }
+{ #category : #'private - HTTP requests' }
 SingleResourceRESTfulControllerTest >> requestToPOST: content as: aMediaType [
 
 	^ TeaRequest
@@ -111,5 +111,5 @@ SingleResourceRESTfulControllerTest >> resourceUrl [
 { #category : #'private - support' }
 SingleResourceRESTfulControllerTest >> urlForResourceIdentifiedBy: anIdentifier [
 
-	^ self resourceUrl / anIdentifier asString asZnUrl
+	^ self resourceUrl / anIdentifier asString asUrl
 ]

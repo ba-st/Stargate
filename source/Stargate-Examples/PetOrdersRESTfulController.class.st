@@ -6,9 +6,9 @@ Class {
 	#superclass : #SingleResourceRESTfulController,
 	#instVars : [
 		'ordersRepository',
-		'requestHandler',
 		'commentsRequestHandler',
-		'commentsByOrderId'
+		'commentsByOrderId',
+		'ordersRequestHandler'
 	],
 	#category : #'Stargate-Examples-PetStore'
 }
@@ -46,7 +46,7 @@ PetOrdersRESTfulController >> affect: builder withMediaControlsFor: order locate
 { #category : #'API - orders' }
 PetOrdersRESTfulController >> cancelOrderBasedOn: httpRequest within: requestContext [
 
-	^ requestHandler
+	^ ordersRequestHandler
 		from: httpRequest
 		within: requestContext
 		get: [ :id | ordersRepository findIdentifiedBy: id ]
@@ -95,7 +95,7 @@ PetOrdersRESTfulController >> commentsTemplate [
 { #category : #'API - orders' }
 PetOrdersRESTfulController >> completeOrderBasedOn: httpRequest within: requestContext [
 
-	^ requestHandler
+	^ ordersRequestHandler
 		from: httpRequest
 		within: requestContext
 		get: [ :id | ordersRepository findIdentifiedBy: id ]
@@ -155,7 +155,7 @@ PetOrdersRESTfulController >> createCommentBasedOn: httpRequest within: requestC
 { #category : #'API - orders' }
 PetOrdersRESTfulController >> createOrderBasedOn: httpRequest within: requestContext [
 
-	^ requestHandler
+	^ ordersRequestHandler
 		withResourceCreatedFrom: httpRequest
 		within: requestContext
 		do: [ :order | 
@@ -272,7 +272,7 @@ PetOrdersRESTfulController >> encodeComments: resource [
 { #category : #'API - orders' }
 PetOrdersRESTfulController >> getOrderBasedOn: httpRequest within: requestContext [
 
-	^ requestHandler
+	^ ordersRequestHandler
 		from: httpRequest
 		within: requestContext
 		get: [ :id | 
@@ -293,7 +293,7 @@ PetOrdersRESTfulController >> initializeCommentsRequestHandler [
 					indexOf: comment
 				]
 			extractingIdentifierWith: [ :httpRequest | self commentIdentifierIn: httpRequest ]
-			locatingParentResourceWith: requestHandler resourceLocator;
+			locatingParentResourceWith: ordersRequestHandler resourceLocator;
 		whenAccepting: ZnMimeType textPlain decodeApplying: [ :comment | comment ];
 		whenResponding: ZnMimeType textPlain
 			encodeApplying: [ :resource | self encodeComments: resource ];
@@ -302,19 +302,9 @@ PetOrdersRESTfulController >> initializeCommentsRequestHandler [
 ]
 
 { #category : #initialization }
-PetOrdersRESTfulController >> initializePersistingTo: aPetRepository [
+PetOrdersRESTfulController >> initializeOrdersRequestHandler [
 
-	ordersRepository := aPetRepository.
-	commentsByOrderId := Dictionary new.
-	self
-		initializeRequestHandler;
-		initializeCommentsRequestHandler
-]
-
-{ #category : #initialization }
-PetOrdersRESTfulController >> initializeRequestHandler [
-
-	requestHandler := RESTfulRequestHandlerBuilder new
+	ordersRequestHandler := RESTfulRequestHandlerBuilder new
 		handling: 'orders'
 			locatingResourcesWith: [ :order :requestContext | ordersRepository identifierOf: order ]
 			extractingIdentifierWith: [ :httpRequest | self identifierIn: httpRequest ];
@@ -330,6 +320,16 @@ PetOrdersRESTfulController >> initializeRequestHandler [
 				include: ( ordersRepository lastModificationOf: order )
 			];
 		build
+]
+
+{ #category : #initialization }
+PetOrdersRESTfulController >> initializePersistingTo: aPetRepository [
+
+	ordersRepository := aPetRepository.
+	commentsByOrderId := Dictionary new.
+	self
+		initializeOrdersRequestHandler;
+		initializeCommentsRequestHandler
 ]
 
 { #category : #'API - comments' }
@@ -360,7 +360,7 @@ PetOrdersRESTfulController >> orderVersion1dot0dot0MediaType [
 { #category : #private }
 PetOrdersRESTfulController >> requestHandler [
 
-	^ requestHandler
+	^ ordersRequestHandler
 ]
 
 { #category : #configuring }

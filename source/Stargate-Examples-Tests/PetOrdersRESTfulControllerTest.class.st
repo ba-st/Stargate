@@ -16,6 +16,15 @@ PetOrdersRESTfulControllerTest >> baseUrl [
 	^ 'https://petstore.example.com' asUrl
 ]
 
+{ #category : #'tests - comments' }
+PetOrdersRESTfulControllerTest >> commentsRelatedTo: order [
+
+	^ resourceController
+		orderCommentsBasedOn:
+			( self requestToGETSubresource: order links comments identifiedBy: 1 accepting: ZnMimeType textPlain )
+		within: self newHttpRequestContext
+]
+
 { #category : #'private - support' }
 PetOrdersRESTfulControllerTest >> createCommentFor: order identifiedBy: anId withContent: aComment [
 
@@ -33,7 +42,7 @@ PetOrdersRESTfulControllerTest >> createOrder [
 	^ resourceController
 		createOrderBasedOn:
 			( self
-				requestToCreateOrderFrom: ( '{"date":"2018-10-24T18:05:46.418Z","pet":"<1p>"}' expandMacrosWith: self petUrl ) )
+				requestToPOSTAsOrder: ( '{"date":"2018-10-24T18:05:46.418Z","pet":"<1p>"}' expandMacrosWith: self petUrl ) )
 		within: self newHttpRequestContext
 ]
 
@@ -45,7 +54,7 @@ PetOrdersRESTfulControllerTest >> getFirstOrderAndWithJsonDo: aBlock [
 	response := resourceController
 		getOrderBasedOn:
 			( self
-				requestToGetResourceIdentifiedBy: 1
+				requestToGETResourceIdentifiedBy: 1
 				accepting: resourceController orderVersion1dot0dot0MediaType )
 		within: self newHttpRequestContext.
 
@@ -71,13 +80,7 @@ PetOrdersRESTfulControllerTest >> petUrl [
 	^ self baseUrl / 'pets/1' asUrl
 ]
 
-{ #category : #'private - support' }
-PetOrdersRESTfulControllerTest >> requestToCreateOrderFrom: json [
-
-	^ self requestToPOST: json as: resourceController orderVersion1dot0dot0MediaType
-]
-
-{ #category : #'private - support' }
+{ #category : #'private - HTTP requests' }
 PetOrdersRESTfulControllerTest >> requestToDELETEComment: aSubresourceUrl at: aCommentIndex forOrder: anOrderId [
 
 	^ TeaRequest
@@ -85,8 +88,8 @@ PetOrdersRESTfulControllerTest >> requestToDELETEComment: aSubresourceUrl at: aC
 		pathParams: ( self parametersWith: anOrderId and: aCommentIndex )
 ]
 
-{ #category : #'private - support' }
-PetOrdersRESTfulControllerTest >> requestToGetComment: aSubresourceUrl at: aCommentIndex forOrder: anOrderId [
+{ #category : #'private - HTTP requests' }
+PetOrdersRESTfulControllerTest >> requestToGETComment: aSubresourceUrl at: aCommentIndex forOrder: anOrderId [
 
 	^ TeaRequest
 		fromZnRequest:
@@ -96,7 +99,7 @@ PetOrdersRESTfulControllerTest >> requestToGetComment: aSubresourceUrl at: aComm
 		pathParams: ( self parametersWith: anOrderId and: aCommentIndex )
 ]
 
-{ #category : #'private - support' }
+{ #category : #'private - HTTP requests' }
 PetOrdersRESTfulControllerTest >> requestToPOST: url identifiedBy: anIdentifier [
 
 	^ TeaRequest
@@ -104,7 +107,13 @@ PetOrdersRESTfulControllerTest >> requestToPOST: url identifiedBy: anIdentifier 
 		pathParams: ( self parametersWith: anIdentifier )
 ]
 
-{ #category : #'private - support' }
+{ #category : #'private - HTTP requests' }
+PetOrdersRESTfulControllerTest >> requestToPOSTAsOrder: json [
+
+	^ self requestToPOST: json as: resourceController orderVersion1dot0dot0MediaType
+]
+
+{ #category : #'private - HTTP requests' }
 PetOrdersRESTfulControllerTest >> requestToPUTComment: aComment on: aSubresourceUrl at: aCommentIndex forOrder: anOrderId conditionalTo: anETag [
 
 	^ TeaRequest
@@ -157,7 +166,7 @@ PetOrdersRESTfulControllerTest >> testCannotGetComment [
 
 			self
 				should: [ resourceController
-						orderCommentBasedOn: ( self requestToGetComment: order links comments at: 3 forOrder: 1 )
+						orderCommentBasedOn: ( self requestToGETComment: order links comments at: 3 forOrder: 1 )
 						within: self newHttpRequestContext
 					]
 				raise: HTTPClientError notFound
@@ -170,7 +179,7 @@ PetOrdersRESTfulControllerTest >> testCannotUpdateComment [
 	self
 		withJsonFromContentsIn: self createOrder
 		do: [ :order | 
-			| knownETag |
+			| knownETag response |
 
 			knownETag := ( self createCommentFor: order identifiedBy: 1 withContent: 'Hey!' ) entityTag.
 			self createCommentFor: order identifiedBy: 1 withContent: 'Mr. DJ'.
@@ -186,16 +195,25 @@ PetOrdersRESTfulControllerTest >> testCannotUpdateComment [
 								conditionalTo: knownETag )
 						within: self newHttpRequestContext
 					]
-				raise: HTTPClientError notFound
+				raise: HTTPClientError notFound.
+
+			response := self commentsRelatedTo: order.
+
+			self
+				assert: response isSuccess;
+				assert: response contentType equals: ZnMimeType textPlain;
+				assert: response contents equals: '- Hey!<n>- Mr. DJ' expandMacros
 			]
 ]
 
 { #category : #'tests - comments' }
-PetOrdersRESTfulControllerTest >> testCannotUpdateCommentWhenETagNotMatches [
+PetOrdersRESTfulControllerTest >> testCannotUpdateCommentWhenETagDoesNotMatch [
 
 	self
 		withJsonFromContentsIn: self createOrder
 		do: [ :order | 
+			| response |
+
 			self
 				createCommentFor: order identifiedBy: 1 withContent: 'Hey!';
 				createCommentFor: order identifiedBy: 1 withContent: 'Mr. DJ'.
@@ -211,7 +229,14 @@ PetOrdersRESTfulControllerTest >> testCannotUpdateCommentWhenETagNotMatches [
 								conditionalTo: '"XXX"' asETag )
 						within: self newHttpRequestContext
 					]
-				raise: HTTPClientError preconditionFailed
+				raise: HTTPClientError preconditionFailed.
+
+			response := self commentsRelatedTo: order.
+
+			self
+				assert: response isSuccess;
+				assert: response contentType equals: ZnMimeType textPlain;
+				assert: response contents equals: '- Hey!<n>- Mr. DJ' expandMacros
 			]
 ]
 
@@ -265,7 +290,7 @@ PetOrdersRESTfulControllerTest >> testDeleteComment [
 
 			response := resourceController
 				orderCommentsBasedOn:
-					( self requestToGetSubresource: order links comments identifiedBy: 1 accepting: ZnMimeType textPlain )
+					( self requestToGETSubresource: order links comments identifiedBy: 1 accepting: ZnMimeType textPlain )
 				within: self newHttpRequestContext.
 
 			self
@@ -308,7 +333,7 @@ PetOrdersRESTfulControllerTest >> testGetComment [
 				createCommentFor: order identifiedBy: 1 withContent: 'Mr. DJ'.
 
 			response := resourceController
-				orderCommentBasedOn: ( self requestToGetComment: order links comments at: 1 forOrder: 1 )
+				orderCommentBasedOn: ( self requestToGETComment: order links comments at: 1 forOrder: 1 )
 				within: self newHttpRequestContext.
 
 			self
@@ -330,10 +355,7 @@ PetOrdersRESTfulControllerTest >> testGetComments [
 				createCommentFor: order identifiedBy: 1 withContent: 'Hey!';
 				createCommentFor: order identifiedBy: 1 withContent: 'Mr. DJ'.
 
-			response := resourceController
-				orderCommentsBasedOn:
-					( self requestToGetSubresource: order links comments identifiedBy: 1 accepting: ZnMimeType textPlain )
-				within: self newHttpRequestContext.
+			response := self commentsRelatedTo: order.
 
 			self
 				assert: response isSuccess;
@@ -352,7 +374,7 @@ PetOrdersRESTfulControllerTest >> testGetCommentsForJustCreatedOrder [
 
 			response := resourceController
 				orderCommentsBasedOn:
-					( self requestToGetSubresource: order links comments identifiedBy: 1 accepting: ZnMimeType textPlain )
+					( self requestToGETSubresource: order links comments identifiedBy: 1 accepting: ZnMimeType textPlain )
 				within: self newHttpRequestContext.
 
 			self
@@ -509,7 +531,7 @@ PetOrdersRESTfulControllerTest >> testUpdateComment [
 
 			response := resourceController
 				orderCommentsBasedOn:
-					( self requestToGetSubresource: order links comments identifiedBy: 1 accepting: ZnMimeType textPlain )
+					( self requestToGETSubresource: order links comments identifiedBy: 1 accepting: ZnMimeType textPlain )
 				within: self newHttpRequestContext.
 
 			self
