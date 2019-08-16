@@ -79,3 +79,15 @@ HttpRequestContext >> paginationControls [
 
 	^ (self objectUnder: #paginationLinks ifNone: [ #() ]) asArray
 ]
+
+{ #category : #accessing }
+HttpRequestContext >> parentResource [
+
+	^ self objectUnder: #parentResource
+]
+
+{ #category : #accessing }
+HttpRequestContext >> parentResource: anIdentifier [
+
+	self hold: anIdentifier under: #parentResource
+]

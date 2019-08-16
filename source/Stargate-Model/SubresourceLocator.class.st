@@ -1,74 +1,86 @@
 "
-I'm responsible for locating specific resource instances and generating location urls from them
+I'm responsible for locating specific subresource instances and generating location urls from them
 "
 Class {
-	#name : #ResourceLocator,
+	#name : #SubresourceLocator,
 	#superclass : #ResourceLocatorBehavior,
 	#instVars : [
-		'baseUrl',
 		'endpoint',
 		'identifierLookupAction',
 		'locationResolverBinding',
+		'resourceLocator',
 		'exceptionHandler'
 	],
 	#category : #'Stargate-Model-Controllers'
 }
 
 { #category : #'instance creation' }
-ResourceLocator class >> handling: aStringOrSymbol calculatingLocationWith: aLocationResolver andIdentifierBy: aBlock [
+SubresourceLocator class >> handling: aStringOrSymbol
+	calculatingLocationWith: aLocationResolver
+	andIdentifierBy: aBlock
+	locatingParentResourceWith: aResourceLocator [
 
 	^ self
 		handling: aStringOrSymbol
 		resolvingLocationWith: ( Binding to: aLocationResolver )
 		andIdentifierBy: aBlock
+		locatingParentResourceWith: aResourceLocator
 ]
 
 { #category : #'instance creation' }
-ResourceLocator class >> handling: aStringOrSymbol extractingIdentifierWith: aBlock [
+SubresourceLocator class >> handling: aStringOrSymbol extractingIdentifierWith: aBlock locatingParentResourceWith: aResourceLocator [
 
 	^ self
 		handling: aStringOrSymbol
 		resolvingLocationWith: ( Binding undefinedExplainedBy: 'Missing location resolution policy.' )
 		andIdentifierBy: aBlock
+		locatingParentResourceWith: aResourceLocator
 ]
 
 { #category : #private }
-ResourceLocator class >> handling: aStringOrSymbol resolvingLocationWith: aLocationResolverBinding andIdentifierBy: aBlock [
+SubresourceLocator class >> handling: aStringOrSymbol
+	resolvingLocationWith: aLocationResolverBinding
+	andIdentifierBy: aBlock
+	locatingParentResourceWith: aResourceLocator [
 
 	^ self new
 		initializeHandling: aStringOrSymbol
 		resolvingLocationWith: aLocationResolverBinding
 		andIdentifierBy: aBlock
+		locatingParentResourceWith: aResourceLocator
 ]
 
 { #category : #accessing }
-ResourceLocator >> baseUrl: aServerUrl [
+SubresourceLocator >> baseUrl: aServerUrl [
 
-	baseUrl := aServerUrl asUrl
+	resourceLocator baseUrl: aServerUrl
 ]
 
 { #category : #testing }
-ResourceLocator >> canLookupResources [
+SubresourceLocator >> canLookupResources [
 
 	^ locationResolverBinding isDefined
 ]
 
 { #category : #accessing }
-ResourceLocator >> endpoint [
+SubresourceLocator >> endpoint [
 
 	^ endpoint
 ]
 
 { #category : #accessing }
-ResourceLocator >> handleExceptionsWith: anExceptionHandler [
+SubresourceLocator >> handleExceptionsWith: anExceptionHandler [
 
 	exceptionHandler := anExceptionHandler
 ]
 
 { #category : #initialization }
-ResourceLocator >> initializeHandling: aStringOrSymbol resolvingLocationWith: aLocationResolverBinding andIdentifierBy: aBlock [
+SubresourceLocator >> initializeHandling: aStringOrSymbol
+	resolvingLocationWith: aLocationResolverBinding
+	andIdentifierBy: aBlock
+	locatingParentResourceWith: aResourceLocator [
 
-	baseUrl := '' asUrl.
+	resourceLocator := aResourceLocator.
 	endpoint := '/<1s>' expandMacrosWith: aStringOrSymbol asString.
 	locationResolverBinding := aLocationResolverBinding.
 	identifierLookupAction := aBlock.
@@ -76,14 +88,15 @@ ResourceLocator >> initializeHandling: aStringOrSymbol resolvingLocationWith: aL
 ]
 
 { #category : #querying }
-ResourceLocator >> locationOf: resource within: requestContext [
+SubresourceLocator >> locationOf: resource within: requestContext [
 
-	^ baseUrl / endpoint asUrl
+	^ ( resourceLocator locationOf: requestContext parentResource within: requestContext )
+		/ endpoint asUrl
 		/ ( locationResolverBinding content cull: resource cull: requestContext ) asString asUrl
 ]
 
 { #category : #querying }
-ResourceLocator >> lookupResouceIdentifiedBy: httpRequest evaluating: aQueryBlock [
+SubresourceLocator >> lookupResouceIdentifiedBy: httpRequest evaluating: aQueryBlock [
 
 	^ exceptionHandler
 		handleNotFoundAndMissingParametersDuring: [ 

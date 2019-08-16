@@ -20,7 +20,23 @@ SingleResourceRESTfulControllerTest >> endpoint [
 ]
 
 { #category : #'private - support' }
-SingleResourceRESTfulControllerTest >> requestToGet: aUrl accepting: anAcceptHeader [
+SingleResourceRESTfulControllerTest >> parametersWith: anIdentifier [
+
+	^ SmallDictionary new
+		at: resourceController identifierKey put: anIdentifier;
+		yourself
+]
+
+{ #category : #'private - HTTP requests' }
+SingleResourceRESTfulControllerTest >> requestToDELETEResourceIdentifiedBy: anIdentifier [
+
+	^ TeaRequest
+		fromZnRequest: ( ZnRequest delete: ( self urlForResourceIdentifiedBy: anIdentifier ) )
+		pathParams: ( self parametersWith: anIdentifier )
+]
+
+{ #category : #'private - HTTP requests' }
+SingleResourceRESTfulControllerTest >> requestToGET: aUrl accepting: anAcceptHeader [
 
 	^ TeaRequest
 		fromZnRequest:
@@ -29,44 +45,41 @@ SingleResourceRESTfulControllerTest >> requestToGet: aUrl accepting: anAcceptHea
 				yourself)
 ]
 
-{ #category : #'private - support' }
-SingleResourceRESTfulControllerTest >> requestToGetResourceIdentifiedBy: anIdentifier accepting: anAcceptHeader [
+{ #category : #'private - HTTP requests' }
+SingleResourceRESTfulControllerTest >> requestToGETResourceIdentifiedBy: anIdentifier accepting: anAcceptHeader [
 
 	^ TeaRequest
 		fromZnRequest:
-			((ZnRequest get: (self urlForResourceIdentifiedBy: anIdentifier))
+			( ( ZnRequest get: ( self urlForResourceIdentifiedBy: anIdentifier ) )
 				setAccept: anAcceptHeader;
-				yourself)
-		pathParams: {(#identifier -> anIdentifier)} asDictionary
+				yourself )
+		pathParams: ( self parametersWith: anIdentifier )
 ]
 
-{ #category : #'private - support' }
-SingleResourceRESTfulControllerTest >> requestToGetResourceIdentifiedBy: anIdentifier accepting: anAcceptHeader conditionalTo: anETag [
+{ #category : #'private - HTTP requests' }
+SingleResourceRESTfulControllerTest >> requestToGETResourceIdentifiedBy: anIdentifier accepting: anAcceptHeader conditionalTo: anETag [
 
 	^ TeaRequest
 		fromZnRequest:
-			((ZnRequest get: (self urlForResourceIdentifiedBy: anIdentifier))
+			( ( ZnRequest get: ( self urlForResourceIdentifiedBy: anIdentifier ) )
 				setAccept: anAcceptHeader;
 				setIfNoneMatchTo: anETag;
-				yourself)
-		pathParams: {(#identifier -> anIdentifier)} asDictionary
+				yourself )
+		pathParams: ( self parametersWith: anIdentifier )
 ]
 
-{ #category : #'private - support' }
-SingleResourceRESTfulControllerTest >> requestToGetSubresource: aSubresourceEndpoint identifiedBy: anIdentifier accepting: anAcceptHeader [
+{ #category : #'private - HTTP requests' }
+SingleResourceRESTfulControllerTest >> requestToGETSubresource: aSubresourceUrl identifiedBy: anIdentifier accepting: anAcceptHeader [
 
 	^ TeaRequest
 		fromZnRequest:
-			( ( ZnRequest get: ( self urlForResourceIdentifiedBy: anIdentifier ) / aSubresourceEndpoint )
+			( ( ZnRequest get: aSubresourceUrl )
 				setAccept: anAcceptHeader;
 				yourself )
-		pathParams:
-			( SmallDictionary new
-				at: #identifier put: anIdentifier;
-				yourself )
+		pathParams: ( self parametersWith: anIdentifier )
 ]
 
-{ #category : #'private - support' }
+{ #category : #'private - HTTP requests' }
 SingleResourceRESTfulControllerTest >> requestToPATCHResourceIdentifiedBy: anIdentifier with: aRequestBody accepting: anAcceptHeader conditionalTo: anETag [
 
 	^ TeaRequest
@@ -76,13 +89,10 @@ SingleResourceRESTfulControllerTest >> requestToPATCHResourceIdentifiedBy: anIde
 				setIfMatchTo: anETag;
 				entity: ( ZnEntity with: aRequestBody type: anAcceptHeader );
 				yourself )
-		pathParams:
-			( SmallDictionary new
-				at: #identifier put: anIdentifier;
-				yourself )
+		pathParams: ( self parametersWith: anIdentifier )
 ]
 
-{ #category : #'private - support' }
+{ #category : #'private - HTTP requests' }
 SingleResourceRESTfulControllerTest >> requestToPOST: content as: aMediaType [
 
 	^ TeaRequest
@@ -101,5 +111,5 @@ SingleResourceRESTfulControllerTest >> resourceUrl [
 { #category : #'private - support' }
 SingleResourceRESTfulControllerTest >> urlForResourceIdentifiedBy: anIdentifier [
 
-	^ self resourceUrl / anIdentifier asString asZnUrl
+	^ self resourceUrl / anIdentifier asString asUrl
 ]

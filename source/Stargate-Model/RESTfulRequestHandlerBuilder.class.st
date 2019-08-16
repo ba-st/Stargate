@@ -92,12 +92,31 @@ RESTfulRequestHandlerBuilder >> handling: anEndpoint extractingIdentifierWith: a
 ]
 
 { #category : #configuring }
+RESTfulRequestHandlerBuilder >> handling: anEndpoint extractingIdentifierWith: aBlock locatingParentResourceWith: aResourceLocator [
+
+	resourceLocator := SubresourceLocator
+		handling: anEndpoint
+		extractingIdentifierWith: aBlock
+		locatingParentResourceWith: aResourceLocator
+]
+
+{ #category : #configuring }
 RESTfulRequestHandlerBuilder >> handling: anEndpoint locatingResourcesWith: aLocationBlock extractingIdentifierWith: aBlock [
 
 	resourceLocator := ResourceLocator
 		handling: anEndpoint
 		calculatingLocationWith: aLocationBlock
 		andIdentifierBy: aBlock
+]
+
+{ #category : #configuring }
+RESTfulRequestHandlerBuilder >> handling: anEndpoint locatingSubresourcesWith: aLocationBlock extractingIdentifierWith: aBlock locatingParentResourceWith: aResourceLocator [
+
+	resourceLocator := SubresourceLocator
+		handling: anEndpoint
+		calculatingLocationWith: aLocationBlock
+		andIdentifierBy: aBlock
+		locatingParentResourceWith: aResourceLocator
 ]
 
 { #category : #initialization }

@@ -148,8 +148,7 @@ RESTfulRequestHandlerBehavior >> from: httpRequest within: requestContext get: f
 
 			updatedResource := self decode: httpRequest within: requestContext.
 			exceptionHandler
-				handleConflictsDuring: [ updateBlock value: resourceToUpdate value: updatedResource ].
-			resourceToUpdate
+				handleConflictsDuring: [ updateBlock value: resourceToUpdate value: updatedResource ]
 			]
 ]
 
@@ -222,6 +221,12 @@ RESTfulRequestHandlerBehavior >> resourceCreationPolicyBasedOn: httpRequest [
 	^ RESTfulControllerRespondCreatedEntityPolicy
 		for: self
 		encodedAs: ( self targetMediaTypeFrom: httpRequest )
+]
+
+{ #category : #accessing }
+RESTfulRequestHandlerBehavior >> resourceLocator [
+
+	^ resourceLocator
 ]
 
 { #category : #accessing }

@@ -27,7 +27,7 @@ SouthAmericanCurrenciesRESTfulControllerTest >> testGetArgentinePeso [
 	response := resourceController
 		currencyBasedOn:
 			( self
-				requestToGetResourceIdentifiedBy: 'ARS'
+				requestToGETResourceIdentifiedBy: 'ARS'
 				accepting: resourceController currencyVersion1dot0dot0MediaType )
 		within: self newHttpRequestContext.
 
@@ -50,6 +50,29 @@ SouthAmericanCurrenciesRESTfulControllerTest >> testGetArgentinePeso [
 ]
 
 { #category : #tests }
+SouthAmericanCurrenciesRESTfulControllerTest >> testGetArgentinePesoBanknotes [
+
+	| response |
+
+	response := resourceController
+		currencyBanknotesBasedOn:
+			( self
+				requestToGETSubresource: 'banknotes'
+				identifiedBy: 'ARS'
+				accepting: ZnMimeType applicationJson )
+		within: self newHttpRequestContext.
+
+	self
+		assert: response isSuccess;
+		assert: response status equals: 200;
+		assert: response contentType asMediaType equals: ZnMimeType applicationJson.
+
+	self
+		withJsonFromContentsIn: response
+		do: [ :banknotes | self assertCollection: banknotes hasSameElements: #(5 10 20 50 100 200 500 1000) ]
+]
+
+{ #category : #tests }
 SouthAmericanCurrenciesRESTfulControllerTest >> testGetBrazilianReal [
 
 	| response |
@@ -57,7 +80,7 @@ SouthAmericanCurrenciesRESTfulControllerTest >> testGetBrazilianReal [
 	response := resourceController
 		currencyBasedOn:
 			( self
-				requestToGetResourceIdentifiedBy: 'BRL'
+				requestToGETResourceIdentifiedBy: 'BRL'
 				accepting: resourceController currencyVersion1dot0dot0MediaType )
 		within: self newHttpRequestContext.
 
@@ -87,7 +110,7 @@ SouthAmericanCurrenciesRESTfulControllerTest >> testGetCurrencies [
 	response := resourceController
 		currenciesBasedOn:
 			( self
-				requestToGet: self resourceUrl
+				requestToGET: self resourceUrl
 				accepting: resourceController currencyVersion1dot0dot0MediaType )
 		within: self newHttpRequestContext.
 
@@ -112,7 +135,7 @@ SouthAmericanCurrenciesRESTfulControllerTest >> testGetCurrencyNotFoundShouldFai
 
 	self
 		should: [ resourceController
-				currencyBasedOn: ( self requestToGetResourceIdentifiedBy: 'ZZZ' accepting: '*/*' )
+				currencyBasedOn: ( self requestToGETResourceIdentifiedBy: 'ZZZ' accepting: '*/*' )
 				within: self newHttpRequestContext
 			]
 		raise: HTTPClientError
@@ -127,7 +150,7 @@ SouthAmericanCurrenciesRESTfulControllerTest >> testGetNotModifiedWhenValidETag 
 	response := resourceController
 		currencyBasedOn:
 			( self
-				requestToGetResourceIdentifiedBy: 'ARS'
+				requestToGETResourceIdentifiedBy: 'ARS'
 				accepting: resourceController currencyVersion1dot0dot0MediaType )
 		within: self newHttpRequestContext.
 
@@ -138,7 +161,7 @@ SouthAmericanCurrenciesRESTfulControllerTest >> testGetNotModifiedWhenValidETag 
 	response := resourceController
 		currencyBasedOn:
 			( self
-				requestToGetResourceIdentifiedBy: 'ARS'
+				requestToGETResourceIdentifiedBy: 'ARS'
 				accepting: resourceController currencyVersion1dot0dot0MediaType
 				conditionalTo: response entityTag )
 		within: self newHttpRequestContext.
@@ -157,7 +180,7 @@ SouthAmericanCurrenciesRESTfulControllerTest >> testTemplates [
 
 	self
 		assertCollection: ( routes collect: #urlTemplate )
-		hasSameElements: #('/currencies' '/currencies/<identifier:IsObject>').
+		hasSameElements: #('/currencies' '/currencies/<identifier:IsObject>' '/currencies/<identifier:IsObject>/banknotes').
 
 	routes do: [ :route | self assert: route httpMethod equals: #GET ]
 ]

@@ -57,9 +57,11 @@ PetsRESTfulControllerTest >> entityTagOfPetIdentifiedBy: anIdentifier [
 
 	| getResponse |
 
-	getResponse := resourceController getPetBasedOn: (self requestToGetResourceIdentifiedBy: anIdentifier accepting: self defaultPetMediaType) within: self newHttpRequestContext.
+	getResponse := resourceController
+		getPetBasedOn: ( self requestToGETResourceIdentifiedBy: anIdentifier accepting: self defaultPetMediaType )
+		within: self newHttpRequestContext.
 	self assert: getResponse isSuccess.
-	^ getResponse headers at: 'ETag'
+	^ getResponse entityTag
 ]
 
 { #category : #'private - support' }
@@ -67,11 +69,11 @@ PetsRESTfulControllerTest >> requestMissingIfMatchHeaderToUpdatePetIdentifiedBy:
 
 	^ TeaRequest
 		fromZnRequest:
-			((ZnRequest patch: (self urlForResourceIdentifiedBy: anIdentifier))
+			( ( ZnRequest patch: ( self urlForResourceIdentifiedBy: anIdentifier ) )
 				setAccept: self defaultPetMediaType;
-				entity: (ZnEntity with: ('{"name":"<1s>"}' expandMacrosWith: aName) type: self defaultPetMediaType);
-				yourself)
-		pathParams: {(#identifier -> anIdentifier)} asDictionary
+				entity: ( ZnEntity with: ( '{"name":"<1s>"}' expandMacrosWith: aName ) type: self defaultPetMediaType );
+				yourself )
+		pathParams: ( self parametersWith: anIdentifier )
 ]
 
 { #category : #'private - support' }
@@ -81,17 +83,9 @@ PetsRESTfulControllerTest >> requestToCreatePetFrom: json [
 ]
 
 { #category : #'private - support' }
-PetsRESTfulControllerTest >> requestToDeletePetIdentifiedBy: anIdentifier [
-
-	^ TeaRequest
-		fromZnRequest: ( ZnRequest delete: ( self urlForResourceIdentifiedBy: anIdentifier ) )
-		pathParams: {( #identifier -> anIdentifier )} asDictionary
-]
-
-{ #category : #'private - support' }
 PetsRESTfulControllerTest >> requestToGetPetsAccepting: anAcceptHeader [
 
-	^ self requestToGet: self resourceUrl accepting: anAcceptHeader
+	^ self requestToGET: self resourceUrl accepting: anAcceptHeader
 ]
 
 { #category : #'private - support' }
@@ -138,7 +132,7 @@ PetsRESTfulControllerTest >> setUpResourceController [
 PetsRESTfulControllerTest >> testCantDeleteInvalidPet [
 
 	self
-		should: [ resourceController deletePetBasedOn: (self requestToDeletePetIdentifiedBy: 1) within: self newHttpRequestContext ]
+		should: [ resourceController deletePetBasedOn: (self requestToDELETEResourceIdentifiedBy: 1) within: self newHttpRequestContext ]
 		raise: HTTPClientError
 		withExceptionDo: [ :signal | self assert: signal code equals: 404 ]
 ]
@@ -154,7 +148,7 @@ PetsRESTfulControllerTest >> testCantUpdatePetIfMissingETag [
 ]
 
 { #category : #'tests - update' }
-PetsRESTfulControllerTest >> testCantUpdatePetWhenETagNotMatching [
+PetsRESTfulControllerTest >> testCantUpdatePetWhenETagDoesNotMatch [
 
 	self
 		createPet;
@@ -172,7 +166,7 @@ PetsRESTfulControllerTest >> testComplexPagination [
 	response := resourceController
 		getPetsBasedOn:
 			( self
-				requestToGet: 'https://pets.example.com/pets?limit=2'
+				requestToGET: 'https://pets.example.com/pets?limit=2'
 				accepting: resourceController petSummaryVersion1dot0dot0MediaType )
 		within: self newHttpRequestContext.
 	self
@@ -197,7 +191,7 @@ PetsRESTfulControllerTest >> testComplexPagination [
 	response := resourceController
 		getPetsBasedOn:
 			( self
-				requestToGet: 'https://pets.example.com/pets?start=3&limit=2'
+				requestToGET: 'https://pets.example.com/pets?start=3&limit=2'
 				accepting: resourceController petSummaryVersion1dot0dot0MediaType )
 		within: self newHttpRequestContext.
 	self
@@ -234,7 +228,7 @@ PetsRESTfulControllerTest >> testDeletePet [
 
 	self createPet.
 
-	response := resourceController deletePetBasedOn: (self requestToDeletePetIdentifiedBy: 1) within: self newHttpRequestContext.
+	response := resourceController deletePetBasedOn: (self requestToDELETEResourceIdentifiedBy: 1) within: self newHttpRequestContext.
 
 	self
 		assert: response isSuccess;
@@ -250,7 +244,7 @@ PetsRESTfulControllerTest >> testGetNotModifiedWhenValidETag [
 	self createPet.
 
 	response := resourceController
-		getPetBasedOn: (self requestToGetResourceIdentifiedBy: 1 accepting: self defaultPetMediaType)
+		getPetBasedOn: (self requestToGETResourceIdentifiedBy: 1 accepting: self defaultPetMediaType)
 		within: self newHttpRequestContext.
 
 	self
@@ -260,7 +254,7 @@ PetsRESTfulControllerTest >> testGetNotModifiedWhenValidETag [
 	response := resourceController
 		getPetBasedOn:
 			(self
-				requestToGetResourceIdentifiedBy: 1
+				requestToGETResourceIdentifiedBy: 1
 				accepting: self defaultPetMediaType
 				conditionalTo: '"c051344b8c92c5ed8a2bd0752070c35ed3de3bab"' asETag)
 		within: self newHttpRequestContext.
@@ -283,7 +277,7 @@ PetsRESTfulControllerTest >> testGetPetJustCreated [
 		assert: petRepository count equals: 1.
 
 	response := resourceController
-		getPetBasedOn: ( self requestToGetResourceIdentifiedBy: 1 accepting: self defaultPetMediaType )
+		getPetBasedOn: ( self requestToGETResourceIdentifiedBy: 1 accepting: self defaultPetMediaType )
 		within: self newHttpRequestContext.
 
 	self
@@ -346,7 +340,7 @@ PetsRESTfulControllerTest >> testGetPetNotFoundShouldFail [
 
 	self
 		should: [ resourceController
-				getPetBasedOn: ( self requestToGetResourceIdentifiedBy: 1 accepting: '*/*' )
+				getPetBasedOn: ( self requestToGETResourceIdentifiedBy: 1 accepting: '*/*' )
 				within: self newHttpRequestContext
 			]
 		raise: HTTPClientError
@@ -368,7 +362,7 @@ PetsRESTfulControllerTest >> testGetPetSummaryJustCreated [
 	response := resourceController
 		getPetBasedOn:
 			( self
-				requestToGetResourceIdentifiedBy: 1
+				requestToGETResourceIdentifiedBy: 1
 				accepting: resourceController petSummaryVersion1dot0dot0MediaType )
 		within: self newHttpRequestContext.
 
@@ -483,7 +477,7 @@ PetsRESTfulControllerTest >> testGetPetsWithPagination [
 				assert: json items size equals: 5.
 
 			response := resourceController
-				getPetsBasedOn: ( self requestToGet: json links next accepting: response contentType )
+				getPetsBasedOn: ( self requestToGET: json links next accepting: response contentType )
 				within: self newHttpRequestContext.
 			self
 				assert: response isSuccess;
