@@ -57,9 +57,11 @@ PetsRESTfulControllerTest >> entityTagOfPetIdentifiedBy: anIdentifier [
 
 	| getResponse |
 
-	getResponse := resourceController getPetBasedOn: (self requestToGetResourceIdentifiedBy: anIdentifier accepting: self defaultPetMediaType) within: self newHttpRequestContext.
+	getResponse := resourceController
+		getPetBasedOn: ( self requestToGetResourceIdentifiedBy: anIdentifier accepting: self defaultPetMediaType )
+		within: self newHttpRequestContext.
 	self assert: getResponse isSuccess.
-	^ getResponse headers at: 'ETag'
+	^ getResponse entityTag
 ]
 
 { #category : #'private - support' }
@@ -67,11 +69,11 @@ PetsRESTfulControllerTest >> requestMissingIfMatchHeaderToUpdatePetIdentifiedBy:
 
 	^ TeaRequest
 		fromZnRequest:
-			((ZnRequest patch: (self urlForResourceIdentifiedBy: anIdentifier))
+			( ( ZnRequest patch: ( self urlForResourceIdentifiedBy: anIdentifier ) )
 				setAccept: self defaultPetMediaType;
-				entity: (ZnEntity with: ('{"name":"<1s>"}' expandMacrosWith: aName) type: self defaultPetMediaType);
-				yourself)
-		pathParams: {(#identifier -> anIdentifier)} asDictionary
+				entity: ( ZnEntity with: ( '{"name":"<1s>"}' expandMacrosWith: aName ) type: self defaultPetMediaType );
+				yourself )
+		pathParams: ( self parametersWith: anIdentifier )
 ]
 
 { #category : #'private - support' }
@@ -130,7 +132,7 @@ PetsRESTfulControllerTest >> setUpResourceController [
 PetsRESTfulControllerTest >> testCantDeleteInvalidPet [
 
 	self
-		should: [ resourceController deletePetBasedOn: (self requestToDeleteResourceIdentifiedBy: 1) within: self newHttpRequestContext ]
+		should: [ resourceController deletePetBasedOn: (self requestToDELETEResourceIdentifiedBy: 1) within: self newHttpRequestContext ]
 		raise: HTTPClientError
 		withExceptionDo: [ :signal | self assert: signal code equals: 404 ]
 ]
@@ -226,7 +228,7 @@ PetsRESTfulControllerTest >> testDeletePet [
 
 	self createPet.
 
-	response := resourceController deletePetBasedOn: (self requestToDeleteResourceIdentifiedBy: 1) within: self newHttpRequestContext.
+	response := resourceController deletePetBasedOn: (self requestToDELETEResourceIdentifiedBy: 1) within: self newHttpRequestContext.
 
 	self
 		assert: response isSuccess;

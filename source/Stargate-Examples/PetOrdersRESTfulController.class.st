@@ -238,6 +238,16 @@ PetOrdersRESTfulController >> declareGetOrderRoute [
 		evaluating: [ :httpRequest :requestContext | self getOrderBasedOn: httpRequest within: requestContext ]
 ]
 
+{ #category : #routes }
+PetOrdersRESTfulController >> declareUpdateOrderCommentRoute [
+
+	^ RouteSpecification
+		handling: #PUT
+		at: self commentIdentifierTemplate
+		evaluating:
+			[ :httpRequest :requestContext | self updateOrderCommentBasedOn: httpRequest within: requestContext ]
+]
+
 { #category : #'API - comments' }
 PetOrdersRESTfulController >> deleteOrderCommentBasedOn: httpRequest within: requestContext [
 
@@ -364,4 +374,22 @@ PetOrdersRESTfulController >> serverUrl: aServerUrl [
 PetOrdersRESTfulController >> typeIdConstraint [
 
 	^ IsInteger
+]
+
+{ #category : #'API - comments' }
+PetOrdersRESTfulController >> updateOrderCommentBasedOn: httpRequest within: requestContext [
+
+	^ commentsRequestHandler
+		from: httpRequest
+		within: requestContext
+		get: [ :index | 
+			requestContext hold: index under: #commentIndex.
+			( self commentsForOrderIn: httpRequest ) at: index ifAbsent: [ ObjectNotFound signal ]
+			]
+		thenUpdateWith: [ :oldComment :newComment | 
+			( self commentsForOrderIn: httpRequest )
+				at: ( requestContext objectUnder: #commentIndex )
+				put: newComment.
+			newComment
+			]
 ]

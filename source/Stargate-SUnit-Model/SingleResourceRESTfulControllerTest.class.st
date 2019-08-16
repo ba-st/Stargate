@@ -20,14 +20,19 @@ SingleResourceRESTfulControllerTest >> endpoint [
 ]
 
 { #category : #'private - support' }
-SingleResourceRESTfulControllerTest >> requestToDeleteResourceIdentifiedBy: anIdentifier [
+SingleResourceRESTfulControllerTest >> parametersWith: anIdentifier [
+
+	^ SmallDictionary new
+		at: resourceController identifierKey put: anIdentifier;
+		yourself
+]
+
+{ #category : #'private - support' }
+SingleResourceRESTfulControllerTest >> requestToDELETEResourceIdentifiedBy: anIdentifier [
 
 	^ TeaRequest
 		fromZnRequest: ( ZnRequest delete: ( self urlForResourceIdentifiedBy: anIdentifier ) )
-		pathParams:
-			( SmallDictionary new
-				at: resourceController identifierKey put: anIdentifier;
-				yourself )
+		pathParams: ( self parametersWith: anIdentifier )
 ]
 
 { #category : #'private - support' }
@@ -45,10 +50,10 @@ SingleResourceRESTfulControllerTest >> requestToGetResourceIdentifiedBy: anIdent
 
 	^ TeaRequest
 		fromZnRequest:
-			((ZnRequest get: (self urlForResourceIdentifiedBy: anIdentifier))
+			( ( ZnRequest get: ( self urlForResourceIdentifiedBy: anIdentifier ) )
 				setAccept: anAcceptHeader;
-				yourself)
-		pathParams: {(#identifier -> anIdentifier)} asDictionary
+				yourself )
+		pathParams: ( self parametersWith: anIdentifier )
 ]
 
 { #category : #'private - support' }
@@ -56,11 +61,11 @@ SingleResourceRESTfulControllerTest >> requestToGetResourceIdentifiedBy: anIdent
 
 	^ TeaRequest
 		fromZnRequest:
-			((ZnRequest get: (self urlForResourceIdentifiedBy: anIdentifier))
+			( ( ZnRequest get: ( self urlForResourceIdentifiedBy: anIdentifier ) )
 				setAccept: anAcceptHeader;
 				setIfNoneMatchTo: anETag;
-				yourself)
-		pathParams: {(#identifier -> anIdentifier)} asDictionary
+				yourself )
+		pathParams: ( self parametersWith: anIdentifier )
 ]
 
 { #category : #'private - support' }
@@ -71,10 +76,7 @@ SingleResourceRESTfulControllerTest >> requestToGetSubresource: aSubResourceUrl 
 			( ( ZnRequest get: aSubResourceUrl )
 				setAccept: anAcceptHeader;
 				yourself )
-		pathParams:
-			( SmallDictionary new
-				at: #identifier put: anIdentifier;
-				yourself )
+		pathParams: ( self parametersWith: anIdentifier )
 ]
 
 { #category : #'private - support' }
@@ -87,10 +89,7 @@ SingleResourceRESTfulControllerTest >> requestToPATCHResourceIdentifiedBy: anIde
 				setIfMatchTo: anETag;
 				entity: ( ZnEntity with: aRequestBody type: anAcceptHeader );
 				yourself )
-		pathParams:
-			( SmallDictionary new
-				at: #identifier put: anIdentifier;
-				yourself )
+		pathParams: ( self parametersWith: anIdentifier )
 ]
 
 { #category : #'private - support' }

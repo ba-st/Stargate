@@ -1,3 +1,6 @@
+"
+I'm responsible for locating specific subresource instances and generating location urls from them
+"
 Class {
 	#name : #SubresourceLocator,
 	#superclass : #ResourceLocatorBehavior,

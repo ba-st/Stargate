@@ -80,5 +80,6 @@ InMemoryPetRepository >> update: pet with: updatedPet [
 	pet synchronizeWith: updatedPet.
 	updateTimestamps
 		at: ( self identifierOf: pet )
-		put: ( updateTimestamps at: ( self identifierOf: pet ) ) + 1
+		put: ( updateTimestamps at: ( self identifierOf: pet ) ) + 1.
+	^ pet
 ]

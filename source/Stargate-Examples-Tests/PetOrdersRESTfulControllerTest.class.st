@@ -58,6 +58,14 @@ PetOrdersRESTfulControllerTest >> getFirstOrderAndWithJsonDo: aBlock [
 ]
 
 { #category : #'private - support' }
+PetOrdersRESTfulControllerTest >> parametersWith: anOrderId and: aCommentIndex [
+
+	^ ( self parametersWith: anOrderId )
+		at: resourceController commentIdentifierKey put: aCommentIndex;
+		yourself
+]
+
+{ #category : #'private - support' }
 PetOrdersRESTfulControllerTest >> petUrl [
 
 	^ self baseUrl / 'pets/1' asUrl
@@ -70,15 +78,11 @@ PetOrdersRESTfulControllerTest >> requestToCreateOrderFrom: json [
 ]
 
 { #category : #'private - support' }
-PetOrdersRESTfulControllerTest >> requestToDeleteComment: aSubresourceUrl at: aCommentIndex forOrder: anOrderId [
+PetOrdersRESTfulControllerTest >> requestToDELETEComment: aSubresourceUrl at: aCommentIndex forOrder: anOrderId [
 
 	^ TeaRequest
 		fromZnRequest: ( ZnRequest delete: aSubresourceUrl asUrl / aCommentIndex asString )
-		pathParams:
-			( SmallDictionary new
-				at: resourceController identifierKey put: anOrderId;
-				at: resourceController commentIdentifierKey put: aCommentIndex;
-				yourself )
+		pathParams: ( self parametersWith: anOrderId and: aCommentIndex )
 ]
 
 { #category : #'private - support' }
@@ -89,17 +93,27 @@ PetOrdersRESTfulControllerTest >> requestToGetComment: aSubresourceUrl at: aComm
 			( ( ZnRequest get: aSubresourceUrl asUrl / aCommentIndex asString )
 				setAccept: ZnMimeType textPlain;
 				yourself )
-		pathParams:
-			( SmallDictionary new
-				at: resourceController identifierKey put: anOrderId;
-				at: resourceController commentIdentifierKey put: aCommentIndex;
-				yourself )
+		pathParams: ( self parametersWith: anOrderId and: aCommentIndex )
 ]
 
 { #category : #'private - support' }
 PetOrdersRESTfulControllerTest >> requestToPOST: url identifiedBy: anIdentifier [
 
-	^ TeaRequest fromZnRequest: (ZnRequest post: url) pathParams: {(#identifier -> anIdentifier)} asDictionary
+	^ TeaRequest
+		fromZnRequest: ( ZnRequest post: url )
+		pathParams: ( self parametersWith: anIdentifier )
+]
+
+{ #category : #'private - support' }
+PetOrdersRESTfulControllerTest >> requestToPUTComment: aComment on: aSubresourceUrl at: aCommentIndex forOrder: anOrderId conditionalTo: anETag [
+
+	^ TeaRequest
+		fromZnRequest:
+			( ( ZnRequest put: aSubresourceUrl asUrl / aCommentIndex asString )
+				setIfMatchTo: anETag;
+				entity: ( ZnEntity text: aComment );
+				yourself )
+		pathParams: ( self parametersWith: anOrderId and: aCommentIndex )
 ]
 
 { #category : #running }
@@ -124,7 +138,7 @@ PetOrdersRESTfulControllerTest >> testCannnotDeleteComment [
 		do: [ :order | 
 			self
 				should: [ resourceController
-						deleteOrderCommentBasedOn: ( self requestToDeleteComment: order links comments at: 1 forOrder: 1 )
+						deleteOrderCommentBasedOn: ( self requestToDELETEComment: order links comments at: 1 forOrder: 1 )
 						within: self newHttpRequestContext
 					]
 				raise: HTTPClientError notFound
@@ -147,6 +161,57 @@ PetOrdersRESTfulControllerTest >> testCannotGetComment [
 						within: self newHttpRequestContext
 					]
 				raise: HTTPClientError notFound
+			]
+]
+
+{ #category : #'tests - comments' }
+PetOrdersRESTfulControllerTest >> testCannotUpdateComment [
+
+	self
+		withJsonFromContentsIn: self createOrder
+		do: [ :order | 
+			| knownETag |
+
+			knownETag := ( self createCommentFor: order identifiedBy: 1 withContent: 'Hey!' ) entityTag.
+			self createCommentFor: order identifiedBy: 1 withContent: 'Mr. DJ'.
+
+			self
+				should: [ resourceController
+						updateOrderCommentBasedOn:
+							( self
+								requestToPUTComment: 'Hola!'
+								on: order links comments
+								at: 5
+								forOrder: 1
+								conditionalTo: knownETag )
+						within: self newHttpRequestContext
+					]
+				raise: HTTPClientError notFound
+			]
+]
+
+{ #category : #'tests - comments' }
+PetOrdersRESTfulControllerTest >> testCannotUpdateCommentWhenETagNotMatches [
+
+	self
+		withJsonFromContentsIn: self createOrder
+		do: [ :order | 
+			self
+				createCommentFor: order identifiedBy: 1 withContent: 'Hey!';
+				createCommentFor: order identifiedBy: 1 withContent: 'Mr. DJ'.
+
+			self
+				should: [ resourceController
+						updateOrderCommentBasedOn:
+							( self
+								requestToPUTComment: 'Hola!'
+								on: order links comments
+								at: 1
+								forOrder: 1
+								conditionalTo: '"XXX"' asETag )
+						within: self newHttpRequestContext
+					]
+				raise: HTTPClientError preconditionFailed
 			]
 ]
 
@@ -191,7 +256,7 @@ PetOrdersRESTfulControllerTest >> testDeleteComment [
 				createCommentFor: order identifiedBy: 1 withContent: 'Mr. DJ'.
 
 			response := resourceController
-				deleteOrderCommentBasedOn: ( self requestToDeleteComment: order links comments at: 2 forOrder: 1 )
+				deleteOrderCommentBasedOn: ( self requestToDELETEComment: order links comments at: 2 forOrder: 1 )
 				within: self newHttpRequestContext.
 
 			self
@@ -382,6 +447,25 @@ PetOrdersRESTfulControllerTest >> testOrderCreation [
 ]
 
 { #category : #tests }
+PetOrdersRESTfulControllerTest >> testRoutes [
+
+	| routes |
+
+	routes := resourceController routes.
+
+	self
+		assert: routes size equals: 9;
+		assertCollection: ( routes collect: #urlTemplate )
+			hasSameElements: #(
+				'/orders' 
+				'/orders/<identifier:IsInteger>' 
+				'/orders/<identifier:IsInteger>/cancel' 
+				'/orders/<identifier:IsInteger>/complete' 
+				'/orders/<identifier:IsInteger>/comments' 
+				'/orders/<identifier:IsInteger>/comments/<commentIdentifier:IsInteger>')
+]
+
+{ #category : #tests }
 PetOrdersRESTfulControllerTest >> testTemplate [
 
 	| controller |
@@ -395,4 +479,42 @@ PetOrdersRESTfulControllerTest >> testTemplate [
 		assert: controller commentsTemplate equals: '/orders/<identifier:IsInteger>/comments';
 		assert: controller commentIdentifierTemplate
 			equals: '/orders/<identifier:IsInteger>/comments/<commentIdentifier:IsInteger>'
+]
+
+{ #category : #'tests - comments' }
+PetOrdersRESTfulControllerTest >> testUpdateComment [
+
+	self
+		withJsonFromContentsIn: self createOrder
+		do: [ :order | 
+			| response knownETag |
+
+			knownETag := ( self createCommentFor: order identifiedBy: 1 withContent: 'Hey!' ) entityTag.
+			self createCommentFor: order identifiedBy: 1 withContent: 'Mr. DJ'.
+
+			response := resourceController
+				updateOrderCommentBasedOn:
+					( self
+						requestToPUTComment: 'Hola!'
+						on: order links comments
+						at: 1
+						forOrder: 1
+						conditionalTo: knownETag )
+				within: self newHttpRequestContext.
+
+			self
+				assert: response isSuccess;
+				deny: response entityTag = knownETag;
+				assert: response contents equals: 'Hola!'.
+
+			response := resourceController
+				orderCommentsBasedOn:
+					( self requestToGetSubresource: order links comments identifiedBy: 1 accepting: ZnMimeType textPlain )
+				within: self newHttpRequestContext.
+
+			self
+				assert: response isSuccess;
+				assert: response contentType equals: ZnMimeType textPlain;
+				assert: response contents equals: '- Hola!<n>- Mr. DJ' expandMacros
+			]
 ]

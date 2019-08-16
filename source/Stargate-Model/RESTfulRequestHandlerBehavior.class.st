@@ -148,8 +148,7 @@ RESTfulRequestHandlerBehavior >> from: httpRequest within: requestContext get: f
 
 			updatedResource := self decode: httpRequest within: requestContext.
 			exceptionHandler
-				handleConflictsDuring: [ updateBlock value: resourceToUpdate value: updatedResource ].
-			resourceToUpdate
+				handleConflictsDuring: [ updateBlock value: resourceToUpdate value: updatedResource ]
 			]
 ]
 
