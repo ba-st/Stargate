@@ -53,11 +53,11 @@ SingleResourceRESTfulControllerTest >> requestToGetResourceIdentifiedBy: anIdent
 ]
 
 { #category : #'private - support' }
-SingleResourceRESTfulControllerTest >> requestToGetSubresource: aSubresourceEndpoint identifiedBy: anIdentifier accepting: anAcceptHeader [
+SingleResourceRESTfulControllerTest >> requestToGetSubresource: aSubResourceUrl identifiedBy: anIdentifier accepting: anAcceptHeader [
 
 	^ TeaRequest
 		fromZnRequest:
-			( ( ZnRequest get: ( self urlForResourceIdentifiedBy: anIdentifier ) / aSubresourceEndpoint )
+			( ( ZnRequest get: aSubResourceUrl )
 				setAccept: anAcceptHeader;
 				yourself )
 		pathParams:

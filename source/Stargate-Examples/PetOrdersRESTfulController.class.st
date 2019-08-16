@@ -196,12 +196,41 @@ PetOrdersRESTfulController >> declareCreateOrderRoute [
 ]
 
 { #category : #routes }
+PetOrdersRESTfulController >> declareGetOrderCommentRoute [
+
+	^ RouteSpecification
+		handling: #GET
+		at: self commentIdentifierTemplate
+		evaluating: [ :httpRequest :requestContext | self orderCommentBasedOn: httpRequest within: requestContext ]
+]
+
+{ #category : #routes }
+PetOrdersRESTfulController >> declareGetOrderCommentsRoute [
+
+	^ RouteSpecification
+		handling: #GET
+		at: self commentsTemplate
+		evaluating: [ :httpRequest :requestContext | self orderCommentsBasedOn: httpRequest within: requestContext ]
+]
+
+{ #category : #routes }
 PetOrdersRESTfulController >> declareGetOrderRoute [
 
 	^ RouteSpecification
 		handling: #GET
 		at: self identifierTemplate
 		evaluating: [ :httpRequest :requestContext | self getOrderBasedOn: httpRequest within: requestContext ]
+]
+
+{ #category : #private }
+PetOrdersRESTfulController >> encodeComments: resource [
+
+	^ resource isArray
+		ifTrue: [ ( CollectionFormatter
+				separatingWith: '<n>' expandMacros
+				applyingToEach: [ :comment | '- <1s>' expandMacrosWith: comment ] ) format: resource
+			]
+		ifFalse: [ resource asString ]
 ]
 
 { #category : #'API - orders' }
@@ -230,7 +259,8 @@ PetOrdersRESTfulController >> initializeCommentsRequestHandler [
 			extractingIdentifierWith: [ :httpRequest | self commentIdentifierIn: httpRequest ]
 			locatingParentResourceWith: requestHandler resourceLocator;
 		whenAccepting: ZnMimeType textPlain decodeApplying: [ :comment | comment ];
-		whenResponding: ZnMimeType textPlain encodeApplying: [ :comment | comment ];
+		whenResponding: ZnMimeType textPlain
+			encodeApplying: [ :resource | self encodeComments: resource ];
 		createEntityTagHashing: [ :hasher :comment :requestContext | hasher include: comment ];
 		build
 ]
@@ -264,6 +294,28 @@ PetOrdersRESTfulController >> initializeRequestHandler [
 				include: ( ordersRepository lastModificationOf: order )
 			];
 		build
+]
+
+{ #category : #'API - comments' }
+PetOrdersRESTfulController >> orderCommentBasedOn: httpRequest within: requestContext [
+
+	^ commentsRequestHandler
+		from: httpRequest
+		within: requestContext
+		get: [ :commentIndex | 
+			( commentsByOrderId at: ( self identifierIn: httpRequest ) ifAbsent: [ #() ] )
+				at: commentIndex
+				ifAbsent: [ ObjectNotFound signal ]
+			]
+]
+
+{ #category : #'API - comments' }
+PetOrdersRESTfulController >> orderCommentsBasedOn: httpRequest within: requestContext [
+
+	^ commentsRequestHandler
+		from: httpRequest
+		within: requestContext
+		getCollection: [ ( commentsByOrderId at: ( self identifierIn: httpRequest ) ifAbsent: [ #() ] ) asArray ]
 ]
 
 { #category : #private }

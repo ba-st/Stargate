@@ -21,7 +21,7 @@ PetOrdersRESTfulControllerTest >> createCommentFor: order identifiedBy: anId wit
 
 	| request |
 
-	request := self requestToPOST: order links self asUrl / 'comments' identifiedBy: anId.
+	request := self requestToPOST: order links comments asUrl identifiedBy: anId.
 	request entity: ( ZnEntity with: aComment type: ZnMimeType textPlain ).
 
 	^ resourceController createCommentBasedOn: request within: self newHttpRequestContext
@@ -70,6 +70,21 @@ PetOrdersRESTfulControllerTest >> requestToCreateOrderFrom: json [
 ]
 
 { #category : #'private - support' }
+PetOrdersRESTfulControllerTest >> requestToGetComment: aSubresourceUrl at: aCommentIndex forOrder: anOrderId [
+
+	^ TeaRequest
+		fromZnRequest:
+			( ( ZnRequest get: aSubresourceUrl asUrl / aCommentIndex asString )
+				setAccept: ZnMimeType textPlain;
+				yourself )
+		pathParams:
+			( SmallDictionary new
+				at: resourceController identifierKey put: anOrderId;
+				at: resourceController commentIdentifierKey put: aCommentIndex;
+				yourself )
+]
+
+{ #category : #'private - support' }
 PetOrdersRESTfulControllerTest >> requestToPOST: url identifiedBy: anIdentifier [
 
 	^ TeaRequest fromZnRequest: (ZnRequest post: url) pathParams: {(#identifier -> anIdentifier)} asDictionary
@@ -89,28 +104,32 @@ PetOrdersRESTfulControllerTest >> setUpResourceController [
 	resourceController := PetOrdersRESTfulController persistingTo: orderRepository 
 ]
 
-{ #category : #'tests - orders' }
-PetOrdersRESTfulControllerTest >> testGetCanceledOrder [
+{ #category : #'tests - comments' }
+PetOrdersRESTfulControllerTest >> testCannotGetComment [
+
+	| orderCreationResponse |
+
+	orderCreationResponse := self createOrder.
+	self assert: orderCreationResponse isSuccess.
 
 	self
-		createOrder;
-		getFirstOrderAndWithJsonDo: [ :json | 
+		withJsonFromContentsIn: orderCreationResponse
+		do: [ :order | 
 			self
-				assertUrl: json pet equals: self petUrl;
-				assert: json status equals: 'registered';
-				assertUrl: json links self equals: 'https://petstore.example.com/orders/1';
-				assertUrl: json links cancel equals: 'https://petstore.example.com/orders/1/cancel';
-				assertUrl: json links complete equals: 'https://petstore.example.com/orders/1/complete';
-				assert: (resourceController cancelOrderBasedOn: (self requestToPOST: json links cancel identifiedBy: 1) within: self newHttpRequestContext) isSuccess ];
-		getFirstOrderAndWithJsonDo: [ :json | 
+				createCommentFor: order identifiedBy: 1 withContent: 'Hey!';
+				createCommentFor: order identifiedBy: 1 withContent: 'Mr. DJ'.
+
 			self
-				assertUrl: json pet equals: self petUrl;
-				assert: json status equals: 'canceled';
-				assertUrl: json links self equals: 'https://petstore.example.com/orders/1' ]
+				should: [ resourceController
+						orderCommentBasedOn: ( self requestToGetComment: order links comments at: 3 forOrder: 1 )
+						within: self newHttpRequestContext
+					]
+				raise: HTTPClientError notFound
+			]
 ]
 
 { #category : #'tests - comments' }
-PetOrdersRESTfulControllerTest >> testGetCommentsForJustCreatedOrder [
+PetOrdersRESTfulControllerTest >> testCommentCreation [
 
 	| response orderCreationResponse |
 
@@ -137,6 +156,102 @@ PetOrdersRESTfulControllerTest >> testGetCommentsForJustCreatedOrder [
 				assert: response contentType equals: ZnMimeType textPlain;
 				assert: response contents equals: 'Second';
 				assertUrl: response location equals: 'https://petstore.example.com/orders/1/comments/2'
+			]
+]
+
+{ #category : #'tests - orders' }
+PetOrdersRESTfulControllerTest >> testGetCanceledOrder [
+
+	self
+		createOrder;
+		getFirstOrderAndWithJsonDo: [ :json | 
+			self
+				assertUrl: json pet equals: self petUrl;
+				assert: json status equals: 'registered';
+				assertUrl: json links self equals: 'https://petstore.example.com/orders/1';
+				assertUrl: json links cancel equals: 'https://petstore.example.com/orders/1/cancel';
+				assertUrl: json links complete equals: 'https://petstore.example.com/orders/1/complete';
+				assert: (resourceController cancelOrderBasedOn: (self requestToPOST: json links cancel identifiedBy: 1) within: self newHttpRequestContext) isSuccess ];
+		getFirstOrderAndWithJsonDo: [ :json | 
+			self
+				assertUrl: json pet equals: self petUrl;
+				assert: json status equals: 'canceled';
+				assertUrl: json links self equals: 'https://petstore.example.com/orders/1' ]
+]
+
+{ #category : #'tests - comments' }
+PetOrdersRESTfulControllerTest >> testGetComment [
+
+	| response orderCreationResponse |
+
+	orderCreationResponse := self createOrder.
+	self assert: orderCreationResponse isSuccess.
+
+	self
+		withJsonFromContentsIn: orderCreationResponse
+		do: [ :order | 
+			self
+				createCommentFor: order identifiedBy: 1 withContent: 'Hey!';
+				createCommentFor: order identifiedBy: 1 withContent: 'Mr. DJ'.
+
+			response := resourceController
+				orderCommentBasedOn: ( self requestToGetComment: order links comments at: 1 forOrder: 1 )
+				within: self newHttpRequestContext.
+
+			self
+				assert: response isSuccess;
+				assert: response contentType equals: ZnMimeType textPlain;
+				assert: response contents equals: 'Hey!'
+			]
+]
+
+{ #category : #'tests - comments' }
+PetOrdersRESTfulControllerTest >> testGetComments [
+
+	| response orderCreationResponse |
+
+	orderCreationResponse := self createOrder.
+	self assert: orderCreationResponse isSuccess.
+
+	self
+		withJsonFromContentsIn: orderCreationResponse
+		do: [ :order | 
+			self
+				createCommentFor: order identifiedBy: 1 withContent: 'Hey!';
+				createCommentFor: order identifiedBy: 1 withContent: 'Mr. DJ'.
+
+			response := resourceController
+				orderCommentsBasedOn:
+					( self requestToGetSubresource: order links comments identifiedBy: 1 accepting: ZnMimeType textPlain )
+				within: self newHttpRequestContext.
+
+			self
+				assert: response isSuccess;
+				assert: response contentType equals: ZnMimeType textPlain;
+				assert: response contents equals: '- Hey!<n>- Mr. DJ' expandMacros
+			]
+]
+
+{ #category : #'tests - comments' }
+PetOrdersRESTfulControllerTest >> testGetCommentsForJustCreatedOrder [
+
+	| response orderCreationResponse |
+
+	orderCreationResponse := self createOrder.
+	self assert: orderCreationResponse isSuccess.
+
+	self
+		withJsonFromContentsIn: orderCreationResponse
+		do: [ :order | 
+			response := resourceController
+				orderCommentsBasedOn:
+					( self requestToGetSubresource: order links comments identifiedBy: 1 accepting: ZnMimeType textPlain )
+				within: self newHttpRequestContext.
+
+			self
+				assert: response isSuccess;
+				assert: response contentType equals: ZnMimeType textPlain;
+				assert: response contents isEmpty
 			]
 ]
 
@@ -206,37 +321,6 @@ PetOrdersRESTfulControllerTest >> testInvalidStateTransition [
 		should: [ resourceController completeOrderBasedOn: (self requestToPOST: completeOrderLink identifiedBy: 1) within: self newHttpRequestContext ]
 			raise: HTTPClientError
 			withExceptionDo: [ :error | self assert: error code equals: 409 ]
-]
-
-{ #category : #'tests - comments' }
-PetOrdersRESTfulControllerTest >> testOrderCommentCreation [
-
-	| response orderCreationResponse |
-
-	orderCreationResponse := self createOrder.
-	self assert: orderCreationResponse isSuccess.
-
-	self
-		withJsonFromContentsIn: orderCreationResponse
-		do: [ :order | 
-			response := self createCommentFor: order identifiedBy: 1 withContent: 'First comment!'.
-
-			self
-				assert: response isSuccess;
-				assert: response isCreated;
-				assert: response contentType equals: ZnMimeType textPlain;
-				assert: response contents equals: 'First comment!';
-				assertUrl: response location equals: 'https://petstore.example.com/orders/1/comments/1'.
-
-			response := self createCommentFor: order identifiedBy: 1 withContent: 'Second'.
-
-			self
-				assert: response isSuccess;
-				assert: response isCreated;
-				assert: response contentType equals: ZnMimeType textPlain;
-				assert: response contents equals: 'Second';
-				assertUrl: response location equals: 'https://petstore.example.com/orders/1/comments/2'
-			]
 ]
 
 { #category : #'tests - orders' }

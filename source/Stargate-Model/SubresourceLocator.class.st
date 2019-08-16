@@ -2,11 +2,9 @@ Class {
 	#name : #SubresourceLocator,
 	#superclass : #ResourceLocatorBehavior,
 	#instVars : [
-		'baseUrl',
 		'endpoint',
 		'identifierLookupAction',
 		'locationResolverBinding',
-		'exceptionHandler',
 		'resourceLocator'
 	],
 	#category : #'Stargate-Model-Controllers'
@@ -95,7 +93,7 @@ SubresourceLocator >> locationOf: resource within: requestContext [
 { #category : #querying }
 SubresourceLocator >> lookupResouceIdentifiedBy: httpRequest evaluating: aQueryBlock [
 
-	^ exceptionHandler
+	^ resourceLocator exceptionHandler
 		handleNotFoundAndMissingParametersDuring: [ 
 			| identifier |
 			identifier := identifierLookupAction cull: httpRequest.
