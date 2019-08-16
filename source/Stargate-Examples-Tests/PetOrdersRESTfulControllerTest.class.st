@@ -70,6 +70,18 @@ PetOrdersRESTfulControllerTest >> requestToCreateOrderFrom: json [
 ]
 
 { #category : #'private - support' }
+PetOrdersRESTfulControllerTest >> requestToDeleteComment: aSubresourceUrl at: aCommentIndex forOrder: anOrderId [
+
+	^ TeaRequest
+		fromZnRequest: ( ZnRequest delete: aSubresourceUrl asUrl / aCommentIndex asString )
+		pathParams:
+			( SmallDictionary new
+				at: resourceController identifierKey put: anOrderId;
+				at: resourceController commentIdentifierKey put: aCommentIndex;
+				yourself )
+]
+
+{ #category : #'private - support' }
 PetOrdersRESTfulControllerTest >> requestToGetComment: aSubresourceUrl at: aCommentIndex forOrder: anOrderId [
 
 	^ TeaRequest
@@ -105,15 +117,25 @@ PetOrdersRESTfulControllerTest >> setUpResourceController [
 ]
 
 { #category : #'tests - comments' }
-PetOrdersRESTfulControllerTest >> testCannotGetComment [
-
-	| orderCreationResponse |
-
-	orderCreationResponse := self createOrder.
-	self assert: orderCreationResponse isSuccess.
+PetOrdersRESTfulControllerTest >> testCannnotDeleteComment [
 
 	self
-		withJsonFromContentsIn: orderCreationResponse
+		withJsonFromContentsIn: self createOrder
+		do: [ :order | 
+			self
+				should: [ resourceController
+						deleteOrderCommentBasedOn: ( self requestToDeleteComment: order links comments at: 1 forOrder: 1 )
+						within: self newHttpRequestContext
+					]
+				raise: HTTPClientError notFound
+			]
+]
+
+{ #category : #'tests - comments' }
+PetOrdersRESTfulControllerTest >> testCannotGetComment [
+
+	self
+		withJsonFromContentsIn: self createOrder
 		do: [ :order | 
 			self
 				createCommentFor: order identifiedBy: 1 withContent: 'Hey!';
@@ -131,14 +153,11 @@ PetOrdersRESTfulControllerTest >> testCannotGetComment [
 { #category : #'tests - comments' }
 PetOrdersRESTfulControllerTest >> testCommentCreation [
 
-	| response orderCreationResponse |
-
-	orderCreationResponse := self createOrder.
-	self assert: orderCreationResponse isSuccess.
-
 	self
-		withJsonFromContentsIn: orderCreationResponse
+		withJsonFromContentsIn: self createOrder
 		do: [ :order | 
+			| response |
+
 			response := self createCommentFor: order identifiedBy: 1 withContent: 'First comment!'.
 
 			self
@@ -156,6 +175,38 @@ PetOrdersRESTfulControllerTest >> testCommentCreation [
 				assert: response contentType equals: ZnMimeType textPlain;
 				assert: response contents equals: 'Second';
 				assertUrl: response location equals: 'https://petstore.example.com/orders/1/comments/2'
+			]
+]
+
+{ #category : #'tests - comments' }
+PetOrdersRESTfulControllerTest >> testDeleteComment [
+
+	self
+		withJsonFromContentsIn: self createOrder
+		do: [ :order | 
+			| response |
+
+			self
+				createCommentFor: order identifiedBy: 1 withContent: 'Hey!';
+				createCommentFor: order identifiedBy: 1 withContent: 'Mr. DJ'.
+
+			response := resourceController
+				deleteOrderCommentBasedOn: ( self requestToDeleteComment: order links comments at: 2 forOrder: 1 )
+				within: self newHttpRequestContext.
+
+			self
+				assert: response isSuccess;
+				assert: response isNoContent.
+
+			response := resourceController
+				orderCommentsBasedOn:
+					( self requestToGetSubresource: order links comments identifiedBy: 1 accepting: ZnMimeType textPlain )
+				within: self newHttpRequestContext.
+
+			self
+				assert: response isSuccess;
+				assert: response contentType equals: ZnMimeType textPlain;
+				assert: response contents equals: '- Hey!' expandMacros
 			]
 ]
 
@@ -182,14 +233,11 @@ PetOrdersRESTfulControllerTest >> testGetCanceledOrder [
 { #category : #'tests - comments' }
 PetOrdersRESTfulControllerTest >> testGetComment [
 
-	| response orderCreationResponse |
-
-	orderCreationResponse := self createOrder.
-	self assert: orderCreationResponse isSuccess.
-
 	self
-		withJsonFromContentsIn: orderCreationResponse
+		withJsonFromContentsIn: self createOrder
 		do: [ :order | 
+			| response |
+
 			self
 				createCommentFor: order identifiedBy: 1 withContent: 'Hey!';
 				createCommentFor: order identifiedBy: 1 withContent: 'Mr. DJ'.
@@ -208,14 +256,11 @@ PetOrdersRESTfulControllerTest >> testGetComment [
 { #category : #'tests - comments' }
 PetOrdersRESTfulControllerTest >> testGetComments [
 
-	| response orderCreationResponse |
-
-	orderCreationResponse := self createOrder.
-	self assert: orderCreationResponse isSuccess.
-
 	self
-		withJsonFromContentsIn: orderCreationResponse
+		withJsonFromContentsIn: self createOrder
 		do: [ :order | 
+			| response |
+
 			self
 				createCommentFor: order identifiedBy: 1 withContent: 'Hey!';
 				createCommentFor: order identifiedBy: 1 withContent: 'Mr. DJ'.
@@ -235,14 +280,11 @@ PetOrdersRESTfulControllerTest >> testGetComments [
 { #category : #'tests - comments' }
 PetOrdersRESTfulControllerTest >> testGetCommentsForJustCreatedOrder [
 
-	| response orderCreationResponse |
-
-	orderCreationResponse := self createOrder.
-	self assert: orderCreationResponse isSuccess.
-
 	self
-		withJsonFromContentsIn: orderCreationResponse
+		withJsonFromContentsIn: self createOrder
 		do: [ :order | 
+			| response |
+
 			response := resourceController
 				orderCommentsBasedOn:
 					( self requestToGetSubresource: order links comments identifiedBy: 1 accepting: ZnMimeType textPlain )

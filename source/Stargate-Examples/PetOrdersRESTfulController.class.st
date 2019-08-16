@@ -81,6 +81,12 @@ PetOrdersRESTfulController >> commentIdentifierTemplate [
 ]
 
 { #category : #private }
+PetOrdersRESTfulController >> commentsForOrderIn: httpRequest [
+
+	^ commentsByOrderId at: ( self identifierIn: httpRequest ) ifAbsent: [ #() ]
+]
+
+{ #category : #private }
 PetOrdersRESTfulController >> commentsTemplate [
 
 	^ '<1s><2s>' expandMacrosWith: self identifierTemplate with: commentsRequestHandler endpoint
@@ -196,6 +202,16 @@ PetOrdersRESTfulController >> declareCreateOrderRoute [
 ]
 
 { #category : #routes }
+PetOrdersRESTfulController >> declareDeleteOrderCommentRoute [
+
+	^ RouteSpecification
+		handling: #DELETE
+		at: self commentIdentifierTemplate
+		evaluating:
+			[ :httpRequest :requestContext | self deleteOrderCommentBasedOn: httpRequest within: requestContext ]
+]
+
+{ #category : #routes }
 PetOrdersRESTfulController >> declareGetOrderCommentRoute [
 
 	^ RouteSpecification
@@ -220,6 +236,16 @@ PetOrdersRESTfulController >> declareGetOrderRoute [
 		handling: #GET
 		at: self identifierTemplate
 		evaluating: [ :httpRequest :requestContext | self getOrderBasedOn: httpRequest within: requestContext ]
+]
+
+{ #category : #'API - comments' }
+PetOrdersRESTfulController >> deleteOrderCommentBasedOn: httpRequest within: requestContext [
+
+	^ commentsRequestHandler
+		from: httpRequest
+		within: requestContext
+		get: [ :index | ( self commentsForOrderIn: httpRequest ) at: index ifAbsent: [ ObjectNotFound signal ] ]
+		thenDo: [ :comment | ( self commentsForOrderIn: httpRequest ) remove: comment ]
 ]
 
 { #category : #private }
@@ -302,11 +328,8 @@ PetOrdersRESTfulController >> orderCommentBasedOn: httpRequest within: requestCo
 	^ commentsRequestHandler
 		from: httpRequest
 		within: requestContext
-		get: [ :commentIndex | 
-			( commentsByOrderId at: ( self identifierIn: httpRequest ) ifAbsent: [ #() ] )
-				at: commentIndex
-				ifAbsent: [ ObjectNotFound signal ]
-			]
+		get:
+			[ :commentIndex | ( self commentsForOrderIn: httpRequest ) at: commentIndex ifAbsent: [ ObjectNotFound signal ] ]
 ]
 
 { #category : #'API - comments' }
@@ -315,7 +338,7 @@ PetOrdersRESTfulController >> orderCommentsBasedOn: httpRequest within: requestC
 	^ commentsRequestHandler
 		from: httpRequest
 		within: requestContext
-		getCollection: [ ( commentsByOrderId at: ( self identifierIn: httpRequest ) ifAbsent: [ #() ] ) asArray ]
+		getCollection: [ ( self commentsForOrderIn: httpRequest ) asArray ]
 ]
 
 { #category : #private }

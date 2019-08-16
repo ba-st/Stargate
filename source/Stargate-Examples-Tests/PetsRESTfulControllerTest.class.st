@@ -81,14 +81,6 @@ PetsRESTfulControllerTest >> requestToCreatePetFrom: json [
 ]
 
 { #category : #'private - support' }
-PetsRESTfulControllerTest >> requestToDeletePetIdentifiedBy: anIdentifier [
-
-	^ TeaRequest
-		fromZnRequest: ( ZnRequest delete: ( self urlForResourceIdentifiedBy: anIdentifier ) )
-		pathParams: {( #identifier -> anIdentifier )} asDictionary
-]
-
-{ #category : #'private - support' }
 PetsRESTfulControllerTest >> requestToGetPetsAccepting: anAcceptHeader [
 
 	^ self requestToGet: self resourceUrl accepting: anAcceptHeader
@@ -138,7 +130,7 @@ PetsRESTfulControllerTest >> setUpResourceController [
 PetsRESTfulControllerTest >> testCantDeleteInvalidPet [
 
 	self
-		should: [ resourceController deletePetBasedOn: (self requestToDeletePetIdentifiedBy: 1) within: self newHttpRequestContext ]
+		should: [ resourceController deletePetBasedOn: (self requestToDeleteResourceIdentifiedBy: 1) within: self newHttpRequestContext ]
 		raise: HTTPClientError
 		withExceptionDo: [ :signal | self assert: signal code equals: 404 ]
 ]
@@ -234,7 +226,7 @@ PetsRESTfulControllerTest >> testDeletePet [
 
 	self createPet.
 
-	response := resourceController deletePetBasedOn: (self requestToDeletePetIdentifiedBy: 1) within: self newHttpRequestContext.
+	response := resourceController deletePetBasedOn: (self requestToDeleteResourceIdentifiedBy: 1) within: self newHttpRequestContext.
 
 	self
 		assert: response isSuccess;

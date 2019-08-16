@@ -20,6 +20,17 @@ SingleResourceRESTfulControllerTest >> endpoint [
 ]
 
 { #category : #'private - support' }
+SingleResourceRESTfulControllerTest >> requestToDeleteResourceIdentifiedBy: anIdentifier [
+
+	^ TeaRequest
+		fromZnRequest: ( ZnRequest delete: ( self urlForResourceIdentifiedBy: anIdentifier ) )
+		pathParams:
+			( SmallDictionary new
+				at: resourceController identifierKey put: anIdentifier;
+				yourself )
+]
+
+{ #category : #'private - support' }
 SingleResourceRESTfulControllerTest >> requestToGet: aUrl accepting: anAcceptHeader [
 
 	^ TeaRequest
