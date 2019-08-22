@@ -10,7 +10,7 @@ Here's a simplified architecture diagram:
 
 This class is responsible for installing and configuring a set of controllers and starting the server.
 The user must provide two objects on instance creation:
-- `configuration`: It's any object convertible to a dictionary containing configuration parameters. In particular is delegated to `Teapot`.
+- `configuration`: Any object convertible to a dictionary containing configuration parameters. In particular is delegated to `Teapot`.
 - `controllers`: A list of controllers to be installed.
 
 ### Additional Configuration
@@ -19,9 +19,9 @@ The user must provide two objects on instance creation:
 
 ### Installing and controlling
 
-Once you ended up with the configuration you must send to the API the message `install`. This will configure the supported routes and the exception handlers on Teapot.
+Once you finish configuration you must send to the API the message `install`. This will configure the supported routes and the exception handlers on Teapot.
 
-To start the server, send to the API the message `start` and to stop it `stop`.
+To start the server, send to the API the message `start`. Send `stop` to stop it.
 
 For example:
 
@@ -43,7 +43,7 @@ api
 
 ## ResourceRESTfulController
 
-A controller is responsible for providing a set of routes to be configured in an API and acts as mediator between the HTTP Server and the request handlers it manages. To fulfill it's purpose it will configure one or more request handlers and collaborate with them to implement the methods required in every route it declares.
+A controller is responsible for providing a set of routes to be configured in an API and acts as mediator between the HTTP Server and the request handlers it manages. To fulfill its purpose it will configure one or more request handlers and collaborate with them to implement the methods required in every route it declares.
 
 ## Request processing pipeline
 

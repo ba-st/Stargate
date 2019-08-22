@@ -2,7 +2,7 @@
 
 A controller is responsible for providing a set of routes to be configured in an API and acts as mediator between the HTTP Server and the request handlers it manages. To fulfill it's purpose it will configure one or more request handlers and collaborate with them to implement the methods required in every route it declares.
 
-Usually controllers are tied to a resource, in that case you must subclass `SingleResourceRESTfulController`, in case you want to manage more than one resource with the same controller directly subclass `ResourceRESTfulController`.
+Usually controllers are tied to a resource, in that case you must subclass `SingleResourceRESTfulController`, in case you want to manage more than one resource with the same controller directly, subclass `ResourceRESTfulController`.
 
 In any case a controller must provide a set of routes to be installed. You can easily declare new routes by implementing a method starting with `declare` and ending with `Route`, returning an instance of `RouteSpecification`, for example:
 
@@ -108,17 +108,17 @@ Controllers must provide a way to calculate an ETag for resources configuring th
 
 ## Collection Pagination
 
-By default GET requests over collections will not be paginated. To get collections paginated configure the builder by sending the message `paginateCollectionsWithDefaultLimit:` providing the default page limit. A request handler will parse `start` and `limit` as query parameters during a GET request processing and will provide a pagination object.
+By default GET requests over collections will not be paginated. To get collections paginated, configure the builder by sending the message `paginateCollectionsWithDefaultLimit:` providing the default page limit. A request handler will parse `start` and `limit` as query parameters during a GET request processing and will provide a pagination object.
 
 ## Exception Handling
 
-Request handlers will handle some exceptions by default and raise it as proper HTTP errors:
+Request handlers will handle some exceptions by default and raise them as proper HTTP errors:
 - `ObjectNotFound` will raise a 404/Not Found error
 - `ConflictingObjectFound` will raise a 409/Conflict error
 - `KeyNotFound` and `NeoJSONParseError` will raise a 400/Bad Request error
 - `TeaNoSuchParam` will raise a 400/Bad Request error
 
-The end use can configure additional exceptions to be automatically handled by sending `handleExceptionsApplying:` to the builder. For example:
+The end user can configure additional exceptions to be automatically handled by sending `handleExceptionsApplying:` to the builder. For example:
 ```smalltalk
 builder
     handleExceptionsApplying: [ :handler |

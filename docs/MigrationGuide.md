@@ -4,7 +4,7 @@
 
 Some changes can be automatically migrated from v2:
 
-Load manually the package `Stargate-Deprecated-V3`. It will include deprecations and some of them includes automatic rewrite expressions.
+Manually load the package `Stargate-Deprecated-V3`. It includes deprecations, some of them with automatic rewrite expressions.
 
 Other changes cannot be migrated in an automated fashion:
 
@@ -21,7 +21,7 @@ Other changes cannot be migrated in an automated fashion:
 
 Some changes can be automatically migrated from v1:
 
-Load manually the package `Stargate-MigrationTo2`. It will include deprecations including automatic rewrite expressions, so if you exercise the code it will get converted to the new versions.
+Manually load the package `Stargate-MigrationTo2`. It will include deprecations including automatic rewrite expressions, so if you execute the code it will get converted to the new versions.
 
 Other changes cannot be migrated in an automated fashion, but are easy to do:
 
