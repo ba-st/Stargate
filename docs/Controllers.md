@@ -22,17 +22,17 @@ Controllers must also implement `serverUrl:`. Usually this end ups delegating th
 
 Subclasses of `SingleResourceRESTfulController` must implement `requestHandler` returning the request handler attached to the managed resource and `typeIdConstraint` returning some object in the `IsObject` hierarchy. This constraint is used to provide a URI template for an individual resource instance.
 
-Controllers perform it's action by collaboration with one or more instances of a request handler. The easy way to create a request handler is to use an instance of `RESTfulRequestHandlerBuilder`.
+Controllers perform their action by collaboration with one or more instances of a request handler. The easy way to create a request handler is to use an instance of `RESTfulRequestHandlerBuilder`.
 
 # Request handler
 
-A request handler purpose is to help implementing each operation a controller must support.
+A request handler's purpose is to help implement each operation a controller must support.
 
 - `GET` operations over an individual resource must send `from:within:get:` to the request handler with the `httpRequest`, the `requestContext` and a block that will be evaluated with the `id` parsed from the URL and must return a resource instance.
-- `GET` operations over a resource collection must send `from:within:getCollection:` with a block that will be evaluated with a pagination object in case the request handler was configured with pagination. This block must return the collection to be encoded in the response, and in case it's paginated and hypermedia driven must update the `requestContext` with the corresponding pagination links.
+- `GET` operations over a resource collection must send `from:within:getCollection:` with a block that will be evaluated with a pagination object in case the request handler was configured with pagination. This block must return the collection to be encoded in the response, and in case it's paginated and hypermedia driven, it must update the `requestContext` with the corresponding pagination links.
 - `POST` operations creating a new resource instance must send any of:  			
 	- `withResourceCreatedFrom:within:do:` with a block that will be evaluated with the resource instance created by decoding the request body.
-	- `withRepresentationIn:within:createResourceWith:thenDo:`, the first block will be evaluated with a half-decoded representation (for example a `NeoJSONObject`) and must produce a resource instance, the second block will be evaluated with the resource instance. This separation allow for better error handling because during the first block evaluation  decoding errors will be automatically handled.
+	- `withRepresentationIn:within:createResourceWith:thenDo:`, the first block will be evaluated with a half-decoded representation (for example a `NeoJSONObject`) and must produce a resource instance, the second block will be evaluated with the resource instance. This separation allows for better error handling because during the first block evaluation decoding errors will be automatically handled.
 - `DELETE` operations or `POST` operations not creating new resources must send `from:within:get:thenDo:`. The first block will receive the resource `id` parsed from the URL and must lookup for a resource instance. The second block will receive this resource instance to perform the removal or the action we want. This message will always produce a `204/No Content` response if successful.
 - `PUT` or `PATCH` operations over an individual resource must send `from:within:get:thenUpdateWith:`. The first block will receive the resource `id` and must lookup for a resource instance. The second block will receive both the found resource and the resource created by decoding the request body and must perform the update operation and return the updated resource that will be encoded in the response body.
 
@@ -42,7 +42,7 @@ A request handler builder will help us to create a request handler. The builder 
 
 ## Basic Configuration
 
-- For non hypermedia driven controllers only implementing GET functionality over a resource configure the builder using `handling:extractingIdentifierWith:`. This method will receive an endpoint to handle and a block used to extract the identifier of a resource instance from the request. For example:
+- For non hypermedia driven controllers only implementing GET functionality over a resource, configure the builder using `handling:extractingIdentifierWith:`. This method will receive an endpoint to handle and a block used to extract the identifier of a resource instance from the request. For example:
 ```smalltalk
 builder
     handling: 'currencies'
@@ -103,7 +103,7 @@ builder
 ## ETags
 
 Controllers must provide a way to calculate an ETag for resources configuring the builder with one of the following methods:
-- `createEntityTagWith:` will receive a block that will be evaluated with the resource, the media type and the request context and must produce an ETag value
+- `createEntityTagWith:` will receive a block that will be evaluated with the resource, the media type and the request context and must produce an ETag value.
 - `createEntityTagHashing:` will receive a block that will be evaluated with a `hasher`, the resource and the request context. One must include objects to be considered in the hash by sending `include:` to the hasher instance. The hasher will then produce an ETag value applying a Hash function to all the included objects.
 
 ## Collection Pagination
