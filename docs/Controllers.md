@@ -24,6 +24,18 @@ Subclasses of `SingleResourceRESTfulController` must implement `requestHandler` 
 
 Controllers perform it's action by collaboration with one or more instances of a request handler. The easy way to create a request handler is to use an instance of `RESTfulRequestHandlerBuilder`.
 
+# Request handler
+
+A request handler purpose is to help implementing each operation a controller must support.
+
+- `GET` operations over an individual resource must send `from:within:get:` to the request handler with the `httpRequest`, the `requestContext` and a block that will be evaluated with the `id` parsed from the URL and must return a resource instance.
+- `GET` operations over a resource collection must send `from:within:getCollection:` with a block that will be evaluated with a pagination object in case the request handler was configured with pagination. This block must return the collection to be encoded in the response, and in case it's paginated and hypermedia driven must update the `requestContext` with the corresponding pagination links.
+- `POST` operations creating a new resource instance must send any of:  			
+	- `withResourceCreatedFrom:within:do:` with a block that will be evaluated with the resource instance created by decoding the request body.
+	- `withRepresentationIn:within:createResourceWith:thenDo:`, the first block will be evaluated with a half-decoded representation (for example a `NeoJSONObject`) and must produce a resource instance, the second block will be evaluated with the resource instance. This separation allow for better error handling because during the first block evaluation  decoding errors will be automatically handled.
+- `DELETE` operations or `POST` operations not creating new resources must send `from:within:get:thenDo:`. The first block will receive the resource `id` parsed from the URL and must lookup for a resource instance. The second block will receive this resource instance to perform the removal or the action we want. This message will always produce a `204/No Content` response if successful.
+- `PUT` or `PATCH` operations over an individual resource must send `from:within:get:thenUpdateWith:`. The first block will receive the resource `id` and must lookup for a resource instance. The second block will receive both the found resource and the resource created by decoding the request body and must perform the update operation and return the updated resource that will be encoded in the response body.
+
 # Request Handler Builder
 
 A request handler builder will help us to create a request handler. The builder must be configured in order to produce a valid request handler:
@@ -60,6 +72,21 @@ builder
 		extractingIdentifierWith: [ :httpRequest | self commentIdentifierIn: httpRequest ]
 		locatingParentResourceWith: parentRequestHandler resourceLocator
 ```
+
+## Representation Decoding
+
+Controllers implementing `POST`, `PUT` or `PATCH` methods will need to take the request body and convert this representation to a resource instance, configuring the builder by using any of:
+- `whenAccepting:decodeApplying:` will create a decoding rule attached to a media type and apply a block receiving the request body as parameter.
+- `whenAccepting:decodeFromJsonApplying:` will use `NeoJSON` to help in the decoding. The block will receive the original json and a `NeoJSONReader` ready to be configured.
+- `decodeToNeoJSONObjectWhenAccepting:` will produce an instance of `NeoJSONObject`
+
+## Representation Encoding
+
+Controllers needing to include a body in the response will need to take a resource instance and convert it to the negotiated representation, configuring the builder using any of:
+- `whenResponding:encodeApplying:` will create a decoding rule attached to a media type applying a block receiving the resource instance as parameter.
+- `whenResponding:encodeToJsonApplying:` will use `NeoJSON` to help in the encoding. The provided block will receive a `NeoJSONWriter` ready to be configured.
+
+The media types attached to an encoding rule are automatically considered in the content negotiation.
 
 ## Hypermedia driven controllers
 
