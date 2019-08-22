@@ -15,7 +15,7 @@ The user must provide two objects on instance creation:
 
 ### Additional Configuration
 - **CORS** , you can configure the CORS support by sending the message `beCORSAwareAllowing:` to the API with a list of URLs you want to support as origins.
-- **Top Level Error Handlers**: The API always configures an error handler for `HTTPClientError` generating a response with the corresponding error code and additional details when available. However users are allowed to configure additional error handlers by sending: `on:addErrorHandler:` with the Exception to handle and block that will receive the handled exception and the current request.
+- **Top Level Error Handlers**: The API always configures an error handler for `HTTPClientError` generating a response with the corresponding error code and additional details when available. However users are allowed to configure additional error handlers by sending: `on:addErrorHandler:` with the Exception to handle and a block that will receive the handled exception and the current request.
 
 ### Installing and controlling
 
