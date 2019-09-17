@@ -177,11 +177,28 @@ RESTfulRequestHandlerBuilder >> whenResponding: aMediaType encodeToJsonApplying:
 
 	self
 		whenResponding: aMediaType
+		encodeToJsonApplying: aBlock
+		writingResourceWith: [ :writer :resource | writer nextPut: resource ]
+]
+
+{ #category : #encoding }
+RESTfulRequestHandlerBuilder >> whenResponding: aMediaType encodeToJsonApplying: aBlock as: schema [
+
+	self
+		whenResponding: aMediaType
+		encodeToJsonApplying: aBlock
+		writingResourceWith: [ :writer :resource | writer nextPut: resource as: schema ]
+]
+
+{ #category : #encoding }
+RESTfulRequestHandlerBuilder >> whenResponding: aMediaType encodeToJsonApplying: aBlock writingResourceWith: aResourceWritingBlock [
+
+	self
+		whenResponding: aMediaType
 		encodeApplying: [ :resource :requestContext | 
 			String
 				streamContents: [ :stream | 
 					| writer |
-
 					writer := NeoJSONWriter on: stream.
 					aBlock value: resource value: requestContext value: writer.
 					writer
@@ -191,7 +208,7 @@ RESTfulRequestHandlerBuilder >> whenResponding: aMediaType encodeToJsonApplying:
 								mapInstVar: #items;
 								mapAsHypermediaControls: [ :collection | requestContext hypermediaControlsFor: collection items ]
 							].
-					writer nextPut: resource
+					aResourceWritingBlock value: writer value: resource
 					]
 			]
 ]

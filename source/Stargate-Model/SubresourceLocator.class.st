@@ -51,6 +51,12 @@ SubresourceLocator class >> handling: aStringOrSymbol
 ]
 
 { #category : #accessing }
+SubresourceLocator >> baseUrl [
+
+	^ resourceLocator baseUrl
+]
+
+{ #category : #accessing }
 SubresourceLocator >> baseUrl: aServerUrl [
 
 	resourceLocator baseUrl: aServerUrl
@@ -68,10 +74,22 @@ SubresourceLocator >> endpoint [
 	^ endpoint
 ]
 
+{ #category : #private }
+SubresourceLocator >> exceptionHandler [
+
+	^ exceptionHandler
+]
+
 { #category : #accessing }
 SubresourceLocator >> handleExceptionsWith: anExceptionHandler [
 
 	exceptionHandler := anExceptionHandler
+]
+
+{ #category : #private }
+SubresourceLocator >> identifierLookupAction [
+
+	^ identifierLookupAction
 ]
 
 { #category : #initialization }
@@ -93,15 +111,4 @@ SubresourceLocator >> locationOf: resource within: requestContext [
 	^ ( resourceLocator locationOf: requestContext parentResource within: requestContext )
 		/ endpoint asUrl
 		/ ( locationResolverBinding content cull: resource cull: requestContext ) asString asUrl
-]
-
-{ #category : #querying }
-SubresourceLocator >> lookupResouceIdentifiedBy: httpRequest evaluating: aQueryBlock [
-
-	^ exceptionHandler
-		handleNotFoundAndMissingParametersDuring: [ 
-			| identifier |
-			identifier := identifierLookupAction cull: httpRequest.
-			aQueryBlock cull: identifier
-			]
 ]

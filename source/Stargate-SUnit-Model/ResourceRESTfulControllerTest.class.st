@@ -53,3 +53,9 @@ ResourceRESTfulControllerTest >> withJsonFromContentsIn: httpResponse do: aBlock
 
 	aBlock value: (NeoJSONObject fromString: httpResponse contents)
 ]
+
+{ #category : #'private - support' }
+ResourceRESTfulControllerTest >> withJsonFromItemsIn: httpResponse do: aBlock [
+
+	self withJsonFromContentsIn: httpResponse do: [:json | aBlock value: json items]
+]

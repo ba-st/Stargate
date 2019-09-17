@@ -11,11 +11,11 @@ NeoJSONObjectMapping >> mapAsHypermediaControls: aBlock [
 { #category : #'*Stargate-Model' }
 NeoJSONObjectMapping >> mapProperty: propertyName getter: readBlock [
 
-	self mapProperty: propertyName getter: readBlock setter: [:object :value | ]
+	^ self mapProperty: propertyName getter: readBlock setter: [ :object :value |  ]
 ]
 
 { #category : #'*Stargate-Model' }
 NeoJSONObjectMapping >> mapProperty: propertyName setter: writeBlock [
 
-	self mapProperty: propertyName getter: [ :object |  ] setter: writeBlock
+	^ self mapProperty: propertyName getter: [ :object |  ] setter: writeBlock
 ]

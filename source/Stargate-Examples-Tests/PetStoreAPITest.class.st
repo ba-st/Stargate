@@ -174,7 +174,7 @@ PetStoreAPITest >> testCreatePet [
 		assert: json status equals: 'new';
 		assert: json name equals: 'Firulais';
 		assert: json type equals: 'dog';
-		assert: json links self equals: response location
+		assert: json selfLocation equals: response location
 ]
 
 { #category : #tests }
