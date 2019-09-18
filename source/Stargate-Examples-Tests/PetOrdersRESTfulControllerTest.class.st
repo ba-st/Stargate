@@ -16,7 +16,7 @@ PetOrdersRESTfulControllerTest >> baseUrl [
 	^ 'https://petstore.example.com' asUrl
 ]
 
-{ #category : #'tests - comments' }
+{ #category : #'private - support' }
 PetOrdersRESTfulControllerTest >> commentsRelatedTo: order [
 
 	^ resourceController
@@ -410,25 +410,34 @@ PetOrdersRESTfulControllerTest >> testHATEOAS [
 			self
 				assertUrl: json pet equals: self petUrl;
 				assert: json status equals: 'registered';
-				assertUrl: json links self equals: 'https://petstore.example.com/orders/1';
+				assertUrl: json selfLocation equals: 'https://petstore.example.com/orders/1';
 				assertUrl: json links cancel equals: 'https://petstore.example.com/orders/1/cancel';
 				assertUrl: json links complete equals: 'https://petstore.example.com/orders/1/complete';
-				assert: (resourceController completeOrderBasedOn: (self requestToPOST: json links complete identifiedBy: 1) within: self newHttpRequestContext) isSuccess ];
+				assert:
+					( resourceController
+						completeOrderBasedOn: ( self requestToPOST: json links complete identifiedBy: 1 )
+						within: self newHttpRequestContext ) isSuccess
+			];
 		getFirstOrderAndWithJsonDo: [ :json | 
 			self
 				assertUrl: json pet equals: self petUrl;
 				assert: json status equals: 'completed';
-				assertUrl: json links self equals: 'https://petstore.example.com/orders/1';
+				assertUrl: json selfLocation equals: 'https://petstore.example.com/orders/1';
 				assertUrl: json links cancel equals: 'https://petstore.example.com/orders/1/cancel';
 				assert: json links complete isNil;
-				assert: (resourceController cancelOrderBasedOn: (self requestToPOST: json links cancel identifiedBy: 1) within: self newHttpRequestContext) isSuccess ];
+				assert:
+					( resourceController
+						cancelOrderBasedOn: ( self requestToPOST: json links cancel identifiedBy: 1 )
+						within: self newHttpRequestContext ) isSuccess
+			];
 		getFirstOrderAndWithJsonDo: [ :json | 
 			self
 				assertUrl: json pet equals: self petUrl;
 				assert: json status equals: 'canceled';
-				assertUrl: json links self equals: 'https://petstore.example.com/orders/1';
+				assertUrl: json selfLocation equals: 'https://petstore.example.com/orders/1';
 				assert: json links cancel isNil;
-				assert: json links complete isNil ]
+				assert: json links complete isNil
+			]
 ]
 
 { #category : #'tests - orders' }

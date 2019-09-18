@@ -183,7 +183,7 @@ PetsRESTfulControllerTest >> testComplexPagination [
 		withJsonFromContentsIn: response
 		do: [ :json | 
 			self
-				assertUrl: json links self equals: 'https://pets.example.com/pets?limit=2';
+				assertUrl: json selfLocation equals: 'https://pets.example.com/pets?limit=2';
 				assertUrl: json links next equals: 'https://pets.example.com/pets?start=3&limit=2';
 				assertUrl: json links last equals: 'https://pets.example.com/pets?start=5&limit=2';
 				assert: json items size equals: 2
@@ -212,7 +212,7 @@ PetsRESTfulControllerTest >> testComplexPagination [
 		withJsonFromContentsIn: response
 		do: [ :json | 
 			self
-				assertUrl: json links self asZnUrl equals: 'https://pets.example.com/pets?start=3&limit=2';
+				assertUrl: json selfLocation asZnUrl equals: 'https://pets.example.com/pets?start=3&limit=2';
 				assertUrl: json links first asZnUrl equals: 'https://pets.example.com/pets?start=1&limit=2';
 				assertUrl: json links prev asZnUrl equals: 'https://pets.example.com/pets?start=1&limit=2';
 				assertUrl: json links next asZnUrl equals: 'https://pets.example.com/pets?start=5&limit=2';
@@ -404,7 +404,7 @@ PetsRESTfulControllerTest >> testGetPets [
 		do: [ :json | 
 			self
 				assert: json items isEmpty;
-				assertUrl: json links self equals: 'https://pets.example.com/pets'
+				assertUrl: json selfLocation equals: 'https://pets.example.com/pets'
 			]
 ]
 
@@ -431,17 +431,17 @@ PetsRESTfulControllerTest >> testGetPetsNotEmpty [
 
 	self
 		withJsonFromContentsIn: response
-		do: [ :json | 
-			| dogSummary |
-
+			do: [ :json | self assertUrl: json selfLocation equals: 'https://pets.example.com/pets' ];
+		withJsonFromItemsIn: response
+			do: [ :items | 
 			self
-				assertUrl: json links self equals: 'https://pets.example.com/pets';
-				assert: json items size equals: 1.
-			dogSummary := json items first.
-			self
-				assert: dogSummary name equals: 'Firulais';
-				assertUrl: dogSummary links self equals: 'https://pets.example.com/pets/1';
-				assert: dogSummary type isNil
+				withTheOnlyOneIn: items
+				do: [ :dogSummary | 
+					self
+						assert: dogSummary name equals: 'Firulais';
+						assertUrl: dogSummary selfLocation equals: 'https://pets.example.com/pets/1';
+						assert: dogSummary type isNil
+					]
 			]
 ]
 
@@ -471,7 +471,7 @@ PetsRESTfulControllerTest >> testGetPetsWithPagination [
 		withJsonFromContentsIn: response
 		do: [ :json | 
 			self
-				assertUrl: json links self equals: 'https://pets.example.com/pets';
+				assertUrl: json selfLocation equals: 'https://pets.example.com/pets';
 				assertUrl: json links next equals: 'https://pets.example.com/pets?start=6&limit=5';
 				assertUrl: json links last equals: 'https://pets.example.com/pets?start=6&limit=5';
 				assert: json items size equals: 5.
@@ -493,7 +493,7 @@ PetsRESTfulControllerTest >> testGetPetsWithPagination [
 				withJsonFromContentsIn: response
 				do: [ :json2 | 
 					self
-						assertUrl: json2 links self equals: 'https://pets.example.com/pets?start=6&limit=5';
+						assertUrl: json2 selfLocation equals: 'https://pets.example.com/pets?start=6&limit=5';
 						assertUrl: json2 links first equals: 'https://pets.example.com/pets?start=1&limit=5';
 						assertUrl: json2 links prev equals: 'https://pets.example.com/pets?start=1&limit=5';
 						assert: json2 links next isNil;

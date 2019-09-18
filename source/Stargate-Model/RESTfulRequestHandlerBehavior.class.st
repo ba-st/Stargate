@@ -11,8 +11,7 @@ Class {
 		'encodingRules',
 		'entityTagCalculator',
 		'acceptNegotiator',
-		'resourceLocator',
-		'exceptionHandler'
+		'resourceLocator'
 	],
 	#category : #'Stargate-Model-Controllers'
 }
@@ -33,7 +32,7 @@ RESTfulRequestHandlerBehavior >> decode: httpRequest within: requestContext [
 		at: httpRequest contentType
 		ifAbsent: [ HTTPClientError unsupportedMediaType signal: 'Decoder not found for given media type' ].
 
-	^ exceptionHandler
+	^ self exceptionHandler
 		handleDecodingFailedDuring: [ decodingRule cull: httpRequest contents cull: requestContext ]
 ]
 
@@ -84,7 +83,13 @@ RESTfulRequestHandlerBehavior >> entityTagToMatchBasedOn: httpRequest [
 { #category : #private }
 RESTfulRequestHandlerBehavior >> evaluateCollectionQuery: aQueryEvaluationBlock [
 
-	^ exceptionHandler handleMissingQueryParametersDuring: aQueryEvaluationBlock
+	^ self exceptionHandler handleMissingQueryParametersDuring: aQueryEvaluationBlock
+]
+
+{ #category : #accessing }
+RESTfulRequestHandlerBehavior >> exceptionHandler [
+
+	^ resourceLocator exceptionHandler
 ]
 
 { #category : #API }
@@ -94,7 +99,7 @@ RESTfulRequestHandlerBehavior >> from: httpRequest within: requestContext get: a
 
 	mediaType := self targetMediaTypeFrom: httpRequest.
 	resource := resourceLocator
-		lookupResouceIdentifiedBy: httpRequest
+		lookupResourceIdentifiedBy: httpRequest
 		evaluating: aQueryEvaluationBlock.
 	self
 		ifNoneMatchHeaderPresentIn: httpRequest
@@ -120,9 +125,9 @@ RESTfulRequestHandlerBehavior >> from: httpRequest within: requestContext get: a
 	| resource |
 
 	resource := resourceLocator
-		lookupResouceIdentifiedBy: httpRequest
+		lookupResourceIdentifiedBy: httpRequest
 		evaluating: aQueryEvaluationBlock.
-	exceptionHandler handleConflictsDuring: [ actionBlock value: resource ].
+	self exceptionHandler handleConflictsDuring: [ actionBlock value: resource ].
 	^ ZnResponse noContent
 ]
 
@@ -147,7 +152,7 @@ RESTfulRequestHandlerBehavior >> from: httpRequest within: requestContext get: f
 				within: requestContext.
 
 			updatedResource := self decode: httpRequest within: requestContext.
-			exceptionHandler
+			self exceptionHandler
 				handleConflictsDuring: [ updateBlock value: resourceToUpdate value: updatedResource ]
 			]
 ]
@@ -183,14 +188,14 @@ RESTfulRequestHandlerBehavior >> initializeResourceLocator: aResouceLocator
 	calculateEntityTagsWith: anEntityTagCalculator
 	handleErrorsWith: anExceptionHandler [
 
+
 	resourceLocator := aResouceLocator.
 	resourceLocator handleExceptionsWith: anExceptionHandler.
 	paginationPolicy := aPaginationPolicy cull: self.
 	decodingRules := theDecodingRules.
 	encodingRules := theEncodingRules.
 	acceptNegotiator := RESTfulControllerAcceptNegotiator basedOn: encodingRules keys.
-	entityTagCalculator := anEntityTagCalculator.
-	exceptionHandler := anExceptionHandler
+	entityTagCalculator := anEntityTagCalculator
 ]
 
 { #category : #private }
@@ -247,7 +252,10 @@ RESTfulRequestHandlerBehavior >> withRepresentationIn: httpRequest within: reque
 	^ self
 		withResourceCreatedFrom: httpRequest
 		within: requestContext
-		do: [ :representation | aBlock value: ( aCreationBlock value: representation ) ]
+		do: [ :representation | 
+			aBlock
+				value: ( self exceptionHandler handleDecodingFailedDuring: [ aCreationBlock value: representation ] )
+			]
 ]
 
 { #category : #API }
@@ -257,6 +265,6 @@ RESTfulRequestHandlerBehavior >> withResourceCreatedFrom: httpRequest within: re
 
 	creationPolicy := self resourceCreationPolicyBasedOn: httpRequest.
 	decodedRepresentation := self decode: httpRequest within: requestContext.
-	newResource := exceptionHandler handleConflictsDuring: [ aBlock value: decodedRepresentation ].
+	newResource := self exceptionHandler handleConflictsDuring: [ aBlock value: decodedRepresentation ].
 	^ creationPolicy responseFor: newResource basedOn: httpRequest within: requestContext
 ]

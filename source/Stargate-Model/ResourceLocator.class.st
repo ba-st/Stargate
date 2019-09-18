@@ -42,6 +42,12 @@ ResourceLocator class >> handling: aStringOrSymbol resolvingLocationWith: aLocat
 ]
 
 { #category : #accessing }
+ResourceLocator >> baseUrl [
+
+	^ baseUrl
+]
+
+{ #category : #accessing }
 ResourceLocator >> baseUrl: aServerUrl [
 
 	baseUrl := aServerUrl asUrl
@@ -59,10 +65,22 @@ ResourceLocator >> endpoint [
 	^ endpoint
 ]
 
+{ #category : #private }
+ResourceLocator >> exceptionHandler [
+
+	^ exceptionHandler
+]
+
 { #category : #accessing }
 ResourceLocator >> handleExceptionsWith: anExceptionHandler [
 
 	exceptionHandler := anExceptionHandler
+]
+
+{ #category : #private }
+ResourceLocator >> identifierLookupAction [
+
+	^ identifierLookupAction
 ]
 
 { #category : #initialization }
@@ -78,17 +96,6 @@ ResourceLocator >> initializeHandling: aStringOrSymbol resolvingLocationWith: aL
 { #category : #querying }
 ResourceLocator >> locationOf: resource within: requestContext [
 
-	^ baseUrl / endpoint asUrl
+	^ self baseUrl / endpoint asUrl
 		/ ( locationResolverBinding content cull: resource cull: requestContext ) asString asUrl
-]
-
-{ #category : #querying }
-ResourceLocator >> lookupResouceIdentifiedBy: httpRequest evaluating: aQueryBlock [
-
-	^ exceptionHandler
-		handleNotFoundAndMissingParametersDuring: [ 
-			| identifier |
-			identifier := identifierLookupAction cull: httpRequest.
-			aQueryBlock cull: identifier
-			]
 ]
