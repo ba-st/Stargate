@@ -10,7 +10,7 @@ Class {
 { #category : #'private - support' }
 SouthAmericanCurrenciesRESTfulControllerTest >> baseUrl [
 
-	^ 'https://currencies.example.com' asZnUrl
+	^ 'https://currencies.example.com' asUrl
 ]
 
 { #category : #running }

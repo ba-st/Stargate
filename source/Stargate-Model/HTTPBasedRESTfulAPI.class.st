@@ -45,23 +45,26 @@ HTTPBasedRESTfulAPI >> configureRoutes [
 { #category : #initialization }
 HTTPBasedRESTfulAPI >> initializeConfiguredBy: configuration installing: aRESTfulControllerCollection [
 
-	teapotServer := Teapot configure: configuration , {(#notFoundHandlerClass -> Tea405AwareNotFoundHandler)}.
-	controllers := aRESTfulControllerCollection.
+	teapotServer := Teapot
+		configure: configuration , {( #notFoundHandlerClass -> Tea405AwareNotFoundHandler )}.
+	controllers := OrderedCollection with: ( OperationalPluginsRESTfulController on: self ).
+	controllers addAll: aRESTfulControllerCollection.
 	errorHandlers := OrderedCollection new.
-	
+
 	self
 		on: HTTPClientError
 		addErrorHandler: [ :clientError :request | 
 			| json |
 
 			json := NeoJSONWriter toStringPretty: clientError.
-			(ZnResponse statusCode: clientError code)
+			( ZnResponse statusCode: clientError code )
 				headers:
-							(ZnHeaders defaultResponseHeaders
-								at: 'Access-Control-Allow-Origin' put: '*';
-								yourself);
-				entity: (ZnEntity json: json);
-				yourself ]
+					( ZnHeaders defaultResponseHeaders
+						at: 'Access-Control-Allow-Origin' put: '*';
+						yourself );
+				entity: ( ZnEntity json: json );
+				yourself
+			]
 ]
 
 { #category : #actions }
@@ -70,6 +73,12 @@ HTTPBasedRESTfulAPI >> install [
 	self
 		configureRoutes;
 		configureErrorHandlers
+]
+
+{ #category : #testing }
+HTTPBasedRESTfulAPI >> isEnabled: aPlugin [
+
+	^ false
 ]
 
 { #category : #configuring }

@@ -178,6 +178,18 @@ PetStoreAPITest >> testCreatePet [
 ]
 
 { #category : #tests }
+PetStoreAPITest >> testGetOperationalPlugins [
+
+	| json |
+
+	json := NeoJSONObject fromString: ( self newClient get: self baseUrl / 'operations' asUrl ).
+
+	self
+		assert: json items isCollection;
+		assert: json links size equals: 1
+]
+
+{ #category : #tests }
 PetStoreAPITest >> testGetPets [
 
 	| json |
