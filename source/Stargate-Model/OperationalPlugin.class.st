@@ -24,10 +24,24 @@ OperationalPlugin class >> availablePlugins [
 	^ self allLeafSubclasses
 ]
 
+{ #category : #'instance creation' }
+OperationalPlugin class >> configuredBy: configuration [
+
+	^ self subclassResponsibility
+]
+
 { #category : #accessing }
 OperationalPlugin class >> endpoint [
 
 	^ self subclassResponsibility
+]
+
+{ #category : #accessing }
+OperationalPlugin class >> pluginAt: endpoint [
+
+	^ self availablePlugins
+		detect: [ :plugin | plugin endpoint = endpoint ]
+		ifNone: [ ObjectNotFound signal: ( 'Plugin <1s> not available' expandMacrosWith: endpoint ) ]
 ]
 
 { #category : #accessing }

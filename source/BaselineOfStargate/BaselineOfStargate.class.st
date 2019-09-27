@@ -50,8 +50,13 @@ BaselineOfStargate >> setUpDependencies: spec [
 BaselineOfStargate >> setUpPackages: spec [
 
 	spec
-		package: 'Stargate-Model' with: [ spec requires: #('Buoy-Deployment' 'Hyperspace-Deployment' 'Teapot-Deployment') ];
+		package: 'Stargate-Model'
+			with: [ spec requires: #('Buoy-Deployment' 'Hyperspace-Deployment' 'Teapot-Deployment') ];
 		group: 'Deployment' with: 'Stargate-Model'.
+	spec
+		package: 'Stargate-HealthCheck' with: [ spec requires: 'Stargate-Model' ];
+		group: 'Deployment' with: 'Stargate-HealthCheck'.
+
 	spec
 		package: 'Stargate-Examples' with: [ spec requires: 'Stargate-Model' ];
 		group: 'Examples' with: 'Stargate-Examples'.
@@ -59,7 +64,7 @@ BaselineOfStargate >> setUpPackages: spec [
 		package: 'Stargate-SUnit-Model' with: [ spec requires: #('Stargate-Model' 'Buoy-SUnit') ];
 		group: 'Dependent-SUnit-Extensions' with: 'Stargate-SUnit-Model'.
 	spec
-		package: 'Stargate-Model-Tests' with: [ spec requires: #('Stargate-Model' 'Stargate-Examples') ];
+		package: 'Stargate-Model-Tests' with: [ spec requires: #('Stargate-Model' 'Stargate-Examples' 'Stargate-HealthCheck') ];
 		group: 'Tests' with: 'Stargate-Model-Tests'.
 	spec
 		package: 'Stargate-Examples-Tests'

@@ -17,6 +17,31 @@ OperationalPluginsRESTfulController class >> on: anHTTPBasedRESTfulAPI [
 	^ self new initializeOn: anHTTPBasedRESTfulAPI
 ]
 
+{ #category : #private }
+OperationalPluginsRESTfulController >> configureOperationalPluginEncodingOn: writer within: requestContext [
+
+	OperationalPlugin availablePlugins
+		do: [ :pluginType | 
+			writer
+				for: pluginType class
+				do: [ :mapping | 
+					mapping
+						mapProperty: #name getter: [ :plugin | plugin pluginName asString ];
+						mapProperty: #status getter: [ :plugin | self statusOf: plugin ];
+						mapAsHypermediaControls: [ :plugin | requestContext hypermediaControlsFor: plugin ]
+					]
+			]
+]
+
+{ #category : #routes }
+OperationalPluginsRESTfulController >> declareGetOperationalPluginRoute [
+
+	^ RouteSpecification
+		handling: #GET
+		at: self identifierTemplate
+		evaluating: [ :httpRequest :requestContext | self operationalPluginBasedOn: httpRequest within: requestContext ]
+]
+
 { #category : #routes }
 OperationalPluginsRESTfulController >> declareGetOperationalPluginsRoute [
 
@@ -31,31 +56,35 @@ OperationalPluginsRESTfulController >> declareGetOperationalPluginsRoute [
 OperationalPluginsRESTfulController >> initializeOn: anHTTPBasedRESTfulAPI [
 
 	api := anHTTPBasedRESTfulAPI.
+	self initializeRequestHandler
+]
+
+{ #category : #initialization }
+OperationalPluginsRESTfulController >> initializeRequestHandler [
+
 	requestHandler := RESTfulRequestHandlerBuilder new
 		handling: 'operations'
 			locatingResourcesWith: [ :plugin | plugin endpoint ]
 			extractingIdentifierWith: [ :httpRequest | self identifierIn: httpRequest ];
 		beHypermediaDriven;
 		whenResponding: self operationalPluginVersion1dot0dot0MediaType
-			encodeToJsonApplying: [ :resource :requestContext :writer | 
-			OperationalPlugin availablePlugins
-				do: [ :pluginClass | 
-					writer
-						for: pluginClass class
-						do: [ :mapping | 
-							mapping
-								mapProperty: #name getter: [ :plugin | plugin pluginName asString ];
-								mapProperty: #status getter: [ :plugin | self statusOf: plugin ];
-								mapAsHypermediaControls: [ :plugin | requestContext hypermediaControlsFor: plugin ]
-							]
-					]
-			];
+			encodeToJsonApplying:
+				[ :resource :requestContext :writer | self configureOperationalPluginEncodingOn: writer within: requestContext ];
 		createEntityTagHashing: [ :hasher :plugin :requestContext | 
 			hasher
 				include: plugin pluginName;
 				include: ( self statusOf: plugin )
 			];
 		build
+]
+
+{ #category : #API }
+OperationalPluginsRESTfulController >> operationalPluginBasedOn: httpRequest within: requestContext [
+
+	^ requestHandler
+		from: httpRequest
+		within: requestContext
+		get: [ :endpoint | OperationalPlugin pluginAt: endpoint ]
 ]
 
 { #category : #private }
@@ -80,9 +109,9 @@ OperationalPluginsRESTfulController >> requestHandler [
 ]
 
 { #category : #querying }
-OperationalPluginsRESTfulController >> statusOf: aPlugin [
+OperationalPluginsRESTfulController >> statusOf: aPluginType [
 
-	^ ( api isEnabled: aPlugin ) then: [ 'ENABLED' ] otherwise: [ 'DISABLED' ]
+	^ ( api isEnabled: aPluginType ) then: [ 'ENABLED' ] otherwise: [ 'DISABLED' ]
 ]
 
 { #category : #private }

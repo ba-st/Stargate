@@ -3,9 +3,8 @@ Test
 "
 Class {
 	#name : #PetStoreAPITest,
-	#superclass : #TestCase,
+	#superclass : #HTTPBasedRESTfulAPITest,
 	#instVars : [
-		'api',
 		'petsController',
 		'ordersController'
 	],
@@ -13,30 +12,10 @@ Class {
 }
 
 { #category : #private }
-PetStoreAPITest >> baseUrl [
+PetStoreAPITest >> controllersToInstall [
 
-	^ 'http://localhost' asUrl port: self port
-]
-
-{ #category : #private }
-PetStoreAPITest >> checkPortAvailability [
-
-	[ | socket |
-
-	socket := ZnNetworkingUtils serverSocketOn: self port.
-	socket close
-	]
-		on: Error
-		do: [ :error | self fail: ( 'Port <1p> is not available' expandMacrosWith: self port ) ]
-]
-
-{ #category : #private }
-PetStoreAPITest >> newClient [
-
-	^ ZnClient new
-		beOneShot;
-		enforceHttpSuccess: true;
-		yourself
+	^ {petsController.
+	ordersController}
 ]
 
 { #category : #private }
@@ -46,31 +25,11 @@ PetStoreAPITest >> port [
 ]
 
 { #category : #running }
-PetStoreAPITest >> setUp [
+PetStoreAPITest >> setUpAPI [
 
-	super setUp.
-	self checkPortAvailability.
 	petsController := PetsRESTfulController new.
 	ordersController := PetOrdersRESTfulController new.
-	api := HTTPBasedRESTfulAPI
-		configuredBy:
-			{( #port -> self port ).
-			( #serverUrl -> self baseUrl )}
-		installing: {petsController. ordersController}.
-
-	api on: Error addErrorHandler: [ :error :request | self fail ].
-
-	api
-		install;
-		start
-]
-
-{ #category : #running }
-PetStoreAPITest >> tearDown [
-
-	api ifNotNil: [ api stop ].
-	api := nil.
-	super tearDown
+	super setUpAPI
 ]
 
 { #category : #'tests - client errors' }
@@ -175,18 +134,6 @@ PetStoreAPITest >> testCreatePet [
 		assert: json name equals: 'Firulais';
 		assert: json type equals: 'dog';
 		assert: json selfLocation equals: response location
-]
-
-{ #category : #tests }
-PetStoreAPITest >> testGetOperationalPlugins [
-
-	| json |
-
-	json := NeoJSONObject fromString: ( self newClient get: self baseUrl / 'operations' asUrl ).
-
-	self
-		assert: json items isCollection;
-		assert: json links size equals: 1
 ]
 
 { #category : #tests }
