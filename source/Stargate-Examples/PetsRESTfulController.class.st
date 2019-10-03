@@ -164,7 +164,7 @@ PetsRESTfulController >> getPetsBasedOn: httpRequest within: requestContext [
 					end := pagination end min: total.
 					self
 						addPaginationControlsTo: requestContext
-						basedOn: httpRequest absoluteUrl
+						basedOn: ( httpRequest absoluteUrl asHostedAt: requestHandler resourceLocator baseUrl )
 						start: start
 						limit: pagination limit
 						end: end
