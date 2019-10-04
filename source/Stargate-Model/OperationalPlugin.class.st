@@ -50,6 +50,12 @@ OperationalPlugin class >> pluginName [
 	^ self subclassResponsibility
 ]
 
+{ #category : #configuring }
+OperationalPlugin >> includeControllersIn: controllers [
+
+	self subclassResponsibility
+]
+
 { #category : #acccessing }
 OperationalPlugin >> name [
 

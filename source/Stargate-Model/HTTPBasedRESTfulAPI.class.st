@@ -51,7 +51,7 @@ HTTPBasedRESTfulAPI >> enable: anOperationalPluginEndpoint configuredBy: configu
 	pluginToEnable := ( OperationalPlugin pluginAt: anOperationalPluginEndpoint )
 		configuredBy: configuration.
 	enabledOperationalPlugins add: pluginToEnable.
-	controllers add: pluginToEnable controller
+	pluginToEnable includeControllersIn: controllers
 ]
 
 { #category : #initialization }

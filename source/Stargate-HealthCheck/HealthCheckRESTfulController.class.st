@@ -3,11 +3,19 @@ Class {
 	#superclass : #SingleResourceRESTfulController,
 	#instVars : [
 		'requestHandler',
-		'plugin',
-		'riskScoreToStatus'
+		'plugin'
+	],
+	#classVars : [
+		'RiskScoreToStatusMapping'
 	],
 	#category : #'Stargate-HealthCheck'
 }
+
+{ #category : #'class initialization' }
+HealthCheckRESTfulController class >> initialize [
+
+	RiskScoreToStatusMapping := #('PASS' 'WARN' 'FAIL').
+]
 
 { #category : #'instance creation' }
 HealthCheckRESTfulController class >> over: aHealthCheckPlugin [
@@ -34,7 +42,6 @@ HealthCheckRESTfulController >> healthCheckSummaryVersion1dot0dot0MediaType [
 HealthCheckRESTfulController >> initializeOver: aHealthCheckPlugin [
 
 	plugin := aHealthCheckPlugin.
-	riskScoreToStatus := #('PASS' 'WARN' 'FAIL').
 	self initializeRequestHandler
 ]
 
@@ -48,8 +55,11 @@ HealthCheckRESTfulController >> initializeRequestHandler [
 			encodeToJsonApplying: [ :resource :requestContext :writer | 
 			writer
 				for: OverallHealthCondition
-				do:
-					[ :mapping | mapping mapProperty: #status getter: [ :condition | riskScoreToStatus at: condition riskScore ] ]
+				do: [ :mapping | 
+					mapping
+						mapProperty: #status
+						getter: [ :condition | RiskScoreToStatusMapping at: condition riskScore ]
+					]
 			];
 		createEntityTagHashing: [ :hasher :healthCheckStatus :requestContext |  ];
 		build

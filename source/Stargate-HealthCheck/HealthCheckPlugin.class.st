@@ -43,10 +43,10 @@ HealthCheckPlugin class >> runningAll: aHealthCheckCollection [
 	^ self basicNew initializeRunningAll: aHealthCheckCollection
 ]
 
-{ #category : #'as yet unclassified' }
-HealthCheckPlugin >> controller [
+{ #category : #configuring }
+HealthCheckPlugin >> includeControllersIn: controllers [
 
-	^ HealthCheckRESTfulController over: self
+	controllers add: ( HealthCheckRESTfulController over: self )
 ]
 
 { #category : #initalize }
