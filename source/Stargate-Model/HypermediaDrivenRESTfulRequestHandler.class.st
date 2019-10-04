@@ -36,8 +36,7 @@ HypermediaDrivenRESTfulRequestHandler >> encodeResourceCollection: resourceColle
 	requestContext
 		holdAsHypermediaControls:
 			( self paginationPolicy
-				addPaginationControlsTo:
-					( Array with: 'self' -> ( httpRequest absoluteUrl asHostedAt: self resourceLocator baseUrl ) )
+				addPaginationControlsTo: ( Array with: 'self' -> httpRequest absoluteUrl )
 				within: requestContext )
 		for: resourceCollection.
 	resourceCollection do: [ :resource | self holdResource: resource controlsWithin: requestContext ].
