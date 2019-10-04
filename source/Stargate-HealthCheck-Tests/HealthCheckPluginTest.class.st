@@ -4,7 +4,7 @@ A HealthCheckPluginTest is a test class for testing the behavior of HealthCheckP
 Class {
 	#name : #HealthCheckPluginTest,
 	#superclass : #TestCase,
-	#category : #'Stargate-Model-Tests-Operations'
+	#category : #'Stargate-HealthCheck-Tests'
 }
 
 { #category : #private }
@@ -26,28 +26,6 @@ HealthCheckPluginTest >> failureDetails [
 HealthCheckPluginTest >> successfulHealthCheck [
 
 	^ TestHealthCheck responding: ( Healthy onHealthCheckNamed: 'succeeding' )
-]
-
-{ #category : #'tests - encoding' }
-HealthCheckPluginTest >> testHealthCheckResultEncoding [
-
-	| result json details |
-
-	result := ( HealthCheckPlugin
-		runningAll:
-			( Array with: self failedHealthCheck with: self successfulHealthCheck with: self warningHealthCheck ) )
-		runHealthChecks.
-
-	json := NeoJSONObject fromString: ( NeoJSONWriter toStringPretty: result ).
-
-	self assert: json status equals: 'FAIL'.
-	details := json details.
-	self
-		assert: details failing status equals: 'FAIL';
-		assert: details failing details message equals: 'Low space on disk';
-		assert: details warning status equals: 'WARN';
-		assert: details warning details message equals: 'Approaching disk low space limit';
-		assert: details succeeding status equals: 'PASS'
 ]
 
 { #category : #'tests - running' }

@@ -7,7 +7,7 @@ Class {
 	#instVars : [
 		'status'
 	],
-	#category : #'Stargate-Model-Tests-Operations'
+	#category : #'Stargate-HealthCheck-Tests'
 }
 
 { #category : #'instance creation' }

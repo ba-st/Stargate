@@ -56,7 +56,6 @@ BaselineOfStargate >> setUpPackages: spec [
 	spec
 		package: 'Stargate-HealthCheck' with: [ spec requires: 'Stargate-Model' ];
 		group: 'Deployment' with: 'Stargate-HealthCheck'.
-
 	spec
 		package: 'Stargate-Examples' with: [ spec requires: 'Stargate-Model' ];
 		group: 'Examples' with: 'Stargate-Examples'.
@@ -64,8 +63,12 @@ BaselineOfStargate >> setUpPackages: spec [
 		package: 'Stargate-SUnit-Model' with: [ spec requires: #('Stargate-Model' 'Buoy-SUnit') ];
 		group: 'Dependent-SUnit-Extensions' with: 'Stargate-SUnit-Model'.
 	spec
-		package: 'Stargate-Model-Tests' with: [ spec requires: #('Stargate-Model' 'Stargate-Examples' 'Stargate-HealthCheck') ];
+		package: 'Stargate-Model-Tests'
+			with: [ spec requires: #('Stargate-Model' 'Stargate-Examples' 'Stargate-HealthCheck') ];
 		group: 'Tests' with: 'Stargate-Model-Tests'.
+	spec
+		package: 'Stargate-HealthCheck-Tests' with: [ spec requires: 'Stargate-HealthCheck' ];
+		group: 'Tests' with: 'Stargate-HealthCheck-Tests'.
 	spec
 		package: 'Stargate-Examples-Tests'
 			with: [ spec requires: #('Dependent-SUnit-Extensions' 'Stargate-Examples') ];
