@@ -39,9 +39,7 @@ HypermediaDrivenRESTfulRequestHandler >> encodeResourceCollection: resourceColle
 				addPaginationControlsTo: ( Array with: 'self' -> httpRequest absoluteUrl )
 				within: requestContext )
 		for: resourceCollection.
-
 	resourceCollection do: [ :resource | self holdResource: resource controlsWithin: requestContext ].
-
 	^ super
 		encodeResourceCollection: ( ResourceCollection wrapping: resourceCollection )
 		to: mediaType

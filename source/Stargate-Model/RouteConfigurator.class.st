@@ -50,7 +50,10 @@ RouteConfigurator >> configureRouteFrom: aRouteSpecification [
 		perform: ( '<1s>:' expandMacrosWith: aRouteSpecification httpMethod ) asSymbol
 		with:
 			aRouteSpecification urlTemplate
-				-> [ :request | aRouteSpecification handler value: request value: HttpRequestContext new ]
+				-> [ :request | 
+					self withServerUrlDo: [ :url | request url: ( request url asHostedAt: url ) ].
+					aRouteSpecification handler value: request value: HttpRequestContext new
+					]
 ]
 
 { #category : #initialization }
@@ -58,6 +61,12 @@ RouteConfigurator >> initializeAppliedTo: aTeapot sendingMessagesTo: aResourceRE
 
 	teapot := aTeapot.
 	resourceController := aResourceRESTfulController.
-	teapot server serverUrl ifNotNil: [ :url | resourceController serverUrl: url ].
+	self withServerUrlDo: [ :url | resourceController serverUrl: url ].
 	routesAllowingCors := Dictionary new
+]
+
+{ #category : #'private - configuring' }
+RouteConfigurator >> withServerUrlDo: aBlock [
+
+	teapot server serverUrl ifNotNil: aBlock
 ]
