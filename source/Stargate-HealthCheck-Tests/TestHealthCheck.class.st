@@ -5,25 +5,25 @@ Class {
 	#name : #TestHealthCheck,
 	#superclass : #HealthCheck,
 	#instVars : [
-		'status'
+		'healthCondition'
 	],
 	#category : #'Stargate-HealthCheck-Tests'
 }
 
 { #category : #'instance creation' }
-TestHealthCheck class >> responding: aHealthCheckStatus [
+TestHealthCheck class >> responding: aHealthCondition [
 
-	^ self new initializeResponding: aHealthCheckStatus
+	^ self new initializeResponding: aHealthCondition
 ]
 
 { #category : #initialize }
-TestHealthCheck >> initializeResponding: aHealthCheckStatus [
+TestHealthCheck >> initializeResponding: aHealthCondition [
 
-	status := aHealthCheckStatus
+	healthCondition := aHealthCondition
 ]
 
 { #category : #running }
 TestHealthCheck >> run [
 
-	^ status
+	^ healthCondition
 ]

@@ -9,7 +9,7 @@ Class {
 	#category : #'Stargate-HealthCheck'
 }
 
-{ #category : #'as yet unclassified' }
+{ #category : #'instance creation' }
 HealthCheckRESTfulController class >> over: aHealthCheckPlugin [
 
 	^ self new initializeOver: aHealthCheckPlugin

@@ -29,6 +29,17 @@ HealthCheckPluginTest >> successfulHealthCheck [
 ]
 
 { #category : #'tests - running' }
+HealthCheckPluginTest >> testHealthCheckMix [
+
+	self
+		deny:
+			( HealthCheckPlugin
+				runningAll:
+					( Array with: self failedHealthCheck with: self successfulHealthCheck with: self warningHealthCheck ) )
+				runHealthChecks hasSucceeded
+]
+
+{ #category : #'tests - running' }
 HealthCheckPluginTest >> testHealthCheckSucceedingWithWarnings [
 
 	self
