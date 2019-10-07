@@ -297,7 +297,7 @@ PetOrdersRESTfulController >> initializeCommentsRequestHandler [
 		whenAccepting: ZnMimeType textPlain decodeApplying: [ :comment | comment ];
 		whenResponding: ZnMimeType textPlain
 			encodeApplying: [ :resource | self encodeComments: resource ];
-		createEntityTagHashing: [ :hasher :comment :requestContext | hasher include: comment ];
+		createEntityHashingEncodedResource;
 		build
 ]
 

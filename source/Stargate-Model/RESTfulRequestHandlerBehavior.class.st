@@ -69,7 +69,7 @@ RESTfulRequestHandlerBehavior >> endpoint [
 { #category : #private }
 RESTfulRequestHandlerBehavior >> entityTagOf: resource encodedAs: mediaType within: requestContext [
 
-	^ ZnETag with: ( entityTagCalculator value: resource value: mediaType value: requestContext )
+	^ ZnETag with: ( entityTagCalculator value: resource value: mediaType value: requestContext value: self )
 ]
 
 { #category : #private }
