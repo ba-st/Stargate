@@ -54,17 +54,6 @@ RESTfulRequestHandlerBuilder >> build [
 ]
 
 { #category : #configuring }
-RESTfulRequestHandlerBuilder >> createEntityHashingEncodedResource [
-
-	self
-		createEntityTagWith: [ :resource :mediaType :requestContext :requestHandler | 
-			EntityTagHasher new
-				include: ( requestHandler encodeResource: resource to: mediaType within: requestContext );
-				calculateHash
-			]
-]
-
-{ #category : #configuring }
 RESTfulRequestHandlerBuilder >> createEntityTagHashing: aBlockClosure [
 
 	self
@@ -74,6 +63,17 @@ RESTfulRequestHandlerBuilder >> createEntityTagHashing: aBlockClosure [
 			aBlockClosure cull: hasher cull: resource cull: requestContext.
 			hasher
 				include: mediaType;
+				calculateHash
+			]
+]
+
+{ #category : #configuring }
+RESTfulRequestHandlerBuilder >> createEntityTagHashingEncodedResource [
+
+	self
+		createEntityTagWith: [ :resource :mediaType :requestContext :requestHandler | 
+			EntityTagHasher new
+				include: ( requestHandler encodeResource: resource to: mediaType within: requestContext );
 				calculateHash
 			]
 ]
