@@ -4,7 +4,7 @@ I provide a URL template, an HTTP method and a handler to invoke for this route.
 "
 Class {
 	#name : #RouteSpecification,
-	#superclass : #Object,
+	#superclass : #AbstractRouteSpecification,
 	#instVars : [
 		'httpMethod',
 		'handler',

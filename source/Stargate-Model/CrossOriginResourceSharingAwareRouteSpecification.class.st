@@ -1,6 +1,6 @@
 Class {
 	#name : #CrossOriginResourceSharingAwareRouteSpecification,
-	#superclass : #Object,
+	#superclass : #AbstractRouteSpecification,
 	#instVars : [
 		'specification'
 	],
