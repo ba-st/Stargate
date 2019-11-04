@@ -7,7 +7,7 @@ Class {
 	#category : #'Stargate-HealthCheck'
 }
 
-{ #category : #'as yet unclassified' }
+{ #category : #'instance creation' }
 Healthy class >> onHealthCheckNamed: aName [
 
 	^ self new initializeOnHealthCheckNamed: aName

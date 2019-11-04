@@ -53,6 +53,12 @@ HttpRequestContext >> hypermediaControlsFor: resource [
 	^ hypermediaControls at: resource ifAbsent: [ #() ]
 ]
 
+{ #category : #authorization }
+HttpRequestContext >> includesPermission: aPermission [
+
+	^ ( self objectUnder: #permisisions ifNone: [ #() ] ) includes: aPermission
+]
+
 { #category : #initialization }
 HttpRequestContext >> initialize [
 
@@ -90,4 +96,10 @@ HttpRequestContext >> parentResource [
 HttpRequestContext >> parentResource: anIdentifier [
 
 	self hold: anIdentifier under: #parentResource
+]
+
+{ #category : #authorization }
+HttpRequestContext >> permissions: aPermissionCollection [
+
+	self hold: aPermissionCollection under: #permissions
 ]

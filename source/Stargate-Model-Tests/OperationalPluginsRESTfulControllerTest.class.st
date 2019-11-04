@@ -19,6 +19,16 @@ OperationalPluginsRESTfulControllerTest >> isEnabled: aPlugin [
 	^ false
 ]
 
+{ #category : #'private - support' }
+OperationalPluginsRESTfulControllerTest >> operationsConfiguration [
+
+	^ Dictionary new
+		at: #authSchema put: 'jwt';
+		at: #authAlgorithm put: JWAHMACSHA256 parameterValue;
+		at: #authSecret put: 'secret';
+		yourself
+]
+
 { #category : #running }
 OperationalPluginsRESTfulControllerTest >> setUpResourceController [
 

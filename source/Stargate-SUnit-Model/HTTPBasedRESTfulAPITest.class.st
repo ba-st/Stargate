@@ -16,6 +16,12 @@ HTTPBasedRESTfulAPITest class >> isAbstract [
 	^ self name = #HTTPBasedRESTfulAPITest
 ]
 
+{ #category : #running }
+HTTPBasedRESTfulAPITest >> algorithmName [
+
+	^ JWAHMACSHA256 parameterValue
+]
+
 { #category : #private }
 HTTPBasedRESTfulAPITest >> baseUrl [
 
@@ -50,9 +56,40 @@ HTTPBasedRESTfulAPITest >> newClient [
 ]
 
 { #category : #private }
+HTTPBasedRESTfulAPITest >> newJWTAuthorizedClient [
+
+	| client jws |
+
+	jws := JsonWebSignature new.
+	jws algorithmName: self algorithmName.
+	jws payload: JWTClaimsSet new.
+	jws key: self secret.
+
+	client := self newClient.
+	client request setAuthorization: ( 'Bearer <1s>' expandMacrosWith: jws compactSerialized ).
+	^ client
+]
+
+{ #category : #running }
+HTTPBasedRESTfulAPITest >> operationsConfiguration [
+
+	^ Dictionary new
+		at: #authSchema put: 'jwt';
+		at: #authAlgorithm put: self algorithmName;
+		at: #authSecret put: self secret;
+		yourself
+]
+
+{ #category : #private }
 HTTPBasedRESTfulAPITest >> port [
 
 	^ self subclassResponsibility
+]
+
+{ #category : #running }
+HTTPBasedRESTfulAPITest >> secret [
+
+	^ 'secret'
 ]
 
 { #category : #running }
@@ -70,12 +107,13 @@ HTTPBasedRESTfulAPITest >> setUpAPI [
 
 	self checkPortAvailability.
 	api := HTTPBasedRESTfulAPI
-		configuredBy: { #port -> self port . #serverUrl -> self baseUrl }
+		configuredBy:
+			{ #port -> self port.
+			 #serverUrl -> self baseUrl.
+			 #operations -> self operationsConfiguration }
 		installing: self controllersToInstall.
 
-	api on: Error addErrorHandler: [ :error :request | self fail ].
-
-
+	api on: Error addErrorHandler: [ :error :request | self fail ]
 ]
 
 { #category : #running }

@@ -8,7 +8,8 @@ Class {
 		'teapotServer',
 		'controllers',
 		'errorHandlers',
-		'enabledOperationalPlugins'
+		'enabledOperationalPlugins',
+		'operationsConfiguration'
 	],
 	#category : #'Stargate-Model-Controllers'
 }
@@ -58,7 +59,8 @@ HTTPBasedRESTfulAPI >> enable: anOperationalPluginEndpoint configuredBy: configu
 HTTPBasedRESTfulAPI >> initializeConfiguredBy: configuration installing: aRESTfulControllerCollection [
 
 	teapotServer := Teapot
-		configure: configuration , { #notFoundHandlerClass -> Tea405AwareNotFoundHandler }.
+		configure: configuration , {( #notFoundHandlerClass -> Tea405AwareNotFoundHandler )}.
+	operationsConfiguration := configuration asDictionary at: #operations.
 	self
 		initializeControllersWithAll: aRESTfulControllerCollection;
 		initializeErrorHandlers;
@@ -117,6 +119,12 @@ HTTPBasedRESTfulAPI >> isEnabled: aPluginType [
 HTTPBasedRESTfulAPI >> on: exception addErrorHandler: aDyadicBlock [
 
 	errorHandlers add: exception -> aDyadicBlock
+]
+
+{ #category : #accessing }
+HTTPBasedRESTfulAPI >> operationsConfiguration [
+
+	^ operationsConfiguration
 ]
 
 { #category : #actions }

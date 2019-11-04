@@ -10,6 +10,23 @@ Class {
 	#category : #'Stargate-Model-Auth'
 }
 
+{ #category : #private }
+ZnAuthenticationFilter class >> canHandle: configuration [
+
+	| schema |
+
+	schema := configuration at: #authSchema ifAbsent: [ ^ false ].
+	^ schema = 'basic'
+]
+
+{ #category : #private }
+ZnAuthenticationFilter class >> configuredBy: configuration [
+
+	^ self
+		username: ( configuration at: #authUsername ifAbsent: [ AssertionFailed signal: 'Missing username' ] )
+		password: ( configuration at: #authPassword ifAbsent: [ AssertionFailed signal: 'Missing password' ] )
+]
+
 { #category : #'instance creation' }
 ZnAuthenticationFilter class >> username: username password: password [
 
@@ -29,7 +46,7 @@ ZnAuthenticationFilter >> authChallenge [
 ]
 
 { #category : #private }
-ZnAuthenticationFilter >> checkCredentials: authorization for: httpRequest ifInvalid: aBlock [
+ZnAuthenticationFilter >> checkCredentials: authorization for: httpRequest within: requestContext ifInvalid: aBlock [
 
 	( authenticator isRequestAuthenticated: httpRequest )
 		ifFalse: aBlock

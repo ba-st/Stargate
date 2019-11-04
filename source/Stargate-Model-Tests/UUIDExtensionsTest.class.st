@@ -1,3 +1,6 @@
+"
+I'm testing extensions to UUID
+"
 Class {
 	#name : #UUIDExtensionsTest,
 	#superclass : #TestCase,

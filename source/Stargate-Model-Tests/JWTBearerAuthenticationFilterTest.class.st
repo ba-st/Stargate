@@ -8,9 +8,15 @@ Class {
 }
 
 { #category : #private }
+JWTBearerAuthenticationFilterTest >> algorithmName [
+
+	^ JWAHMACSHA256 parameterValue
+]
+
+{ #category : #private }
 JWTBearerAuthenticationFilterTest >> newFilter [
 
-	^ JWTBearerAuthenticationFilter with: 'secret' forAlgorithmNamed: 'HS256'
+	^ JWTBearerAuthenticationFilter with: self secret forAlgorithmNamed: self algorithmName
 ]
 
 { #category : #private }
@@ -41,10 +47,35 @@ JWTBearerAuthenticationFilterTest >> newHttpRequestWithUnsecuredJWTBearerAuthent
 		yourself
 ]
 
+{ #category : #private }
+JWTBearerAuthenticationFilterTest >> secret [
+
+	^ 'secret'
+]
+
 { #category : #tests }
 JWTBearerAuthenticationFilterTest >> testAuthChallenge [
 
 	self assert: self newFilter authChallenge equals: 'Bearer'
+]
+
+{ #category : #tests }
+JWTBearerAuthenticationFilterTest >> testBasedOnConfiguration [
+
+	| filter |
+
+	filter := AuthenticationFilter
+		basedOn:
+			( Dictionary new
+				at: #authSchema put: 'jwt';
+				at: #authAlgorithm put: self algorithmName;
+				at: #authSecret put: self secret;
+				yourself ).
+
+	self
+		assert: ( filter isA: JWTBearerAuthenticationFilter );
+		shouldnt: [ filter teaEvalActionOnRequest: ( self newHttpRequestWithJWTBearerAuthenticationFor: self secret ) ]
+			raise: TeaAbort
 ]
 
 { #category : #tests }
@@ -59,11 +90,11 @@ JWTBearerAuthenticationFilterTest >> testInvalidCredentials [
 		isUnauthorizedAfterApplying: filter.
 
 	self
-		assertResponseFor: ( self newHttpRequestWithJWTBearerAuthenticationScrappingSignatureFor: 'secret' )
+		assertResponseFor: ( self newHttpRequestWithJWTBearerAuthenticationScrappingSignatureFor: self secret )
 		isUnauthorizedAfterApplying: filter.
 
 	self
-		assertResponseFor: ( self newHttpRequestWithUnsecuredJWTBearerAuthenticationFor: 'secret' )
+		assertResponseFor: ( self newHttpRequestWithUnsecuredJWTBearerAuthenticationFor: self secret )
 		isUnauthorizedAfterApplying: filter
 ]
 
@@ -80,6 +111,36 @@ JWTBearerAuthenticationFilterTest >> testInvalidType [
 ]
 
 { #category : #tests }
+JWTBearerAuthenticationFilterTest >> testMissingAlgorithmConfiguration [
+
+	self
+		should: [ AuthenticationFilter
+				basedOn:
+					( Dictionary new
+						at: #authSchema put: 'jwt';
+						at: #authSecret put: self secret;
+						yourself )
+			]
+		raise: ObjectNotFound
+		withMessageText: 'Missing authentication configuration'
+]
+
+{ #category : #tests }
+JWTBearerAuthenticationFilterTest >> testMissingSecretConfiguration [
+
+	self
+		should: [ AuthenticationFilter
+				basedOn:
+					( Dictionary new
+						at: #authSchema put: 'jwt';
+						at: #authAlgorithm put: self algorithmName;
+						yourself )
+			]
+		raise: ObjectNotFound
+		withMessageText: 'Missing authentication configuration'
+]
+
+{ #category : #tests }
 JWTBearerAuthenticationFilterTest >> testValidCredentials [
 
 	| filter |
@@ -88,7 +149,7 @@ JWTBearerAuthenticationFilterTest >> testValidCredentials [
 
 	self
 		shouldnt:
-			[ filter teaEvalActionOnRequest: ( self newHttpRequestWithJWTBearerAuthenticationFor: 'secret' ) ]
+			[ filter teaEvalActionOnRequest: ( self newHttpRequestWithJWTBearerAuthenticationFor: self secret ) ]
 		raise: TeaAbort
 ]
 
@@ -98,7 +159,7 @@ JWTBearerAuthenticationFilterTest >> tokenWithKey: aKey [
 	| jws |
 
 	jws := JsonWebSignature new
-		algorithmName: 'HS256';
+		algorithmName: self algorithmName;
 		payload: JWTClaimsSet new.
 
 	jws key: aKey.

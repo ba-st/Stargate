@@ -26,6 +26,18 @@ RouteSpecification >> asCorsAware [
 ]
 
 { #category : #configuring }
+RouteSpecification >> authenticatedBy: anAuthorizationFilter [
+
+	^ self class
+		handling: httpMethod
+		at: urlTemplate
+		evaluating: [ :httpRequest :requestContext | 
+			anAuthorizationFilter evaluateActionOnRequest: httpRequest within: requestContext.
+			handler value: httpRequest value: requestContext
+			]
+]
+
+{ #category : #configuring }
 RouteSpecification >> configureUsing: aRouteConfigurator [ 
 
 	aRouteConfigurator configureRouteFrom: self  

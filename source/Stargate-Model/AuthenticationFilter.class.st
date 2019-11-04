@@ -7,6 +7,33 @@ Class {
 	#category : #'Stargate-Model-Auth'
 }
 
+{ #category : #'instance creation' }
+AuthenticationFilter class >> basedOn: configuration [
+
+	^ self allSubclasses
+		detect: [ :class | class canHandle: configuration ]
+		ifFound: [ :subclass | subclass configuredBy: configuration ]
+		ifNone: [ self signalMissingConfiguration ]
+]
+
+{ #category : #private }
+AuthenticationFilter class >> canHandle: configuration [
+
+	^ self subclassResponsibility
+]
+
+{ #category : #private }
+AuthenticationFilter class >> configuredBy: configuration [
+
+	^ self subclassResponsibility
+]
+
+{ #category : #private }
+AuthenticationFilter class >> signalMissingConfiguration [
+
+	^ ObjectNotFound signal: 'Missing authentication configuration'
+]
+
 { #category : #accessing }
 AuthenticationFilter >> authChallenge [
 
@@ -14,13 +41,13 @@ AuthenticationFilter >> authChallenge [
 ]
 
 { #category : #private }
-AuthenticationFilter >> checkCredentials: authorization for: httpRequest ifInvalid: aBlock [ 
+AuthenticationFilter >> checkCredentials: authorization for: httpRequest within: requestContext ifInvalid: aBlock [
 
 	self subclassResponsibility
 ]
 
-{ #category : #'tea action' }
-AuthenticationFilter >> teaEvalActionOnRequest: httpRequest [
+{ #category : #evaluating }
+AuthenticationFilter >> evaluateActionOnRequest: httpRequest within: requestContext [
 
 	| authorization |
 
@@ -30,5 +57,12 @@ AuthenticationFilter >> teaEvalActionOnRequest: httpRequest [
 	self
 		checkCredentials: authorization
 		for: httpRequest
+		within: requestContext
 		ifInvalid: [ httpRequest abort: ( ZnResponse unauthorized: self authChallenge ) ]
+]
+
+{ #category : #evaluating }
+AuthenticationFilter >> teaEvalActionOnRequest: httpRequest [
+
+	self evaluateActionOnRequest: httpRequest within: HttpRequestContext new
 ]

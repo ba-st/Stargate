@@ -1,3 +1,6 @@
+"
+I'm testing extensions to classes in the Hyperspace project
+"
 Class {
 	#name : #HyperspaceExtensionsTest,
 	#superclass : #TestCase,

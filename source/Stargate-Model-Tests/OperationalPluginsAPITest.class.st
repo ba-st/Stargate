@@ -36,12 +36,30 @@ OperationalPluginsAPITest >> serverUrl: aUrl [
 ]
 
 { #category : #tests }
+OperationalPluginsAPITest >> testCannotGetHealtCheckPluginWithoutProperPermissions [
+
+	self
+		should: [ self newClient get: self operationsUrl / HealthCheckPlugin endpoint asUrl ]
+		raise: ZnHttpUnsuccessful
+		withExceptionDo: [ :error | self assert: error response isAuthenticationRequired ]
+]
+
+{ #category : #tests }
+OperationalPluginsAPITest >> testCannotGetOperationalPluginsWithoutProperPermissions [
+
+	self
+		should: [ self newClient get: self operationsUrl ]
+		raise: ZnHttpUnsuccessful
+		withExceptionDo: [ :error | self assert: error response isAuthenticationRequired ]
+]
+
+{ #category : #tests }
 OperationalPluginsAPITest >> testGetHealtCheckPlugin [
 
 	| json healthCheckResponse |
 
 	json := NeoJSONObject
-		fromString: ( self newClient get: self operationsUrl / HealthCheckPlugin endpoint asUrl ).
+		fromString: ( self newJWTAuthorizedClient get: self operationsUrl / HealthCheckPlugin endpoint asUrl ).
 
 	self
 		assert: json status equals: 'ENABLED';
@@ -66,7 +84,7 @@ OperationalPluginsAPITest >> testGetOperationalPlugins [
 
 	| json |
 
-	json := NeoJSONObject fromString: ( self newClient get: self operationsUrl ).
+	json := NeoJSONObject fromString: ( self newJWTAuthorizedClient get: self operationsUrl ).
 
 	self
 		assert: json items isCollection;

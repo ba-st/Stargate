@@ -1,3 +1,6 @@
+"
+I'm an abstract test case for authentication filters
+"
 Class {
 	#name : #AuthenticationFilterTest,
 	#superclass : #TestCase,
@@ -33,6 +36,12 @@ AuthenticationFilterTest >> newFilter [
 
 { #category : #tests }
 AuthenticationFilterTest >> testAuthChallenge [
+
+	self subclassResponsibility
+]
+
+{ #category : #tests }
+AuthenticationFilterTest >> testBasedOnConfiguration [
 
 	self subclassResponsibility
 ]

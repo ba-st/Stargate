@@ -6,7 +6,8 @@ Class {
 	#superclass : #SingleResourceRESTfulController,
 	#instVars : [
 		'requestHandler',
-		'api'
+		'api',
+		'authenticationFilter'
 	],
 	#category : #'Stargate-Model-Operations'
 }
@@ -56,6 +57,7 @@ OperationalPluginsRESTfulController >> declareGetOperationalPluginsRoute [
 OperationalPluginsRESTfulController >> initializeOn: anHTTPBasedRESTfulAPI [
 
 	api := anHTTPBasedRESTfulAPI.
+	authenticationFilter := AuthenticationFilter basedOn: api operationsConfiguration.
 	self initializeRequestHandler
 ]
 
@@ -106,6 +108,13 @@ OperationalPluginsRESTfulController >> operationalPluginsBasedOn: httpRequest wi
 OperationalPluginsRESTfulController >> requestHandler [
 
 	^ requestHandler
+]
+
+{ #category : #private }
+OperationalPluginsRESTfulController >> routes [
+
+	^ super routes
+		collect: [ :routeSpecification | routeSpecification authenticatedBy: authenticationFilter ]
 ]
 
 { #category : #querying }

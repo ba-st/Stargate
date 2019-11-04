@@ -11,6 +11,24 @@ Class {
 	#category : #'Stargate-Model-Auth'
 }
 
+{ #category : #private }
+JWTBearerAuthenticationFilter class >> canHandle: configuration [
+
+	| schema algorithm |
+
+	schema := configuration at: #authSchema ifAbsent: [ ^ false ].
+	algorithm := configuration at: #authAlgorithm ifAbsent: [ ^ false ].
+	^ schema = 'jwt' and: [ algorithm = JWAHMACSHA256 parameterValue ]
+]
+
+{ #category : #private }
+JWTBearerAuthenticationFilter class >> configuredBy: configuration [
+
+	^ self
+		with: ( configuration at: #authSecret ifAbsent: [ self signalMissingConfiguration ] )
+		forAlgorithmNamed: ( configuration at: #authAlgorithm )
+]
+
 { #category : #'instance creation' }
 JWTBearerAuthenticationFilter class >> with: aKey forAlgorithmNamed: anAlgorithmName [
 
@@ -24,7 +42,7 @@ JWTBearerAuthenticationFilter >> authChallenge [
 ]
 
 { #category : #private }
-JWTBearerAuthenticationFilter >> checkCredentials: authorization for: httpRequest ifInvalid: aBlock [
+JWTBearerAuthenticationFilter >> checkCredentials: authorization for: httpRequest within: requestContext ifInvalid: aBlock [
 
 	| tokenString |
 
@@ -35,7 +53,8 @@ JWTBearerAuthenticationFilter >> checkCredentials: authorization for: httpReques
 
 	jws := JsonWebSignature materializeCompact: tokenString key: key.
 	jws algorithm = algorithm
-		ifFalse: aBlock
+		ifFalse: aBlock.
+	requestContext permissions: jws payload permissions
 	]
 		on: Error
 		do: [ :error | error return: aBlock value ]
