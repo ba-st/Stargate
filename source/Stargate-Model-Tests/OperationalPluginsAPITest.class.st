@@ -8,9 +8,23 @@ Class {
 }
 
 { #category : #private }
+OperationalPluginsAPITest >> claimSet [
+
+	^ super claimSet
+		permissions: #('read:operations');
+		yourself
+]
+
+{ #category : #private }
 OperationalPluginsAPITest >> controllersToInstall [
 
 	^ Array with: self 
+]
+
+{ #category : #private }
+OperationalPluginsAPITest >> newJWTAuthorizedClientLackingPermissions [
+
+	^ self newJWTAuthorizedClientClaiming: super claimSet
 ]
 
 { #category : #private }
@@ -36,24 +50,6 @@ OperationalPluginsAPITest >> serverUrl: aUrl [
 ]
 
 { #category : #tests }
-OperationalPluginsAPITest >> testCannotGetHealtCheckPluginWithoutProperPermissions [
-
-	self
-		should: [ self newClient get: self operationsUrl / HealthCheckPlugin endpoint asUrl ]
-		raise: ZnHttpUnsuccessful
-		withExceptionDo: [ :error | self assert: error response isAuthenticationRequired ]
-]
-
-{ #category : #tests }
-OperationalPluginsAPITest >> testCannotGetOperationalPluginsWithoutProperPermissions [
-
-	self
-		should: [ self newClient get: self operationsUrl ]
-		raise: ZnHttpUnsuccessful
-		withExceptionDo: [ :error | self assert: error response isAuthenticationRequired ]
-]
-
-{ #category : #tests }
 OperationalPluginsAPITest >> testGetHealtCheckPlugin [
 
 	| json healthCheckResponse |
@@ -66,7 +62,7 @@ OperationalPluginsAPITest >> testGetHealtCheckPlugin [
 		assert: json name equals: HealthCheckPlugin pluginName;
 		assert: json links size equals: 1.
 
-	healthCheckResponse := self newClient
+	healthCheckResponse := self newJWTAuthorizedClient
 		url: json selfLocation;
 		post;
 		response.
@@ -80,6 +76,26 @@ OperationalPluginsAPITest >> testGetHealtCheckPlugin [
 ]
 
 { #category : #tests }
+OperationalPluginsAPITest >> testGetHealtCheckPluginForbidden [
+
+	self
+		should: [ self newJWTAuthorizedClientLackingPermissions
+				get: self operationsUrl / HealthCheckPlugin endpoint asUrl
+			]
+		raise: ZnHttpUnsuccessful
+		withExceptionDo: [ :error | self assert: error response code equals: 403 ]
+]
+
+{ #category : #tests }
+OperationalPluginsAPITest >> testGetHealtCheckPluginUnauthorized [
+
+	self
+		should: [ self newClient get: self operationsUrl / HealthCheckPlugin endpoint asUrl ]
+		raise: ZnHttpUnsuccessful
+		withExceptionDo: [ :error | self assert: error response isAuthenticationRequired ]
+]
+
+{ #category : #tests }
 OperationalPluginsAPITest >> testGetOperationalPlugins [
 
 	| json |
@@ -89,4 +105,22 @@ OperationalPluginsAPITest >> testGetOperationalPlugins [
 	self
 		assert: json items isCollection;
 		assert: json links size equals: 1
+]
+
+{ #category : #tests }
+OperationalPluginsAPITest >> testGetOperationalPluginsForbidden [
+
+	self
+		should: [ self newJWTAuthorizedClientLackingPermissions get: self operationsUrl ]
+		raise: ZnHttpUnsuccessful
+		withExceptionDo: [ :error | self assert: error response code equals: 403 ]
+]
+
+{ #category : #tests }
+OperationalPluginsAPITest >> testGetOperationalPluginsUnauthorized [
+
+	self
+		should: [ self newClient get: self operationsUrl ]
+		raise: ZnHttpUnsuccessful
+		withExceptionDo: [ :error | self assert: error response isAuthenticationRequired ]
 ]

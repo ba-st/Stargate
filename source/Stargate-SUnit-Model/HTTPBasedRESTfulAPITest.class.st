@@ -41,6 +41,12 @@ HTTPBasedRESTfulAPITest >> checkPortAvailability [
 ]
 
 { #category : #private }
+HTTPBasedRESTfulAPITest >> claimSet [
+
+	^ JWTClaimsSet new
+]
+
+{ #category : #private }
 HTTPBasedRESTfulAPITest >> controllersToInstall [
 
 	^ self subclassResponsibility
@@ -58,11 +64,17 @@ HTTPBasedRESTfulAPITest >> newClient [
 { #category : #private }
 HTTPBasedRESTfulAPITest >> newJWTAuthorizedClient [
 
+	^ self newJWTAuthorizedClientClaiming: self claimSet
+]
+
+{ #category : #private }
+HTTPBasedRESTfulAPITest >> newJWTAuthorizedClientClaiming: aClaimSet [
+
 	| client jws |
 
 	jws := JsonWebSignature new.
 	jws algorithmName: self algorithmName.
-	jws payload: JWTClaimsSet new.
+	jws payload: aClaimSet.
 	jws key: self secret.
 
 	client := self newClient.

@@ -1,6 +1,6 @@
 Class {
 	#name : #HealthCheckRESTfulController,
-	#superclass : #SingleResourceRESTfulController,
+	#superclass : #OperationsRESTfulController,
 	#instVars : [
 		'requestHandler',
 		'plugin'
@@ -14,13 +14,14 @@ Class {
 { #category : #'class initialization' }
 HealthCheckRESTfulController class >> initialize [
 
-	RiskScoreToStatusMapping := #('PASS' 'WARN' 'FAIL').
+	<ignoreInCoverage>
+	RiskScoreToStatusMapping := #('PASS' 'WARN' 'FAIL')
 ]
 
 { #category : #'instance creation' }
-HealthCheckRESTfulController class >> over: aHealthCheckPlugin [
+HealthCheckRESTfulController class >> over: aHealthCheckPlugin configuredBy: configuration [
 
-	^ self new initializeOver: aHealthCheckPlugin
+	^ ( self authenticationFilterBasedOn: configuration ) initializeOver: aHealthCheckPlugin
 ]
 
 { #category : #routes }
@@ -49,7 +50,7 @@ HealthCheckRESTfulController >> initializeOver: aHealthCheckPlugin [
 HealthCheckRESTfulController >> initializeRequestHandler [
 
 	requestHandler := RESTfulRequestHandlerBuilder new
-		handling: ( 'operations/<1s>' expandMacrosWith: plugin class endpoint )
+		handling: ( 'operations/<1s>' expandMacrosWith: self pluginEndpoint )
 			extractingIdentifierWith: [ :httpRequest | self identifierIn: httpRequest ];
 		whenResponding: self healthCheckSummaryVersion1dot0dot0MediaType
 			encodeToJsonApplying: [ :resource :requestContext :writer | 
@@ -66,21 +67,38 @@ HealthCheckRESTfulController >> initializeRequestHandler [
 ]
 
 { #category : #private }
+HealthCheckRESTfulController >> pluginEndpoint [
+
+	^ plugin class endpoint
+]
+
+{ #category : #private }
 HealthCheckRESTfulController >> requestHandler [
 
 	^ requestHandler
 ]
 
+{ #category : #private }
+HealthCheckRESTfulController >> requiredPermission [
+
+	^ 'run:<1s>' expandMacrosWith: self pluginEndpoint
+]
+
 { #category : #API }
 HealthCheckRESTfulController >> runHealthChecksBasedOn: httpRequest within: requestContext [
 
-	| healthCheckStatus entity |
+	| healthCheckStatus entity targetMediaType |
+
+	targetMediaType := requestHandler targetMediaTypeFrom: httpRequest.
+	"The summary media type can be requested without authorization credentials"
+	[ self assert: httpRequest isAuthorizedWithin: requestContext ]
+		unless: targetMediaType = self healthCheckSummaryVersion1dot0dot0MediaType .
 
 	healthCheckStatus := plugin runHealthChecks.
 
 	entity := requestHandler
 		encodeResource: healthCheckStatus
-		to: ( requestHandler targetMediaTypeFrom: httpRequest )
+		to: targetMediaType
 		within: requestContext.
 
 	^ healthCheckStatus hasSucceeded

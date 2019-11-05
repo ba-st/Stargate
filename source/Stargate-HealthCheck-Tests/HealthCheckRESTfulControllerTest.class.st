@@ -3,18 +3,12 @@ A HealthCheckRESTfulControllerTest is a test class for testing the behavior of H
 "
 Class {
 	#name : #HealthCheckRESTfulControllerTest,
-	#superclass : #SingleResourceRESTfulControllerTest,
+	#superclass : #OperationalPluginRESTfulControllerTest,
 	#instVars : [
 		'healthChecks'
 	],
 	#category : #'Stargate-HealthCheck-Tests'
 }
-
-{ #category : #'private - support' }
-HealthCheckRESTfulControllerTest >> baseUrl [
-
-	^ 'http://api.example.com' asUrl
-]
 
 { #category : #'private - support' }
 HealthCheckRESTfulControllerTest >> requestToPOSTAccepting: aMediaType [
@@ -36,7 +30,9 @@ HealthCheckRESTfulControllerTest >> setUp [
 { #category : #running }
 HealthCheckRESTfulControllerTest >> setUpResourceController [
 
-	resourceController := HealthCheckRESTfulController over: ( HealthCheckPlugin runningAll: healthChecks )
+	resourceController := HealthCheckRESTfulController
+		over: ( HealthCheckPlugin runningAll: healthChecks )
+		configuredBy: self operationsConfiguration
 ]
 
 { #category : #tests }

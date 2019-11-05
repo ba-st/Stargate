@@ -3,11 +3,10 @@ I'm a RESTful controller providing access to the list of available operational p
 "
 Class {
 	#name : #OperationalPluginsRESTfulController,
-	#superclass : #SingleResourceRESTfulController,
+	#superclass : #OperationsRESTfulController,
 	#instVars : [
 		'requestHandler',
-		'api',
-		'authenticationFilter'
+		'api'
 	],
 	#category : #'Stargate-Model-Operations'
 }
@@ -15,7 +14,8 @@ Class {
 { #category : #'instance creation' }
 OperationalPluginsRESTfulController class >> on: anHTTPBasedRESTfulAPI [
 
-	^ self new initializeOn: anHTTPBasedRESTfulAPI
+	^ ( self authenticationFilterBasedOn: anHTTPBasedRESTfulAPI operationsConfiguration )
+		initializeOn: anHTTPBasedRESTfulAPI
 ]
 
 { #category : #private }
@@ -57,7 +57,6 @@ OperationalPluginsRESTfulController >> declareGetOperationalPluginsRoute [
 OperationalPluginsRESTfulController >> initializeOn: anHTTPBasedRESTfulAPI [
 
 	api := anHTTPBasedRESTfulAPI.
-	authenticationFilter := AuthenticationFilter basedOn: api operationsConfiguration.
 	self initializeRequestHandler
 ]
 
@@ -83,6 +82,8 @@ OperationalPluginsRESTfulController >> initializeRequestHandler [
 { #category : #API }
 OperationalPluginsRESTfulController >> operationalPluginBasedOn: httpRequest within: requestContext [
 
+	self assert: httpRequest isAuthorizedWithin: requestContext.
+
 	^ requestHandler
 		from: httpRequest
 		within: requestContext
@@ -98,6 +99,8 @@ OperationalPluginsRESTfulController >> operationalPluginVersion1dot0dot0MediaTyp
 { #category : #API }
 OperationalPluginsRESTfulController >> operationalPluginsBasedOn: httpRequest within: requestContext [
 
+	self assert: httpRequest isAuthorizedWithin: requestContext.
+
 	^ requestHandler
 		from: httpRequest
 		within: requestContext
@@ -111,10 +114,9 @@ OperationalPluginsRESTfulController >> requestHandler [
 ]
 
 { #category : #private }
-OperationalPluginsRESTfulController >> routes [
+OperationalPluginsRESTfulController >> requiredPermission [
 
-	^ super routes
-		collect: [ :routeSpecification | routeSpecification authenticatedBy: authenticationFilter ]
+	^ 'read:operations'
 ]
 
 { #category : #querying }

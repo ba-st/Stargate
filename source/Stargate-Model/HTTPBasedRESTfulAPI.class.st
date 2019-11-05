@@ -21,6 +21,12 @@ HTTPBasedRESTfulAPI class >> configuredBy: configuration installing: aRESTfulCon
 	^ self new initializeConfiguredBy: configuration installing: aRESTfulControllerCollection
 ]
 
+{ #category : #'private - configuring' }
+HTTPBasedRESTfulAPI >> addController: aRESTfulController [
+
+	controllers add: aRESTfulController
+]
+
 { #category : #configuring }
 HTTPBasedRESTfulAPI >> beCORSAwareAllowing: origins [
 
@@ -52,7 +58,7 @@ HTTPBasedRESTfulAPI >> enable: anOperationalPluginEndpoint configuredBy: configu
 	pluginToEnable := ( OperationalPlugin pluginAt: anOperationalPluginEndpoint )
 		configuredBy: configuration.
 	enabledOperationalPlugins add: pluginToEnable.
-	pluginToEnable includeControllersIn: controllers
+	pluginToEnable includeControllersIn: self
 ]
 
 { #category : #initialization }

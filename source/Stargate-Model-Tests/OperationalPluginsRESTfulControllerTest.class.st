@@ -3,30 +3,14 @@ An OperationalPluginsRESTfulControllerTest is a test class for testing the behav
 "
 Class {
 	#name : #OperationalPluginsRESTfulControllerTest,
-	#superclass : #SingleResourceRESTfulControllerTest,
+	#superclass : #OperationalPluginRESTfulControllerTest,
 	#category : #'Stargate-Model-Tests-Operations'
 }
-
-{ #category : #'private - support' }
-OperationalPluginsRESTfulControllerTest >> baseUrl [
-
-	^ 'https://api.example.com' asUrl
-]
 
 { #category : #'private - support' }
 OperationalPluginsRESTfulControllerTest >> isEnabled: aPlugin [
 
 	^ false
-]
-
-{ #category : #'private - support' }
-OperationalPluginsRESTfulControllerTest >> operationsConfiguration [
-
-	^ Dictionary new
-		at: #authSchema put: 'jwt';
-		at: #authAlgorithm put: JWAHMACSHA256 parameterValue;
-		at: #authSecret put: 'secret';
-		yourself
 ]
 
 { #category : #running }

@@ -56,7 +56,7 @@ HttpRequestContext >> hypermediaControlsFor: resource [
 { #category : #authorization }
 HttpRequestContext >> includesPermission: aPermission [
 
-	^ ( self objectUnder: #permisisions ifNone: [ #() ] ) includes: aPermission
+	^ ( self objectUnder: #permissions ifNone: [ #() ] ) includes: aPermission
 ]
 
 { #category : #initialization }

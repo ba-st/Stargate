@@ -44,9 +44,10 @@ HealthCheckPlugin class >> runningAll: aHealthCheckCollection [
 ]
 
 { #category : #configuring }
-HealthCheckPlugin >> includeControllersIn: controllers [
+HealthCheckPlugin >> includeControllersIn: api [
 
-	controllers add: ( HealthCheckRESTfulController over: self )
+	api
+		addController: ( HealthCheckRESTfulController over: self configuredBy: api operationsConfiguration )
 ]
 
 { #category : #initalize }
