@@ -28,6 +28,7 @@ OperationalPluginsAPITest >> testGetHealtCheckPlugin [
 
 	healthCheckResponse := self newJWTAuthorizedClient
 		url: json selfLocation;
+		setAccept: 'application/vnd.stargate.health-check.summary+json;version=1.0.0' asMediaType;
 		post;
 		response.
 
