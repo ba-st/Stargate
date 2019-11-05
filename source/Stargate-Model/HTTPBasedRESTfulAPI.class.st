@@ -84,7 +84,9 @@ HTTPBasedRESTfulAPI >> initializeControllersWithAll: aRESTfulControllerCollectio
 HTTPBasedRESTfulAPI >> initializeEnabledOperationalPlugins [
 
 	enabledOperationalPlugins := OrderedCollection new.
-	self enable: HealthCheckPlugin endpoint configuredBy: operationsConfiguration
+	OperationalPlugin availablePlugins
+		select: [ :plugin | plugin enabledByDefault ]
+		thenDo: [ :plugin | self enable: plugin endpoint configuredBy: operationsConfiguration ]
 ]
 
 { #category : #initialization }

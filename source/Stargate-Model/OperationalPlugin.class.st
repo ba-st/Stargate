@@ -30,6 +30,12 @@ OperationalPlugin class >> configuredBy: configuration [
 	^ self subclassResponsibility
 ]
 
+{ #category : #testing }
+OperationalPlugin class >> enabledByDefault [
+
+	^ false
+]
+
 { #category : #accessing }
 OperationalPlugin class >> endpoint [
 

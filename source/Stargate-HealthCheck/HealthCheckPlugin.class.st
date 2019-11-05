@@ -13,6 +13,12 @@ HealthCheckPlugin class >> configuredBy: configuration [
 	^ self new
 ]
 
+{ #category : #testing }
+HealthCheckPlugin class >> enabledByDefault [
+
+	^ true
+]
+
 { #category : #accessing }
 HealthCheckPlugin class >> endpoint [
 
