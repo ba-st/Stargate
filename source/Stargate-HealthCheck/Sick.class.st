@@ -1,3 +1,6 @@
+"
+I represent a sick health condition. An API in this state is still working correctly, but approaching some threshold that can make it unhealthy in short notice.
+"
 Class {
 	#name : #Sick,
 	#superclass : #HealthCondition,
@@ -26,17 +29,17 @@ Sick >> details [
 	^ details
 ]
 
-{ #category : #testing }
-Sick >> hasSucceeded [
-
-	^ true
-]
-
 { #category : #initalize }
 Sick >> initializeDetailedBy: aDetailsObject onHealthCheckNamed: aName [
 
 	details := aDetailsObject.
 	concern := aName
+]
+
+{ #category : #testing }
+Sick >> isNotCritical [
+
+	^ true
 ]
 
 { #category : #accessing }

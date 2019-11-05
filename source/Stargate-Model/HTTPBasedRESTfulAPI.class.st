@@ -85,7 +85,12 @@ HTTPBasedRESTfulAPI >> initializeEnabledOperationalPlugins [
 
 	enabledOperationalPlugins := OrderedCollection new.
 	OperationalPlugin availablePlugins
-		select: [ :plugin | plugin enabledByDefault ]
+		select: [ :plugin | 
+			operationsConfiguration
+				at: plugin endpoint
+				ifPresent: [ :pluginConfiguration | pluginConfiguration at: #enabled ifAbsent: [ plugin enabledByDefault ] ]
+				ifAbsent: [ plugin enabledByDefault ]
+			]
 		thenDo: [ :plugin | self enable: plugin endpoint configuredBy: operationsConfiguration ]
 ]
 

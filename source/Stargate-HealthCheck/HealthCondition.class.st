@@ -1,17 +1,20 @@
+"
+I'm an abstract class representing health conditions 
+"
 Class {
 	#name : #HealthCondition,
 	#superclass : #Object,
 	#category : #'Stargate-HealthCheck'
 }
 
-{ #category : #accessing }
-HealthCondition >> concern [
+{ #category : #testing }
+HealthCondition >> isCritical [
 
-	^ self subclassResponsibility
+	^ self isNotCritical not
 ]
 
 { #category : #testing }
-HealthCondition >> hasSucceeded [
+HealthCondition >> isNotCritical [
 
 	^ self subclassResponsibility
 ]

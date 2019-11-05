@@ -1,3 +1,6 @@
+"
+I'm a controller exposing the API of HealthCheckPlugin
+"
 Class {
 	#name : #HealthCheckRESTfulController,
 	#superclass : #OperationsRESTfulController,
@@ -14,7 +17,7 @@ Class {
 { #category : #'class initialization' }
 HealthCheckRESTfulController class >> initialize [
 
-	<ignoreInCoverage>
+	<ignoreForCoverage>
 	RiskScoreToStatusMapping := #('PASS' 'WARN' 'FAIL')
 ]
 
@@ -118,21 +121,21 @@ HealthCheckRESTfulController >> requiredPermission [
 { #category : #API }
 HealthCheckRESTfulController >> runHealthChecksBasedOn: httpRequest within: requestContext [
 
-	| healthCheckStatus entity targetMediaType |
+	| healthCondition entity targetMediaType |
 
 	targetMediaType := requestHandler targetMediaTypeFrom: httpRequest.
 	"The summary media type can be requested without authorization credentials"
 	[ self assert: httpRequest isAuthorizedWithin: requestContext ]
 		unless: targetMediaType = self healthCheckSummaryVersion1dot0dot0MediaType .
 
-	healthCheckStatus := plugin runHealthChecks.
+	healthCondition := plugin runHealthChecks.
 
 	entity := requestHandler
-		encodeResource: healthCheckStatus
+		encodeResource: healthCondition
 		to: targetMediaType
 		within: requestContext.
 
-	^ healthCheckStatus hasSucceeded
+	^ healthCondition isNotCritical
 		then: [ ZnResponse ok: entity ]
 		otherwise: [ ( ZnResponse statusCode: 503 )
 				entity: entity;

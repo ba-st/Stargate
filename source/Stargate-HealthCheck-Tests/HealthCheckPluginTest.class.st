@@ -29,42 +29,70 @@ HealthCheckPluginTest >> successfulHealthCheck [
 ]
 
 { #category : #'tests - running' }
+HealthCheckPluginTest >> testEnabledByDefault [
+
+	self assert: HealthCheckPlugin enabledByDefault
+]
+
+{ #category : #'tests - running' }
 HealthCheckPluginTest >> testHealthCheckMix [
 
-	self
-		deny:
-			( HealthCheckPlugin
-				runningAll:
-					( Array with: self failedHealthCheck with: self successfulHealthCheck with: self warningHealthCheck ) )
-				runHealthChecks hasSucceeded
+	| healthCondition |
+
+	healthCondition := ( HealthCheckPlugin
+		runningAll:
+			( Array with: self failedHealthCheck with: self successfulHealthCheck with: self warningHealthCheck ) )
+		runHealthChecks.
+
+	self assert: healthCondition isCritical
 ]
 
 { #category : #'tests - running' }
 HealthCheckPluginTest >> testHealthCheckSucceedingWithWarnings [
 
-	self
-		assert:
-			( HealthCheckPlugin
-				runningAll: ( Array with: self successfulHealthCheck with: self warningHealthCheck ) )
-				runHealthChecks hasSucceeded
+	| healthCondition |
+
+	healthCondition := ( HealthCheckPlugin
+		runningAll: ( Array with: self successfulHealthCheck with: self warningHealthCheck ) )
+		runHealthChecks.
+
+	self assert: healthCondition isNotCritical
 ]
 
 { #category : #'tests - running' }
 HealthCheckPluginTest >> testNoHealthChecksConfigured [
 
-	self assert: HealthCheckPlugin new runHealthChecks hasSucceeded
+	| healthCondition |
+
+	healthCondition := HealthCheckPlugin new runHealthChecks.
+
+	self assert: healthCondition isNotCritical
+]
+
+{ #category : #test }
+HealthCheckPluginTest >> testPrintOn [
+
+	self assert: HealthCheckPlugin new printString equals: 'Health Check'
 ]
 
 { #category : #'tests - running' }
 HealthCheckPluginTest >> testSingleHealthCheckFailing [
 
-	self deny: ( HealthCheckPlugin running: self failedHealthCheck ) runHealthChecks hasSucceeded
+	| healthCondition |
+
+	healthCondition := ( HealthCheckPlugin running: self failedHealthCheck ) runHealthChecks.
+
+	self assert: healthCondition isCritical
 ]
 
 { #category : #'tests - running' }
 HealthCheckPluginTest >> testSingleHealthCheckSucceeding [
 
-	self assert: ( HealthCheckPlugin running: self successfulHealthCheck ) runHealthChecks hasSucceeded
+	| healthCondition |
+
+	healthCondition := ( HealthCheckPlugin running: self successfulHealthCheck ) runHealthChecks.
+
+	self assert: healthCondition isNotCritical
 ]
 
 { #category : #private }

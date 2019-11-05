@@ -1,3 +1,6 @@
+"
+I represent a healthy health condition. An API in this state is working correctly.
+"
 Class {
 	#name : #Healthy,
 	#superclass : #HealthCondition,
@@ -25,16 +28,16 @@ Healthy >> details [
 	^ Dictionary new
 ]
 
-{ #category : #testing }
-Healthy >> hasSucceeded [
-
-	^ true
-]
-
 { #category : #initialization }
 Healthy >> initializeOnHealthCheckNamed: aName [
 
 	concern := aName
+]
+
+{ #category : #testing }
+Healthy >> isNotCritical [
+
+	^ true
 ]
 
 { #category : #accessing }

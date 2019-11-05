@@ -1,3 +1,7 @@
+"
+I'm one of the operational plugins.
+I provide the notion of health checks that can be run and report a health condition.
+"
 Class {
 	#name : #HealthCheckPlugin,
 	#superclass : #OperationalPlugin,

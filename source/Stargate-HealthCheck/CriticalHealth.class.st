@@ -1,3 +1,6 @@
+"
+I represent a critical health condition. An API in this state is unable to work correctly.
+"
 Class {
 	#name : #CriticalHealth,
 	#superclass : #HealthCondition,
@@ -26,17 +29,17 @@ CriticalHealth >> details [
 	^ details
 ]
 
-{ #category : #testing }
-CriticalHealth >> hasSucceeded [
-
-	^ false
-]
-
 { #category : #initialization }
 CriticalHealth >> initializeDetailedBy: aDetailsObject onHealthCheckNamed: aName [
 
 	details := aDetailsObject.
 	concern := aName
+]
+
+{ #category : #testing }
+CriticalHealth >> isNotCritical [
+
+	^ false
 ]
 
 { #category : #accessing }
