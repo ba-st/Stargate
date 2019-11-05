@@ -20,6 +20,12 @@ CriticalHealth >> concern [
 	^ concern
 ]
 
+{ #category : #accessing }
+CriticalHealth >> details [
+
+	^ details
+]
+
 { #category : #testing }
 CriticalHealth >> hasSucceeded [
 

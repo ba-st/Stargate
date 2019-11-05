@@ -19,6 +19,12 @@ Healthy >> concern [
 	^ concern
 ]
 
+{ #category : #accessing }
+Healthy >> details [
+
+	^ Dictionary new
+]
+
 { #category : #testing }
 Healthy >> hasSucceeded [
 

@@ -24,6 +24,25 @@ HealthCheckRESTfulController class >> over: aHealthCheckPlugin configuredBy: con
 	^ ( self authenticationFilterBasedOn: configuration ) initializeOver: aHealthCheckPlugin
 ]
 
+{ #category : #private }
+HealthCheckRESTfulController >> asHealthConditionDetails: overallHealthCondition [
+
+	| details |
+
+	details := Dictionary new.
+	overallHealthCondition
+		conditionsDo: [ :healthCondition | 
+			details
+				at: ( healthCondition concern copyReplaceAll: ' ' with: '-' )
+				put:
+					( Dictionary new
+						at: 'status' put: ( self statusOf: healthCondition );
+						at: 'details' put: healthCondition details;
+						yourself )
+			].
+	^ details
+]
+
 { #category : #routes }
 HealthCheckRESTfulController >> declareRunHealthChecksRoute [
 
@@ -31,6 +50,12 @@ HealthCheckRESTfulController >> declareRunHealthChecksRoute [
 		handling: #POST
 		at: self endpoint
 		evaluating: [ :httpRequest :requestContext | self runHealthChecksBasedOn: httpRequest within: requestContext ]
+]
+
+{ #category : #private }
+HealthCheckRESTfulController >> healthCheckDetailsVersion1dot0dot0MediaType [
+
+	^ self jsonMediaType: 'health-check.details' vendoredBy: 'stargate' version: '1.0.0'
 ]
 
 { #category : #private }
@@ -56,10 +81,16 @@ HealthCheckRESTfulController >> initializeRequestHandler [
 			encodeToJsonApplying: [ :resource :requestContext :writer | 
 			writer
 				for: OverallHealthCondition
+				do: [ :mapping | mapping mapProperty: #status getter: [ :condition | self statusOf: condition ] ]
+			];
+		whenResponding: self healthCheckDetailsVersion1dot0dot0MediaType
+			encodeToJsonApplying: [ :resource :requestContext :writer | 
+			writer
+				for: OverallHealthCondition
 				do: [ :mapping | 
 					mapping
-						mapProperty: #status
-						getter: [ :condition | RiskScoreToStatusMapping at: condition riskScore ]
+						mapProperty: #status getter: [ :condition | self statusOf: condition ];
+						mapProperty: #details getter: [ :condition | self asHealthConditionDetails: condition ]
 					]
 			];
 		createEntityTagHashing: [ :hasher :healthCheckStatus :requestContext |  ];
@@ -107,6 +138,12 @@ HealthCheckRESTfulController >> runHealthChecksBasedOn: httpRequest within: requ
 				entity: entity;
 				yourself
 			]
+]
+
+{ #category : #private }
+HealthCheckRESTfulController >> statusOf: condition [
+
+	^ RiskScoreToStatusMapping at: condition riskScore
 ]
 
 { #category : #private }

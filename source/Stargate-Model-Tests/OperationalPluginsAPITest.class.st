@@ -3,50 +3,14 @@ I'm a test case for the self-provided API of the operational plugins.
 "
 Class {
 	#name : #OperationalPluginsAPITest,
-	#superclass : #HTTPBasedRESTfulAPITest,
+	#superclass : #OperationalPluginAPITest,
 	#category : #'Stargate-Model-Tests-Operations'
 }
 
 { #category : #private }
-OperationalPluginsAPITest >> claimSet [
+OperationalPluginsAPITest >> requiredPermissions [
 
-	^ super claimSet
-		permissions: #('read:operations');
-		yourself
-]
-
-{ #category : #private }
-OperationalPluginsAPITest >> controllersToInstall [
-
-	^ Array with: self 
-]
-
-{ #category : #private }
-OperationalPluginsAPITest >> newJWTAuthorizedClientLackingPermissions [
-
-	^ self newJWTAuthorizedClientClaiming: super claimSet
-]
-
-{ #category : #private }
-OperationalPluginsAPITest >> operationsUrl [
-
-	^ self baseUrl / 'operations' asUrl
-]
-
-{ #category : #private }
-OperationalPluginsAPITest >> port [
-
-	^ 9999
-]
-
-{ #category : #private }
-OperationalPluginsAPITest >> routes [
-
-	^ #()
-]
-
-{ #category : #private }
-OperationalPluginsAPITest >> serverUrl: aUrl [ 
+	^ #('read:operations')
 ]
 
 { #category : #tests }

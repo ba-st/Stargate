@@ -20,6 +20,12 @@ Sick >> concern [
 	^ concern
 ]
 
+{ #category : #accessing }
+Sick >> details [
+
+	^ details
+]
+
 { #category : #testing }
 Sick >> hasSucceeded [
 

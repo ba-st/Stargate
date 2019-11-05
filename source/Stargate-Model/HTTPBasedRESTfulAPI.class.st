@@ -70,7 +70,7 @@ HTTPBasedRESTfulAPI >> initializeConfiguredBy: configuration installing: aRESTfu
 	self
 		initializeControllersWithAll: aRESTfulControllerCollection;
 		initializeErrorHandlers;
-		initializeEnabledOperationalPluginsBy: configuration
+		initializeEnabledOperationalPlugins
 ]
 
 { #category : #initialization }
@@ -81,10 +81,10 @@ HTTPBasedRESTfulAPI >> initializeControllersWithAll: aRESTfulControllerCollectio
 ]
 
 { #category : #initialization }
-HTTPBasedRESTfulAPI >> initializeEnabledOperationalPluginsBy: configuration [
+HTTPBasedRESTfulAPI >> initializeEnabledOperationalPlugins [
 
 	enabledOperationalPlugins := OrderedCollection new.
-	self enable: HealthCheckPlugin endpoint configuredBy: configuration 
+	self enable: HealthCheckPlugin endpoint configuredBy: operationsConfiguration
 ]
 
 { #category : #initialization }

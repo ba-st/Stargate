@@ -19,6 +19,12 @@ OverallHealthCondition >> concern [
 	^ 'overall'
 ]
 
+{ #category : #enumerating }
+OverallHealthCondition >> conditionsDo: aBlockClosure [
+
+	conditions do: aBlockClosure
+]
+
 { #category : #testing }
 OverallHealthCondition >> hasSucceeded [
 

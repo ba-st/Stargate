@@ -51,7 +51,7 @@ OperationalPlugin class >> pluginName [
 ]
 
 { #category : #configuring }
-OperationalPlugin >> includeControllersIn: controllers [
+OperationalPlugin >> includeControllersIn: api [
 
 	self subclassResponsibility
 ]
