@@ -115,7 +115,7 @@ HealthCheckRESTfulController >> requestHandler [
 { #category : #private }
 HealthCheckRESTfulController >> requiredPermission [
 
-	^ 'run:<1s>' expandMacrosWith: self pluginEndpoint
+	^ 'execute:<1s>' expandMacrosWith: self pluginEndpoint
 ]
 
 { #category : #API }

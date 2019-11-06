@@ -10,7 +10,7 @@ Class {
 { #category : #running }
 HealthCheckPluginAPITest >> requiredPermissions [
 
-	^ #('run:health-check')
+	^ #('execute:health-check')
 ]
 
 { #category : #tests }

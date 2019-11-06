@@ -18,7 +18,7 @@ HealthCheckPluginConfigurationAPITest >> operationsConfiguration [
 { #category : #running }
 HealthCheckPluginConfigurationAPITest >> requiredPermissions [
 
-	^ #('run:health-check')
+	^ #('execute:health-check')
 ]
 
 { #category : #tests }
