@@ -19,7 +19,7 @@ PetsRESTfulControllerTest >> assert: anObject equals: aSecondObject or: aThirdOb
 { #category : #'private - support' }
 PetsRESTfulControllerTest >> baseUrl [
 
-	^ 'https://pets.example.com' asZnUrl 
+	^ 'https://pets.example.com' asUrl 
 ]
 
 { #category : #'private - support' }

@@ -36,22 +36,33 @@ BaselineOfStargate >> setUpDependencies: spec [
 		project: 'Buoy-SUnit' copyFrom: 'Buoy' with: [ spec loads: 'Dependent-SUnit-Extensions' ].
 
 	spec
-		baseline: 'Hyperspace'
-			with: [ spec repository: 'github://ba-st/Hyperspace:v1/source' ];
+		baseline: 'Hyperspace' with: [ spec repository: 'github://ba-st/Hyperspace:v1/source' ];
 		project: 'Hyperspace-Deployment' copyFrom: 'Hyperspace' with: [ spec loads: 'Deployment' ].
 
 	spec
 		baseline: 'Teapot' with: [ spec repository: 'github://zeroflag/Teapot:v2.6.0/source' ];
 		project: 'Teapot-Deployment' copyFrom: 'Teapot' with: [ spec loads: 'Deployment' ];
-		project: 'Teapot-Tools' copyFrom: 'Teapot' with: [ spec loads: 'Tools' ]
+		project: 'Teapot-Tools' copyFrom: 'Teapot' with: [ spec loads: 'Tools' ].
+
+	spec
+		baseline: 'JSONWebToken' with: [ spec repository: 'github://ba-st/JSONWebToken:master/source' ];
+		project: 'JSONWebToken-Deployment'
+			copyFrom: 'JSONWebToken'
+			with: [ spec loads: 'JSONWebToken-Core' ]
 ]
 
 { #category : #baselines }
 BaselineOfStargate >> setUpPackages: spec [
 
 	spec
-		package: 'Stargate-Model' with: [ spec requires: #('Buoy-Deployment' 'Hyperspace-Deployment' 'Teapot-Deployment') ];
+		package: 'Stargate-Model'
+			with: [ spec
+				requires: #('Buoy-Deployment' 'Hyperspace-Deployment' 'Teapot-Deployment' 'JSONWebToken-Deployment')
+			];
 		group: 'Deployment' with: 'Stargate-Model'.
+	spec
+		package: 'Stargate-HealthCheck' with: [ spec requires: 'Stargate-Model' ];
+		group: 'Deployment' with: 'Stargate-HealthCheck'.
 	spec
 		package: 'Stargate-Examples' with: [ spec requires: 'Stargate-Model' ];
 		group: 'Examples' with: 'Stargate-Examples'.
@@ -59,8 +70,12 @@ BaselineOfStargate >> setUpPackages: spec [
 		package: 'Stargate-SUnit-Model' with: [ spec requires: #('Stargate-Model' 'Buoy-SUnit') ];
 		group: 'Dependent-SUnit-Extensions' with: 'Stargate-SUnit-Model'.
 	spec
-		package: 'Stargate-Model-Tests' with: [ spec requires: #('Stargate-Model' 'Stargate-Examples') ];
+		package: 'Stargate-Model-Tests'
+			with: [ spec requires: #('Stargate-Model' 'Stargate-Examples' 'Stargate-HealthCheck') ];
 		group: 'Tests' with: 'Stargate-Model-Tests'.
+	spec
+		package: 'Stargate-HealthCheck-Tests' with: [ spec requires: 'Stargate-HealthCheck' ];
+		group: 'Tests' with: 'Stargate-HealthCheck-Tests'.
 	spec
 		package: 'Stargate-Examples-Tests'
 			with: [ spec requires: #('Dependent-SUnit-Extensions' 'Stargate-Examples') ];

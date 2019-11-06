@@ -4,7 +4,7 @@ I provide a URL template, an HTTP method and a handler to invoke for this route.
 "
 Class {
 	#name : #RouteSpecification,
-	#superclass : #Object,
+	#superclass : #AbstractRouteSpecification,
 	#instVars : [
 		'httpMethod',
 		'handler',
@@ -23,6 +23,18 @@ RouteSpecification class >> handling: anHttpMethod at: anUrlTemplate evaluating:
 RouteSpecification >> asCorsAware [
 	
 	^ CrossOriginResourceSharingAwareRouteSpecification decorating: self
+]
+
+{ #category : #configuring }
+RouteSpecification >> authenticatedBy: anAuthorizationFilter [
+
+	^ self class
+		handling: httpMethod
+		at: urlTemplate
+		evaluating: [ :httpRequest :requestContext | 
+			anAuthorizationFilter evaluateActionOnRequest: httpRequest within: requestContext.
+			handler value: httpRequest value: requestContext
+			]
 ]
 
 { #category : #configuring }
