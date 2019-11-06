@@ -9,13 +9,11 @@ An operational plugin has the following characteristics:
 - Must be secured with a proper authorization filter. In specific cases a plugin can respond with some basic data in case there's no authorization (for example a basic health-check) but this behavior  must be the exception to the rule.
 - Should be possible to enable/disable/configure it on the fly using an API endpoint (given the proper authorization credentials) using the media controls provided in the plugin representation
 
-## Operations API
+## Configuration Options
 
-A RESTful API is available as the entry point for the operational plugins. All the endpoints requires authentication and most of them authorization.
+Operations configuration are received in the general Stargate configuration parameters under the `#operations` key. This key is a dictionary including general configuration and plugin specific configuration.
 
-### Configuration Options
-
-Operations configuration are received in the general Stargate configuration parameters under the `#operations` key. This key is a dictionary including general configuration and plugin specific configuration. Following is a list of the general options:
+Following is a list of the general options:
 - `#authSchema`: `jwt` or `basic`. It's used to configure the authentication filters on the operational plugin endpoints. In case Basic auth is used the only accessible endpoints will be the ones not requiring authorization. When JWT is used the `scope` claim will be parsed and used as permissions.
 
 If the schema is `jwt` (Recommended)
@@ -25,6 +23,21 @@ If the schema is `jwt` (Recommended)
 If the schema is `basic`
 - `#username`: The username to be used in basic auth
 - `#password`: The password to be used in basic auth
+
+Plugin specific configuration are included under a `#{{plugin-endpoint}}` key. All the plugins can be enabled or disabled by configuration including an `#enabled` option in the specific configuration. For example to disable the Health Check plugin the configuration must be something like:
+```
+Dictionary new
+  at: #operations put: (
+    Dictionary new
+      at: #'health-check' put: {#enabled -> false} asDictionary;
+      yourself
+    );
+  yourself
+```
+
+## Operations API
+
+A RESTful API is available as the entry point for the operational plugins. All the endpoints requires authentication and most of them authorization.
 
 ### Listing available plugins
 
