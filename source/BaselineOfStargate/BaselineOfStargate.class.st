@@ -52,30 +52,55 @@ BaselineOfStargate >> setUpDependencies: spec [
 ]
 
 { #category : #baselines }
-BaselineOfStargate >> setUpPackages: spec [
+BaselineOfStargate >> setUpDeploymentPackages: spec [
 
 	spec
 		package: 'Stargate-Model'
 			with: [ spec
 				requires: #('Buoy-Deployment' 'Hyperspace-Deployment' 'Teapot-Deployment' 'JSONWebToken-Deployment')
 			];
+		group: 'Core' with: 'Stargate-Model';
 		group: 'Deployment' with: 'Stargate-Model'.
+
 	spec
 		package: 'Stargate-HealthCheck' with: [ spec requires: 'Stargate-Model' ];
+		group: 'HealthCheck' with: 'Stargate-HealthCheck';
 		group: 'Deployment' with: 'Stargate-HealthCheck'.
+
+	spec
+		package: 'Stargate-Metrics' with: [ spec requires: 'Stargate-Model' ];
+		group: 'Metrics' with: 'Stargate-Metrics';
+		group: 'Deployment' with: 'Stargate-Metrics'
+]
+
+{ #category : #baselines }
+BaselineOfStargate >> setUpPackages: spec [
+
+	self setUpDeploymentPackages: spec.
 	spec
 		package: 'Stargate-Examples' with: [ spec requires: 'Stargate-Model' ];
 		group: 'Examples' with: 'Stargate-Examples'.
 	spec
 		package: 'Stargate-SUnit-Model' with: [ spec requires: #('Stargate-Model' 'Buoy-SUnit') ];
 		group: 'Dependent-SUnit-Extensions' with: 'Stargate-SUnit-Model'.
+	self setUpTestPackages: spec
+]
+
+{ #category : #baselines }
+BaselineOfStargate >> setUpTestPackages: spec [
+
 	spec
 		package: 'Stargate-Model-Tests'
 			with: [ spec requires: #('Stargate-Model' 'Stargate-Examples' 'Stargate-HealthCheck') ];
 		group: 'Tests' with: 'Stargate-Model-Tests'.
 	spec
-		package: 'Stargate-HealthCheck-Tests' with: [ spec requires: 'Stargate-HealthCheck' ];
+		package: 'Stargate-HealthCheck-Tests'
+			with: [ spec requires: #('Stargate-HealthCheck' 'Stargate-Model-Tests') ];
 		group: 'Tests' with: 'Stargate-HealthCheck-Tests'.
+	spec
+		package: 'Stargate-Metrics-Tests'
+			with: [ spec requires: #('Stargate-Metrics' 'Stargate-Model-Tests') ];
+		group: 'Tests' with: 'Stargate-Metrics-Tests'.
 	spec
 		package: 'Stargate-Examples-Tests'
 			with: [ spec requires: #('Dependent-SUnit-Extensions' 'Stargate-Examples') ];
