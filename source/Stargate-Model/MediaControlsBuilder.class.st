@@ -5,10 +5,17 @@ Class {
 	#name : #MediaControlsBuilder,
 	#superclass : #Object,
 	#instVars : [
-		'mediaControls'
+		'mediaControls',
+		'resourceLocatorBinding'
 	],
 	#category : #'Stargate-Model-HATEOAS'
 }
+
+{ #category : #'instance creation' }
+MediaControlsBuilder class >> locatingResourcesWith: aResourceLocator [
+
+	^ self new initializeLocatingResourcesWith: aResourceLocator
+]
 
 { #category : #adding }
 MediaControlsBuilder >> addAsSelfLink: aUrl [
@@ -22,6 +29,12 @@ MediaControlsBuilder >> addLink: aUrl relatedTo: aRelationType [
 	mediaControls add: aRelationType -> aUrl
 ]
 
+{ #category : #adding }
+MediaControlsBuilder >> addRelativeLink: aRelativeUrl relatedTo: aRelationType [
+
+	mediaControls add: aRelationType -> ( resourceLocatorBinding content baseUrl / aRelativeUrl )
+]
+
 { #category : #building }
 MediaControlsBuilder >> build [
 
@@ -32,5 +45,12 @@ MediaControlsBuilder >> build [
 MediaControlsBuilder >> initialize [
 
 	super initialize.
-	mediaControls := OrderedCollection new
+	mediaControls := OrderedCollection new.
+	resourceLocatorBinding := Binding undefinedExplainedBy: 'Missing resource locator'
+]
+
+{ #category : #initialization }
+MediaControlsBuilder >> initializeLocatingResourcesWith: aResourceLocator [
+
+	resourceLocatorBinding := Binding to: aResourceLocator
 ]

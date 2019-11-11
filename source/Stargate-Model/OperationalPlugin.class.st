@@ -24,6 +24,12 @@ OperationalPlugin class >> availablePlugins [
 	^ self allLeafSubclasses
 ]
 
+{ #category : #configuring }
+OperationalPlugin class >> configureMediaControlsIn: builder within: requestContext [
+
+	self subclassResponsibility
+]
+
 { #category : #'instance creation' }
 OperationalPlugin class >> configuredBy: configuration [
 

@@ -34,6 +34,12 @@ OperationalPluginAPITest >> newJWTAuthorizedClientLackingPermissions [
 ]
 
 { #category : #private }
+OperationalPluginAPITest >> operationsPluginsUrl [
+
+	^ self operationsUrl / 'plugins'
+]
+
+{ #category : #private }
 OperationalPluginAPITest >> operationsUrl [
 
 	^ self baseUrl / 'operations' asUrl

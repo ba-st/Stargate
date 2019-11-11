@@ -7,6 +7,32 @@ Class {
 	#category : #'Stargate-Model-Tests-Operations'
 }
 
+{ #category : #'private - asserting' }
+OperationalPluginsRESTfulControllerTest >> assertHealthcheckStatusOn: plugins [
+
+	^ plugins
+		detect: [ :plugin | plugin name = HealthCheckPlugin pluginName ]
+		ifFound: [ :healthcheck | 
+			self
+				assert: healthcheck status equals: 'DISABLED';
+				assertUrl: healthcheck selfLocation equals: 'https://api.example.com/operations/plugins/health-check'
+			]
+		ifNone: [ self fail ]
+]
+
+{ #category : #'private - asserting' }
+OperationalPluginsRESTfulControllerTest >> assertMetricsStatusOn: plugins [
+
+	^ plugins
+		detect: [ :plugin | plugin name = MetricsPlugin pluginName ]
+		ifFound: [ :metrics | 
+			self
+				assert: metrics status equals: 'DISABLED';
+				assertUrl: metrics selfLocation equals: 'https://api.example.com/operations/plugins/metrics'
+			]
+		ifNone: [ self fail ]
+]
+
 { #category : #'private - support' }
 OperationalPluginsRESTfulControllerTest >> isEnabled: aPlugin [
 
@@ -43,7 +69,7 @@ OperationalPluginsRESTfulControllerTest >> testGetHealtCheckPlugin [
 			self
 				assert: healthcheck name equals: HealthCheckPlugin pluginName;
 				assert: healthcheck status equals: 'DISABLED';
-				assertUrl: healthcheck selfLocation equals: 'https://api.example.com/operations/health-check'
+				assertUrl: healthcheck selfLocation equals: 'https://api.example.com/operations/plugins/health-check'
 			]
 ]
 
@@ -68,13 +94,9 @@ OperationalPluginsRESTfulControllerTest >> testGetPlugins [
 	self
 		withJsonFromItemsIn: response
 		do: [ :plugins | 
+			self assert: plugins size equals: 2.
 			self
-				withTheOnlyOneIn: plugins
-				do: [ :healthcheck | 
-					self
-						assert: healthcheck name equals: HealthCheckPlugin pluginName;
-						assert: healthcheck status equals: 'DISABLED';
-						assertUrl: healthcheck selfLocation equals: 'https://api.example.com/operations/health-check'
-					]
+				assertHealthcheckStatusOn: plugins;
+				assertMetricsStatusOn: plugins
 			]
 ]

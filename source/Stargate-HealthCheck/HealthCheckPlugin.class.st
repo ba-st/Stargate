@@ -11,6 +11,14 @@ Class {
 	#category : #'Stargate-HealthCheck'
 }
 
+{ #category : #configuring }
+HealthCheckPlugin class >> configureMediaControlsIn: builder within: requestContext [
+
+	builder
+		addRelativeLink: ( 'operations/<1s>' expandMacrosWith: self endpoint ) asUrl
+		relatedTo: 'run'
+]
+
 { #category : #'instance creation' }
 HealthCheckPlugin class >> configuredBy: configuration [
 

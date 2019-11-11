@@ -41,3 +41,9 @@ OperationsRESTfulController >> routes [
 	^ super routes
 		collect: [ :routeSpecification | routeSpecification authenticatedBy: authenticationFilter ]
 ]
+
+{ #category : #private }
+OperationsRESTfulController >> typeIdConstraint [
+
+	^ IsObject
+]
