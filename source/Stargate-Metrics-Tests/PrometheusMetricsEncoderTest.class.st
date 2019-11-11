@@ -15,7 +15,7 @@ PrometheusMetricsEncoderTest >> assertEncodingOf: aMetric equals: aString [
 
 	self
 		assert: ( String streamContents: [ :stream | encoder encode: aMetric on: stream ] )
-		equals: aString
+		equals: ( aString expandMacrosWith: Character lf asString )
 ]
 
 { #category : #running }
@@ -35,8 +35,7 @@ PrometheusMetricsEncoderTest >> testCounterEncoding [
 				describedBy: 'Minimalistic line:'
 				withValue: 12.47 )
 		equals:
-			'# HELP metric_without_timestamp_and_labels Minimalistic line:<l># TYPE metric_without_timestamp_and_labels counter<l>metric_without_timestamp_and_labels 12.47<l>'
-				expandMacros
+			'# HELP metric_without_timestamp_and_labels Minimalistic line:<1s># TYPE metric_without_timestamp_and_labels counter<1s>metric_without_timestamp_and_labels 12.47<1s>'
 ]
 
 { #category : #tests }
@@ -44,13 +43,9 @@ PrometheusMetricsEncoderTest >> testGaugeEncoding [
 
 	self
 		assertEncodingOf:
-			( Gauge
-				named: 'Metric without timestamp and labels'
-				describedBy: 'Minimalistic line:'
-				withValue: 1 )
+			( Gauge named: 'Metric without timestamp and labels' describedBy: 'Minimalistic line:' withValue: 1 )
 		equals:
-			'# HELP metric_without_timestamp_and_labels Minimalistic line:<l># TYPE metric_without_timestamp_and_labels gauge<l>metric_without_timestamp_and_labels 1<l>'
-				expandMacros
+			'# HELP metric_without_timestamp_and_labels Minimalistic line:<1s># TYPE metric_without_timestamp_and_labels gauge<1s>metric_without_timestamp_and_labels 1<1s>'
 ]
 
 { #category : #tests }
@@ -69,8 +64,7 @@ PrometheusMetricsEncoderTest >> testLabeledAndTimestampedMetricEncodingForCounte
 					at: (DateAndTime year: 1970 month: 1 day: 2 offset: 0 asDuration);
 				build )
 		equals:
-			'# HELP api_http_request_count The total number of HTTP requests.<l># TYPE api_http_request_count counter<l>api_http_request_count{method="post",code="200"} 1027 0<l>api_http_request_count{method="post",code="400"} 3 86400000<l>'
-				expandMacros
+			'# HELP api_http_request_count The total number of HTTP requests.<1s># TYPE api_http_request_count counter<1s>api_http_request_count{method="post",code="200"} 1027 0<1s>api_http_request_count{method="post",code="400"} 3 86400000<1s>'
 ]
 
 { #category : #tests }
@@ -87,8 +81,7 @@ PrometheusMetricsEncoderTest >> testLabeledMetricEncodingForCounters [
 					labeledBy: { #method -> 'post' . #code -> 400 };
 				build )
 		equals:
-			'# HELP api_http_request_count The total number of HTTP requests.<l># TYPE api_http_request_count counter<l>api_http_request_count{method="post",code="200"} 1027<l>api_http_request_count{method="post",code="400"} 3<l>'
-				expandMacros
+			'# HELP api_http_request_count The total number of HTTP requests.<1s># TYPE api_http_request_count counter<1s>api_http_request_count{method="post",code="200"} 1027<1s>api_http_request_count{method="post",code="400"} 3<1s>'
 ]
 
 { #category : #tests }
@@ -103,8 +96,7 @@ PrometheusMetricsEncoderTest >> testLabeledMetricEncodingForGauges [
 				addValue: 3 labeledBy: { #code -> 400 };
 				build )
 		equals:
-			'# HELP api_http_request_count The total number of HTTP requests.<l># TYPE api_http_request_count gauge<l>api_http_request_count{code="200"} 1027<l>api_http_request_count{code="400"} 3<l>'
-				expandMacros
+			'# HELP api_http_request_count The total number of HTTP requests.<1s># TYPE api_http_request_count gauge<1s>api_http_request_count{code="200"} 1027<1s>api_http_request_count{code="400"} 3<1s>'
 ]
 
 { #category : #tests }
@@ -116,8 +108,7 @@ PrometheusMetricsEncoderTest >> testTimestampedCounterEncoding [
 				over: ( Counter named: 'Tenured count' describedBy: 'Number of objects tenured' withValue: 2500 )
 				at: self timestamp )
 		equals:
-			'# HELP tenured_count Number of objects tenured<l># TYPE tenured_count counter<l>tenured_count 2500 0<l>'
-				expandMacros
+			'# HELP tenured_count Number of objects tenured<1s># TYPE tenured_count counter<1s>tenured_count 2500 0<1s>'
 ]
 
 { #category : #running }

@@ -37,5 +37,5 @@ TimestampedMetricTest >> testAccessing [
 { #category : #private }
 TimestampedMetricTest >> timestamp [
 
-	^ DateAndTime year: 2020 month: 1
+	^ DateAndTime year: 2020 month: 1 day: 1
 ]
