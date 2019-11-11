@@ -11,16 +11,6 @@ Class {
 }
 
 { #category : #'encoding - private' }
-PrometheusMetricsEncoder >> encode: aBasicMetric asType: type on: aWriteStream [
-
-	self
-		encodeHelpLineFor: aBasicMetric on: aWriteStream;
-		encode: type asTypeLineFor: aBasicMetric on: aWriteStream.
-	self encodeBasic: aBasicMetric on: aWriteStream.
-	aWriteStream lf
-]
-
-{ #category : #'encoding - private' }
 PrometheusMetricsEncoder >> encode: aType asTypeLineFor: aMetric on: aWriteStream [
 
 	aWriteStream nextPutAll: '# TYPE '.
