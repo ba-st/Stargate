@@ -15,7 +15,7 @@ GarbageCollectionMetrics >> garbageCollectionCount [
 
 	^ CompositeMetricBuilder forCounter
 		named: 'Garbage Collector invokations';
-		describedBy: 'Number of times the garbage collector was invokated';
+		describedBy: 'Number of times the garbage collector was invoked';
 		addValue: Smalltalk vm fullGCCount labeledBy: { #type -> 'full' } at: self currentTimestamp;
 		addValue: Smalltalk vm incrementalGCCount
 			labeledBy: { #type -> 'incremental' }

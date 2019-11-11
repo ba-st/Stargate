@@ -138,7 +138,7 @@ MetricsRESTfulController >> requiredPermission [
 { #category : #private }
 MetricsRESTfulController >> textPlainVersion0dot0dot4MediaType [
 
-	"This is Prometheus Client Data Exposition Format v0.0.4. The Prometheus serves requires the text/plain as the media type,
+	"This is Prometheus Client Data Exposition Format v0.0.4. The Prometheus server requires the text/plain as the media type,
 	even when it wants a specific format"
 
 	^ ZnMimeType textPlain version: '0.0.4'

@@ -14,12 +14,12 @@ CounterTest >> testAccessing [
 
 	counter := Counter
 		named: 'tenure count'
-		describedBy: 'The number of objects that has been tenured'
+		describedBy: 'The number of objects that have been tenured'
 		withValue: 125000.
 
 	self
 		assert: counter name equals: 'tenure count';
-		assert: counter description equals: 'The number of objects that has been tenured';
+		assert: counter description equals: 'The number of objects that have been tenured';
 		assert: counter value equals: 125000
 ]
 
@@ -29,11 +29,11 @@ CounterTest >> testCountersDontAcceptNegativeValues [
 	self
 		should: [ Counter
 				named: 'tenure count'
-				describedBy: 'The number of objects that has been tenured'
+				describedBy: 'The number of objects that have been tenured'
 				withValue: -1
 			]
 		raise: InstanceCreationFailed
-		withMessageText: 'Counters value can only increase or be equal to 0'
+		withMessageText: 'Counter values can only increase or be equal to 0'
 ]
 
 { #category : #tests }
@@ -49,7 +49,7 @@ CounterTest >> testCountersMustHaveADescription [
 CounterTest >> testCountersMustHaveAName [
 
 	self
-		should: [ Counter named: '' describedBy: 'The number of objects that has been tenured' withValue: 1 ]
+		should: [ Counter named: '' describedBy: 'The number of objects that have been tenured' withValue: 1 ]
 		raise: InstanceCreationFailed
 		withMessageText: 'A metric name cannot be empty'
 ]
@@ -61,13 +61,13 @@ CounterTest >> testPrintString [
 
 	counter := Counter
 		named: 'tenure count'
-		describedBy: 'The number of objects that has been tenured'
+		describedBy: 'The number of objects that have been tenured'
 		withValue: 125000.
 
 	self
 		assert: counter printString
 		equals:
 			'tenure count
-The number of objects that has been tenured
+The number of objects that have been tenured
 125000'
 ]

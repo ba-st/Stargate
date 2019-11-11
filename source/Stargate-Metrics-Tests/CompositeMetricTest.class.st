@@ -14,7 +14,7 @@ CompositeMetricTest >> testPrintSting [
 
 	metric := CompositeMetricBuilder forCounter
 		named: 'tenure count';
-		describedBy: 'The number of objects that has been tenured';
+		describedBy: 'The number of objects that have been tenured';
 		addValue: 12500 labeledBy: #() asDictionary;
 		build.
 
@@ -22,6 +22,6 @@ CompositeMetricTest >> testPrintSting [
 		assert: metric printString
 		equals:
 			'tenure count
-The number of objects that has been tenured
+The number of objects that have been tenured
 	[] 12500'
 ]

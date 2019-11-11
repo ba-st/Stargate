@@ -52,7 +52,7 @@ RunningSystemMetricsTest >> assertUptimeMetric: counter [
 
 	self
 		assert: counter name equals: 'Uptime in seconds';
-		assert: counter description equals: 'Number of seconds since the system is started.';
+		assert: counter description equals: 'Number of seconds since the system started.';
 		assert: counter type equals: Counter;
 		assert: counter value strictlyPositive
 ]

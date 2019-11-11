@@ -16,7 +16,7 @@ TimestampedMetricTest >> setUp [
 	super setUp.
 	basicMetric := Counter
 		named: 'tenure count'
-		describedBy: 'The number of objects that has been tenured'
+		describedBy: 'The number of objects that have been tenured'
 		withValue: 125000
 ]
 
@@ -45,7 +45,7 @@ TimestampedMetricTest >> testPrintString [
 		assert: metric printString
 		equals:
 			'tenure count
-The number of objects that has been tenured
+The number of objects that have been tenured
 2020-01-01T00:00:00+00:00 125000'
 ]
 

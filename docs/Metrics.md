@@ -2,7 +2,7 @@
 
 One of the operational plugins. It's usually exercised by monitoring software.
 
-This plugin is disables by default and allows to configure the metrics to gather. This configuration is made via the `#operations` config.
+This plugin is disabled by default and allows configuring the metrics to gather. This configuration is made via the `#operations` config.
 
 For example:
 

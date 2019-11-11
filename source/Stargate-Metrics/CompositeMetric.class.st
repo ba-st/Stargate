@@ -10,7 +10,7 @@ Class {
 	#category : #'Stargate-Metrics'
 }
 
-{ #category : #'as yet unclassified' }
+{ #category : #'instance creation' }
 CompositeMetric class >> withAll: aMetricCollection [
 
 	AssertionChecker

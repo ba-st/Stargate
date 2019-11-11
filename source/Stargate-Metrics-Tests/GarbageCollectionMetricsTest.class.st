@@ -12,7 +12,7 @@ GarbageCollectionMetricsTest >> assertGarbageCollectionCountMetrics: composite [
 
 	self
 		assert: composite name equals: 'Garbage Collector invokations';
-		assert: composite description equals: 'Number of times the garbage collector was invokated';
+		assert: composite description equals: 'Number of times the garbage collector was invoked';
 		assert: composite type equals: Counter;
 		assert: composite metrics size equals: 2.
 	composite metrics

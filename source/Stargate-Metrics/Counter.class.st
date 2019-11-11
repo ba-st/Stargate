@@ -24,7 +24,7 @@ Counter class >> named: aMetricName describedBy: aMetricDescription withValue: a
 			asserter
 				enforce: [ aMetricName notEmpty ] because: 'A metric name cannot be empty';
 				enforce: [ aMetricDescription notEmpty ] because: 'A metric description cannot be empty';
-				enforce: [ aNumber positive ] because: 'Counters value can only increase or be equal to 0'
+				enforce: [ aNumber positive ] because: 'Counter values can only increase or be equal to 0'
 			];
 		buildAndCheck.
 
