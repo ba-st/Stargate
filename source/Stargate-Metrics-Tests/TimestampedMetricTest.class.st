@@ -34,6 +34,21 @@ TimestampedMetricTest >> testAccessing [
 		assert: metric timestamp equals: self timestamp
 ]
 
+{ #category : #tests }
+TimestampedMetricTest >> testPrintString [
+
+	| metric |
+
+	metric := TimestampedMetric over: basicMetric at: self timestamp.
+
+	self
+		assert: metric printString
+		equals:
+			'tenure count
+The number of objects that has been tenured
+2020-01-01T00:00:00-03:00 125000'
+]
+
 { #category : #private }
 TimestampedMetricTest >> timestamp [
 

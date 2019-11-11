@@ -53,3 +53,21 @@ GaugeTest >> testGaugesMustHaveAName [
 		raise: InstanceCreationFailed
 		withMessageText: 'A metric name cannot be empty'
 ]
+
+{ #category : #tests }
+GaugeTest >> testPrintString [
+
+	| gauge |
+
+	gauge := Gauge
+		named: 'memory free bytes'
+		describedBy: 'The number of bytes of available allocated memory'
+		withValue: 125000.
+
+	self
+		assert: gauge printString
+		equals:
+			'memory free bytes
+The number of bytes of available allocated memory
+125000'
+]

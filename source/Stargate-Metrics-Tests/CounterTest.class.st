@@ -53,3 +53,21 @@ CounterTest >> testCountersMustHaveAName [
 		raise: InstanceCreationFailed
 		withMessageText: 'A metric name cannot be empty'
 ]
+
+{ #category : #tests }
+CounterTest >> testPrintString [
+
+	| counter |
+
+	counter := Counter
+		named: 'tenure count'
+		describedBy: 'The number of objects that has been tenured'
+		withValue: 125000.
+
+	self
+		assert: counter printString
+		equals:
+			'tenure count
+The number of objects that has been tenured
+125000'
+]
