@@ -32,5 +32,5 @@ HealthCheckPluginConfigurationAPITest >> testPluginIsDisabled [
 				post
 			]
 			raise: ZnHttpUnsuccessful
-			withExceptionDo: [ :error | self assert: error response code equals: 405 ]
+			withExceptionDo: [ :error | self assert: error response isNotFound ]
 ]

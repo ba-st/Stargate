@@ -64,10 +64,11 @@ OperationalPluginsRESTfulController >> initializeOn: anHTTPBasedRESTfulAPI [
 OperationalPluginsRESTfulController >> initializeRequestHandler [
 
 	requestHandler := RESTfulRequestHandlerBuilder new
-		handling: 'operations'
+		handling: 'operations/plugins'
 			locatingResourcesWith: [ :plugin | plugin endpoint ]
 			extractingIdentifierWith: [ :httpRequest | self identifierIn: httpRequest ];
-		beHypermediaDriven;
+		beHypermediaDrivenBy:
+				[ :builder :plugin :requestContext :pluginLocation | plugin configureMediaControlsIn: builder within: requestContext ];
 		whenResponding: self operationalPluginVersion1dot0dot0MediaType
 			encodeToJsonApplying:
 				[ :resource :requestContext :writer | self configureOperationalPluginEncodingOn: writer within: requestContext ];

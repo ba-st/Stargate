@@ -4,6 +4,12 @@ Class {
 	#category : #'Stargate-Metrics'
 }
 
+{ #category : #accessing }
+GarbageCollectionMetrics class >> providerName [
+
+	^ 'garbage collection'
+]
+
 { #category : #private }
 GarbageCollectionMetrics >> garbageCollectionCount [
 

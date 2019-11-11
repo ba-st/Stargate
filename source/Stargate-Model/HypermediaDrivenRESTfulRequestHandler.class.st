@@ -80,7 +80,7 @@ HypermediaDrivenRESTfulRequestHandler >> initializeResourceLocator: aResouceLoca
 HypermediaDrivenRESTfulRequestHandler >> mediaControlsFor: resource within: requestContext [
 
 	^ mediaControlsFactory
-		cull: MediaControlsBuilder new
+		cull: ( MediaControlsBuilder locatingResourcesWith: resourceLocator )
 		cull: resource
 		cull: requestContext
 		cull: ( self locationOf: resource within: requestContext )

@@ -4,6 +4,12 @@ Class {
 	#category : #'Stargate-Metrics'
 }
 
+{ #category : #accessing }
+MemoryMetrics class >> providerName [
+
+	^ 'memory'
+]
+
 { #category : #calculating }
 MemoryMetrics >> gatherMetrics [
 

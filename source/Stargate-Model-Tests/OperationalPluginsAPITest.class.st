@@ -19,15 +19,15 @@ OperationalPluginsAPITest >> testGetHealtCheckPlugin [
 	| json healthCheckResponse |
 
 	json := NeoJSONObject
-		fromString: ( self newJWTAuthorizedClient get: self operationsUrl / HealthCheckPlugin endpoint asUrl ).
+		fromString: ( self newJWTAuthorizedClient get: self operationsPluginsUrl / HealthCheckPlugin endpoint asUrl ).
 
 	self
 		assert: json status equals: 'ENABLED';
 		assert: json name equals: HealthCheckPlugin pluginName;
-		assert: json links size equals: 1.
+		assert: json links size equals: 2.
 
 	healthCheckResponse := self newJWTAuthorizedClient
-		url: json selfLocation;
+		url: json links run;
 		setAccept: 'application/vnd.stargate.health-check.summary+json;version=1.0.0' asMediaType;
 		post;
 		response.
@@ -45,7 +45,7 @@ OperationalPluginsAPITest >> testGetHealtCheckPluginForbidden [
 
 	self
 		should: [ self newJWTAuthorizedClientLackingPermissions
-				get: self operationsUrl / HealthCheckPlugin endpoint asUrl
+				get: self operationsPluginsUrl / HealthCheckPlugin endpoint asUrl
 			]
 		raise: ZnHttpUnsuccessful
 		withExceptionDo: [ :error | self assert: error response code equals: 403 ]
@@ -55,7 +55,7 @@ OperationalPluginsAPITest >> testGetHealtCheckPluginForbidden [
 OperationalPluginsAPITest >> testGetHealtCheckPluginUnauthorized [
 
 	self
-		should: [ self newClient get: self operationsUrl / HealthCheckPlugin endpoint asUrl ]
+		should: [ self newClient get: self operationsPluginsUrl / HealthCheckPlugin endpoint asUrl ]
 		raise: ZnHttpUnsuccessful
 		withExceptionDo: [ :error | self assert: error response isAuthenticationRequired ]
 ]
@@ -65,7 +65,7 @@ OperationalPluginsAPITest >> testGetOperationalPlugins [
 
 	| json |
 
-	json := NeoJSONObject fromString: ( self newJWTAuthorizedClient get: self operationsUrl ).
+	json := NeoJSONObject fromString: ( self newJWTAuthorizedClient get: self operationsPluginsUrl ).
 
 	self
 		assert: json items isCollection;
@@ -76,7 +76,7 @@ OperationalPluginsAPITest >> testGetOperationalPlugins [
 OperationalPluginsAPITest >> testGetOperationalPluginsForbidden [
 
 	self
-		should: [ self newJWTAuthorizedClientLackingPermissions get: self operationsUrl ]
+		should: [ self newJWTAuthorizedClientLackingPermissions get: self operationsPluginsUrl ]
 		raise: ZnHttpUnsuccessful
 		withExceptionDo: [ :error | self assert: error response code equals: 403 ]
 ]
@@ -85,7 +85,7 @@ OperationalPluginsAPITest >> testGetOperationalPluginsForbidden [
 OperationalPluginsAPITest >> testGetOperationalPluginsUnauthorized [
 
 	self
-		should: [ self newClient get: self operationsUrl ]
+		should: [ self newClient get: self operationsPluginsUrl ]
 		raise: ZnHttpUnsuccessful
 		withExceptionDo: [ :error | self assert: error response isAuthenticationRequired ]
 ]
