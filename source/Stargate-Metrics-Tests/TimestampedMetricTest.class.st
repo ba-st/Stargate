@@ -46,11 +46,11 @@ TimestampedMetricTest >> testPrintString [
 		equals:
 			'tenure count
 The number of objects that has been tenured
-2020-01-01T00:00:00-03:00 125000'
+2020-01-01T00:00:00+00:00 125000'
 ]
 
 { #category : #private }
 TimestampedMetricTest >> timestamp [
 
-	^ DateAndTime year: 2020 month: 1 day: 1
+	^ DateAndTime year: 2020 month: 1 day: 1 offset: 0 asDuration
 ]
