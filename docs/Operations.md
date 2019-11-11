@@ -25,7 +25,7 @@ If the schema is `basic`
 - `#password`: The password to be used in basic auth
 
 Plugin specific configuration are included under a `#{{plugin-endpoint}}` key. All the plugins can be enabled or disabled by configuration including an `#enabled` option in the specific configuration. For example to disable the Health Check plugin the configuration must be something like:
-```
+```smalltalk
 Dictionary new
   at: #operations put: (
     Dictionary new
@@ -41,7 +41,7 @@ A RESTful API is available as the entry point for the operational plugins. All t
 
 ### Listing available plugins
 
-- Endpoint: `/operations`
+- Endpoint: `/operations/plugins`
 - Allowed HTTP methods: `GET`
 - Supported media types: `application/vnd.stargate.operational-plugin+json`
 - Authentication: Required
@@ -55,18 +55,19 @@ Example response:
       "name":"Health Check",
       "status":"ENABLED",
       "links":{
-        "self":"{{BASE_URL}}/operations/health-check"
+        "self":"{{BASE_URL}}/operations/plugins/health-check",
+        "run":"{{BASE_URL}}/operations/health-check"
       }
     }
   ],
   "links":{
-    "self":"{{BASE_URL}}/operations"
+    "self":"{{BASE_URL}}/operations/plugins"
   }
 }
 ```
 ### Accessing a plugin
 
-- Endpoint: `/operations/{{plugin-endpoint}}`
+- Endpoint: `/operations/plugins/{{plugin-endpoint}}`
 - Allowed HTTP methods: `GET`
 - Supported media types: `application/vnd.stargate.operational-plugin+json`
 - Authentication: Required
@@ -78,7 +79,8 @@ Example response:
   "name":"Health Check",
   "status":"ENABLED",
   "links":{
-    "self":"{{BASE_URL}}/operations/health-check"
+    "self":"{{BASE_URL}}/operations/plugins/health-check",
+    "run":"{{BASE_URL}}/operations/health-check"
   }
 }
 ```
