@@ -52,7 +52,7 @@ GarbageCollectionMetricsTest >> assertTenureCountMetrics: counter [
 		assert: counter description
 			equals: 'Cummulative number of objects tenured by the Garbage Collector';
 		assert: counter type equals: Counter;
-		assert: counter value strictlyPositive
+		assert: counter value positive
 ]
 
 { #category : #test }
