@@ -65,12 +65,12 @@ BaselineOfStargate >> setUpDeploymentPackages: spec [
 	spec
 		package: 'Stargate-HealthCheck' with: [ spec requires: 'Stargate-Model' ];
 		group: 'HealthCheck' with: 'Stargate-HealthCheck';
-		group: 'Deployment' with: 'Stargate-HealthCheck'.
+		group: 'Deployment' with: 'HealthCheck'.
 
 	spec
 		package: 'Stargate-Metrics' with: [ spec requires: 'Stargate-Model' ];
 		group: 'Metrics' with: 'Stargate-Metrics';
-		group: 'Deployment' with: 'Stargate-Metrics'
+		group: 'Deployment' with: 'Metrics'
 ]
 
 { #category : #baselines }
