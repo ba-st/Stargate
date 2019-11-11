@@ -148,9 +148,3 @@ HealthCheckRESTfulController >> statusOf: condition [
 
 	^ RiskScoreToStatusMapping at: condition riskScore
 ]
-
-{ #category : #private }
-HealthCheckRESTfulController >> typeIdConstraint [
-
-	^ IsObject
-]

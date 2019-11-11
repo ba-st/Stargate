@@ -149,9 +149,3 @@ MetricsRESTfulController >> textPrometheusClientDataExpositionFormatVersion0dot0
 
 	^ 'text/vnd.stargate.prometheus.client-data-exposition' asMediaType version: '0.0.4'
 ]
-
-{ #category : #private }
-MetricsRESTfulController >> typeIdConstraint [
-
-	^ IsObject
-]

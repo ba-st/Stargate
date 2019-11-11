@@ -125,9 +125,3 @@ OperationalPluginsRESTfulController >> statusOf: aPluginType [
 
 	^ ( api isEnabled: aPluginType ) then: [ 'ENABLED' ] otherwise: [ 'DISABLED' ]
 ]
-
-{ #category : #private }
-OperationalPluginsRESTfulController >> typeIdConstraint [
-
-	^ IsObject
-]
