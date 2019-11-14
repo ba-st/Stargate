@@ -73,3 +73,21 @@ OperationalPlugin >> name [
 
 	^ self class pluginName
 ]
+
+{ #category : #accessing }
+OperationalPlugin >> startOn: teapotServer [
+
+	"This method is called when the server is started, giving
+	the chance to the plugin to perform some start-up tasks"
+
+	
+]
+
+{ #category : #accessing }
+OperationalPlugin >> stop [
+
+	"This method is called when the server is stopped, giving
+	the chance to the plugin to perform some clean-up tasks"
+
+	
+]

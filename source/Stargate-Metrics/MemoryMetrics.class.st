@@ -1,3 +1,6 @@
+"
+I'm a provider of metrics related to memory
+"
 Class {
 	#name : #MemoryMetrics,
 	#superclass : #MetricProvider,

@@ -77,3 +77,15 @@ MetricsPlugin >> printOn: stream [
 
 	stream nextPutAll: self name
 ]
+
+{ #category : #initialize }
+MetricsPlugin >> startOn: teapotServer [
+
+	metricProviders do: [ :provider | provider installOn: teapotServer ]
+]
+
+{ #category : #initialize }
+MetricsPlugin >> stop [
+
+	metricProviders do: #uninstall
+]

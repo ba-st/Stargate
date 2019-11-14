@@ -143,11 +143,13 @@ HTTPBasedRESTfulAPI >> operationsConfiguration [
 { #category : #actions }
 HTTPBasedRESTfulAPI >> start [
 
+	enabledOperationalPlugins do: [ :plugin | plugin startOn: teapotServer ].
 	teapotServer start
 ]
 
 { #category : #actions }
 HTTPBasedRESTfulAPI >> stop [
 
-	teapotServer stop
+	teapotServer stop.
+	enabledOperationalPlugins do: #stop
 ]
