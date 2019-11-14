@@ -1,3 +1,6 @@
+"
+I'm a provider of metrics related to the running system
+"
 Class {
 	#name : #RunningSystemMetrics,
 	#superclass : #MetricProvider,

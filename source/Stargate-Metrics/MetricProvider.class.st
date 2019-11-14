@@ -30,3 +30,11 @@ MetricProvider >> gatherMetrics [
 
 	self subclassResponsibility
 ]
+
+{ #category : #actions }
+MetricProvider >> installOn: teapotServer [
+]
+
+{ #category : #actions }
+MetricProvider >> uninstall [
+]
