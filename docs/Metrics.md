@@ -23,6 +23,7 @@ Available metric providers:
 - `memory` gathers metrics over the allocated memory (total, old space, free old space, eden space, young space)
 - `garbage collection` gathers metrics over the garbage collector (time spent on garbage collection, invokation count and tenure count)
 - `running system` gathers information over the running system (uptime, process count by status and priority, external semaphore table data)
+- `http` (optional group) gathers information over the incoming HTTP requests (request count, request duration, response size by HTTP method, response code and URL)
 
 ## API
 
@@ -289,6 +290,51 @@ Content-Type: application/vnd.stargate.operational-metrics+json
             "category":"Used external semaphore table slots"
          }
       ]
-   }
+   },
+   {
+     "name": "HTTP request count",
+     "description": "Number of HTTP requests received",
+     "type": "Counter",
+     "value": 1,
+     "metrics": [
+       {
+         "value": 1,
+         "http_method": "GET",
+         "url": "http://localhost:9999/operations/metrics",
+         "timestamp": "2019-11-14T12:24:21.084248-03:00",
+         "response_code": 200
+       }
+     ]
+   },
+   {
+     "name": "HTTP response size in bytes",
+     "description": "Size in bytes of content in the HTTP responses",
+     "type": "Counter",
+     "value": 2844,
+     "metrics": [
+       {
+         "value": 2844,
+         "http_method": "GET",
+         "url": "http://localhost:9999/operations/metrics",
+         "timestamp": "2019-11-14T12:24:21.084273-03:00",
+         "response_code": 200
+       }
+     ]
+   },
+   {
+     "name": "HTTP request/response duration in ms",
+     "description": "Milliseconds to process a request and produce a response",
+     "type": "Counter",
+     "value": 15,
+     "metrics": [
+       {
+         "value": 15,
+         "http_method": "GET",
+         "url": "http://localhost:9999/operations/metrics",
+         "timestamp": "2019-11-14T12:24:21.08429-03:00",
+         "response_code": 200
+       }
+     ]
+   }   
 ]
 ```
