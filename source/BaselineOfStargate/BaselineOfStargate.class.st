@@ -48,7 +48,11 @@ BaselineOfStargate >> setUpDependencies: spec [
 		baseline: 'JSONWebToken' with: [ spec repository: 'github://ba-st/JSONWebToken:master/source' ];
 		project: 'JSONWebToken-Deployment'
 			copyFrom: 'JSONWebToken'
-			with: [ spec loads: 'JSONWebToken-Core' ]
+			with: [ spec loads: 'JSONWebToken-Core' ].
+
+	spec
+		baseline: 'JRPC' with: [ spec repository: 'github://juliendelplanque/JRPC:v3.0.0' ];
+		project: 'JRPC-Deployment' copyFrom: 'JRPC' with: [ spec loads: 'Server-Deployment' ]
 ]
 
 { #category : #baselines }
@@ -76,10 +80,16 @@ BaselineOfStargate >> setUpDeploymentPackages: spec [
 		package: 'Stargate-Metrics-HTTP' with: [ spec requires: 'Stargate-Metrics' ];
 		group: 'Metrics-HTTP' with: 'Stargate-Metrics-HTTP';
 		group: 'Deployment' with: 'Metrics-HTTP'.
-		
-	spec package: 'Stargate-Application-Control' with: [ spec requires: 'Stargate-Model' ];
+
+	spec
+		package: 'Stargate-JSON-RPC' with: [ spec requires: #('Stargate-Model' 'JRPC-Deployment') ];
+		group: 'JSON-RPC' with: 'Stargate-JSON-RPC';
+		group: 'Deployment' with: 'JSON-RPC'.
+
+	spec
+		package: 'Stargate-Application-Control' with: [ spec requires: #('Stargate-Model' 'JSON-RPC') ];
 		group: 'Application-Control' with: 'Stargate-Application-Control';
-		group: 'Deployment' with: 'Application-Control'.
+		group: 'Deployment' with: 'Application-Control'
 ]
 
 { #category : #baselines }
