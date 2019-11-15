@@ -56,6 +56,20 @@ OperationalPlugin class >> pluginAt: endpoint [
 		ifNone: [ ObjectNotFound signal: ( 'Plugin <1s> not available' expandMacrosWith: endpoint ) ]
 ]
 
+{ #category : #'instance creation' }
+OperationalPlugin class >> pluginConfigurationOn: configuration [
+
+	| selfConfiguration |
+
+	selfConfiguration := configuration at: self endpoint.
+
+	AssertionChecker
+		enforce: [ selfConfiguration at: #enabled ]
+		because: 'A disabled plugin must not be configured.'.
+
+	^ selfConfiguration
+]
+
 { #category : #accessing }
 OperationalPlugin class >> pluginName [
 

@@ -75,7 +75,11 @@ BaselineOfStargate >> setUpDeploymentPackages: spec [
 	spec
 		package: 'Stargate-Metrics-HTTP' with: [ spec requires: 'Stargate-Metrics' ];
 		group: 'Metrics-HTTP' with: 'Stargate-Metrics-HTTP';
-		group: 'Deployment' with: 'Metrics-HTTP'
+		group: 'Deployment' with: 'Metrics-HTTP'.
+		
+	spec package: 'Stargate-Application-Control' with: [ spec requires: 'Stargate-Model' ];
+		group: 'Application-Control' with: 'Stargate-Application-Control';
+		group: 'Deployment' with: 'Application-Control'.
 ]
 
 { #category : #baselines }
@@ -110,6 +114,10 @@ BaselineOfStargate >> setUpTestPackages: spec [
 		package: 'Stargate-Metrics-HTTP-Tests'
 			with: [ spec requires: #('Stargate-Metrics-HTTP' 'Stargate-Model-Tests') ];
 		group: 'Tests' with: 'Stargate-Metrics-HTTP-Tests'.
+	spec
+		package: 'Stargate-Application-Control-Tests'
+			with: [ spec requires: #('Stargate-Application-Control' 'Stargate-Model-Tests') ];
+		group: 'Tests' with: 'Stargate-Application-Control-Tests'.
 	spec
 		package: 'Stargate-Examples-Tests'
 			with: [ spec requires: #('Dependent-SUnit-Extensions' 'Stargate-Examples') ];

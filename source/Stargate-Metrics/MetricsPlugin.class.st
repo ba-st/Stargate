@@ -24,11 +24,7 @@ MetricsPlugin class >> configuredBy: configuration [
 
 	| selfConfiguration |
 
-	selfConfiguration := configuration at: self endpoint.
-
-	AssertionChecker
-		enforce: [ selfConfiguration at: #enabled ]
-		because: 'A disabled plugin must not be configured.'.
+	selfConfiguration := self pluginConfigurationOn: configuration.
 
 	^ self new initializeGatheringAll: ( selfConfiguration at: #metrics ifAbsent: [ #() ] )
 ]
