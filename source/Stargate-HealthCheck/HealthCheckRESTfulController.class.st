@@ -78,8 +78,7 @@ HealthCheckRESTfulController >> initializeOver: aHealthCheckPlugin [
 HealthCheckRESTfulController >> initializeRequestHandler [
 
 	requestHandler := RESTfulRequestHandlerBuilder new
-		handling: ( 'operations/<1s>' expandMacrosWith: self pluginEndpoint )
-			extractingIdentifierWith: [ :httpRequest | self identifierIn: httpRequest ];
+		handling: ( 'operations/<1s>' expandMacrosWith: self pluginEndpoint );
 		whenResponding: self healthCheckSummaryVersion1dot0dot0MediaType
 			encodeToJsonApplying: [ :resource :requestContext :writer | 
 			writer

@@ -15,6 +15,12 @@ Class {
 }
 
 { #category : #'instance creation' }
+ResourceLocator class >> handling: aStringOrSymbol [
+
+	^ self handling: aStringOrSymbol extractingIdentifierWith: [ :httpRequest | '' ]
+]
+
+{ #category : #'instance creation' }
 ResourceLocator class >> handling: aStringOrSymbol calculatingLocationWith: aLocationResolver andIdentifierBy: aBlock [
 
 	^ self

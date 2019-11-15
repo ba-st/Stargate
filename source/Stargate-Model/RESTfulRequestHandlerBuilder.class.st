@@ -97,6 +97,12 @@ RESTfulRequestHandlerBuilder >> handleExceptionsApplying: aBlock [
 ]
 
 { #category : #configuring }
+RESTfulRequestHandlerBuilder >> handling: anEndpoint [
+
+	resourceLocator := ResourceLocator handling: anEndpoint
+]
+
+{ #category : #configuring }
 RESTfulRequestHandlerBuilder >> handling: anEndpoint extractingIdentifierWith: aBlock [
 
 	resourceLocator := ResourceLocator handling: anEndpoint extractingIdentifierWith: aBlock

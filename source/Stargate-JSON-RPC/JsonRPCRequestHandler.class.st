@@ -15,8 +15,7 @@ Class {
 { #category : #'instance creation' }
 JsonRPCRequestHandler class >> handling: anEndpoint [
 
-	^ self new
-		initializeResolvingLocationWith: ( ResourceLocator handling: anEndpoint extractingIdentifierWith: [ :httpRequest | '' ] )
+	^ self new initializeResolvingLocationWith: ( ResourceLocator handling: anEndpoint )
 ]
 
 { #category : #configuring }
