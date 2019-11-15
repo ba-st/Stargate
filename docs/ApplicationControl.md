@@ -39,7 +39,7 @@ This is a JSON RPC API.
 
 #### Examples
 
-** Notification **
+**Notification**
 
 Request
 ```json
@@ -56,7 +56,7 @@ Response
 ```json
 HTTP/1.1 202 Accepted
 ```
-** Remote Procedure Call **
+**Remote Procedure Call**
 
 Request
 ```json
@@ -82,7 +82,7 @@ Content-Type: application/json
 }
 ```
 
-** Unknown Method**
+**Unknown Method**
 
 Request
 ```json

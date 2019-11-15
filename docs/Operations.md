@@ -9,6 +9,11 @@ An operational plugin has the following characteristics:
 - Must be secured with a proper authorization filter. In specific cases a plugin can respond with some basic data in case there's no authorization (for example a basic health-check) but this behavior must be the exception to the rule.
 - Should be possible to enable/disable/configure it on the fly using an API endpoint (given the proper authorization credentials) using the media controls provided in the plugin representation
 
+## Implemented Plugins
+- [Application Control](ApplicationControl.md)
+- [Healt Check](HealthCheck.md)
+- [Metrics](Metrics.md)
+
 ## Configuration Options
 
 Configuration options are received in the general Stargate configuration parameters under the `#operations` key. This key is a dictionary including general configuration and plugin specific configuration.
