@@ -18,7 +18,7 @@ Dictionary new
 
 To get a list of supported commands print the result of `ApplicationControlPlugin availableCommands collect: #methodName as: Array`.
 
-Available metric providers:
+Available commands:
 
 - `shutdown` Gracefully shutdowns the running application
 
