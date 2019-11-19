@@ -51,7 +51,7 @@ BaselineOfStargate >> setUpDependencies: spec [
 			with: [ spec loads: 'JSONWebToken-Core' ].
 
 	spec
-		baseline: 'JRPC' with: [ spec repository: 'github://juliendelplanque/JRPC:v3.0.0' ];
+		baseline: 'JRPC' with: [ spec repository: 'github://juliendelplanque/JRPC:v3.0.0/src' ];
 		project: 'JRPC-Deployment' copyFrom: 'JRPC' with: [ spec loads: 'Server-Deployment' ]
 ]
 
