@@ -8,6 +8,19 @@ Class {
 }
 
 { #category : #'private - asserting' }
+OperationalPluginsRESTfulControllerTest >> assertApplicationControlStatusOn: plugins [
+
+	^ plugins
+		detect: [ :plugin | plugin name = ApplicationControlPlugin pluginName ]
+		ifFound: [ :applicationControl | 
+			self
+				assert: applicationControl status equals: 'DISABLED';
+				assertUrl: applicationControl selfLocation equals: 'https://api.example.com/operations/plugins/application-control'
+			]
+		ifNone: [ self fail ]
+]
+
+{ #category : #'private - asserting' }
 OperationalPluginsRESTfulControllerTest >> assertHealthcheckStatusOn: plugins [
 
 	^ plugins
@@ -94,9 +107,10 @@ OperationalPluginsRESTfulControllerTest >> testGetPlugins [
 	self
 		withJsonFromItemsIn: response
 		do: [ :plugins | 
-			self assert: plugins size equals: 2.
+			self assert: plugins size equals: 3.
 			self
 				assertHealthcheckStatusOn: plugins;
-				assertMetricsStatusOn: plugins
+				assertMetricsStatusOn: plugins;
+				assertApplicationControlStatusOn: plugins
 			]
 ]

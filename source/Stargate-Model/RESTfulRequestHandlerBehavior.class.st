@@ -10,8 +10,8 @@ Class {
 		'decodingRules',
 		'encodingRules',
 		'entityTagCalculator',
-		'acceptNegotiator',
-		'resourceLocator'
+		'resourceLocator',
+		'acceptNegotiator'
 	],
 	#category : #'Stargate-Model-Controllers'
 }

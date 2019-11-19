@@ -41,8 +41,11 @@ baseline: spec
 
 - `Deployment` will load all the packages needed in a deployed application (including the operational plugins)
 - `Core` will load the minimal packages required in a deployed application (excluding operational plugins)
+- `JSON-RPC` will load the deployment support to integrate JSON-RPC calls under some endpoint in the RESTful API
 - `HealthCheck` will load the deployment support for the HealthCheck plugin
 - `Metrics` will load the deployment support for the Metrics plugin
+- `Metrics-HTTP` will load additional metrics for HTTP requests
+- `Application-Control` will load the deployment support for the Application Control plugin
 - `Tests` will load the test cases
 - `Dependent-SUnit-Extensions` will load the extensions to the SUnit framework
 - `Tools` will load the extensions to the SUnit framework and development tools (inspector and spotter extensions)

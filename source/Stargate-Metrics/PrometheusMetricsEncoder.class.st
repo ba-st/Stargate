@@ -125,7 +125,7 @@ PrometheusMetricsEncoder >> encodingActionFor: aMetricType [
 { #category : #'encoding - private' }
 PrometheusMetricsEncoder >> escapeBackslashAndLineFeeds: aString [
 
-	^ ( aString copyReplaceAll: '\' with: '\\' ) copyReplaceAll: Character linefeed asString with: '\n'
+	^ ( aString copyReplaceAll: '\' with: '\\' ) copyReplaceAll: String lf with: '\n'
 ]
 
 { #category : #'encoding - private' }

@@ -99,8 +99,7 @@ MetricsRESTfulController >> initializeOver: aMetricsPlugin [
 MetricsRESTfulController >> initializeRequestHandler [
 
 	requestHandler := RESTfulRequestHandlerBuilder new
-		handling: ( 'operations/<1s>' expandMacrosWith: self pluginEndpoint )
-			extractingIdentifierWith: [ :httpRequest | self identifierIn: httpRequest ];
+		handling: ( 'operations/<1s>' expandMacrosWith: self pluginEndpoint );
 		whenResponding: self textPlainVersion0dot0dot4MediaType
 			encodeApplying: [ :resource | self encodeMetricsInPrometheusTextFormat: resource ];
 		whenResponding: self textPrometheusClientDataExpositionFormatVersion0dot0dot4MediaType
