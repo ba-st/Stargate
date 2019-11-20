@@ -11,6 +11,7 @@ An operational plugin has the following characteristics:
 
 ## Implemented Plugins
 - [Application Control](ApplicationControl.md)
+- [Application Info](ApplicationInfo.md)
 - [Healt Check](HealthCheck.md)
 - [Metrics](Metrics.md)
 
