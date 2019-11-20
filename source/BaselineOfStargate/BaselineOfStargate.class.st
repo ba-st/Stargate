@@ -148,7 +148,7 @@ BaselineOfStargate >> setUpTestPackages: spec [
 		group: 'Tests' with: 'Stargate-Application-Control-Tests'.
 	spec
 		package: 'Stargate-Application-Info-Tests'
-			with: [ spec requires: #('Stargate-Application-Info' 'Stargate-Model-Tests') ];
+			with: [ spec requires: #('Application-Info' 'Stargate-Model-Tests') ];
 		group: 'Tests' with: 'Stargate-Application-Info-Tests'.
 	spec
 		package: 'Stargate-Examples-Tests'
