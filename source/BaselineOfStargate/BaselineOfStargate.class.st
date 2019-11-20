@@ -8,6 +8,7 @@ Class {
 BaselineOfStargate >> baseline: spec [
 
 	<baseline>
+	self setUpCompatibilityPackages: spec.
 	spec
 		for: #pharo
 		do: [ self
@@ -25,6 +26,17 @@ BaselineOfStargate >> baseline: spec [
 BaselineOfStargate >> projectClass [
 
 	^ MetacelloCypressBaselineProject
+]
+
+{ #category : #baselines }
+BaselineOfStargate >> setUpCompatibilityPackages: spec [
+
+	spec
+		for: #'pharo6.x'
+		do: [ spec
+				package: 'Stargate-Application-Info-Pharo6';
+				group: 'Application-Info' with: 'Stargate-Application-Info-Pharo6'
+			]
 ]
 
 { #category : #baselines }
