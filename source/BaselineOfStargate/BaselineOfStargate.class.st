@@ -8,7 +8,6 @@ Class {
 BaselineOfStargate >> baseline: spec [
 
 	<baseline>
-	self setUpCompatibilityPackages: spec.
 	spec
 		for: #pharo
 		do: [ self
@@ -19,7 +18,8 @@ BaselineOfStargate >> baseline: spec [
 				group: 'Examples' with: #('Deployment' 'Stargate-Examples');
 				group: 'Tools' with: #('Teapot-Tools');
 				group: 'Development' with: #('Tests' 'Tools')
-			]
+			].
+	self setUpCompatibilityPackages: spec
 ]
 
 { #category : #accessing }
@@ -35,7 +35,8 @@ BaselineOfStargate >> setUpCompatibilityPackages: spec [
 		for: #'pharo6.x'
 		do: [ spec
 				package: 'Stargate-Application-Info-Pharo6';
-				group: 'Application-Info' with: 'Stargate-Application-Info-Pharo6'
+				group: 'Application-Info' with: 'Stargate-Application-Info-Pharo6';
+				group: 'Deployment' with: 'Stargate-Application-Info-Pharo6'
 			]
 ]
 
