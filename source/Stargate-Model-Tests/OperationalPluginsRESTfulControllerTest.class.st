@@ -15,7 +15,22 @@ OperationalPluginsRESTfulControllerTest >> assertApplicationControlStatusOn: plu
 		ifFound: [ :applicationControl | 
 			self
 				assert: applicationControl status equals: 'DISABLED';
-				assertUrl: applicationControl selfLocation equals: 'https://api.example.com/operations/plugins/application-control'
+				assertUrl: applicationControl selfLocation
+					equals: 'https://api.example.com/operations/plugins/application-control'
+			]
+		ifNone: [ self fail ]
+]
+
+{ #category : #'private - asserting' }
+OperationalPluginsRESTfulControllerTest >> assertApplicationInfoStatusOn: plugins [
+
+	^ plugins
+		detect: [ :plugin | plugin name = ApplicationInfoPlugin pluginName ]
+		ifFound: [ :applicationControl | 
+			self
+				assert: applicationControl status equals: 'DISABLED';
+				assertUrl: applicationControl selfLocation
+					equals: 'https://api.example.com/operations/plugins/application-info'
 			]
 		ifNone: [ self fail ]
 ]
@@ -28,7 +43,8 @@ OperationalPluginsRESTfulControllerTest >> assertHealthcheckStatusOn: plugins [
 		ifFound: [ :healthcheck | 
 			self
 				assert: healthcheck status equals: 'DISABLED';
-				assertUrl: healthcheck selfLocation equals: 'https://api.example.com/operations/plugins/health-check'
+				assertUrl: healthcheck selfLocation
+					equals: 'https://api.example.com/operations/plugins/health-check'
 			]
 		ifNone: [ self fail ]
 ]
@@ -107,10 +123,11 @@ OperationalPluginsRESTfulControllerTest >> testGetPlugins [
 	self
 		withJsonFromItemsIn: response
 		do: [ :plugins | 
-			self assert: plugins size equals: 3.
+			self assert: plugins size equals: 4.
 			self
 				assertHealthcheckStatusOn: plugins;
 				assertMetricsStatusOn: plugins;
-				assertApplicationControlStatusOn: plugins
+				assertApplicationControlStatusOn: plugins;
+				assertApplicationInfoStatusOn: plugins
 			]
 ]

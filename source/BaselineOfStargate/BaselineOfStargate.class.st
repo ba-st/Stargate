@@ -89,7 +89,12 @@ BaselineOfStargate >> setUpDeploymentPackages: spec [
 	spec
 		package: 'Stargate-Application-Control' with: [ spec requires: #('Stargate-Model' 'JSON-RPC') ];
 		group: 'Application-Control' with: 'Stargate-Application-Control';
-		group: 'Deployment' with: 'Application-Control'
+		group: 'Deployment' with: 'Application-Control'.
+
+	spec
+		package: 'Stargate-Application-Info' with: [ spec requires: 'Stargate-Model' ];
+		group: 'Application-Info' with: 'Stargate-Application-Info';
+		group: 'Deployment' with: 'Application-Info'
 ]
 
 { #category : #baselines }
@@ -128,6 +133,10 @@ BaselineOfStargate >> setUpTestPackages: spec [
 		package: 'Stargate-Application-Control-Tests'
 			with: [ spec requires: #('Stargate-Application-Control' 'Stargate-Model-Tests') ];
 		group: 'Tests' with: 'Stargate-Application-Control-Tests'.
+	spec
+		package: 'Stargate-Application-Info-Tests'
+			with: [ spec requires: #('Stargate-Application-Info' 'Stargate-Model-Tests') ];
+		group: 'Tests' with: 'Stargate-Application-Info-Tests'.
 	spec
 		package: 'Stargate-Examples-Tests'
 			with: [ spec requires: #('Dependent-SUnit-Extensions' 'Stargate-Examples') ];
