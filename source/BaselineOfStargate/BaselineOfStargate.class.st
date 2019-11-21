@@ -18,13 +18,26 @@ BaselineOfStargate >> baseline: spec [
 				group: 'Examples' with: #('Deployment' 'Stargate-Examples');
 				group: 'Tools' with: #('Teapot-Tools');
 				group: 'Development' with: #('Tests' 'Tools')
-			]
+			].
+	self setUpCompatibilityPackages: spec
 ]
 
 { #category : #accessing }
 BaselineOfStargate >> projectClass [
 
 	^ MetacelloCypressBaselineProject
+]
+
+{ #category : #baselines }
+BaselineOfStargate >> setUpCompatibilityPackages: spec [
+
+	spec
+		for: #'pharo6.x'
+		do: [ spec
+				package: 'Stargate-Application-Info-Pharo6';
+				group: 'Application-Info' with: 'Stargate-Application-Info-Pharo6';
+				group: 'Deployment' with: 'Stargate-Application-Info-Pharo6'
+			]
 ]
 
 { #category : #baselines }
@@ -89,7 +102,12 @@ BaselineOfStargate >> setUpDeploymentPackages: spec [
 	spec
 		package: 'Stargate-Application-Control' with: [ spec requires: #('Stargate-Model' 'JSON-RPC') ];
 		group: 'Application-Control' with: 'Stargate-Application-Control';
-		group: 'Deployment' with: 'Application-Control'
+		group: 'Deployment' with: 'Application-Control'.
+
+	spec
+		package: 'Stargate-Application-Info' with: [ spec requires: 'Stargate-Model' ];
+		group: 'Application-Info' with: 'Stargate-Application-Info';
+		group: 'Deployment' with: 'Application-Info'
 ]
 
 { #category : #baselines }
@@ -128,6 +146,10 @@ BaselineOfStargate >> setUpTestPackages: spec [
 		package: 'Stargate-Application-Control-Tests'
 			with: [ spec requires: #('Stargate-Application-Control' 'Stargate-Model-Tests') ];
 		group: 'Tests' with: 'Stargate-Application-Control-Tests'.
+	spec
+		package: 'Stargate-Application-Info-Tests'
+			with: [ spec requires: #('Application-Info' 'Stargate-Model-Tests') ];
+		group: 'Tests' with: 'Stargate-Application-Info-Tests'.
 	spec
 		package: 'Stargate-Examples-Tests'
 			with: [ spec requires: #('Dependent-SUnit-Extensions' 'Stargate-Examples') ];

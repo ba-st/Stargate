@@ -42,31 +42,3 @@ MetricsPluginAPITest >> testGetMetricsWithPermissions [
 		assert: metricsResponse contentType asMediaType equals: ( ZnMimeType textPlain version: '0.0.4' );
 		assert: metricsResponse contents notEmpty
 ]
-
-{ #category : #tests }
-MetricsPluginAPITest >> testRunHealtCheckPluginAskingDetailsWithoutAuthentication [
-
-	self
-		should: [ self newClient
-				url: self operationsUrl / HealthCheckPlugin endpoint asUrl;
-				setAccept: 'application/vnd.stargate.health-check.details+json;version=1.0.0' asMediaType;
-				post;
-				response
-			]
-		raise: ZnHttpUnsuccessful
-		withExceptionDo: [ :error | self assert: error response code equals: 401 ]
-]
-
-{ #category : #tests }
-MetricsPluginAPITest >> testRunHealtCheckPluginAskingDetailsWithoutPermissions [
-
-	self
-		should: [ self newJWTAuthorizedClientLackingPermissions
-				url: self operationsUrl / HealthCheckPlugin endpoint asUrl;
-				setAccept: 'application/vnd.stargate.health-check.details+json;version=1.0.0' asMediaType;
-				post;
-				response
-			]
-		raise: ZnHttpUnsuccessful
-		withExceptionDo: [ :error | self assert: error response code equals: 403 ]
-]
