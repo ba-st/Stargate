@@ -10,6 +10,7 @@ An operational plugin has the following characteristics:
 - Should be possible to enable/disable/configure it on the fly using an API endpoint (given the proper authorization credentials) using the media controls provided in the plugin representation
 
 ## Implemented Plugins
+- [Application Configuration](ApplicationConfiguration.md)
 - [Application Control](ApplicationControl.md)
 - [Application Info](ApplicationInfo.md)
 - [Healt Check](HealthCheck.md)
