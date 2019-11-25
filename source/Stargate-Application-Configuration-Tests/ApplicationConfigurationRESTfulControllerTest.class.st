@@ -94,7 +94,10 @@ ApplicationConfigurationRESTfulControllerTest >> testGetConfigurationInPlainText
 		assert: response isSuccess;
 		assert: response contentType asMediaType equals: ( ZnMimeType textPlain version: '1.0.0' );
 		assert: response contents
-			equals: 'port = 6000<r><l>base-url = https://api.example.com<r><l>debug-mode = true' expandMacros
+			equals:
+			( 'port = 6000<1s><2s>base-url = https://api.example.com<1s><2s>debug-mode = true'
+				expandMacrosWith: String cr
+				with: String lf )
 ]
 
 { #category : #'private - support' }
