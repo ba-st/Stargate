@@ -65,7 +65,14 @@ BaselineOfStargate >> setUpDependencies: spec [
 
 	spec
 		baseline: 'JRPC' with: [ spec repository: 'github://juliendelplanque/JRPC:v3.0.0/src' ];
-		project: 'JRPC-Deployment' copyFrom: 'JRPC' with: [ spec loads: 'Server-Deployment' ]
+		project: 'JRPC-Deployment' copyFrom: 'JRPC' with: [ spec loads: 'Server-Deployment' ].
+
+	spec
+		baseline: 'ApplicationStarter'
+			with: [ spec repository: 'github://ba-st/ApplicationStarter:v1/source' ];
+		project: 'ApplicationStarter-Deployment'
+			copyFrom: 'ApplicationStarter'
+			with: [ spec loads: 'Deployment' ]
 ]
 
 { #category : #baselines }
@@ -107,7 +114,13 @@ BaselineOfStargate >> setUpDeploymentPackages: spec [
 	spec
 		package: 'Stargate-Application-Info' with: [ spec requires: 'Stargate-Model' ];
 		group: 'Application-Info' with: 'Stargate-Application-Info';
-		group: 'Deployment' with: 'Application-Info'
+		group: 'Deployment' with: 'Application-Info'.
+
+	spec
+		package: 'Stargate-Application-Configuration'
+			with: [ spec requires: #('Stargate-Model' 'ApplicationStarter-Deployment') ];
+		group: 'Application-Configuration' with: 'Stargate-Application-Configuration';
+		group: 'Deployment' with: 'Application-Configuration'
 ]
 
 { #category : #baselines }
@@ -150,6 +163,10 @@ BaselineOfStargate >> setUpTestPackages: spec [
 		package: 'Stargate-Application-Info-Tests'
 			with: [ spec requires: #('Application-Info' 'Stargate-Model-Tests') ];
 		group: 'Tests' with: 'Stargate-Application-Info-Tests'.
+	spec
+		package: 'Stargate-Application-Configuration-Tests'
+			with: [ spec requires: #('Application-Configuration' 'Stargate-Model-Tests') ];
+		group: 'Tests' with: 'Stargate-Application-Configuration-Tests'.
 	spec
 		package: 'Stargate-Examples-Tests'
 			with: [ spec requires: #('Dependent-SUnit-Extensions' 'Stargate-Examples') ];
