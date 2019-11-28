@@ -42,7 +42,8 @@ ApplicationConfigurationRESTfulController >> configureConfigurationEncodingOn: w
 				mapAccessor: #name;
 				mapProperty: #'current-value' getter: [ :definition | plugin currentValueFor: definition ];
 				mapAccessor: #default
-			]
+			];
+		for: ZnUrl customDo: [ :mapping | mapping encoder: [ :url | url printString ] ]
 ]
 
 { #category : #routes }
