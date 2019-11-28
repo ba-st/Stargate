@@ -10,14 +10,14 @@ Class {
 { #category : #private }
 ApplicationConfigurationPluginAPITest >> configurationDefinitions [
 
-	^ Array with: ( FlagArgument named: 'debug-mode' )
+	^ Array with: ( MandatoryArgument named: 'public-url' )
 ]
 
 { #category : #private }
 ApplicationConfigurationPluginAPITest >> configurationProvider [
 
 	^ [ Dictionary new
-		at: 'debug-mode' put: true;
+		at: 'public-url' put: 'http://api.example.com' asUrl;
 		yourself
 	]
 ]
@@ -62,8 +62,8 @@ ApplicationConfigurationPluginAPITest >> testGetConfigurationWithPermissions [
 				withTheOnlyOneIn: configurations
 				do: [ :config | 
 					self
-						assert: config name equals: 'debug-mode';
-						assert: ( config at: #'current-value' )
+						assert: config name equals: 'public-url';
+						assert: ( config at: #'current-value' ) equals: 'http://api.example.com/'
 					]
 			]
 ]
