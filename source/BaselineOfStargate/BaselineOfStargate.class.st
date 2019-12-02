@@ -69,7 +69,7 @@ BaselineOfStargate >> setUpDependencies: spec [
 
 	spec
 		baseline: 'ApplicationStarter'
-			with: [ spec repository: 'github://ba-st/ApplicationStarter:v1/source' ];
+			with: [ spec repository: 'github://ba-st/ApplicationStarter:v2/source' ];
 		project: 'ApplicationStarter-Deployment'
 			copyFrom: 'ApplicationStarter'
 			with: [ spec loads: 'Deployment' ]
