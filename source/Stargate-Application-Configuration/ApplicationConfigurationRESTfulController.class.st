@@ -20,30 +20,39 @@ ApplicationConfigurationRESTfulController class >> over: aPlugin configuredBy: c
 { #category : #private }
 ApplicationConfigurationRESTfulController >> configureConfigurationEncodingOn: writer [
 
+	CommandLineArgument
+		subclassesDo: [ :subclass | 
+			writer
+				for: subclass
+				do: [ :mapper | 
+					mapper
+						mapAccessor: #name;
+						mapProperty: #'current-value'
+							getter: [ :definition | self currentValueOrMaskFor: definition ]
+					]
+			].
+
 	writer
 		for: MandatoryArgument
-			do: [ :mapper | 
-			mapper
-				mapProperty: #type getter: [ :definition | 'mandatory' ];
-				mapAccessor: #name;
-				mapProperty: #'current-value' getter: [ :definition | plugin currentValueFor: definition ]
-			];
-		for: FlagArgument
-			do: [ :mapper | 
-			mapper
-				mapProperty: #type getter: [ :definition | 'flag' ];
-				mapAccessor: #name;
-				mapProperty: #'current-value' getter: [ :definition | plugin currentValueFor: definition ]
-			];
+			do: [ :mapper | mapper mapProperty: #type getter: [ :definition | 'mandatory' ] ];
+		for: FlagArgument do: [ :mapper | mapper mapProperty: #type getter: [ :definition | 'flag' ] ];
 		for: OptionalArgument
 			do: [ :mapper | 
 			mapper
 				mapProperty: #type getter: [ :definition | 'optional' ];
-				mapAccessor: #name;
-				mapProperty: #'current-value' getter: [ :definition | plugin currentValueFor: definition ];
 				mapAccessor: #default
 			];
+		for: SensitiveArgument
+			do: [ :mapper | mapper mapProperty: #type getter: [ :definition | 'sensitive' ] ];
 		for: ZnUrl customDo: [ :mapping | mapping encoder: [ :url | url printString ] ]
+]
+
+{ #category : #private }
+ApplicationConfigurationRESTfulController >> currentValueOrMaskFor: definition [
+
+	^ ( definition isA: SensitiveArgument )
+		then: [ '********' ]
+		otherwise: [ plugin currentValueFor: definition ]
 ]
 
 { #category : #routes }
@@ -56,7 +65,7 @@ ApplicationConfigurationRESTfulController >> declareGetApplicationConfigurationR
 			[ :httpRequest :requestContext | self getApplicationConfigurationBasedOn: httpRequest within: requestContext ]
 ]
 
-{ #category : #initialization }
+{ #category : #private }
 ApplicationConfigurationRESTfulController >> encodeConfigurationInTextFormat: configurationDefinitions [
 
 	^ String
@@ -68,7 +77,7 @@ ApplicationConfigurationRESTfulController >> encodeConfigurationInTextFormat: co
 						space;
 						nextPut: $=;
 						space;
-						nextPutAll: ( plugin currentValueFor: definition ) asString
+						nextPutAll: ( self currentValueOrMaskFor: definition ) asString
 					]
 				separatedBy: [ stream crlf ]
 			]

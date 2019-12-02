@@ -14,6 +14,7 @@ ApplicationConfigurationRESTfulControllerTest >> configurationDefinitions [
 		with: ( OptionalArgument named: 'port' defaultingTo: 4000 )
 		with: ( MandatoryArgument named: 'base-url' )
 		with: ( FlagArgument named: 'debug-mode' )
+		with: ( MandatoryArgument named: 'secret' ) asSensitive
 ]
 
 { #category : #'private - support' }
@@ -23,6 +24,7 @@ ApplicationConfigurationRESTfulControllerTest >> configurationProvider [
 		at: 'port' put: 6000;
 		at: 'base-url' put: 'https://api.example.com';
 		at: 'debug-mode' put: true;
+		at: 'secret' put: 'XXX';
 		yourself
 	]
 ]
@@ -64,7 +66,7 @@ ApplicationConfigurationRESTfulControllerTest >> testGetConfigurationInJson [
 		withJsonFromContentsIn: response
 			do: [ :configs | 
 			self
-				assert: configs size equals: 3;
+				assert: configs size equals: 4;
 				withConfigurationNamed: 'port'
 					in: configs
 					do: [ :config | 
@@ -77,7 +79,10 @@ ApplicationConfigurationRESTfulControllerTest >> testGetConfigurationInJson [
 					do: [ :config | self assert: ( config at: #'current-value' ) equals: 'https://api.example.com' ];
 				withConfigurationNamed: 'debug-mode'
 					in: configs
-					do: [ :config | self assert: ( config at: #'current-value' ) ]
+					do: [ :config | self assert: ( config at: #'current-value' ) ];
+				withConfigurationNamed: 'secret'
+					in: configs
+					do: [ :config | self assert: ( config at: #'current-value' ) equals: '********' ]
 			]
 ]
 
@@ -95,7 +100,7 @@ ApplicationConfigurationRESTfulControllerTest >> testGetConfigurationInPlainText
 		assert: response contentType asMediaType equals: ( ZnMimeType textPlain version: '1.0.0' );
 		assert: response contents
 			equals:
-			( 'port = 6000<1s><2s>base-url = https://api.example.com<1s><2s>debug-mode = true'
+			( 'port = 6000<1s><2s>base-url = https://api.example.com<1s><2s>debug-mode = true<1s><2s>secret = ********'
 				expandMacrosWith: String cr
 				with: String lf )
 ]
