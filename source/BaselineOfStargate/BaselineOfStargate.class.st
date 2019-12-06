@@ -58,7 +58,7 @@ BaselineOfStargate >> setUpDependencies: spec [
 		project: 'Teapot-Tools' copyFrom: 'Teapot' with: [ spec loads: 'Tools' ].
 
 	spec
-		baseline: 'JSONWebToken' with: [ spec repository: 'github://ba-st/JSONWebToken:master/source' ];
+		baseline: 'JSONWebToken' with: [ spec repository: 'github://noha/JSONWebToken:0.2.5/source' ];
 		project: 'JSONWebToken-Deployment'
 			copyFrom: 'JSONWebToken'
 			with: [ spec loads: 'JSONWebToken-Core' ].
