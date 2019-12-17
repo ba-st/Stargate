@@ -11,10 +11,17 @@ Class {
 		'encodingRules',
 		'entityTagCalculator',
 		'resourceLocator',
-		'acceptNegotiator'
+		'acceptNegotiator',
+		'cachingDirectives'
 	],
 	#category : #'Stargate-Model-Controllers'
 }
+
+{ #category : #private }
+RESTfulRequestHandlerBehavior >> applyCachingDirectivesTo: response within: requestContext [
+
+	cachingDirectives do: [ :directive | directive cull: response cull: requestContext ]
+]
 
 { #category : #private }
 RESTfulRequestHandlerBehavior >> assert: etag matchesEntityTagOf: entity encodedAs: mediaType within: requestContext [
@@ -171,6 +178,7 @@ RESTfulRequestHandlerBehavior >> from: httpRequest within: requestContext getCol
 		within: requestContext.
 	response := ZnResponse ok: encodedResourceCollection.
 	self paginationPolicy affect: response within: requestContext.
+	self applyCachingDirectivesTo: response within: requestContext.
 	^ response
 ]
 
@@ -186,6 +194,7 @@ RESTfulRequestHandlerBehavior >> initializeResourceLocator: aResouceLocator
 	decodingRules: theDecodingRules
 	encodingRules: theEncodingRules
 	calculateEntityTagsWith: anEntityTagCalculator
+	cachingDirectives: theCachingDirectives
 	handleErrorsWith: anExceptionHandler [
 
 
@@ -195,7 +204,8 @@ RESTfulRequestHandlerBehavior >> initializeResourceLocator: aResouceLocator
 	decodingRules := theDecodingRules.
 	encodingRules := theEncodingRules.
 	acceptNegotiator := RESTfulControllerAcceptNegotiator basedOn: encodingRules keys.
-	entityTagCalculator := anEntityTagCalculator
+	entityTagCalculator := anEntityTagCalculator.
+	cachingDirectives := theCachingDirectives
 ]
 
 { #category : #private }

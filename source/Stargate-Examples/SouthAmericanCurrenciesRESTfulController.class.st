@@ -162,6 +162,7 @@ SouthAmericanCurrenciesRESTfulController >> initializeCurrenciesRequestHandler [
 				include: currency isoCode
 			];
 		handleExceptionsApplying: [ :handler | handler addAsNotFoundError: NotFound ];
+		directCachingWith: [ :caching | caching expireIn: 4 hours ];
 		build
 ]
 
