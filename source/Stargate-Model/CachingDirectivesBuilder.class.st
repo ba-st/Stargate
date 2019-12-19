@@ -25,7 +25,7 @@ CachingDirectivesBuilder >> addCacheControlNamed: aName [
 { #category : #private }
 CachingDirectivesBuilder >> addCacheControlNamed: aName withString: aString [
 
-	self addCacheControlNamed: ( '<1s>="<2s>"' expandMacrosWith: aString )
+	self addCacheControlNamed: ( '<1s>="<2s>"' expandMacrosWith: aName with: aString )
 ]
 
 { #category : #private }
@@ -47,6 +47,21 @@ CachingDirectivesBuilder >> beAvailableFor: aDuration [
 CachingDirectivesBuilder >> beImmutable [
 
 	self addCacheControlNamed: 'immutable'
+]
+
+{ #category : #configuring }
+CachingDirectivesBuilder >> bePrivate [
+
+	self addCacheControlNamed: 'private'
+]
+
+{ #category : #configuring }
+CachingDirectivesBuilder >> bePrivateRestrictedTo: aFieldNameCollection [
+
+	| fieldsString |
+
+	fieldsString := self fieldStringFor: aFieldNameCollection.
+	self addCacheControlNamed: 'private' withString: fieldsString
 ]
 
 { #category : #configuring }
@@ -74,11 +89,32 @@ CachingDirectivesBuilder >> configureUsing: aBlock [
 ]
 
 { #category : #configuring }
+CachingDirectivesBuilder >> doNotCache [
+
+	self addCacheControlNamed: 'no-cache'
+]
+
+{ #category : #configuring }
+CachingDirectivesBuilder >> doNotCacheRestrictedTo: aFieldNameCollection [
+
+	| fieldsString |
+
+	fieldsString := self fieldStringFor: aFieldNameCollection.
+	self addCacheControlNamed: 'no-cache' withString: fieldsString
+]
+
+{ #category : #configuring }
 CachingDirectivesBuilder >> doNotExpire [
 
 	^ self
 		beImmutable;
-		beAvailableFor: 1 year
+		beAvailableFor: 365000000 seconds
+]
+
+{ #category : #configuring }
+CachingDirectivesBuilder >> doNotStore [
+
+	self addCacheControlNamed: 'no-store'
 ]
 
 { #category : #configuring }
@@ -95,6 +131,20 @@ CachingDirectivesBuilder >> expireIn: aDuration [
 			[ :response :context | response headers at: 'Expires' put: ( ZnUtils httpDate: DateAndTime now + aDuration ) ]
 ]
 
+{ #category : #private }
+CachingDirectivesBuilder >> fieldStringFor: aFieldNameCollection [
+
+	^ String
+		streamContents: [ :stream | 
+			aFieldNameCollection
+				do: [ :fieldName | stream nextPutAll: fieldName ]
+				separatedBy: [ stream
+						nextPut: $,;
+						space
+					]
+			]
+]
+
 { #category : #initialization }
 CachingDirectivesBuilder >> initialize [
 	
@@ -106,6 +156,14 @@ CachingDirectivesBuilder >> initialize [
 CachingDirectivesBuilder >> mustRevalidate [
 
 	self addCacheControlNamed: 'must-revalidate'
+]
+
+{ #category : #configuring }
+CachingDirectivesBuilder >> requireRevalidation [
+
+	self
+		doNotCache;
+		beStaleAfter: 0 seconds
 ]
 
 { #category : #configuring }
