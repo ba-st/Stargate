@@ -112,9 +112,11 @@ RESTfulRequestHandlerBehavior >> from: httpRequest within: requestContext get: a
 		ifNoneMatchHeaderPresentIn: httpRequest
 		do: [ :etag | 
 			etag = ( self entityTagOf: resource encodedAs: mediaType within: requestContext )
-				ifTrue: [ ^ ZnResponse notModified
+				ifTrue: [ response := ZnResponse notModified
 						setEntityTag: etag;
-						yourself
+						yourself.
+					self applyCachingDirectivesTo: response within: requestContext.
+					^ response
 					]
 			].
 	response := ZnResponse ok: ( self encodeResource: resource to: mediaType within: requestContext ).
@@ -123,6 +125,7 @@ RESTfulRequestHandlerBehavior >> from: httpRequest within: requestContext get: a
 		encodedAs: mediaType
 		in: response
 		within: requestContext.
+	self applyCachingDirectivesTo: response within: requestContext.
 	^ response
 ]
 

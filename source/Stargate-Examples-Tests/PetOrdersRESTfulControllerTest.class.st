@@ -62,8 +62,10 @@ PetOrdersRESTfulControllerTest >> getFirstOrderAndWithJsonDo: aBlock [
 		assert: response isSuccess;
 		assert: response status equals: 200;
 		assert: response contentType asMediaType
-			equals: resourceController orderVersion1dot0dot0MediaType;
-		withJsonFromContentsIn: response do: aBlock
+			equals: resourceController orderVersion1dot0dot0MediaType.
+	self assertExpiresHeaderFor: response with: 1 minute.
+	self assertCachingDirectivesFor: response with: 'public, Max-Age=60'.
+	self withJsonFromContentsIn: response do: aBlock
 ]
 
 { #category : #'private - support' }
@@ -360,7 +362,8 @@ PetOrdersRESTfulControllerTest >> testGetComments [
 			self
 				assert: response isSuccess;
 				assert: response contentType equals: ZnMimeType textPlain;
-				assert: response contents equals: '- Hey!<n>- Mr. DJ' expandMacros
+				assert: response contents equals: '- Hey!<n>- Mr. DJ' expandMacros.
+			self assertCachingDirectivesFor: response with: 'S-MaxAge=600, proxy-revalidate'
 			]
 ]
 

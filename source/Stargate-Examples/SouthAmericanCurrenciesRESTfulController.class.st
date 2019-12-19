@@ -125,6 +125,7 @@ SouthAmericanCurrenciesRESTfulController >> initializeBanknotesRequestHandler [
 		whenResponding: ZnMimeType applicationJson
 			encodeToJsonApplying: [ :resource :requestContext :writer |  ];
 		createEntityTagHashing: [ :hasher :banknote :requestContext | hasher include: banknote ];
+		directCachingWith: [ :caching | caching doNotExpire ];
 		build
 ]
 
@@ -162,7 +163,7 @@ SouthAmericanCurrenciesRESTfulController >> initializeCurrenciesRequestHandler [
 				include: currency isoCode
 			];
 		handleExceptionsApplying: [ :handler | handler addAsNotFoundError: NotFound ];
-		directCachingWith: [ :caching | caching expireIn: 4 hours ];
+		directCachingWith: [ :caching | caching beImmutable ];
 		build
 ]
 

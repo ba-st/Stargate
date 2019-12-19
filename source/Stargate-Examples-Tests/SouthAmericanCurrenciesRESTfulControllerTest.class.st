@@ -7,18 +7,6 @@ Class {
 	#category : #'Stargate-Examples-Tests-Currencies'
 }
 
-{ #category : #'private - asserting' }
-SouthAmericanCurrenciesRESTfulControllerTest >> assertCachingDirectivesFor: response [
-
-	| expiresString fourHoursInTheFuture oneMinuteBeforeFourHours |
-
-	expiresString := response headers at: #expires ifAbsent: [ self fail ].	"This is just in case the test runs at a time when the minute has changed"
-	oneMinuteBeforeFourHours := ZnUtils httpDate: DateAndTime now + 4 hours - 1 minute.
-	fourHoursInTheFuture := ZnUtils httpDate: DateAndTime now + 4 hours.
-	self
-		assert: ( expiresString = oneMinuteBeforeFourHours or: [ expiresString = fourHoursInTheFuture ] )
-]
-
 { #category : #'private - support' }
 SouthAmericanCurrenciesRESTfulControllerTest >> baseUrl [
 
@@ -78,6 +66,8 @@ SouthAmericanCurrenciesRESTfulControllerTest >> testGetArgentinePesoBanknotes [
 		assert: response isSuccess;
 		assert: response status equals: 200;
 		assert: response contentType asMediaType equals: ZnMimeType applicationJson.
+	self assertExpiresHeaderFor: response with: 1 year.
+	self assertCachingDirectivesFor: response with: 'immutable, public, Max-Age=31536000'.
 
 	self
 		withJsonFromContentsIn: response
@@ -131,7 +121,7 @@ SouthAmericanCurrenciesRESTfulControllerTest >> testGetCurrencies [
 		assert: response status equals: 200;
 		assert: response contentType asMediaType
 			equals: resourceController currencyVersion1dot0dot0MediaType.
-	self assertCachingDirectivesFor: response.
+	self assertCachingDirectivesFor: response with: 'immutable'.
 
 	self
 		withJsonFromContentsIn: response
