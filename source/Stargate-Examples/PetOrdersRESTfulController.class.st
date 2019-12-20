@@ -298,6 +298,11 @@ PetOrdersRESTfulController >> initializeCommentsRequestHandler [
 		whenResponding: ZnMimeType textPlain
 			encodeApplying: [ :resource | self encodeComments: resource ];
 		createEntityTagHashingEncodedResource;
+		directCachingWith: [ :caching | 
+			caching
+				whenSharedBeStaleAfter: 10 minutes;
+				whenSharedMustRevalidate
+			];
 		build
 ]
 
@@ -319,6 +324,7 @@ PetOrdersRESTfulController >> initializeOrdersRequestHandler [
 				include: ( ordersRepository identifierOf: order );
 				include: ( ordersRepository lastModificationOf: order )
 			];
+		directCachingWith: [ :caching | caching beAvailableFor: 1 minute ];
 		build
 ]
 

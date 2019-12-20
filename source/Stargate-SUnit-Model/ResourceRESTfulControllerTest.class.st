@@ -17,6 +17,27 @@ ResourceRESTfulControllerTest class >> isAbstract [
 ]
 
 { #category : #'private - asserting' }
+ResourceRESTfulControllerTest >> assertCachingDirectivesFor: response with: aString [
+
+	self assert: ( response headers at: #'Cache-Control' ifAbsent: [ self fail ] ) equals: aString
+]
+
+{ #category : #'private - asserting' }
+ResourceRESTfulControllerTest >> assertExpiresHeaderFor: response with: aDuration [
+
+	| oneMinuteBeforeFourHours fourHoursInTheFuture expiresString |
+
+	expiresString := response headers at: #expires ifAbsent: [ self fail ].
+	
+	"This is just in case the test runs at a time when the minute has changed"
+	oneMinuteBeforeFourHours := ZnUtils httpDate: DateAndTime now + aDuration - 1 minute.
+	fourHoursInTheFuture := ZnUtils httpDate: DateAndTime now + aDuration.
+
+	self
+		assert: ( expiresString = oneMinuteBeforeFourHours or: [ expiresString = fourHoursInTheFuture ] )
+]
+
+{ #category : #'private - asserting' }
 ResourceRESTfulControllerTest >> assertUrl: aStringOrUrl equals: anotherStringOrUrl [
 
 	self assert: aStringOrUrl asZnUrl equals: anotherStringOrUrl asZnUrl

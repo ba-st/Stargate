@@ -11,7 +11,8 @@ Class {
 		'entityTagFactoryBinding',
 		'handlerFactory',
 		'resourceLocator',
-		'exceptionHandler'
+		'exceptionHandler',
+		'cachingDirectives'
 	],
 	#category : #'Stargate-Model-Controllers'
 }
@@ -34,6 +35,7 @@ RESTfulRequestHandlerBuilder >> beHypermediaDrivenBy: aMediaControlsFactoryBlock
 		decodingRules: decodingRules
 		encodingRules: encodingRules
 		calculateEntityTagsWith: entityTagFactoryBinding content
+		cachingDirectives: cachingDirectives
 		drivenBy: [ :builder :resource :requestContext :resourceLocation | 
 			builder addAsSelfLink: resourceLocation.
 			aMediaControlsFactoryBlock
@@ -91,6 +93,14 @@ RESTfulRequestHandlerBuilder >> decodeToNeoJSONObjectWhenAccepting: aMediaType [
 ]
 
 { #category : #configuring }
+RESTfulRequestHandlerBuilder >> directCachingWith: aBlock [
+
+	cachingDirectives := CachingDirectivesBuilder new
+		configureUsing: aBlock;
+		build
+]
+
+{ #category : #configuring }
 RESTfulRequestHandlerBuilder >> handleExceptionsApplying: aBlock [
 
 	aBlock value: exceptionHandler
@@ -143,6 +153,7 @@ RESTfulRequestHandlerBuilder >> initialize [
 	decodingRules := Dictionary new.
 	encodingRules := Dictionary new.
 	entityTagFactoryBinding := Binding undefinedExplainedBy: 'Missing ETag calculation'.
+	cachingDirectives := #().
 	paginationPolicyFactory := [ :requestHandler | RESTfulControllerDoNotPaginateCollectionsPolicy for: requestHandler ].
 	exceptionHandler := RESTfulRequestExceptionHandler new.
 	handlerFactory := [ RESTfulRequestHandler
@@ -151,6 +162,7 @@ RESTfulRequestHandlerBuilder >> initialize [
 		decodingRules: decodingRules
 		encodingRules: encodingRules
 		calculateEntityTagsWith: entityTagFactoryBinding content
+		cachingDirectives: cachingDirectives
 		handleErrorsWith: exceptionHandler
 	]
 ]

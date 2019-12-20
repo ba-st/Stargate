@@ -201,6 +201,13 @@ PetsRESTfulController >> initializeRequestHandler [
 				include: ( petsRepository identifierOf: pet );
 				include: ( petsRepository lastModificationOf: pet )
 			];
+		directCachingWith: [ :caching | 
+			caching
+				expireIn: 4 hours;
+				bePublic;
+				doNotTransform;
+				mustRevalidate
+			];
 		build
 ]
 
