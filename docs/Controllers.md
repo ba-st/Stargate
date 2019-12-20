@@ -126,3 +126,35 @@ builder
         addAsNotFoundError: NotFound;
         addAsDecodingError: InstanceCreationFailed ];
 ```
+
+## Caching direcrives
+
+Stargate allows including caching directives in the response headers, according to [RFC 7234](https://tools.ietf.org/html/rfc7234).
+
+Headers are configured per resource, which means they are specified in the builder, by indicating the caching behavior.
+```
+builder directCachingWith: [ :caching | 
+			caching
+				expireIn: 4 hours;
+				bePublic;
+				doNotTransform;
+				mustRevalidate
+			];
+```
+
+The available messages can be found in the `configuring` protocol of `CachingDirectivesBuilder`.
+
+Apart from all the response directives (see [here](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Cache-Control) for a summary), there is also support for the extension directive `immutable`, and the `Expires` header.
+
+To simplify some common caching scenarios, the builder can also receive:
+- `beAvailableFor: aDuration` which implies `public`, `max-age` and `expires`
+- `doNotExpire` which implies `immutable`and `max-age=365000000`
+- `requireRevalidation` which implies `no-cache`and `max-age=0`
+
+Both `private` and `no-cache` directives can specify a list of fields that restrict them using `bePrivateRestrictedTo: aFieldNameCollection` and `doNotCacheRestrictedTo: aFieldNameCollection` respectively.
+
+For specific examples on all the different options offered by Stargate, check the example classes and their respective tests:
+- `PetsRESTfulController` offers `/pets` as a _public_ resource for _4 hours_, which _can't be transformed_, and _must be revalidated_ once stale.
+-  `PetOrdersRESTfulController` offers `/orders` as a _public_ resource for _1 minute_, using both the `expires` header and the `max-age` directive.
+- `PetOrdersRESTfulController` offers `/orders/<id>/comments`, indicating _shared_ caches _must revalidate_ the resources after _10 minutes_.
+- `SouthAmericanCurrenciesRESTfulController` offers `/currencies` as an _immutable_ resource, and `/currencies/<id>/banknotes` as an _immutable_ resource fresh for _365.000.000 seconds_.
