@@ -28,8 +28,8 @@ If the schema is `jwt` (Recommended)
   - `#authSecret`: The shared secret required by `HS256`.
 
 If the schema is `basic`
-- `#username`: The username to be used in basic auth
-- `#password`: The password to be used in basic auth
+- `#authUsername`: The username to be used in basic auth
+- `#authPassword`: The password to be used in basic auth
 
 Plugin specific configuration are included under a `#{{plugin-endpoint}}` key. All the plugins can be enabled or disabled by configuration including an `#enabled` option in the specific configuration. For example to disable the Health Check plugin the configuration must be something like:
 ```smalltalk
