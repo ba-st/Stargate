@@ -68,10 +68,10 @@ BaselineOfStargate >> setUpDependencies: spec [
 		project: 'JRPC-Deployment' copyFrom: 'JRPC' with: [ spec loads: 'Server-Deployment' ].
 
 	spec
-		baseline: 'ApplicationStarter'
-			with: [ spec repository: 'github://ba-st/ApplicationStarter:v2/source' ];
-		project: 'ApplicationStarter-Deployment'
-			copyFrom: 'ApplicationStarter'
+		baseline: 'Launchpad'
+			with: [ spec repository: 'github://ba-st/Launchpad:v2/source' ];
+		project: 'Launchpad-Deployment'
+			copyFrom: 'Launchpad'
 			with: [ spec loads: 'Deployment' ]
 ]
 
@@ -118,7 +118,7 @@ BaselineOfStargate >> setUpDeploymentPackages: spec [
 
 	spec
 		package: 'Stargate-Application-Configuration'
-			with: [ spec requires: #('Stargate-Model' 'ApplicationStarter-Deployment') ];
+			with: [ spec requires: #('Stargate-Model' 'Launchpad-Deployment') ];
 		group: 'Application-Configuration' with: 'Stargate-Application-Configuration';
 		group: 'Deployment' with: 'Application-Configuration'
 ]
