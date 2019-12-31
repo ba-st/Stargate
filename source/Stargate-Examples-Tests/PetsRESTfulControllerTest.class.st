@@ -286,7 +286,7 @@ PetsRESTfulControllerTest >> testGetPetJustCreated [
 		assert: response contentType asMediaType equals: self defaultPetMediaType;
 		assert: response entityTag equals: '"c051344b8c92c5ed8a2bd0752070c35ed3de3bab"' asETag.
 	self assertExpiresHeaderFor: response with: 4 hours.
-	self assertCachingDirectivesFor: response with: 'public, no-transform, must-revalidate'.
+	self assertCachingDirectivesFor: response with: #('public' 'no-transform' 'must-revalidate').
 
 	self
 		withJsonFromContentsIn: response
@@ -375,7 +375,7 @@ PetsRESTfulControllerTest >> testGetPetSummaryJustCreated [
 			equals: resourceController petSummaryVersion1dot0dot0MediaType;
 		assert: response entityTag equals: '"1323cdfb8bb0f9011fbd480c5a87c17d05883214"' asETag.
 	self assertExpiresHeaderFor: response with: 4 hours.
-	self assertCachingDirectivesFor: response with: 'public, no-transform, must-revalidate'.
+	self assertCachingDirectivesFor: response with: #('public' 'no-transform' 'must-revalidate').
 
 	self
 		withJsonFromContentsIn: response
@@ -403,7 +403,7 @@ PetsRESTfulControllerTest >> testGetPets [
 		assert: response contentType asMediaType
 			equals: resourceController petSummaryVersion1dot0dot0MediaType.
 	self assertExpiresHeaderFor: response with: 4 hours.
-	self assertCachingDirectivesFor: response with: 'public, no-transform, must-revalidate'.
+	self assertCachingDirectivesFor: response with: #('public' 'no-transform' 'must-revalidate').
 
 	self
 		withJsonFromContentsIn: response
@@ -435,7 +435,7 @@ PetsRESTfulControllerTest >> testGetPetsNotEmpty [
 		assert: response contentType asMediaType
 			equals: resourceController petSummaryVersion1dot0dot0MediaType.
 	self assertExpiresHeaderFor: response with: 4 hours.
-	self assertCachingDirectivesFor: response with: 'public, no-transform, must-revalidate'.
+	self assertCachingDirectivesFor: response with: #('public' 'no-transform' 'must-revalidate').
 
 	self
 		withJsonFromContentsIn: response

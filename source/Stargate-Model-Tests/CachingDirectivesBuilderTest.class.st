@@ -67,7 +67,7 @@ CachingDirectivesBuilderTest >> testBeAvailableFor [
 		assertThereAre: 3
 		directivesFrom: builder
 		whichSetExpiresHeaderTo: 6 hours
-		andCacheControlHeaderTo: 'public, Max-Age=21600'
+		andCacheControlHeaderTo: #('public' 'Max-Age=21600')
 ]
 
 { #category : #tests }
@@ -179,7 +179,7 @@ CachingDirectivesBuilderTest >> testDoNotExpire [
 		assertThereAre: 4
 		directivesFrom: builder
 		whichSetExpiresHeaderTo: 365000000 seconds
-		andCacheControlHeaderTo: 'immutable, public, Max-Age=365000000'
+		andCacheControlHeaderTo: #('immutable' 'public' 'Max-Age=365000000')
 ]
 
 { #category : #tests }
@@ -238,7 +238,10 @@ CachingDirectivesBuilderTest >> testRequireRevalidation [
 	builder := CachingDirectivesBuilder new
 		configureUsing: [ :caching | caching requireRevalidation ];
 		yourself.
-	self assertThereAre: 2 directivesFrom: builder whichSetCacheControlHeaderTo: 'no-cache, Max-Age=0'
+	self
+		assertThereAre: 2
+		directivesFrom: builder
+		whichSetCacheControlHeaderTo: #('no-cache' 'Max-Age=0')
 ]
 
 { #category : #tests }

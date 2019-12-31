@@ -67,7 +67,7 @@ SouthAmericanCurrenciesRESTfulControllerTest >> testGetArgentinePesoBanknotes [
 		assert: response status equals: 200;
 		assert: response contentType asMediaType equals: ZnMimeType applicationJson.
 	self assertExpiresHeaderFor: response with: 365000000 seconds.
-	self assertCachingDirectivesFor: response with: 'immutable, public, Max-Age=365000000'.
+	self assertCachingDirectivesFor: response with: #('immutable' 'public' 'Max-Age=365000000').
 
 	self
 		withJsonFromContentsIn: response
