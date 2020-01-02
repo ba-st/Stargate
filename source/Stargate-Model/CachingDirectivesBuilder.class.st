@@ -13,13 +13,7 @@ Class {
 { #category : #private }
 CachingDirectivesBuilder >> addCacheControlNamed: aName [
 
-	directives
-		add: [ :response :context | 
-			response headers
-				at: 'Cache-Control'
-				put: aName
-				ifPresentMerge: [ :old :new | '<1s>, <2s>' expandMacrosWith: old with: new ]
-			]
+	directives add: [ :response :context | response headers at: 'Cache-Control' add: aName ]
 ]
 
 { #category : #private }
