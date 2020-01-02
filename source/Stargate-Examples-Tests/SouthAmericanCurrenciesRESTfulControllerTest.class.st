@@ -121,7 +121,7 @@ SouthAmericanCurrenciesRESTfulControllerTest >> testGetCurrencies [
 		assert: response status equals: 200;
 		assert: response contentType asMediaType
 			equals: resourceController currencyVersion1dot0dot0MediaType.
-	self assertCachingDirectivesFor: response with: 'immutable'.
+	self assertCachingDirectivesFor: response with: #('immutable').
 
 	self
 		withJsonFromContentsIn: response
