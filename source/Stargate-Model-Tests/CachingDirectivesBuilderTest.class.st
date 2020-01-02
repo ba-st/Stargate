@@ -23,25 +23,25 @@ CachingDirectivesBuilderTest >> assertExpiresHeaderFor: response with: aDuration
 ]
 
 { #category : #'private - asserting' }
-CachingDirectivesBuilderTest >> assertThereAre: aNumber directivesFrom: aBuilder whichSetCacheControlHeaderTo: aString [
+CachingDirectivesBuilderTest >> assertThereAre: aNumber directivesFrom: aBuilder whichSetCacheControlHeaderTo: anArray [
 
 	| directives response |
 
 	directives := aBuilder build.
 	self assert: directives size equals: aNumber.
 	response := self responseAffectedBy: directives.
-	self assert: ( response headers at: 'Cache-Control' ifAbsent: [ self fail ] ) equals: aString
+	self assert: response cachingDirectives equals: anArray
 ]
 
 { #category : #'private - asserting' }
-CachingDirectivesBuilderTest >> assertThereAre: aNumber directivesFrom: aBuilder whichSetExpiresHeaderTo: aDuration andCacheControlHeaderTo: aString [
+CachingDirectivesBuilderTest >> assertThereAre: aNumber directivesFrom: aBuilder whichSetExpiresHeaderTo: aDuration andCacheControlHeaderTo: anArray [
 
 	| directives response |
 
 	directives := aBuilder build.
 	self assert: directives size equals: aNumber.
 	response := self responseAffectedBy: directives.
-	self assert: ( response headers at: 'Cache-Control' ifAbsent: [ self fail ] ) equals: aString.
+	self assert: response cachingDirectives equals: anArray.
 	self assertExpiresHeaderFor: response with: aDuration
 ]
 
@@ -78,7 +78,7 @@ CachingDirectivesBuilderTest >> testBeImmutable [
 	builder := CachingDirectivesBuilder new
 		configureUsing: [ :caching | caching beImmutable ];
 		yourself.
-	self assertThereAre: 1 directivesFrom: builder whichSetCacheControlHeaderTo: 'immutable'
+	self assertThereAre: 1 directivesFrom: builder whichSetCacheControlHeaderTo: #('immutable')
 ]
 
 { #category : #tests }
@@ -89,7 +89,7 @@ CachingDirectivesBuilderTest >> testBePrivate [
 	builder := CachingDirectivesBuilder new
 		configureUsing: [ :caching | caching bePrivate ];
 		yourself.
-	self assertThereAre: 1 directivesFrom: builder whichSetCacheControlHeaderTo: 'private'
+	self assertThereAre: 1 directivesFrom: builder whichSetCacheControlHeaderTo: #('private')
 ]
 
 { #category : #tests }
@@ -100,7 +100,10 @@ CachingDirectivesBuilderTest >> testBePrivateRestrictedTo [
 	builder := CachingDirectivesBuilder new
 		configureUsing: [ :caching | caching bePrivateRestrictedTo: ( Array with: 'server' with: 'user' ) ];
 		yourself.
-	self assertThereAre: 1 directivesFrom: builder whichSetCacheControlHeaderTo: 'private="server, user"'
+	self
+		assertThereAre: 1
+		directivesFrom: builder
+		whichSetCacheControlHeaderTo: #('private="server, user"')
 ]
 
 { #category : #tests }
@@ -111,7 +114,7 @@ CachingDirectivesBuilderTest >> testBePublic [
 	builder := CachingDirectivesBuilder new
 		configureUsing: [ :caching | caching bePublic ];
 		yourself.
-	self assertThereAre: 1 directivesFrom: builder whichSetCacheControlHeaderTo: 'public'
+	self assertThereAre: 1 directivesFrom: builder whichSetCacheControlHeaderTo: #('public')
 ]
 
 { #category : #tests }
@@ -122,10 +125,7 @@ CachingDirectivesBuilderTest >> testBeStaleAfter [
 	builder := CachingDirectivesBuilder new
 		configureUsing: [ :caching | caching beStaleAfter: 2 minutes ];
 		yourself.
-	self
-		assertThereAre: 1
-		directivesFrom: builder
-		whichSetCacheControlHeaderTo: 'Max-Age=120'
+	self assertThereAre: 1 directivesFrom: builder whichSetCacheControlHeaderTo: #('Max-Age=120')
 ]
 
 { #category : #tests }
@@ -142,7 +142,7 @@ CachingDirectivesBuilderTest >> testConfigureUsing [
 	builder := CachingDirectivesBuilder new
 		configureUsing: [ :caching | caching doNotTransform ];
 		yourself.
-	self assertThereAre: 1 directivesFrom: builder whichSetCacheControlHeaderTo: 'no-transform'
+	self assertThereAre: 1 directivesFrom: builder whichSetCacheControlHeaderTo: #('no-transform')
 ]
 
 { #category : #tests }
@@ -153,7 +153,7 @@ CachingDirectivesBuilderTest >> testDoNotCache [
 	builder := CachingDirectivesBuilder new
 		configureUsing: [ :caching | caching doNotCache ];
 		yourself.
-	self assertThereAre: 1 directivesFrom: builder whichSetCacheControlHeaderTo: 'no-cache'
+	self assertThereAre: 1 directivesFrom: builder whichSetCacheControlHeaderTo: #('no-cache')
 ]
 
 { #category : #tests }
@@ -164,7 +164,10 @@ CachingDirectivesBuilderTest >> testDoNotCacheRestrictedTo [
 	builder := CachingDirectivesBuilder new
 		configureUsing: [ :caching | caching doNotCacheRestrictedTo: ( Array with: 'account' ) ];
 		yourself.
-	self assertThereAre: 1 directivesFrom: builder whichSetCacheControlHeaderTo: 'no-cache="account"'
+	self
+		assertThereAre: 1
+		directivesFrom: builder
+		whichSetCacheControlHeaderTo: #('no-cache="account"')
 ]
 
 { #category : #tests }
@@ -190,7 +193,7 @@ CachingDirectivesBuilderTest >> testDoNotStore [
 	builder := CachingDirectivesBuilder new
 		configureUsing: [ :caching | caching doNotStore ];
 		yourself.
-	self assertThereAre: 1 directivesFrom: builder whichSetCacheControlHeaderTo: 'no-store'
+	self assertThereAre: 1 directivesFrom: builder whichSetCacheControlHeaderTo: #('no-store')
 ]
 
 { #category : #tests }
@@ -201,7 +204,7 @@ CachingDirectivesBuilderTest >> testDoNotTransform [
 	builder := CachingDirectivesBuilder new
 		configureUsing: [ :caching | caching doNotTransform ];
 		yourself.
-	self assertThereAre: 1 directivesFrom: builder whichSetCacheControlHeaderTo: 'no-transform'
+	self assertThereAre: 1 directivesFrom: builder whichSetCacheControlHeaderTo: #('no-transform')
 ]
 
 { #category : #tests }
@@ -227,7 +230,7 @@ CachingDirectivesBuilderTest >> testMustRevalidate [
 	builder := CachingDirectivesBuilder new
 		configureUsing: [ :caching | caching mustRevalidate ];
 		yourself.
-	self assertThereAre: 1 directivesFrom: builder whichSetCacheControlHeaderTo: 'must-revalidate'
+	self assertThereAre: 1 directivesFrom: builder whichSetCacheControlHeaderTo: #('must-revalidate')
 ]
 
 { #category : #tests }
@@ -252,10 +255,7 @@ CachingDirectivesBuilderTest >> testWhenSharedBeStaleAfter [
 	builder := CachingDirectivesBuilder new
 		configureUsing: [ :caching | caching whenSharedBeStaleAfter: 15 minutes ];
 		yourself.
-	self
-		assertThereAre: 1
-		directivesFrom: builder
-		whichSetCacheControlHeaderTo: 'S-MaxAge=900'
+	self assertThereAre: 1 directivesFrom: builder whichSetCacheControlHeaderTo: #('S-MaxAge=900')
 ]
 
 { #category : #tests }
@@ -266,5 +266,5 @@ CachingDirectivesBuilderTest >> testWhenSharedMustRevalidate [
 	builder := CachingDirectivesBuilder new
 		configureUsing: [ :caching | caching whenSharedMustRevalidate ];
 		yourself.
-	self assertThereAre: 1 directivesFrom: builder whichSetCacheControlHeaderTo: 'proxy-revalidate'
+	self assertThereAre: 1 directivesFrom: builder whichSetCacheControlHeaderTo: #('proxy-revalidate')
 ]

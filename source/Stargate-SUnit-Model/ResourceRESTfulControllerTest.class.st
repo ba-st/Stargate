@@ -19,7 +19,7 @@ ResourceRESTfulControllerTest class >> isAbstract [
 { #category : #'private - asserting' }
 ResourceRESTfulControllerTest >> assertCachingDirectivesFor: response with: aString [
 
-	self assert: ( response headers at: #'Cache-Control' ifAbsent: [ self fail ] ) equals: aString
+	self assert: response cachingDirectives equals: aString
 ]
 
 { #category : #'private - asserting' }

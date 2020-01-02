@@ -13,7 +13,7 @@ Class {
 { #category : #private }
 CachingDirectivesBuilder >> addCacheControlNamed: aName [
 
-	directives add: [ :response :context | response headers at: 'Cache-Control' add: aName ]
+	directives add: [ :response :context | response addCachingDirective: aName ]
 ]
 
 { #category : #private }
