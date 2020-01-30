@@ -74,12 +74,6 @@ HealthCheckPlugin >> initializeRunningAll: aHealthCheckCollection [
 	healthChecks := aHealthCheckCollection
 ]
 
-{ #category : #printing }
-HealthCheckPlugin >> printOn: stream [
-
-	stream nextPutAll: self name
-]
-
 { #category : #actions }
 HealthCheckPlugin >> runHealthChecks [
 

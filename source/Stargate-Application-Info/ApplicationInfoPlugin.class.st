@@ -75,9 +75,3 @@ ApplicationInfoPlugin >> initializeGatheringAll: enabledInformationProviderNames
 		select: [ :provider | enabledInformationProviderNames includes: provider providerName ]
 		thenCollect: [ :providerClass | providerClass new ]
 ]
-
-{ #category : #printing }
-ApplicationInfoPlugin >> printOn: stream [
-
-	stream nextPutAll: self name
-]
