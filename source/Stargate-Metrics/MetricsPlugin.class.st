@@ -68,19 +68,13 @@ MetricsPlugin >> initializeGatheringAll: enabledMetricNames [
 		thenCollect: [ :providerClass | providerClass new ]
 ]
 
-{ #category : #printing }
-MetricsPlugin >> printOn: stream [
-
-	stream nextPutAll: self name
-]
-
-{ #category : #initialize }
+{ #category : #controlling }
 MetricsPlugin >> startOn: teapotServer [
 
 	metricProviders do: [ :provider | provider installOn: teapotServer ]
 ]
 
-{ #category : #initialize }
+{ #category : #controlling }
 MetricsPlugin >> stop [
 
 	metricProviders do: #uninstall

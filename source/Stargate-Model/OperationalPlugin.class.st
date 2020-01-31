@@ -82,13 +82,19 @@ OperationalPlugin >> includeControllersIn: api [
 	self subclassResponsibility
 ]
 
-{ #category : #acccessing }
+{ #category : #accessing }
 OperationalPlugin >> name [
 
 	^ self class pluginName
 ]
 
-{ #category : #accessing }
+{ #category : #printing }
+OperationalPlugin >> printOn: stream [
+
+	stream nextPutAll: self name
+]
+
+{ #category : #controlling }
 OperationalPlugin >> startOn: teapotServer [
 
 	"This method is called when the server is started, giving
@@ -97,7 +103,7 @@ OperationalPlugin >> startOn: teapotServer [
 	
 ]
 
-{ #category : #accessing }
+{ #category : #controlling }
 OperationalPlugin >> stop [
 
 	"This method is called when the server is stopped, giving
