@@ -4,7 +4,7 @@ I'm an abstract test class providing facilities to test the API of Operational P
 Class {
 	#name : #OperationalPluginAPITest,
 	#superclass : #HTTPBasedRESTfulAPITest,
-	#category : #'Stargate-Model-Tests-Operations'
+	#category : #'Stargate-SUnit-Model'
 }
 
 { #category : #testing }
