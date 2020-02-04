@@ -58,6 +58,22 @@ RESTfulControllerAcceptNegotiatorTest >> testAPIExactMatch [
 ]
 
 { #category : #tests }
+RESTfulControllerAcceptNegotiatorTest >> testAcceptHeaderContentIsAnArray [
+
+	"Fixes a bug discovered when using the Consul HTTP Check method and configuring an Accept header on the check"
+
+	| request |
+
+	request := ZnRequest
+		readFrom:
+			'GET /example HTTP/1.1<r><l>User-Agent: Consul Agent<r><l>Accept: */*<r><l>Accept: application/json<r><l>' expandMacros readStream.
+
+	self
+		assert: ( ( RESTfulControllerAcceptNegotiator basedOn: apiMediaTypes ) bestRepresentationFor: request )
+		equals: 'application/vnd.stargate.pet+json;version=2.0.0' asMediaType
+]
+
+{ #category : #tests }
 RESTfulControllerAcceptNegotiatorTest >> testAcceptingAnything [
 
 	self
