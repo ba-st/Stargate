@@ -66,7 +66,9 @@ RESTfulControllerAcceptNegotiatorTest >> testAcceptHeaderContentIsAnArray [
 
 	request := ZnRequest
 		readFrom:
-			'GET /example HTTP/1.1<r><l>User-Agent: Consul Agent<r><l>Accept: */*<r><l>Accept: application/json<r><l>' expandMacros readStream.
+			( 'GET /example HTTP/1.1<1s><2s>User-Agent: Consul Agent<1s><2s>Accept: */*<1s><2s>Accept: application/json<1s><2s>'
+				expandMacrosWith: Character cr asString
+				with: Character lf asString ) readStream.
 
 	self
 		assert: ( ( RESTfulControllerAcceptNegotiator basedOn: apiMediaTypes ) bestRepresentationFor: request )
