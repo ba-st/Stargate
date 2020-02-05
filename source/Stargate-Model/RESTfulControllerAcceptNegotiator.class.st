@@ -26,7 +26,12 @@ RESTfulControllerAcceptNegotiator >> acceptableMediaTypesIn: anHttpRequest [
 		on: KeyNotFound
 		do: [ :signal | signal return: '*/*' ].
 
-	^ ( acceptHeaderContent splitOn: ',' ) collect: [ :type | type asMediaType ]
+	^ acceptHeaderContent isArray
+		then: [ acceptHeaderContent
+				flatCollect: [ :acceptList | self splitMediaTypesIn: acceptList ]
+				as: OrderedCollection
+			]
+		otherwise: [ self splitMediaTypesIn: acceptHeaderContent ]
 ]
 
 { #category : #querying }
@@ -78,6 +83,12 @@ RESTfulControllerAcceptNegotiator >> precedenceFor: aMediaType [
 RESTfulControllerAcceptNegotiator >> sortByPrecedence: mediaTypes [
 
 	^ mediaTypes sorted: [ :mediaType | self precedenceFor: mediaType ] descending
+]
+
+{ #category : #'private - accessing' }
+RESTfulControllerAcceptNegotiator >> splitMediaTypesIn: acceptList [
+
+	^ ( acceptList splitOn: ',' ) collect: [ :type | type asMediaType ]
 ]
 
 { #category : #'private - accessing' }
