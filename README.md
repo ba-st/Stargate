@@ -13,20 +13,16 @@
 </p>
 
 [![GitHub release](https://img.shields.io/github/release/ba-st/Stargate.svg)](https://github.com/ba-st/Stargate/releases/latest)
-[![Build Status](https://travis-ci.com/ba-st/Stargate.svg?branch=release-candidate)](https://travis-ci.com/ba-st/Stargate)
-[![Coverage Status](https://coveralls.io/repos/github/ba-st/Stargate/badge.svg?branch=release-candidate)](https://coveralls.io/github/ba-st/Stargate?branch=release-candidate)
+[![Build Status](https://github.com/ba-st/Stargate/workflows/Build/badge.svg?branch=release-candidate)](https://github.com/ba-st/Stargate/actions?query=workflow%3ABuild)
+[![Coverage Status](https://codecov.io/github/ba-st/Stargate/coverage.svg?branch=release-candidate)](https://codecov.io/gh/ba-st/Stargate/branch/release-candidate)
+[![Pharo 7.0](https://img.shields.io/badge/Pharo-7.0-informational)](https://pharo.org)
+[![Pharo 8.0](https://img.shields.io/badge/Pharo-8.0-informational)](https://pharo.org)
 
 It's built on top of Teapot and Zinc, providing a conceptual framework to simplify the creation of RESTful APIs including HATEOAS, content negotiation, API versioning, ETags and pagination.
 
 ## License
 - The code is licensed under [MIT](LICENSE).
 - The documentation is licensed under [CC BY-SA 4.0](http://creativecommons.org/licenses/by-sa/4.0/).
-
-## Quick Start
-
-- Download the latest [Pharo 32](https://get.pharo.org/) or [64 bits VM](https://get.pharo.org/64/).
-- Download a ready to use image from the [release page](https://github.com/ba-st/Stargate/releases/latest)
-- Explore the [documentation](docs/)
 
 ## Installation
 
