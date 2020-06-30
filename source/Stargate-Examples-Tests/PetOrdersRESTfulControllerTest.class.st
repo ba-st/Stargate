@@ -311,7 +311,7 @@ PetOrdersRESTfulControllerTest >> testGetCanceledOrder [
 			self
 				assertUrl: json pet equals: self petUrl;
 				assert: json status equals: 'registered';
-				assertUrl: json links self equals: 'https://petstore.example.com/orders/1';
+				assertUrl: json selfLocation equals: 'https://petstore.example.com/orders/1';
 				assertUrl: json links cancel equals: 'https://petstore.example.com/orders/1/cancel';
 				assertUrl: json links complete equals: 'https://petstore.example.com/orders/1/complete';
 				assert: (resourceController cancelOrderBasedOn: (self requestToPOST: json links cancel identifiedBy: 1) within: self newHttpRequestContext) isSuccess ];
@@ -319,7 +319,7 @@ PetOrdersRESTfulControllerTest >> testGetCanceledOrder [
 			self
 				assertUrl: json pet equals: self petUrl;
 				assert: json status equals: 'canceled';
-				assertUrl: json links self equals: 'https://petstore.example.com/orders/1' ]
+				assertUrl: json selfLocation equals: 'https://petstore.example.com/orders/1' ]
 ]
 
 { #category : #'tests - comments' }
@@ -396,7 +396,7 @@ PetOrdersRESTfulControllerTest >> testGetOrderJustCreated [
 			self
 				assertUrl: json pet equals: self petUrl;
 				assert: json status equals: 'registered';
-				assertUrl: json links self equals: 'https://petstore.example.com/orders/1';
+				assertUrl: json selfLocation equals: 'https://petstore.example.com/orders/1';
 				assertUrl: json links cancel equals: 'https://petstore.example.com/orders/1/cancel';
 				assertUrl: json links complete equals: 'https://petstore.example.com/orders/1/complete' ]
 ]
