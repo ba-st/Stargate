@@ -18,8 +18,7 @@ BaselineOfStargate >> baseline: spec [
 				group: 'Examples' with: #('Deployment' 'Stargate-Examples');
 				group: 'Tools' with: #('Teapot-Tools');
 				group: 'Development' with: #('Tests' 'Tools')
-			].
-	self setUpCompatibilityPackages: spec
+			]
 ]
 
 { #category : #accessing }
@@ -29,27 +28,15 @@ BaselineOfStargate >> projectClass [
 ]
 
 { #category : #baselines }
-BaselineOfStargate >> setUpCompatibilityPackages: spec [
-
-	spec
-		for: #'pharo6.x'
-		do: [ spec
-				package: 'Stargate-Application-Info-Pharo6';
-				group: 'Application-Info' with: 'Stargate-Application-Info-Pharo6';
-				group: 'Deployment' with: 'Stargate-Application-Info-Pharo6'
-			]
-]
-
-{ #category : #baselines }
 BaselineOfStargate >> setUpDependencies: spec [
 
 	spec
-		baseline: 'Buoy' with: [ spec repository: 'github://ba-st/Buoy:v5/source' ];
+		baseline: 'Buoy' with: [ spec repository: 'github://ba-st/Buoy:v6/source' ];
 		project: 'Buoy-Deployment' copyFrom: 'Buoy' with: [ spec loads: 'Deployment' ];
 		project: 'Buoy-SUnit' copyFrom: 'Buoy' with: [ spec loads: 'Dependent-SUnit-Extensions' ].
 
 	spec
-		baseline: 'Hyperspace' with: [ spec repository: 'github://ba-st/Hyperspace:v1/source' ];
+		baseline: 'Hyperspace' with: [ spec repository: 'github://ba-st/Hyperspace:v2/source' ];
 		project: 'Hyperspace-Deployment' copyFrom: 'Hyperspace' with: [ spec loads: 'Deployment' ].
 
 	spec
@@ -58,18 +45,18 @@ BaselineOfStargate >> setUpDependencies: spec [
 		project: 'Teapot-Tools' copyFrom: 'Teapot' with: [ spec loads: 'Tools' ].
 
 	spec
-		baseline: 'JSONWebToken' with: [ spec repository: 'github://noha/JSONWebToken:0.2.5/source' ];
+		baseline: 'JSONWebToken' with: [ spec repository: 'github://noha/JSONWebToken:0.3/source' ];
 		project: 'JSONWebToken-Deployment'
 			copyFrom: 'JSONWebToken'
 			with: [ spec loads: 'JSONWebToken-Core' ].
 
 	spec
-		baseline: 'JRPC' with: [ spec repository: 'github://juliendelplanque/JRPC:v3.0.0/src' ];
+		baseline: 'JRPC' with: [ spec repository: 'github://juliendelplanque/JRPC:v3.x.x/src' ];
 		project: 'JRPC-Deployment' copyFrom: 'JRPC' with: [ spec loads: 'Server-Deployment' ].
 
 	spec
 		baseline: 'Launchpad'
-			with: [ spec repository: 'github://ba-st/Launchpad:v2/source' ];
+			with: [ spec repository: 'github://ba-st/Launchpad:v3/source' ];
 		project: 'Launchpad-Deployment'
 			copyFrom: 'Launchpad'
 			with: [ spec loads: 'Deployment' ]
