@@ -3,17 +3,13 @@ Extension { #name : #JWTClaimsSet }
 { #category : #'*Stargate-Model' }
 JWTClaimsSet >> permissions [
 
-	^ self scope splitOn: Character space
+	^ claims at: 'permissions' ifAbsent: [ ^ #() ]
 ]
 
 { #category : #'*Stargate-Model' }
-JWTClaimsSet >> permissions: aStringCollection [
+JWTClaimsSet >> permissions: aCollection [
 
-	self
-		scope:
-			( String
-				streamContents:
-					[ :stream | aStringCollection do: [ :string | stream nextPutAll: string ] separatedBy: [ stream space ] ] )
+	self at: 'permissions' put: aCollection asArray
 ]
 
 { #category : #'*Stargate-Model' }

@@ -295,7 +295,7 @@ PetsRESTfulControllerTest >> testGetPetJustCreated [
 				assert: json name equals: 'Firulais';
 				assert: json type equals: 'dog';
 				assert: json status equals: 'new';
-				assertUrl: json links self equals: 'https://pets.example.com/pets/1'
+				assertUrl: json selfLocation equals: 'https://pets.example.com/pets/1'
 			]
 ]
 
@@ -333,7 +333,7 @@ PetsRESTfulControllerTest >> testGetPetJustCreatedWhenNoAcceptHeaderPresentInReq
 		do: [ :json | 
 			self
 				assert: json name equals: 'Firulais';
-				assertUrl: json links self equals: 'https://pets.example.com/pets/1'
+				assertUrl: json selfLocation equals: 'https://pets.example.com/pets/1'
 			]
 ]
 
@@ -382,7 +382,7 @@ PetsRESTfulControllerTest >> testGetPetSummaryJustCreated [
 		do: [ :json | 
 			self
 				assert: json name equals: 'Firulais';
-				assertUrl: json links self equals: 'https://pets.example.com/pets/1';
+				assertUrl: json selfLocation equals: 'https://pets.example.com/pets/1';
 				assert: json type isNil;
 				assert: json status isNil
 			]
@@ -586,7 +586,7 @@ PetsRESTfulControllerTest >> testUpdatePetName [
 				assert: json name equals: 'Mendieta';
 				assert: json type equals: 'dog';
 				assert: json status equals: 'new';
-				assertUrl: json links self equals: 'https://pets.example.com/pets/1' ]
+				assertUrl: json selfLocation equals: 'https://pets.example.com/pets/1' ]
 ]
 
 { #category : #'tests - update' }
@@ -613,5 +613,5 @@ PetsRESTfulControllerTest >> testUpdatePetStatus [
 				assert: json name equals: 'Firulais';
 				assert: json type equals: 'dog';
 				assert: json status equals: 'gone';
-				assertUrl: json links self equals: 'https://pets.example.com/pets/1' ]
+				assertUrl: json selfLocation equals: 'https://pets.example.com/pets/1' ]
 ]
