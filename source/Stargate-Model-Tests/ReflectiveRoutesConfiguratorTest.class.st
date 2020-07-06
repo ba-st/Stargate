@@ -34,13 +34,21 @@ ReflectiveRoutesConfiguratorTest >> routes [
 { #category : #tests }
 ReflectiveRoutesConfiguratorTest >> testConfiguringCrossOriginResourceSharingAwareRoutes [
 
-	| teapot |
-
+	| teapot createTest optionsTest |
+	
 	teapot := Teapot on.
 
-	(ReflectiveRoutesConfigurator appliedTo: teapot) addRoutesOf: self.
+	( ReflectiveRoutesConfigurator appliedTo: teapot ) addRoutesOf: self.
 
-	self assert: teapot routes size equals: 3
+	self assert: teapot routes size equals: 3.
+
+	createTest := teapot routes first.
+	self assert: ( createTest canHandleUrl: '/tests' asUrl ).
+	self assert: ( createTest methodMatcher matchesHttpMethod: #POST ).
+
+	optionsTest := teapot routes last.
+	self assert: ( optionsTest canHandleUrl: '/tests' asUrl ).
+	self assert: ( optionsTest methodMatcher matchesHttpMethod: #OPTIONS )
 ]
 
 { #category : #tests }

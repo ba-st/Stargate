@@ -16,7 +16,7 @@ CrossOriginResourceSharingAwareRouteSpecification class >> decorating: aRouteSpe
 { #category : #configuring }
 CrossOriginResourceSharingAwareRouteSpecification >> configureUsing: aRouteConfigurator [
 
-	aRouteConfigurator configureCorsAwareRouteFrom: self  
+	aRouteConfigurator configureCrossOriginResourceSharingAwareRouteFrom: self  
 ]
 
 { #category : #initialization }
