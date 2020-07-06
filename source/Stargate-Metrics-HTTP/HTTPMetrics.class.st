@@ -42,10 +42,12 @@ HTTPMetrics >> handleEvent: aZnServerTransactionEvent [
 
 	| labels |
 
-	labels := self
-		labelsForHttpMethod: aZnServerTransactionEvent request method
-		responding: aZnServerTransactionEvent response code
-		on: aZnServerTransactionEvent request url.
+	labels := Array
+		with: #http_method -> aZnServerTransactionEvent request method
+		with: #url -> aZnServerTransactionEvent request url asString
+		with: #response_code -> aZnServerTransactionEvent response code
+		with: #url_template -> ( aZnServerTransactionEvent request urlTemplateIfAbsent: [ '' ] ).
+
 	self
 		increaseRequestCountAt: labels;
 		increaseResponseSizeAt: labels
@@ -58,10 +60,11 @@ HTTPMetrics >> handleSimplifiedEvent: aZnSimplifiedServerTransactionEvent [
 
 	| labels |
 
-	labels := self
-		labelsForHttpMethod: aZnSimplifiedServerTransactionEvent method
-		responding: aZnSimplifiedServerTransactionEvent responseCode
-		on: aZnSimplifiedServerTransactionEvent url.
+	labels := Array
+		with: #http_method -> aZnSimplifiedServerTransactionEvent method
+		with: #url -> aZnSimplifiedServerTransactionEvent url asString
+		with: #response_code -> aZnSimplifiedServerTransactionEvent responseCode.
+
 	self
 		increaseRequestCountAt: labels;
 		increaseResponseSizeAt: labels with: aZnSimplifiedServerTransactionEvent size;
@@ -113,15 +116,6 @@ HTTPMetrics >> installOn: teapotServer [
 		when: ZnServerTransactionEvent do: [ :event | self handleEvent: event ].
 
 	teapotServer server setLogLevelAtLeastTo: 1
-]
-
-{ #category : #'private - accumulating' }
-HTTPMetrics >> labelsForHttpMethod: aMethod responding: anStatusCode on: anUrl [
-
-	^ Array
-		with: #http_method -> aMethod
-		with: #url -> anUrl asString
-		with: #response_code -> anStatusCode
 ]
 
 { #category : #'private - metrics' }

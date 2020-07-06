@@ -60,7 +60,10 @@ RouteSpecification >> initializeHandling: anHttpMethod at: anURLTemplate evaluat
 
 	httpMethod := anHttpMethod.
 	urlTemplate := anURLTemplate.
-	handler := aBlock
+	handler := [ :httpRequest :requestContext | 
+		httpRequest setUrlTemplate: urlTemplate.
+		aBlock value: httpRequest value: requestContext
+	]
 ]
 
 { #category : #accessing }

@@ -90,7 +90,10 @@ HTTPMetricsTest >> is: aTimestampedMetric labeledWith: anHTTPMethod at: aUrl res
 HTTPMetricsTest >> optionsEventRespondingNotFoundAt: anUrl [
 
 	^ ZnServerTransactionEvent new
-		request: ( ZnRequest options: anUrl );
+		request:
+			( ( ZnRequest options: anUrl )
+				setUrlTemplate: '*';
+				yourself );
 		response: ( ZnResponse notFound: anUrl );
 		timing:
 			( ZnServerTransactionTiming new
@@ -147,6 +150,31 @@ HTTPMetricsTest >> testGatherMetrics [
 			equals: 'Milliseconds to process a request and produce a response';
 		assert: durationMetric value equals: 16;
 		assertMetricValuesIn: durationMetric byCategoryAre: #(6 3 3 4)
+]
+
+{ #category : #tests }
+HTTPMetricsTest >> testGatherMetricsIncludingTemplates [
+
+	| provider metrics countMetric |
+
+	provider := HTTPMetrics new.
+
+	provider
+		handleSimplifiedEvent: ( self getEventAt: '/secure' asUrl respondingOkWith: 'OK' );
+		handleSimplifiedEvent: ( self getEventAt: '/secure' asUrl respondingOkWith: 'OK' );
+		handleSimplifiedEvent: ( self getEventAt: '/unsecure' asUrl respondingOkWith: 'OK' );
+		handleSimplifiedEvent: ( self getEventRespondingNotFoundAt: '/unsecure' asUrl );
+		handleEvent: ( self optionsEventRespondingNotFoundAt: '/secure' asUrl ).
+
+	metrics := provider gatherMetrics.
+
+	self assert: metrics size equals: 3.
+
+	countMetric := metrics first.
+	countMetric metrics
+		detect: [ :metric | metric printString includesSubstring: '#url_template=''*''' ]
+		ifFound: [ :metric | self assert: metric value equals: 1 ]
+		ifNone: [ self fail ]
 ]
 
 { #category : #tests }
