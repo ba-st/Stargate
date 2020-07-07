@@ -50,7 +50,7 @@ RouteConfigurator >> configurePreflightRoutes [
 RouteConfigurator >> configureRouteFrom: aRouteSpecification [
 
 	teapot
-		addRouteMethod: aRouteSpecification httpMethod asSymbol
+		addRouteMethod: (TeaMethodMatcher exactly: aRouteSpecification httpMethod asSymbol)
 		pattern: aRouteSpecification urlTemplate
 		action: [ :request | 
 			self withServerUrlDo: [ :url | request url: ( request url asHostedAt: url ) ].
