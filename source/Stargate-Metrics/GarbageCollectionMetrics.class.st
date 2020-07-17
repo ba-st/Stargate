@@ -7,6 +7,12 @@ Class {
 	#category : #'Stargate-Metrics'
 }
 
+{ #category : #'instance creation' }
+GarbageCollectionMetrics class >> configuredBy: pluginConfiguration [
+
+	^ self new
+]
+
 { #category : #accessing }
 GarbageCollectionMetrics class >> providerName [
 

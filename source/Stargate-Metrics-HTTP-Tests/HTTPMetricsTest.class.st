@@ -51,6 +51,20 @@ HTTPMetricsTest >> assertMetricValuesIn: composite byCategoryAre: anArrayOfValue
 			ifNone: [ self fail ]
 ]
 
+{ #category : #'private - asserting' }
+HTTPMetricsTest >> assertMetricValuesIn: composite byMethodAre: anArrayOfValues [
+
+	self assert: composite metrics size equals: 2.
+
+	composite metrics
+		detect: [ :metric | self is: metric labeledWith: #GET ]
+			ifFound: [ :metric | self assert: metric value equals: anArrayOfValues first ]
+			ifNone: [ self fail ];
+		detect: [ :metric | self is: metric labeledWith: #OPTIONS ]
+			ifFound: [ :metric | self assert: metric value equals: anArrayOfValues last ]
+			ifNone: [ self fail ]
+]
+
 { #category : #private }
 HTTPMetricsTest >> getEventAt: anUrl respondingOkWith: text [
 
@@ -78,9 +92,15 @@ HTTPMetricsTest >> getEventRespondingNotFoundAt: anUrl [
 ]
 
 { #category : #private }
-HTTPMetricsTest >> is: aTimestampedMetric labeledWith: anHTTPMethod at: aUrl responding: anStatusCode [
+HTTPMetricsTest >> is: aTimestampedMetric labeledWith: anHTTPMethod [
 
 	^ ( aTimestampedMetric metric labelAt: #http_method ) = anHTTPMethod
+]
+
+{ #category : #private }
+HTTPMetricsTest >> is: aTimestampedMetric labeledWith: anHTTPMethod at: aUrl responding: anStatusCode [
+
+	^ ( self is: aTimestampedMetric labeledWith: anHTTPMethod )
 		and: [ ( aTimestampedMetric metric labelAt: #url ) = aUrl asString
 				and: [ ( aTimestampedMetric metric labelAt: #response_code ) = anStatusCode ]
 			]
@@ -175,6 +195,58 @@ HTTPMetricsTest >> testGatherMetricsIncludingTemplates [
 		detect: [ :metric | metric printString includesSubstring: '#url_template=''*''' ]
 		ifFound: [ :metric | self assert: metric value equals: 1 ]
 		ifNone: [ self fail ]
+]
+
+{ #category : #tests }
+HTTPMetricsTest >> testGatherMetricsProvidingBreakdownConfiguration [
+
+	| provider metrics countMetric sizeMetric durationMetric |
+
+	provider := HTTPMetrics
+		configuredBy:
+			( Dictionary new
+				at: HTTPMetrics providerName
+					put:
+					( Dictionary new
+						at: #breakdownCategories put: #(#http_method);
+						yourself );
+				yourself ).
+
+	provider
+		handleSimplifiedEvent: ( self getEventAt: '/secure' asUrl respondingOkWith: 'OK' );
+		handleSimplifiedEvent: ( self getEventAt: '/secure' asUrl respondingOkWith: 'OK' );
+		handleSimplifiedEvent: ( self getEventAt: '/unsecure' asUrl respondingOkWith: 'OK' );
+		handleSimplifiedEvent: ( self getEventRespondingNotFoundAt: '/unsecure' asUrl );
+		handleEvent: ( self optionsEventRespondingNotFoundAt: '/secure' asUrl ).
+
+	metrics := provider gatherMetrics.
+
+	self assert: metrics size equals: 3.
+
+	countMetric := metrics first.
+
+	self
+		assert: countMetric name equals: 'HTTP request count';
+		assert: countMetric description equals: 'Number of HTTP requests received';
+		assert: countMetric value equals: 5;
+		assertMetricValuesIn: countMetric byMethodAre: #(4 1).
+
+	sizeMetric := metrics second.
+
+	self
+		assert: sizeMetric name equals: 'HTTP response size in bytes';
+		assert: sizeMetric description equals: 'Size in bytes of content in the HTTP responses';
+		assert: sizeMetric value equals: 46;
+		assertMetricValuesIn: sizeMetric byMethodAre: #(27 19).
+
+	durationMetric := metrics last.
+
+	self
+		assert: durationMetric name equals: 'HTTP request/response duration in ms';
+		assert: durationMetric description
+			equals: 'Milliseconds to process a request and produce a response';
+		assert: durationMetric value equals: 16;
+		assertMetricValuesIn: durationMetric byMethodAre: #(12 4)
 ]
 
 { #category : #tests }

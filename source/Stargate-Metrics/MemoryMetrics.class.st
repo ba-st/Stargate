@@ -7,6 +7,12 @@ Class {
 	#category : #'Stargate-Metrics'
 }
 
+{ #category : #'instance creation' }
+MemoryMetrics class >> configuredBy: pluginConfiguration [
+
+	^ self new
+]
+
 { #category : #accessing }
 MemoryMetrics class >> providerName [
 
