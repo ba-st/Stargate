@@ -22,11 +22,7 @@ MetricsPlugin class >> configureMediaControlsIn: builder within: requestContext 
 { #category : #'instance creation' }
 MetricsPlugin class >> configuredBy: configuration [
 
-	| selfConfiguration |
-
-	selfConfiguration := self pluginConfigurationOn: configuration.
-
-	^ self new initializeGatheringAll: ( selfConfiguration at: #metrics ifAbsent: [ #() ] )
+	^ self new initializeConfiguredBy: ( self pluginConfigurationOn: configuration )
 ]
 
 { #category : #accessing }
@@ -61,11 +57,15 @@ MetricsPlugin >> includeControllersIn: api [
 ]
 
 { #category : #initialize }
-MetricsPlugin >> initializeGatheringAll: enabledMetricNames [
+MetricsPlugin >> initializeConfiguredBy: pluginConfiguration [
+
+	| enabledMetricNames |
+
+	enabledMetricNames := pluginConfiguration at: #metrics ifAbsent: [ #() ].
 
 	metricProviders := MetricProvider allSubclasses
 		select: [ :provider | enabledMetricNames includes: provider providerName ]
-		thenCollect: [ :providerClass | providerClass new ]
+		thenCollect: [ :providerClass | providerClass configuredBy: pluginConfiguration ]
 ]
 
 { #category : #controlling }

@@ -7,6 +7,12 @@ Class {
 	#category : #'Stargate-Metrics'
 }
 
+{ #category : #'instance creation' }
+RunningSystemMetrics class >> configuredBy: pluginConfiguration [
+
+	^ self new
+]
+
 { #category : #accessing }
 RunningSystemMetrics class >> providerName [
 	
