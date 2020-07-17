@@ -98,11 +98,11 @@ HTTPMetricsTest >> is: aTimestampedMetric labeledWith: anHTTPMethod [
 ]
 
 { #category : #private }
-HTTPMetricsTest >> is: aTimestampedMetric labeledWith: anHTTPMethod at: aUrl responding: anStatusCode [
+HTTPMetricsTest >> is: aTimestampedMetric labeledWith: anHTTPMethod at: aUrl responding: aStatusCode [
 
 	^ ( self is: aTimestampedMetric labeledWith: anHTTPMethod )
 		and: [ ( aTimestampedMetric metric labelAt: #url ) = aUrl asString
-				and: [ ( aTimestampedMetric metric labelAt: #response_code ) = anStatusCode ]
+				and: [ ( aTimestampedMetric metric labelAt: #response_code ) = aStatusCode ]
 			]
 ]
 
