@@ -120,7 +120,8 @@ HTTPBasedRESTfulAPITest >> setUpAPI [
 	self checkPortAvailability.
 	api := HTTPBasedRESTfulAPI
 		configuredBy:
-			{ #port -> self port.
+			{ 
+			 #port -> self port.
 			 #serverUrl -> self baseUrl.
 			 #operations -> self operationsConfiguration }
 		installing: self controllersToInstall.

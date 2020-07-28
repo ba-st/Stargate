@@ -8,7 +8,6 @@ Class {
 	#superclass : #Object,
 	#instVars : [
 		'teapot',
-		'routesAllowingCors',
 		'resourceController'
 	],
 	#category : #'Stargate-Model-Routing'
@@ -24,26 +23,7 @@ RouteConfigurator class >> configuring: aTeapot withRoutesDefinedOn: aResourceRE
 RouteConfigurator >> configure [
 	
 	resourceController routes
-		do: [ :routeSpecification | routeSpecification configureUsing: self ].
-	self configurePreflightRoutes
-]
-
-{ #category : #'private - configuring' }
-RouteConfigurator >> configureCrossOriginResourceSharingAwareRouteFrom: aCorsAwareRouteSpecification [
-
-	| specification |
-
-	specification := aCorsAwareRouteSpecification specification.
-	self register: specification httpMethod asAllowedTo: specification urlTemplate.
-	specification configureUsing: self
-]
-
-{ #category : #'private - configuring' }
-RouteConfigurator >> configurePreflightRoutes [
-
-	routesAllowingCors
-		keysAndValuesDo:
-			[ :location :httpMethods | teapot OPTIONS: location -> ( CrossOriginResourceSharingPreflightHandler allowing: httpMethods ) ]
+		do: [ :routeSpecification | routeSpecification configureUsing: self ]
 ]
 
 { #category : #'private - configuring' }
@@ -64,16 +44,6 @@ RouteConfigurator >> initializeConfiguring: aTeapot withRoutesDefinedOn: aResour
 	teapot := aTeapot.
 	resourceController := aResourceRESTfulController.
 	self withServerUrlDo: [ :url | resourceController serverUrl: url ].
-	routesAllowingCors := Dictionary new
-]
-
-{ #category : #'private - configuring' }
-RouteConfigurator >> register: aMethod asAllowedTo: anEndpoint [
-
-	routesAllowingCors
-		at: anEndpoint
-		ifPresent: [ :httpMethods | httpMethods add: aMethod ]
-		ifAbsentPut: [ OrderedCollection with: aMethod ]
 ]
 
 { #category : #'private - configuring' }

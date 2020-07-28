@@ -10,19 +10,19 @@ Class {
 { #category : #accessing }
 ReflectiveRoutesConfiguratorTest >> createTestRoute [
 
-	^ ( RouteSpecification
+	^ RouteSpecification
 		handling: #POST
 		at: '/tests'
-		evaluating: [ :httpRequest :requestContext | self fail ] ) asCorsAware
+		evaluating: [ :httpRequest :requestContext | self fail ] 
 ]
 
 { #category : #accessing }
 ReflectiveRoutesConfiguratorTest >> getTestsRoute [
 
-	^ ( RouteSpecification
+	^ RouteSpecification
 		handling: #GET
 		at: '/tests'
-		evaluating: [ :httpRequest :requestContext | self fail ] ) asCorsAware
+		evaluating: [ :httpRequest :requestContext | self fail ]
 ]
 
 { #category : #accessing }
@@ -34,33 +34,23 @@ ReflectiveRoutesConfiguratorTest >> routes [
 { #category : #tests }
 ReflectiveRoutesConfiguratorTest >> testConfiguringCrossOriginResourceSharingAwareRoutes [
 
-	| teapot createTest optionsTest |
-	
+	| teapot |
+
 	teapot := Teapot on.
 
-	( ReflectiveRoutesConfigurator appliedTo: teapot ) addRoutesOf: self.
+	(ReflectiveRoutesConfigurator appliedTo: teapot) addRoutesOf: self.
 
-	self assert: teapot routes size equals: 3.
-
-	createTest := teapot routes first.
-	self assert: ( createTest canHandleUrl: '/tests' asUrl ).
-	self assert: ( createTest methodMatcher matchesHttpMethod: #POST ).
-
-	optionsTest := teapot routes last.
-	self assert: ( optionsTest canHandleUrl: '/tests' asUrl ).
-	self assert: ( optionsTest methodMatcher matchesHttpMethod: #OPTIONS )
+	self assert: teapot routes size equals: 2
 ]
 
 { #category : #tests }
 ReflectiveRoutesConfiguratorTest >> testConfiguringPetsControllerRoutes [
 
-	| teapot controller |
+	| teapot |
 
 	teapot := Teapot on.
 
-	controller := PetsRESTfulController new.
-
-	( ReflectiveRoutesConfigurator appliedTo: teapot ) addRoutesOf: controller.
+	( ReflectiveRoutesConfigurator appliedTo: teapot ) addRoutesOf: PetsRESTfulController new.
 
 	self assert: teapot routes size equals: 5
 ]

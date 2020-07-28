@@ -21,7 +21,7 @@ PetStoreAPITest >> controllersToInstall [
 { #category : #private }
 PetStoreAPITest >> port [
 
-	^ 9999
+	^ 65535
 ]
 
 { #category : #running }
@@ -47,11 +47,26 @@ PetStoreAPITest >> testBadRequest [
 ]
 
 { #category : #'tests - CORS' }
-PetStoreAPITest >> testCORSHeadersWhenOriginIsAllowed [
+PetStoreAPITest >> testCORSAllowingAnyOrigin [
 
 	| response |
 
-	api beCORSAwareAllowing: {self baseUrl}.
+	api allowCrossOriginSharingApplying: [ :cors | cors allowAnyOrigin ].
+	
+	response := self newClient
+		url: self baseUrl / 'pets' asUrl;
+		headerAt: 'Origin' put: self baseUrl printString;
+		headerAt: 'Access-Control-Request-Headers' put: 'Content-Type';
+		options;
+		response.
+		
+	self 	
+		assert: response code equals: 204;
+		assert: ( response headers at: 'Access-Control-Allow-Origin' ) equals: '*';
+		assert: ( response headers at: 'Access-Control-Allow-Headers' ) equals: 'Content-Type';
+		assert: ( response headers at: 'Vary' ) equals: 'Access-Control-Allow-Headers';
+		assert: ( response headers at: 'Access-Control-Allow-Methods' ) equals: 'POST, GET'.
+	
 	response := self newClient
 		url: self baseUrl / 'pets' asUrl;
 		headerAt: 'Origin' put: self baseUrl printString;
@@ -59,16 +74,100 @@ PetStoreAPITest >> testCORSHeadersWhenOriginIsAllowed [
 		response.
 
 	self
-		assert: (response headers at: 'Vary') equals: 'Origin';
-		assert: (response headers at: 'Access-Control-Allow-Origin') asUrl equals: self baseUrl
+		should: [ response headers at: 'Vary' ] raise: KeyNotFound;
+		assert: ( response headers at: 'Access-Control-Allow-Origin' ) equals: '*'
 ]
 
 { #category : #'tests - CORS' }
-PetStoreAPITest >> testCORSHeadersWhenOriginIsNotAllowed [
+PetStoreAPITest >> testCORSAllowingExactlyOneOrigin [
 
 	| response |
 
-	api beCORSAwareAllowing: {'https://google.com' asUrl}.
+	api allowCrossOriginSharingApplying: [ :cors | cors allowOnlyFrom: {self baseUrl} ].
+
+	response := self newClient
+		url: self baseUrl / 'pets' asUrl;
+		headerAt: 'Origin' put: self baseUrl printString;
+		headerAt: 'Access-Control-Request-Headers' put: 'Content-Type';
+		options;
+		response.
+
+	self
+		assert: response code equals: 204;
+		assert: ( response headers at: 'Access-Control-Allow-Origin' ) asUrl equals: self baseUrl;
+		assert: ( response headers at: 'Access-Control-Allow-Headers' ) equals: 'Content-Type';
+		assert: ( response headers at: 'Vary' ) equals: 'Access-Control-Allow-Headers';
+		assert: ( response headers at: 'Access-Control-Allow-Methods' ) equals: 'POST, GET'.
+
+	response := self newClient
+		url: self baseUrl / 'pets' asUrl;
+		headerAt: 'Origin' put: self baseUrl printString;
+		get;
+		response.
+
+	self
+		should: [ response headers at: 'Vary' ] raise: KeyNotFound;
+		assert: ( response headers at: 'Access-Control-Allow-Origin' ) asUrl equals: self baseUrl
+]
+
+{ #category : #'tests - CORS' }
+PetStoreAPITest >> testCORSAllowingMoreThanOneOrigin [
+
+	| response |
+
+	api
+		allowCrossOriginSharingApplying: [ :cors | 
+			cors
+				allowOnlyFrom:
+					{self baseUrl.
+					'http://google.com/' asUrl}
+			].
+
+	response := self newClient
+		url: self baseUrl / 'pets' asUrl;
+		headerAt: 'Origin' put: self baseUrl printString;
+		headerAt: 'Access-Control-Request-Headers' put: 'Content-Type';
+		options;
+		response.
+
+	self
+		assert: response code equals: 204;
+		assert: ( response headers at: 'Access-Control-Allow-Origin' ) asUrl equals: self baseUrl;
+		assert: ( response headers at: 'Access-Control-Allow-Headers' ) equals: 'Content-Type';
+		assert: ( response headers at: 'Vary' ) equals: 'Origin, Access-Control-Allow-Headers';
+		assert: ( response headers at: 'Access-Control-Allow-Methods' ) equals: 'POST, GET'.
+		
+	response := self newClient
+		url: self baseUrl / 'pets' asUrl;
+		headerAt: 'Origin' put: self baseUrl printString;
+		get;
+		response.
+
+	self
+		assert: ( response headers at: 'Vary' ) equals: 'Origin';
+		assert: ( response headers at: 'Access-Control-Allow-Origin' ) asUrl equals: self baseUrl
+]
+
+{ #category : #'tests - CORS' }
+PetStoreAPITest >> testCORSWhenOriginIsNotAllowed [
+
+	| response |
+
+	api allowCrossOriginSharingApplying: [ :cors | cors allowOnlyFrom:  {'https://google.com' asUrl} ].
+	
+	response := self newClient
+		url: self baseUrl / 'pets' asUrl;
+		headerAt: 'Origin' put: self baseUrl printString;
+		headerAt: 'Access-Control-Request-Headers' put: 'Content-Type';
+		options;
+		response.
+
+	self
+		assert: response code equals: 204;
+		should: [  response headers at: 'Access-Control-Allow-Origin' ] raise: KeyNotFound;
+		should: [ response headers at: 'Access-Control-Allow-Headers' ] raise: KeyNotFound;
+		should: [ response headers at: 'Access-Control-Allow-Methods' ] raise: KeyNotFound.
+	
 	response := self newClient
 		url: self baseUrl / 'pets' asUrl;
 		headerAt: 'Origin' put: self baseUrl printString;
@@ -125,7 +224,7 @@ PetStoreAPITest >> testCreatePet [
 
 	self
 		assert: response isCreated;
-		assert: response location equals: 'http://localhost:9999/pets/1';
+		assert: response location equals: ( self baseUrl / 'pets' / '1' ) asString;
 		assert: response contentType equals: petsController petVersion1dot0dot0MediaType.
 
 	json := NeoJSONObject fromString: response contents.
