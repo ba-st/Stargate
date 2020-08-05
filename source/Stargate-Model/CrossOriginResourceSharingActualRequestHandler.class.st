@@ -20,12 +20,6 @@ CrossOriginResourceSharingActualRequestHandler class >> allowing: anAllowOriginP
 	^ self new initializeAllowing: anAllowOriginPolicy applying: addHeaderCommands 
 ]
 
-{ #category : #'header names' }
-CrossOriginResourceSharingActualRequestHandler >> accessControlAllowCredentials [
-
-	^ Headers >> #accessControlAllowCredentials
-]
-
 { #category : #'collecting headers' }
 CrossOriginResourceSharingActualRequestHandler >> collectAllowedOriginFrom: aRequest [
 
@@ -45,12 +39,6 @@ CrossOriginResourceSharingActualRequestHandler >> initializeAllowing: anAllowOri
 	optionalHeaderCommands := aCommandCollection.
 	
 	headers := Dictionary new
-]
-
-{ #category : #'header names' }
-CrossOriginResourceSharingActualRequestHandler >> origin [
-
-	^ Headers >> #origin
 ]
 
 { #category : #evaluating }

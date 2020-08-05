@@ -49,5 +49,5 @@ SingleResourceRESTfulController >> serverUrl: aServerUrl [
 { #category : #private }
 SingleResourceRESTfulController >> typeIdConstraint [
 
-	^ IsInteger
+	^ self subclassResponsibility
 ]

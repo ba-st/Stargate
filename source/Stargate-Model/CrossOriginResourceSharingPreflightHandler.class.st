@@ -80,12 +80,6 @@ CrossOriginResourceSharingPreflightHandler >> initializeAllowing: anAllowOriginP
 	headers := Dictionary new
 ]
 
-{ #category : #'header names' }
-CrossOriginResourceSharingPreflightHandler >> origin [
-
-	^ Headers >> #origin
-]
-
 { #category : #evaluating }
 CrossOriginResourceSharingPreflightHandler >> teaEvalActionOnRequest: request [
 
