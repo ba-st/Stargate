@@ -1,5 +1,5 @@
 "
-I'm a filter builder. I aimed to provide a clean interface to configure CORS during the instantiation of a HTTPBasedRESTfulAPI
+I'm a filter builder. I aimed to provide a clean interface to configure CORS support during the configuation of a HTTPBasedRESTfulAPI instance.
 "
 Class {
 	#name : #CrossOriginResourceSharingFilterBuilder,
@@ -39,20 +39,8 @@ CrossOriginResourceSharingFilterBuilder >> allowOnlyFrom: origins [
 	actualRequestHandlerBuilder allowOnlyFrom: origins
 ]
 
-{ #category : #building }
-CrossOriginResourceSharingFilterBuilder >> buildActualRequestFilter [
-
-	^ CrossOriginResourceSharingFilter handleActualRequestByEvaluating: actualRequestHandlerBuilder build
-]
-
-{ #category : #building }
-CrossOriginResourceSharingFilterBuilder >> buildPreflightFilter [
-
-	^ CrossOriginResourceSharingFilter handlePreflightByEvaluating: preflightHandlerBuilder build
-]
-
 { #category : #initialization }
-CrossOriginResourceSharingFilterBuilder >> configureAllowedMethodsFrom: aControllerCollection [
+CrossOriginResourceSharingFilterBuilder >> allowedMethodsFrom: aControllerCollection [
 
 	| nonOperationalRoutes allowedMethods |
 
@@ -73,6 +61,18 @@ CrossOriginResourceSharingFilterBuilder >> configureAllowedMethodsFrom: aControl
 			].
 
 	preflightHandlerBuilder allowMethods: allowedMethods
+]
+
+{ #category : #building }
+CrossOriginResourceSharingFilterBuilder >> buildActualRequestFilter [
+
+	^ CrossOriginResourceSharingFilter handleActualRequestByEvaluating: actualRequestHandlerBuilder build
+]
+
+{ #category : #building }
+CrossOriginResourceSharingFilterBuilder >> buildPreflightFilter [
+
+	^ CrossOriginResourceSharingFilter handlePreflightByEvaluating: preflightHandlerBuilder build
 ]
 
 { #category : #configuring }
@@ -100,5 +100,5 @@ CrossOriginResourceSharingFilterBuilder >> inializeUsing: aControllerCollection 
 
 	preflightHandlerBuilder := CrossOriginResourceSharingPreflightHandlerBuilder new.
 	actualRequestHandlerBuilder := CrossOriginResourceSharingActualRequestHandlerBuilder new.
-	self configureAllowedMethodsFrom: aControllerCollection
+	self allowedMethodsFrom: aControllerCollection
 ]

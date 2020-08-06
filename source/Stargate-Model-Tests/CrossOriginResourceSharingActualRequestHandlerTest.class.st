@@ -4,117 +4,183 @@ Class {
 	#category : #'Stargate-Model-Tests-CORS'
 }
 
-{ #category : #tests }
-CrossOriginResourceSharingActualRequestHandlerTest >> requestOriginatedAt: origin [
+{ #category : #'tests - support' }
+CrossOriginResourceSharingActualRequestHandlerTest >> assert: aHandlerBuilderConfiguration handles: aRequest byResponding: responseAssertions [
+
+	| handler response |
+
+	handler := self
+		crossOriginResourceSharingActualRequestHandlerBuilderApplying: aHandlerBuilderConfiguration.
+	response := ZnResponse created: self serverLocation asUrl / 'devices' / '1'.
+	handler teaEvalActionOnRequest: aRequest response: response.
+	responseAssertions value: response
+]
+
+{ #category : #'tests - support' }
+CrossOriginResourceSharingActualRequestHandlerTest >> assertUrl: aStringOrUrl equals: anotherStringOrUrl [
+
+	self assert: aStringOrUrl asZnUrl equals: anotherStringOrUrl asZnUrl
+]
+
+{ #category : #'tests - support' }
+CrossOriginResourceSharingActualRequestHandlerTest >> crossOriginResourceSharingActualRequestHandlerBuilderApplying: aHandlerBuilderConfigurationBlock [
+
+	| handlerBuilder |
+
+	handlerBuilder := CrossOriginResourceSharingActualRequestHandlerBuilder new.
+	aHandlerBuilderConfigurationBlock value: handlerBuilder.
+	^ handlerBuilder build
+]
+
+{ #category : #'tests - support' }
+CrossOriginResourceSharingActualRequestHandlerTest >> postRequestOriginatedAt: origin [
 
 	| request |
 
-	request := ZnRequest options: '/devices' asUrl.
+	request := ZnRequest post: self serverLocation / 'devices' asUrl.
 	request headers at: 'Origin' put: origin.
 
 	^ TeaRequest fromZnRequest: request
 ]
 
-{ #category : #tests }
-CrossOriginResourceSharingActualRequestHandlerTest >> testAllowingAnyOrigin [
+{ #category : #accessing }
+CrossOriginResourceSharingActualRequestHandlerTest >> serverLocation [
 
-	| handler request response |
-	
-	handler := CrossOriginResourceSharingActualRequestHandlerBuilder new
-		allowAnyOrigin;
-		build.
-
-	request := self requestOriginatedAt: 'http://localhost:65000'.
-	response := ZnResponse created: 'http://localhost:65000' asUrl.
-
-	handler teaEvalActionOnRequest: request response: response.
-
-	self
-		assert: response code equals: 201;
-		assert: ( response headers at: 'Access-Control-Allow-Origin' ) equals: '*';
-		should: [ response headers at: 'Vary' ] raise: KeyNotFound
+	^ 'http://server.com' asUrl 
 ]
 
 { #category : #tests }
-CrossOriginResourceSharingActualRequestHandlerTest >> testAllowingCredentials [
+CrossOriginResourceSharingActualRequestHandlerTest >> testAllowAnyOrigin [
 
-	| handler request response |
+	| request |
 
-	handler := CrossOriginResourceSharingActualRequestHandlerBuilder new
-		allowAnyOrigin;
-		allowCredentials;
-		build.
-
-	request := self requestOriginatedAt: 'http://localhost:65000'.
-	response := ZnResponse noContent.
-
-	handler teaEvalActionOnRequest: request response: response.
+	request := self postRequestOriginatedAt: self websiteLocation.
 
 	self
-		assert: response code equals: 204;
-		assert: ( response headers at: 'Access-Control-Allow-Origin' ) equals: '*';
-		assert: ( response headers at: 'Access-Control-Allow-Credentials' ) equals: 'true';
-		should: [ response headers at: 'Vary' ] raise: KeyNotFound
+		assert: [ :handler | handler allowAnyOrigin ]
+		handles: request
+		byResponding: [ :response | 
+			self
+				assert: response code equals: 201;
+				assert: ( response headers at: 'Access-Control-Allow-Origin' ) equals: '*';
+				should: [ response headers at: 'Vary' ] raise: KeyNotFound
+			]
 ]
 
 { #category : #tests }
-CrossOriginResourceSharingActualRequestHandlerTest >> testAllowingExactlyOneOrigin [
+CrossOriginResourceSharingActualRequestHandlerTest >> testAllowCredentials [
 
-	| handler request response |
+	| request |
 
-	handler := CrossOriginResourceSharingActualRequestHandlerBuilder new 
-		allowOnlyFrom: {'http://localhost:65000/' asUrl};
-		build.
-	
-	request := self requestOriginatedAt: 'http://localhost:65000'.
-	response := ZnResponse noContent.
-
-	handler teaEvalActionOnRequest: request response: response.
+	request := self postRequestOriginatedAt: self websiteLocation.
 
 	self
-		assert: response code equals: 204;
-		assert: ( response headers at: 'Access-Control-Allow-Origin' ) equals: 'http://localhost:65000/';
-		should: [ response headers at: 'Vary' ] raise: KeyNotFound
+		assert: [ :handler | 
+			handler
+				allowAnyOrigin;
+				allowCredentials
+			]
+		handles: request
+		byResponding: [ :response | 
+			self
+				assert: response code equals: 201;
+				assert: ( response headers at: 'Access-Control-Allow-Origin' ) equals: '*';
+				assert: ( response headers at: 'Access-Control-Allow-Credentials' ) equals: 'true';
+				should: [ response headers at: 'Vary' ] raise: KeyNotFound
+			]
 ]
 
 { #category : #tests }
-CrossOriginResourceSharingActualRequestHandlerTest >> testAllowingMoreThanOneOrigin [
+CrossOriginResourceSharingActualRequestHandlerTest >> testAllowExactlyOneOrigin [
 
-	| handler request response |
+	| request |
 
-	handler := CrossOriginResourceSharingActualRequestHandlerBuilder new
-		allowOnlyFrom:
-			{'http://localhost:65000/' asUrl.
-			'http://google.com/' asUrl};
-		build.
+	request := self postRequestOriginatedAt: self websiteLocation.
 
-	request := self requestOriginatedAt: 'http://localhost:65000'.
-	response := ZnResponse noContent.
-
-	handler teaEvalActionOnRequest: request response: response.
 	self
-		assert: response code equals: 204;
-		assert: ( response headers at: 'Access-Control-Allow-Origin' ) equals: 'http://localhost:65000/';
-		assert: ( response headers at: 'Vary' ) equals: 'Origin'
+		assert: [ :handler | handler allowOnlyFrom: {self websiteLocation} ]
+		handles: request
+		byResponding: [ :response | 
+			self
+				assert: response code equals: 201;
+				assertUrl: ( response headers at: 'Access-Control-Allow-Origin' ) equals: self websiteLocation;
+				should: [ response headers at: 'Vary' ] raise: KeyNotFound
+			]
 ]
 
 { #category : #tests }
-CrossOriginResourceSharingActualRequestHandlerTest >> testExposingHeaders [
+CrossOriginResourceSharingActualRequestHandlerTest >> testAllowMoreThanOneOrigin [
 
-	| handler request response |
+	| request |
+
+	request := self postRequestOriginatedAt: self websiteLocation.
+
+	self
+		assert: [ :handler | 
+			handler
+				allowOnlyFrom:
+					{self websiteLocation.
+					'http://google.com/' asUrl}
+			]
+		handles: request
+		byResponding: [ :response | 
+			self
+				assert: response code equals: 201;
+				assertUrl: ( response headers at: 'Access-Control-Allow-Origin' ) equals: self websiteLocation;
+				assert: ( response headers at: 'Vary' ) equals: 'Origin'
+			]
+]
+
+{ #category : #tests }
+CrossOriginResourceSharingActualRequestHandlerTest >> testExposeHeaders [
+
+	| request |
+
+	request := self postRequestOriginatedAt: self websiteLocation.
+
+	self
+		assert: [ :handler | 
+			handler
+				allowAnyOrigin;
+				expose: #('Authorization' 'X-Custom')
+			]
+		handles: request
+		byResponding: [ :response | 
+			self
+				assert: response code equals: 201;
+				assert: ( response headers at: 'Access-Control-Allow-Origin' ) equals: '*';
+				assert: ( response headers at: 'Access-Control-Expose-Headers' )
+					equals: 'Authorization, X-Custom'
+			]
+]
+
+{ #category : #tests }
+CrossOriginResourceSharingActualRequestHandlerTest >> testRespondWithEmptyHeadersIfOriginNotAllowed [
+
+	| request handler |
+
+	request := self postRequestOriginatedAt: 'http://www.google.com' asUrl.
+
 
 	handler := CrossOriginResourceSharingActualRequestHandlerBuilder new
-		allowAnyOrigin
-		expose: #('Authorization' 'X-Custom');
+		allowOnlyFrom: {self websiteLocation};
 		build.
-		
-	request := self requestOriginatedAt: 'http://localhost:65000'.
-	response := ZnResponse noContent.
 
-	handler teaEvalActionOnRequest: request response: response.
 	self
-		assert: response code equals: 204;
-		assert: ( response headers at: 'Access-Control-Allow-Origin' ) equals: '*';
-		assert: ( response headers at: 'Access-Control-Expose-Headers' )
-			equals: 'Authorization, X-Custom'
+		should: [ handler teaEvalActionOnRequest: request response: TeaResponse noContent ]
+		raise: TeaAbort
+		withExceptionDo: [ :signal | 
+			| response |
+
+			response := signal response.
+			self
+				assert: response code equals: 204;
+				assert: response headers isEmpty
+			]
+]
+
+{ #category : #accessing }
+CrossOriginResourceSharingActualRequestHandlerTest >> websiteLocation [
+
+	^ 'http://website.com' asUrl
 ]

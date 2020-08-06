@@ -59,6 +59,36 @@ CrossOriginResourceSharingPreflightHandlerTest >> requestOptionsFor: aLocation o
 ]
 
 { #category : #tests }
+CrossOriginResourceSharingPreflightHandlerTest >> testAllowAnyOrigin [
+
+	| allowedMethods request |
+
+	allowedMethods := Dictionary new
+		at: '/devices' put: #('GET' 'POST');
+		yourself.
+
+	request := self
+		requestOptionsFor: '/devices'
+		originatedAt: self websiteLocation
+		configuringHeadersWith: [ :headers | headers at: 'Access-Control-Request-Headers' put: 'Content-Type' ].
+
+	self
+		assert: [ :handler | 
+			handler
+				allowAnyOrigin;
+				allowMethods: allowedMethods
+			]
+		handles: request
+		byResponding: [ :response | 
+			self
+				assert: ( response headers at: 'Access-Control-Allow-Origin' ) equals: '*';
+				assert: ( response headers at: 'Access-Control-Allow-Headers' ) equals: 'Content-Type';
+				assert: ( response headers at: 'Vary' ) equals: 'Access-Control-Allow-Headers';
+				assert: ( response headers at: 'Access-Control-Allow-Methods' ) equals: 'GET, POST'
+			]
+]
+
+{ #category : #tests }
 CrossOriginResourceSharingPreflightHandlerTest >> testAllowCredentials [
 
 	| allowedMethods request |
@@ -91,6 +121,37 @@ CrossOriginResourceSharingPreflightHandlerTest >> testAllowCredentials [
 ]
 
 { #category : #tests }
+CrossOriginResourceSharingPreflightHandlerTest >> testAllowExactlyOneOrigin [
+
+	| allowedMethods request |
+
+	allowedMethods := Dictionary new
+		at: '/devices' put: #('GET' 'POST');
+		yourself.
+
+	request := self
+		requestOptionsFor: '/devices'
+		originatedAt: self websiteLocation
+		configuringHeadersWith: [ :headers | headers at: 'Access-Control-Request-Headers' put: 'Content-Type' ].
+
+	self
+		assert: [ :handler | 
+			handler
+				allowOnlyFrom: {self websiteLocation};
+				allowMethods: allowedMethods
+			]
+		handles: request
+		byResponding: [ :response | 
+			self
+				assertUrl: ( response headers at: 'Access-Control-Allow-Origin' )
+					equals: self websiteLocation;
+				assert: ( response headers at: 'Access-Control-Allow-Headers' ) equals: 'Content-Type';
+				assert: ( response headers at: 'Vary' ) equals: 'Access-Control-Allow-Headers';
+				assert: ( response headers at: 'Access-Control-Allow-Methods' ) equals: 'GET, POST'
+			]
+]
+
+{ #category : #tests }
 CrossOriginResourceSharingPreflightHandlerTest >> testAllowHeadersMatchRequestHeaders [
 
 	| allowedMethods request |
@@ -107,14 +168,13 @@ CrossOriginResourceSharingPreflightHandlerTest >> testAllowHeadersMatchRequestHe
 	self
 		assert: [ :handler | 
 			handler
-				allowOnlyFrom: { self websiteLocation};
+				allowOnlyFrom: {self websiteLocation};
 				allowMethods: allowedMethods
 			]
 		handles: request
 		byResponding: [ :response | 
 			self
-				assertUrl: ( response headers at: 'Access-Control-Allow-Origin' )
-					equals: self websiteLocation;
+				assertUrl: ( response headers at: 'Access-Control-Allow-Origin' ) equals: self websiteLocation;
 				assert: ( response headers at: 'Access-Control-Allow-Methods' ) equals: 'GET, POST';
 				assert: ( response headers at: 'Access-Control-Allow-Headers' )
 					equals: 'Content-Type, Authorization';
@@ -145,11 +205,42 @@ CrossOriginResourceSharingPreflightHandlerTest >> testAllowHeadersWithEmptyReque
 		handles: request
 		byResponding: [ :response | 
 			self
-				assertUrl: ( response headers at: 'Access-Control-Allow-Origin' )
-					equals: self websiteLocation;
+				assertUrl: ( response headers at: 'Access-Control-Allow-Origin' ) equals: self websiteLocation;
 				assert: ( response headers at: 'Access-Control-Allow-Methods' ) equals: 'GET, POST';
 				should: [ response headers at: 'Access-Control-Allow-Headers' ] raise: NotFound;
 				should: [ response headers at: 'Vary' ] raise: KeyNotFound
+			]
+]
+
+{ #category : #tests }
+CrossOriginResourceSharingPreflightHandlerTest >> testAllowMoreThanOneOrigin [
+
+	| allowedMethods request |
+
+	allowedMethods := Dictionary new
+		at: '/devices' put: #('GET' 'POST');
+		yourself.
+
+	request := self
+		requestOptionsFor: '/devices'
+		originatedAt: self websiteLocation
+		configuringHeadersWith: [ :headers | headers at: 'Access-Control-Request-Headers' put: 'Content-Type' ].
+
+	self
+		assert: [ :handler | 
+			handler
+				allowOnlyFrom:
+					{self websiteLocation.
+					'http://google.com/ asUrl' asUrl};
+				allowMethods: allowedMethods
+			]
+		handles: request
+		byResponding: [ :response | 
+			self
+				assertUrl: ( response headers at: 'Access-Control-Allow-Origin' ) equals: self websiteLocation;
+				assert: ( response headers at: 'Access-Control-Allow-Headers' ) equals: 'Content-Type';
+				assert: ( response headers at: 'Vary' ) equals: 'Origin, Access-Control-Allow-Headers';
+				assert: ( response headers at: 'Access-Control-Allow-Methods' ) equals: 'GET, POST'
 			]
 ]
 
@@ -242,104 +333,9 @@ CrossOriginResourceSharingPreflightHandlerTest >> testAllowedMethodsReflectsDefi
 		handles: request
 		byResponding: [ :response | 
 			self
-				assertUrl: ( response headers at: 'Access-Control-Allow-Origin' )
-					equals: self websiteLocation;
+				assertUrl: ( response headers at: 'Access-Control-Allow-Origin' ) equals: self websiteLocation;
 				assert: ( response headers at: 'Access-Control-Allow-Headers' ) equals: 'Content-Type';
 				assert: ( response headers at: 'Vary' ) equals: 'Access-Control-Allow-Headers';
-				assert: ( response headers at: 'Access-Control-Allow-Methods' ) equals: 'GET, POST'
-			]
-]
-
-{ #category : #tests }
-CrossOriginResourceSharingPreflightHandlerTest >> testAllowingAnyOrigin [
-
-	| allowedMethods request |
-
-	allowedMethods := Dictionary new
-		at: '/devices' put: #('GET' 'POST');
-		yourself.
-
-	request := self
-		requestOptionsFor: '/devices'
-		originatedAt: self websiteLocation
-		configuringHeadersWith: [ :headers | headers at: 'Access-Control-Request-Headers' put: 'Content-Type' ].
-
-	self
-		assert: [ :handler | 
-			handler
-				allowAnyOrigin;
-				allowMethods: allowedMethods
-			]
-		handles: request
-		byResponding: [ :response | 
-			self
-				assert: ( response headers at: 'Access-Control-Allow-Origin' ) equals: '*';
-				assert: ( response headers at: 'Access-Control-Allow-Headers' ) equals: 'Content-Type';
-				assert: ( response headers at: 'Vary' ) equals: 'Access-Control-Allow-Headers';
-				assert: ( response headers at: 'Access-Control-Allow-Methods' ) equals: 'GET, POST'
-			]
-]
-
-{ #category : #tests }
-CrossOriginResourceSharingPreflightHandlerTest >> testAllowingExactlyOneOrigin [
-
-	| allowedMethods request |
-
-	allowedMethods := Dictionary new
-		at: '/devices' put: #('GET' 'POST');
-		yourself.
-
-	request := self
-		requestOptionsFor: '/devices'
-		originatedAt: self websiteLocation
-		configuringHeadersWith: [ :headers | headers at: 'Access-Control-Request-Headers' put: 'Content-Type' ].
-
-	self
-		assert: [ :handler | 
-			handler
-				allowOnlyFrom: {self websiteLocation};
-				allowMethods: allowedMethods
-			]
-		handles: request
-		byResponding: [ :response | 
-			self
-				assertUrl: ( response headers at: 'Access-Control-Allow-Origin' )
-					equals: self websiteLocation;
-				assert: ( response headers at: 'Access-Control-Allow-Headers' ) equals: 'Content-Type';
-				assert: ( response headers at: 'Vary' ) equals: 'Access-Control-Allow-Headers';
-				assert: ( response headers at: 'Access-Control-Allow-Methods' ) equals: 'GET, POST'
-			]
-]
-
-{ #category : #tests }
-CrossOriginResourceSharingPreflightHandlerTest >> testAllowingMoreThanOneOrigin [
-
-	| allowedMethods request |
-
-	allowedMethods := Dictionary new
-		at: '/devices' put: #('GET' 'POST');
-		yourself.
-
-	request := self
-		requestOptionsFor: '/devices'
-		originatedAt: self websiteLocation
-		configuringHeadersWith: [ :headers | headers at: 'Access-Control-Request-Headers' put: 'Content-Type' ].
-
-	self
-		assert: [ :handler | 
-			handler
-				allowOnlyFrom:
-					{self websiteLocation.
-					'http://google.com/ asUrl' asUrl};
-				allowMethods: allowedMethods
-			]
-		handles: request
-		byResponding: [ :response | 
-			self
-				assertUrl: ( response headers at: 'Access-Control-Allow-Origin' )
-					equals: self websiteLocation;
-				assert: ( response headers at: 'Access-Control-Allow-Headers' ) equals: 'Content-Type';
-				assert: ( response headers at: 'Vary' ) equals: 'Origin, Access-Control-Allow-Headers';
 				assert: ( response headers at: 'Access-Control-Allow-Methods' ) equals: 'GET, POST'
 			]
 ]
@@ -377,37 +373,7 @@ CrossOriginResourceSharingPreflightHandlerTest >> testDisableCache [
 ]
 
 { #category : #tests }
-CrossOriginResourceSharingPreflightHandlerTest >> testDontHandleRequestFromOriginNotAllowed [
-
-	| allowedMethods request handler response |
-
-	allowedMethods := Dictionary new
-		at: '/devices' put: #('GET' 'POST');
-		yourself.
-
-	request := self
-		requestOptionsFor: '/devices'
-		originatedAt: 'http://www.google.com' asUrl
-		configuringHeadersWith: [ :headers | headers at: 'Access-Control-Request-Headers' put: 'Content-Type' ].
-
-	handler := CrossOriginResourceSharingPreflightHandlerBuilder new
-		allowOnlyFrom: {self websiteLocation};
-		allowMethods: allowedMethods;
-		build.
-
-	self
-		should: [ handler teaEvalActionOnRequest: request ]
-		raise: TeaAbort
-		withExceptionDo: [ :signal | 
-			response := signal response.
-			self
-				assert: response code equals: 204;
-				assert: response headers isEmpty
-			]
-]
-
-{ #category : #tests }
-CrossOriginResourceSharingPreflightHandlerTest >> testDontHandleRequestToNonExistantRoute [
+CrossOriginResourceSharingPreflightHandlerTest >> testDontHandleIfRouteDoesNotMatch [
 
 	| handler allowedMethods request |
 
@@ -462,7 +428,7 @@ CrossOriginResourceSharingPreflightHandlerTest >> testExpireIn [
 ]
 
 { #category : #tests }
-CrossOriginResourceSharingPreflightHandlerTest >> testExposingHeaders [
+CrossOriginResourceSharingPreflightHandlerTest >> testExposeHeaders [
 
 	| allowedMethods request |
 
@@ -517,6 +483,38 @@ CrossOriginResourceSharingPreflightHandlerTest >> testHandlingUrlWithPlaceholder
 				teaEvalActionOnRequest: request
 			]
 		raise: TeaAbort
+]
+
+{ #category : #tests }
+CrossOriginResourceSharingPreflightHandlerTest >> testRespondWithEmptyHeadersIfOriginNotAllowed [
+
+	| allowedMethods request handler |
+
+	allowedMethods := Dictionary new
+		at: '/devices' put: #('GET' 'POST');
+		yourself.
+
+	request := self
+		requestOptionsFor: '/devices'
+		originatedAt: 'http://www.google.com' asUrl
+		configuringHeadersWith: [ :headers | headers at: 'Access-Control-Request-Headers' put: 'Content-Type' ].
+
+	handler := CrossOriginResourceSharingPreflightHandlerBuilder new
+		allowOnlyFrom: {self websiteLocation};
+		allowMethods: allowedMethods;
+		build.
+
+	self
+		should: [ handler teaEvalActionOnRequest: request ]
+		raise: TeaAbort
+		withExceptionDo: [ :signal | 
+			| response |
+
+			response := signal response.
+			self
+				assert: response code equals: 204;
+				assert: response headers isEmpty
+			]
 ]
 
 { #category : #accessing }

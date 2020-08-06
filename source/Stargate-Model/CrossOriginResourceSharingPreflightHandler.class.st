@@ -9,9 +9,6 @@ Class {
 		'allowedMethodsByRoute',
 		'optionalHeaderCommands'
 	],
-	#pools : [
-		'CrossOriginResourceSharing'
-	],
 	#category : #'Stargate-Model-CORS'
 }
 
@@ -21,85 +18,66 @@ CrossOriginResourceSharingPreflightHandler class >> allowing: anAllowOriginPolic
 	^ self new initializeAllowing: anAllowOriginPolicy accessTo: allowMethods applying: headersCommands
 ]
 
-{ #category : #'header names' }
-CrossOriginResourceSharingPreflightHandler >> accessControlAllowHeaders [
-
-	^ Headers >> #accessControlAllowHeaders
-]
-
-{ #category : #'header names' }
-CrossOriginResourceSharingPreflightHandler >> accessControlAllowMethods [
-
-	^ Headers >> #accessControlAllowMethods
-]
-
-{ #category : #'header names' }
-CrossOriginResourceSharingPreflightHandler >> accessControlRequestHeaders [
-
-	^ Headers >> #accessControlRequestHeaders
-]
-
-{ #category : #'collecting headers' }
-CrossOriginResourceSharingPreflightHandler >> collectAllowedHeadersFrom: request [
-
-	request headers
-		at: self accessControlRequestHeaders
-		ifPresent: [ :requestedHeaders | 
-			requestedHeaders
-				splitOn: $,
-				do: [ :header | self add: header trimBoth toHeaderNamed: self accessControlAllowHeaders ].
-			self add: self accessControlAllowHeaders toHeaderNamed: self vary
-			]
-]
-
-{ #category : #'collecting headers' }
-CrossOriginResourceSharingPreflightHandler >> collectAllowedMethodsFrom: allowedMethods [
-
-	allowedMethods do: [ :method | self add: method toHeaderNamed: self accessControlAllowMethods ]
-]
-
-{ #category : #'collecting headers' }
-CrossOriginResourceSharingPreflightHandler >> collectAllowedOriginFrom: aRequest [
-
-	allowOriginPolicy applyOn: self for: aRequest
-]
-
-{ #category : #'collecting headers' }
-CrossOriginResourceSharingPreflightHandler >> collectOptionalHeaders [
-
-	optionalHeaderCommands do: [ :command | command value: self ]
-]
-
 { #category : #initialization }
 CrossOriginResourceSharingPreflightHandler >> initializeAllowing: anAllowOriginPolicy accessTo: methods applying: aCommandCollection [ 
 
 	allowOriginPolicy := anAllowOriginPolicy.
 	allowedMethodsByRoute := methods.
 	optionalHeaderCommands := aCommandCollection.
+]
+
+{ #category : #'private - evaluating' }
+CrossOriginResourceSharingPreflightHandler >> setAllowedHeadersOn: aResponse from: aRequest [
+
+	aRequest headers
+		at: self headerNames >> #accessControlRequestHeaders
+		ifPresent: [ :requestedHeaders | 
+			requestedHeaders
+				splitOn: $,
+				do: [ :header | 
+					aResponse headers
+						at: self headerNames >> #accessControlAllowHeaders
+						addSeparatedWithComma: header trimBoth
+					].
+			self add: self headerNames >> #accessControlAllowHeaders toVaryOn: aResponse
+			]
+]
+
+{ #category : #'private - evaluating' }
+CrossOriginResourceSharingPreflightHandler >> setAllowedMethodsOn: aResponse from: allowedMethods [
+
+	allowedMethods
+		do:
+			[ :method | aResponse headers at: self headerNames >> #accessControlAllowMethods addSeparatedWithComma: method ]
+]
+
+{ #category : #'private - evaluating' }
+CrossOriginResourceSharingPreflightHandler >> setAllowedOriginOn: aResponse from: aRequest [ 
 	
-	headers := Dictionary new
+	allowOriginPolicy applyOn: aResponse for: aRequest using: self
+]
+
+{ #category : #'private - evaluating' }
+CrossOriginResourceSharingPreflightHandler >> setOptionalHeadersOn: aResponse [
+
+	optionalHeaderCommands do: [ :command | command value: aResponse headers value: self headerNames ]
 ]
 
 { #category : #evaluating }
-CrossOriginResourceSharingPreflightHandler >> teaEvalActionOnRequest: request [
+CrossOriginResourceSharingPreflightHandler >> teaEvalActionOnRequest: aRequest [
 
-	| response  |
+	| response |
 
-	self withAllowedMethodsFor: request url do: [ :allowedMethods | 
-		response := TeaResponse noContent.
-		self collectAllowedOriginFrom: request.
-		self collectAllowedMethodsFrom: allowedMethods.
-		self collectAllowedHeadersFrom: request.
-		self collectOptionalHeaders.
-		self applyHeadersTo: response.
-		request abort: response		
-	 ].
-]
-
-{ #category : #'header names' }
-CrossOriginResourceSharingPreflightHandler >> vary [
-
-	^ Headers >> #vary
+	self
+		withAllowedMethodsFor: aRequest url
+		do: [ :allowedMethods | 
+			response := ZnResponse noContent.
+			self setAllowedOriginOn: response from: aRequest.
+			self setAllowedMethodsOn: response from: allowedMethods.
+			self setAllowedHeadersOn: response from: aRequest.
+			self setOptionalHeadersOn: response.
+			aRequest abort: response
+			]
 ]
 
 { #category : #evaluating }

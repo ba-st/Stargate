@@ -1,33 +1,26 @@
 Class {
 	#name : #CrossOriginResourceSharingHandler,
 	#superclass : #Object,
-	#instVars : [
-		'headers'
+	#pools : [
+		'CrossOriginResourceSharing'
 	],
 	#category : #'Stargate-Model-CORS'
 }
 
-{ #category : #configuring }
-CrossOriginResourceSharingHandler >> add: aValue toHeaderNamed: aName [
+{ #category : #'private - evaluating' }
+CrossOriginResourceSharingHandler >> add: aHeaderNamed toVaryOn: aResponse [
 
-	headers
-		at: aName
-		ifPresent: [ :values | values add: aValue ]
-		ifAbsentPut: ( OrderedCollection with: aValue )
+	aResponse headers at: self headerNames >> #vary addSeparatedWithComma: aHeaderNamed
 ]
 
-{ #category : #evaluating }
-CrossOriginResourceSharingHandler >> applyHeadersTo: aResponse [
+{ #category : #accessing }
+CrossOriginResourceSharingHandler >> headerNames [
 
-	headers
-		keysAndValuesDo:
-			[ :header :values | aResponse headers at: header put: ( ( CollectionFormatter separatingWith: ', ' ) format: values ) ]
+	^ Headers
 ]
 
-{ #category : #configuring }
-CrossOriginResourceSharingHandler >> set: aValue toHeaderNamed: aName [
-
-	headers
-		at: aName
-		put: ( OrderedCollection with: aValue )
+{ #category : #'private - evaluating' }
+CrossOriginResourceSharingHandler >> set: anyOrAnOrigin asAllowOriginOn: aResponse [
+	
+	aResponse headers at: self headerNames >> #accessControlAllowOrigin put: anyOrAnOrigin asString 
 ]

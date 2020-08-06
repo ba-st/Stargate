@@ -1,14 +1,11 @@
 Class {
 	#name : #AllowOriginPolicy,
 	#superclass : #Object,
-	#pools : [
-		'CrossOriginResourceSharing'
-	],
 	#category : #'Stargate-Model-CORS'
 }
 
 { #category : #'configuring headers' }
-AllowOriginPolicy >> applyOn: aFilter for: aRequest [
+AllowOriginPolicy >> applyOn: aResponse for: aRequest using: aHandler [ 
 
 	self subclassResponsibility 
 ]

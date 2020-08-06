@@ -1,5 +1,5 @@
 "
-I'm a filter to add CORS support to a teapot server instance.
+I'm a filter used to add CORS support to a HTTPBasedRESTfulAPI instance
 "
 Class {
 	#name : #CrossOriginResourceSharingFilter,

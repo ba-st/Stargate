@@ -23,7 +23,7 @@ CrossOriginResourceSharingPreflightHandlerBuilder >> allowAnyOrigin [
 CrossOriginResourceSharingPreflightHandlerBuilder >> allowCredentials [
 
 	addHeaderCommands
-		add: [ :handler | handler set: true toHeaderNamed: 'Access-Control-Allow-Credentials' ]
+		add: [ :headers :headerNames | headers at: headerNames >> #accessControlAllowCredentials put: true asString ]
 ]
 
 { #category : #configuring }
@@ -50,23 +50,26 @@ CrossOriginResourceSharingPreflightHandlerBuilder >> build [
 { #category : #configuring }
 CrossOriginResourceSharingPreflightHandlerBuilder >> doNotCache [
 
-	addHeaderCommands add: [ :handler | handler set: -1 toHeaderNamed: 'Access-Control-Max-Age' ]
+	addHeaderCommands
+		add: [ :headers :headerNames | headers at: headerNames >> #accessControlMaxAge put: -1 asString ]
 ]
 
 { #category : #configuring }
 CrossOriginResourceSharingPreflightHandlerBuilder >> expireIn: aDuration [
 
 	addHeaderCommands
-		add: [ :filter | filter set: aDuration asSeconds toHeaderNamed: 'Access-Control-Max-Age' ]
+		add:
+			[ :headers :headerNames | headers at: headerNames >> #accessControlMaxAge put: aDuration asSeconds asString ]
 ]
 
 { #category : #configuring }
 CrossOriginResourceSharingPreflightHandlerBuilder >> expose: exposedHeaders [
 
 	addHeaderCommands
-		add: [ :filter | 
+		add: [ :handler :headerNames | 
 			exposedHeaders
-				do: [ :exposedHeader | filter add: exposedHeader toHeaderNamed: 'Access-Control-Expose-Headers' ]
+				do:
+					[ :exposedHeader | handler at: headerNames >> #accessControlExposeHeaders addSeparatedWithComma: exposedHeader ]
 			]
 ]
 

@@ -8,13 +8,7 @@ Class {
 }
 
 { #category : #'configuring headers' }
-AllowAnyOriginPolicy >> accessControlAllowOrigin [
+AllowAnyOriginPolicy >> applyOn: aResponse for: aRequest using: aHandler [ 
 
-	^ Headers >> #accessControlAllowOrigin
-]
-
-{ #category : #'configuring headers' }
-AllowAnyOriginPolicy >> applyOn: aFilter for: aRequest [
-
-	aFilter set: '*' toHeaderNamed: self accessControlAllowOrigin
+	aHandler set: '*' asAllowOriginOn: aResponse 
 ]

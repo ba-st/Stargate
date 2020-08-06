@@ -22,7 +22,7 @@ CrossOriginResourceSharingActualRequestHandlerBuilder >> allowAnyOrigin [
 CrossOriginResourceSharingActualRequestHandlerBuilder >> allowCredentials [
 
 	addHeaderCommands
-		add: [ :handler | handler set: true toHeaderNamed: 'Access-Control-Allow-Credentials' ]
+		add: [ :headers :headerNames | headers at: headerNames >> #accessControlAllowCredentials put: true asString ]
 ]
 
 { #category : #configuring }
@@ -41,9 +41,10 @@ CrossOriginResourceSharingActualRequestHandlerBuilder >> build [
 CrossOriginResourceSharingActualRequestHandlerBuilder >> expose: exposedHeaders [
 
 	addHeaderCommands
-		add: [ :filter | 
+		add: [ :headers :headerNames | 
 			exposedHeaders
-				do: [ :exposedHeader | filter add: exposedHeader toHeaderNamed: 'Access-Control-Expose-Headers' ]
+				do:
+					[ :exposedHeader | headers at: headerNames >> #accessControlExposeHeaders addSeparatedWithComma: exposedHeader ]
 			]
 ]
 

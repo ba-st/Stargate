@@ -16,25 +16,19 @@ AllowSpecifiedOriginsPolicy class >> onlyFrom: origins [
 	^ self new initializeOnlyFrom: origins
 ]
 
-{ #category : #'accessing headers' }
-AllowSpecifiedOriginsPolicy >> accessControlAllowOrigin [
-
-	^ Headers >> #accessControlAllowOrigin
-]
-
 { #category : #'configuring headers' }
-AllowSpecifiedOriginsPolicy >> applyOn: aFilter for: aRequest [
+AllowSpecifiedOriginsPolicy >> applyOn: aResponse for: aRequest using: aHandler [
 
 	| requestOrigin |
 
-	requestOrigin := ( aRequest headers at: self origin ) asUrl.
+	requestOrigin := ( aRequest headers at: aHandler headerNames >> #origin ) asUrl.
 
 	allowedOrigins
 		detect: [ :origin | origin = requestOrigin ]
 		ifFound: [ :allowedOrigin | 
-			aFilter set: allowedOrigin toHeaderNamed: self accessControlAllowOrigin.
+			aHandler set: allowedOrigin asAllowOriginOn: aResponse.
 			allowedOrigins size > 1
-				ifTrue: [ aFilter add: self origin toHeaderNamed: self vary ]
+				ifTrue: [ aHandler add: aHandler headerNames >> #origin toVaryOn: aResponse ]
 			]
 		ifNone: [ aRequest abort: TeaResponse noContent ]
 ]
@@ -43,16 +37,4 @@ AllowSpecifiedOriginsPolicy >> applyOn: aFilter for: aRequest [
 AllowSpecifiedOriginsPolicy >> initializeOnlyFrom: origins [
 
 	allowedOrigins := origins 
-]
-
-{ #category : #'accessing headers' }
-AllowSpecifiedOriginsPolicy >> origin [
-
-	^ Headers >> #origin
-]
-
-{ #category : #'accessing headers' }
-AllowSpecifiedOriginsPolicy >> vary [
-
-	^ Headers >> #vary
 ]

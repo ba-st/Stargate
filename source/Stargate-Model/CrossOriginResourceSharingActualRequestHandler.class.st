@@ -8,9 +8,6 @@ Class {
 		'allowOriginPolicy',
 		'optionalHeaderCommands'
 	],
-	#pools : [
-		'CrossOriginResourceSharing'
-	],
 	#category : #'Stargate-Model-CORS'
 }
 
@@ -20,33 +17,30 @@ CrossOriginResourceSharingActualRequestHandler class >> allowing: anAllowOriginP
 	^ self new initializeAllowing: anAllowOriginPolicy applying: addHeaderCommands 
 ]
 
-{ #category : #'collecting headers' }
-CrossOriginResourceSharingActualRequestHandler >> collectAllowedOriginFrom: aRequest [
-
-	allowOriginPolicy applyOn: self for: aRequest
-]
-
-{ #category : #'collecting headers' }
-CrossOriginResourceSharingActualRequestHandler >> collectOptionalHeaders [
-
-	optionalHeaderCommands do: [ :command | command value: self ]
-]
-
 { #category : #initialization }
 CrossOriginResourceSharingActualRequestHandler >> initializeAllowing: anAllowOriginPolicy applying: aCommandCollection [
 
 	allowOriginPolicy := anAllowOriginPolicy.
 	optionalHeaderCommands := aCommandCollection.
-	
-	headers := Dictionary new
+]
+
+{ #category : #'private - evaluating' }
+CrossOriginResourceSharingActualRequestHandler >> setAllowedOriginOn: aResponse from: aRequest [ 
+
+	allowOriginPolicy applyOn: aResponse for: aRequest using: self
+]
+
+{ #category : #'private - evaluating' }
+CrossOriginResourceSharingActualRequestHandler >> setOptionalHeadersOn: aResponse [
+
+	optionalHeaderCommands do: [ :command | command value: aResponse headers value: self headerNames ]
 ]
 
 { #category : #evaluating }
 CrossOriginResourceSharingActualRequestHandler >> teaEvalActionOnRequest: aRequest response: aResponse [
 
-	self collectAllowedOriginFrom: aRequest.
-	self collectOptionalHeaders.
-	self applyHeadersTo: aResponse.
+	self setAllowedOriginOn: aResponse from: aRequest.
+	self setOptionalHeadersOn: aResponse.
 	
 	^ aResponse
 ]
