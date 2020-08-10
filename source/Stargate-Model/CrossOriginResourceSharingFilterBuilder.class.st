@@ -1,5 +1,5 @@
 "
-I'm a filter builder. I aimed to provide a clean interface to configure CORS support during the configuation of a HTTPBasedRESTfulAPI instance.
+I'm a filter builder. I aim to provide a clean interface to configure CORS support during the configuration of a HTTPBasedRESTfulAPI instance.
 "
 Class {
 	#name : #CrossOriginResourceSharingFilterBuilder,
