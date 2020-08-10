@@ -14,7 +14,7 @@ Class {
 { #category : #'instance creation' }
 CrossOriginResourceSharingFilterBuilder class >> using: aControllerCollection [
 
-	^ self new inializeUsing: aControllerCollection
+	^ self new initializeUsing: aControllerCollection
 ]
 
 { #category : #configuring }
