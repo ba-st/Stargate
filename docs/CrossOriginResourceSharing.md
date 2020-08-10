@@ -78,7 +78,7 @@ api := HTTPBasedRESTfulAPI
       expire: 600 seconds ]
 ````
 
-To avoid caching send the message `#doNotCache` into de configuration block.
+To avoid caching send the message `#doNotCache` inside the configuration block.
 
 ### Expose headers
 
