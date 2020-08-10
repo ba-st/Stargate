@@ -1,6 +1,6 @@
 # Cross-Origin Resource Sharing 
 
-Cross-Origin Resource Sharing, or simply CORS, is a protocol to allow web applications running at one origin access asynchronously resources from a different one.
+Cross-Origin Resource Sharing, or simply CORS, is a protocol that allows web applications running at one origin, asynchronous access to resources from a different one.
 
 Browsers follow the very restrictive [same-origin policy](https://developer.mozilla.org/en-US/docs/Web/Security/Same-origin_policy) for security reasons and use CORS to mitigate the risks of cross-origin HTTP requests when needed.
 
