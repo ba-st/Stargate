@@ -48,7 +48,7 @@ Take into account that an origin differs from another if you change the domain, 
 
 ### Requests with credentials
 
-Optionally, to let the server to allow credentials, like cookies or basic HTTP authentication. send `allowCredentials` into the configuration block.
+Optionally, to let the server to allow credentials, like cookies or basic HTTP authentication, send `allowCredentials` into the configuration block.
 
 ```` smalltalk
 api := HTTPBasedRESTfulAPI
