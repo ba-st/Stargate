@@ -24,7 +24,7 @@ api := HTTPBasedRESTfulAPI
 
 This configuration will allow a web application to make requests to the API from any origin.
 
-### Configure allowed origins
+### Configuring allowed origins
 
 Allowed origins configuration is mandatory. There are two options available.
 
