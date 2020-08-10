@@ -42,15 +42,13 @@ CrossOriginResourceSharingFilterBuilder >> allowOnlyFrom: origins [
 { #category : #initialization }
 CrossOriginResourceSharingFilterBuilder >> allowedMethodsFrom: aControllerCollection [
 
-	| nonOperationalRoutes allowedMethods |
+	| routes allowedMethods |
 
-	nonOperationalRoutes := OrderedCollection new.
+	routes := OrderedCollection new.
 
-	aControllerCollection
-		reject: [ :controller | controller isA: OperationsRESTfulController ]
-		thenCollect: [ :controller | nonOperationalRoutes addAll: controller routes ].
+	aControllerCollection do: [ :controller | routes addAll: controller routes ].
 
-	allowedMethods := nonOperationalRoutes
+	allowedMethods := routes
 		inject: Dictionary new
 		into: [ :methodsByRoute :route | 
 			methodsByRoute
