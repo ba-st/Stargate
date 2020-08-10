@@ -21,7 +21,7 @@ CrossOriginResourceSharingPreflightHandlerTest >> assert: aHandlerBuilderConfigu
 		withExceptionDo: [ :signal | 
 			response := signal response.
 			self
-				assert: response code equals: 204;
+				assert: response isNoContent;
 				shouldnt: [ response headers at: 'Access-Control-Allow-Origin' ] raise: KeyNotFound;
 				shouldnt: [ response headers at: 'Access-Control-Allow-Methods' ] raise: KeyNotFound.
 				

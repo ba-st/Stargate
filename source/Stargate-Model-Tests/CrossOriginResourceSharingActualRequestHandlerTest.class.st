@@ -61,7 +61,7 @@ CrossOriginResourceSharingActualRequestHandlerTest >> testAllowAnyOrigin [
 		handles: request
 		byResponding: [ :response | 
 			self
-				assert: response code equals: 201;
+				assert: response isCreated;
 				assert: ( response headers at: 'Access-Control-Allow-Origin' ) equals: '*';
 				should: [ response headers at: 'Vary' ] raise: KeyNotFound
 			]
@@ -83,7 +83,7 @@ CrossOriginResourceSharingActualRequestHandlerTest >> testAllowCredentials [
 		handles: request
 		byResponding: [ :response | 
 			self
-				assert: response code equals: 201;
+				assert: response isCreated;
 				assert: ( response headers at: 'Access-Control-Allow-Origin' ) equals: '*';
 				assert: ( response headers at: 'Access-Control-Allow-Credentials' ) equals: 'true';
 				should: [ response headers at: 'Vary' ] raise: KeyNotFound
@@ -102,7 +102,7 @@ CrossOriginResourceSharingActualRequestHandlerTest >> testAllowExactlyOneOrigin 
 		handles: request
 		byResponding: [ :response | 
 			self
-				assert: response code equals: 201;
+				assert: response isCreated;
 				assertUrl: ( response headers at: 'Access-Control-Allow-Origin' ) equals: self websiteLocation;
 				should: [ response headers at: 'Vary' ] raise: KeyNotFound
 			]
@@ -125,7 +125,7 @@ CrossOriginResourceSharingActualRequestHandlerTest >> testAllowMoreThanOneOrigin
 		handles: request
 		byResponding: [ :response | 
 			self
-				assert: response code equals: 201;
+				assert: response isCreated;
 				assertUrl: ( response headers at: 'Access-Control-Allow-Origin' ) equals: self websiteLocation;
 				assert: ( response headers at: 'Vary' ) equals: 'Origin'
 			]
@@ -147,7 +147,7 @@ CrossOriginResourceSharingActualRequestHandlerTest >> testExposeHeaders [
 		handles: request
 		byResponding: [ :response | 
 			self
-				assert: response code equals: 201;
+				assert: response isCreated;
 				assert: ( response headers at: 'Access-Control-Allow-Origin' ) equals: '*';
 				assert: ( response headers at: 'Access-Control-Expose-Headers' )
 					equals: 'Authorization, X-Custom'

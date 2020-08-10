@@ -7,5 +7,5 @@ Class {
 { #category : #building }
 CrossOriginResourceSharingRequestHandlerBuilder >> build [
 
-	self subclassResponsibility 
+	^ self subclassResponsibility 
 ]

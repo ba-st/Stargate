@@ -21,6 +21,5 @@ RouteConfiguratorTest >> testConfiguringPetsControllerRoutes [
 	configurator configure.
 
 	self
-		deny: teapot routes isEmpty;
 		assert: teapot routes size equals: 5
 ]
