@@ -94,7 +94,7 @@ CrossOriginResourceSharingFilterBuilder >> expose: headers [
 ]
 
 { #category : #initialization }
-CrossOriginResourceSharingFilterBuilder >> inializeUsing: aControllerCollection [
+CrossOriginResourceSharingFilterBuilder >> initializeUsing: aControllerCollection [
 
 	preflightHandlerBuilder := CrossOriginResourceSharingPreflightHandlerBuilder new.
 	actualRequestHandlerBuilder := CrossOriginResourceSharingActualRequestHandlerBuilder new.
