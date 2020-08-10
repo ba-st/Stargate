@@ -30,7 +30,7 @@ Allowed origins configuration is mandatory. There are two options available.
 
 #### Allowing any origin
 
-To allow any origin send `allowAnyOrigin` into the configuration block.
+To allow any origin send `allowAnyOrigin` inside the configuration block.
 
 #### Restrict allowed origins
 
