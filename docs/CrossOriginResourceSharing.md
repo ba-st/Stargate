@@ -12,7 +12,7 @@ For a more detailed explanation about CORS, see [MDN web docs](https://developer
 
 ### Simple usage
 
-CORS support is disabled by default. To enable it, send `allowCrossOriginSharingApplying:` message along with a configuration block to the api. The simple posible configuration is:
+CORS support is disabled by default. To enable it, send `allowCrossOriginSharingApplying:` message along with a configuration block to the api. The simplest posible configuration is:
 
 ```` smalltalk
 api := HTTPBasedRESTfulAPI
