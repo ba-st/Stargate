@@ -64,7 +64,7 @@ api := HTTPBasedRESTfulAPI
 
 ### Caching preflight requests
 
-You could also indicate how long the result of the preflight request will be cached by setting a cache duration in seconds. Maximum time varies between browsers.
+You can also indicate for how long the result of the preflight request will be cached by setting a cache duration (in seconds). Maximum time varies between browsers.
 
 With the following code the cache is set to expire in 600 seconds:
 
