@@ -1,5 +1,9 @@
 # Migration Guide
 
+## Migration from v5 to v6
+
+Migration of APIs using CORS will be performed automatically via rewrite rule. To achieve this, manually load the package `Stargate-Deprecated-V6`.
+
 ## Migration from v2 to v3
 
 Some changes can be automatically migrated from v2:
