@@ -17,12 +17,6 @@ CrossOriginResourceSharingActualRequestHandlerTest >> assert: aHandlerBuilderCon
 ]
 
 { #category : #'tests - support' }
-CrossOriginResourceSharingActualRequestHandlerTest >> assertUrl: aStringOrUrl equals: anotherStringOrUrl [
-
-	self assert: aStringOrUrl asZnUrl equals: anotherStringOrUrl asZnUrl
-]
-
-{ #category : #'tests - support' }
 CrossOriginResourceSharingActualRequestHandlerTest >> crossOriginResourceSharingActualRequestHandlerBuilderApplying: aHandlerBuilderConfigurationBlock [
 
 	| handlerBuilder |

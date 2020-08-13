@@ -30,12 +30,6 @@ CrossOriginResourceSharingPreflightHandlerTest >> assert: aHandlerBuilderConfigu
 ]
 
 { #category : #'tests - support' }
-CrossOriginResourceSharingPreflightHandlerTest >> assertUrl: aStringOrUrl equals: anotherStringOrUrl [
-
-	self assert: aStringOrUrl asZnUrl equals: anotherStringOrUrl asZnUrl
-]
-
-{ #category : #'tests - support' }
 CrossOriginResourceSharingPreflightHandlerTest >> crossOriginResourceSharingPreflightHandlerBuilderApplying: aHandlerBuilderConfigurationBlock [
 
 	| handlerBuilder |
