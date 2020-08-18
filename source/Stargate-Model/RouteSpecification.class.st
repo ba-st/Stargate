@@ -4,7 +4,7 @@ I provide a URL template, an HTTP method and a handler to invoke for this route.
 "
 Class {
 	#name : #RouteSpecification,
-	#superclass : #AbstractRouteSpecification,
+	#superclass : #Object,
 	#instVars : [
 		'httpMethod',
 		'handler',
@@ -17,12 +17,6 @@ Class {
 RouteSpecification class >> handling: anHttpMethod at: anUrlTemplate evaluating: aBlock [
 
 	^ self new initializeHandling: anHttpMethod at: anUrlTemplate evaluating: aBlock
-]
-
-{ #category : #decorating }
-RouteSpecification >> asCorsAware [
-	
-	^ CrossOriginResourceSharingAwareRouteSpecification decorating: self
 ]
 
 { #category : #configuring }

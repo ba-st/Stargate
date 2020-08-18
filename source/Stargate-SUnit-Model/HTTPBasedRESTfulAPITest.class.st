@@ -52,6 +52,14 @@ HTTPBasedRESTfulAPITest >> controllersToInstall [
 	^ self subclassResponsibility
 ]
 
+{ #category : #'tests - support' }
+HTTPBasedRESTfulAPITest >> ifPortAvailableDo: ifAvailableBlock [
+	
+	( PortAvailabilityChecker on: self port )
+		checkIfAvailableDo: ifAvailableBlock
+		ifNot: [ :reason | self fail: reason ]
+]
+
 { #category : #private }
 HTTPBasedRESTfulAPITest >> newClient [
 
@@ -117,15 +125,16 @@ HTTPBasedRESTfulAPITest >> setUp [
 { #category : #running }
 HTTPBasedRESTfulAPITest >> setUpAPI [
 
-	self checkPortAvailability.
-	api := HTTPBasedRESTfulAPI
-		configuredBy:
-			{ #port -> self port.
-			 #serverUrl -> self baseUrl.
-			 #operations -> self operationsConfiguration }
-		installing: self controllersToInstall.
+	self
+		ifPortAvailableDo: [ api := HTTPBasedRESTfulAPI
+				configuredBy:
+					{( #port -> self port ).
+					( #serverUrl -> self baseUrl ).
+					( #operations -> self operationsConfiguration )}
+				installing: self controllersToInstall.
 
-	api on: Error addErrorHandler: [ :error :request | self fail ]
+			api on: Error addErrorHandler: [ :error :request | self fail ]
+			]
 ]
 
 { #category : #running }

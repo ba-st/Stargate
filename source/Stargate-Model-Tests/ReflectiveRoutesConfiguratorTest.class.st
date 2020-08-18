@@ -10,19 +10,19 @@ Class {
 { #category : #accessing }
 ReflectiveRoutesConfiguratorTest >> createTestRoute [
 
-	^ ( RouteSpecification
+	^ RouteSpecification
 		handling: #POST
 		at: '/tests'
-		evaluating: [ :httpRequest :requestContext | self fail ] ) asCorsAware
+		evaluating: [ :httpRequest :requestContext | self fail ] 
 ]
 
 { #category : #accessing }
 ReflectiveRoutesConfiguratorTest >> getTestsRoute [
 
-	^ ( RouteSpecification
+	^ RouteSpecification
 		handling: #GET
 		at: '/tests'
-		evaluating: [ :httpRequest :requestContext | self fail ] ) asCorsAware
+		evaluating: [ :httpRequest :requestContext | self fail ]
 ]
 
 { #category : #accessing }
@@ -40,19 +40,17 @@ ReflectiveRoutesConfiguratorTest >> testConfiguringCrossOriginResourceSharingAwa
 
 	(ReflectiveRoutesConfigurator appliedTo: teapot) addRoutesOf: self.
 
-	self assert: teapot routes size equals: 3
+	self assert: teapot routes size equals: 2
 ]
 
 { #category : #tests }
 ReflectiveRoutesConfiguratorTest >> testConfiguringPetsControllerRoutes [
 
-	| teapot controller |
+	| teapot |
 
 	teapot := Teapot on.
 
-	controller := PetsRESTfulController new.
-
-	( ReflectiveRoutesConfigurator appliedTo: teapot ) addRoutesOf: controller.
+	( ReflectiveRoutesConfigurator appliedTo: teapot ) addRoutesOf: PetsRESTfulController new.
 
 	self assert: teapot routes size equals: 5
 ]

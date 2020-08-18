@@ -8,61 +8,42 @@ Class {
 	#superclass : #Object,
 	#instVars : [
 		'teapot',
-		'routesAllowingCors',
 		'resourceController'
 	],
 	#category : #'Stargate-Model-Routing'
 }
 
 { #category : #'instance creation' }
-RouteConfigurator class >> appliedTo: aTeapot sendingMessagesTo: aResourceRESTfulController [
+RouteConfigurator class >> configuring: aTeapot withRoutesDefinedOn: aResourceRESTfulController [
 
-	^ self new initializeAppliedTo: aTeapot sendingMessagesTo: aResourceRESTfulController
-]
-
-{ #category : #'private - configuring' }
-RouteConfigurator >> configureCorsAwareRouteFrom: aCorsAwareRouteSpecification [
-
-	| specification |
-
-	specification := aCorsAwareRouteSpecification specification.
-
-	routesAllowingCors
-		at: specification urlTemplate
-		ifPresent: [ :httpMethods | httpMethods add: specification httpMethod ]
-		ifAbsentPut: [ OrderedCollection with: specification httpMethod ].
-
-	specification configureUsing: self
+	^ self new initializeConfiguring: aTeapot withRoutesDefinedOn: aResourceRESTfulController
 ]
 
 { #category : #configuring }
-RouteConfigurator >> configureCrossOriginSharingRoutes [
-
-	routesAllowingCors
-		keysAndValuesDo:
-			[ :location :httpMethods | teapot OPTIONS: location -> ( CrossOriginResourceSharingPreflightHandler allowing: httpMethods ) ]
+RouteConfigurator >> configure [
+	
+	resourceController routes
+		do: [ :routeSpecification | routeSpecification configureUsing: self ]
 ]
 
 { #category : #'private - configuring' }
 RouteConfigurator >> configureRouteFrom: aRouteSpecification [
 
 	teapot
-		perform: ( '<1s>:' expandMacrosWith: aRouteSpecification httpMethod ) asSymbol
-		with:
-			aRouteSpecification urlTemplate
-				-> [ :request | 
-					self withServerUrlDo: [ :url | request url: ( request url asHostedAt: url ) ].
-					aRouteSpecification handler value: request value: HttpRequestContext new
-					]
+		addRouteMethod: (TeaMethodMatcher exactly: aRouteSpecification httpMethod asSymbol)
+		pattern: aRouteSpecification urlTemplate
+		action: [ :request | 
+			self withServerUrlDo: [ :url | request url: ( request url asHostedAt: url ) ].
+			aRouteSpecification handler value: request value: HttpRequestContext new
+			]
 ]
 
 { #category : #initialization }
-RouteConfigurator >> initializeAppliedTo: aTeapot sendingMessagesTo: aResourceRESTfulController [
+RouteConfigurator >> initializeConfiguring: aTeapot withRoutesDefinedOn: aResourceRESTfulController [
 
 	teapot := aTeapot.
 	resourceController := aResourceRESTfulController.
 	self withServerUrlDo: [ :url | resourceController serverUrl: url ].
-	routesAllowingCors := Dictionary new
 ]
 
 { #category : #'private - configuring' }

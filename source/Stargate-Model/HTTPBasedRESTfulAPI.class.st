@@ -28,11 +28,14 @@ HTTPBasedRESTfulAPI >> addController: aRESTfulController [
 ]
 
 { #category : #configuring }
-HTTPBasedRESTfulAPI >> beCORSAwareAllowing: origins [
+HTTPBasedRESTfulAPI >> allowCrossOriginSharingApplying: aConfigurationBlock [
 
-	teapotServer
-		after: '/*' -> (CrossOriginResourceSharingAfterFilter allowing: origins);
-		when: [ :request | request headers includesKey: 'Origin' ]
+	| builder |
+
+	builder := aConfigurationBlock
+		value: ( CrossOriginResourceSharingFilterBuilder using: controllers ).
+	builder buildPreflightFilter applyOn: teapotServer.
+	builder buildActualRequestFilter applyOn: teapotServer
 ]
 
 { #category : #'private - configuring' }

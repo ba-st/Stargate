@@ -37,7 +37,8 @@ BaselineOfStargate >> setUpDependencies: spec [
 
 	spec
 		baseline: 'Hyperspace' with: [ spec repository: 'github://ba-st/Hyperspace:v2/source' ];
-		project: 'Hyperspace-Deployment' copyFrom: 'Hyperspace' with: [ spec loads: 'Deployment' ].
+		project: 'Hyperspace-Deployment' copyFrom: 'Hyperspace' with: [ spec loads: 'Deployment' ];
+		project: 'Hyperspace-SUnit' copyFrom: 'Hyperspace' with: [ spec loads: 'Dependent-SUnit-Extensions' ].
 
 	spec
 		baseline: 'Teapot' with: [ spec repository: 'github://zeroflag/Teapot:v2.6.0/source' ];
@@ -128,7 +129,7 @@ BaselineOfStargate >> setUpTestPackages: spec [
 
 	spec
 		package: 'Stargate-Model-Tests'
-			with: [ spec requires: #('Stargate-Model' 'Stargate-Examples' 'Stargate-HealthCheck') ];
+			with: [ spec requires: #('Stargate-Model' 'Stargate-Examples' 'Stargate-HealthCheck' 'Hyperspace-SUnit') ];
 		group: 'Tests' with: 'Stargate-Model-Tests'.
 	spec
 		package: 'Stargate-HealthCheck-Tests'
@@ -156,6 +157,6 @@ BaselineOfStargate >> setUpTestPackages: spec [
 		group: 'Tests' with: 'Stargate-Application-Configuration-Tests'.
 	spec
 		package: 'Stargate-Examples-Tests'
-			with: [ spec requires: #('Dependent-SUnit-Extensions' 'Stargate-Examples') ];
+			with: [ spec requires: #('Dependent-SUnit-Extensions' 'Stargate-Examples' 'Hyperspace-SUnit') ];
 		group: 'Tests' with: 'Stargate-Examples-Tests'
 ]
