@@ -1,8 +1,6 @@
 name: Build
 
-on:
-  pull_request:
-  push:
+on: [push,pull_request]
 
 jobs:
    build:
@@ -13,14 +11,14 @@ jobs:
     name: ${{ matrix.smalltalk }}
     steps:
       - uses: actions/checkout@v2
-      - uses: ba-st-actions/setup-smalltalkCI@v1.0.0
+      - uses: hpi-swa/setup-smalltalkCI@v1
         with:
           smalltalk-version: ${{ matrix.smalltalk }}
-      - run: smalltalkci -s ${{ matrix.smalltalk }}
+      - name: Load Image and Run Tests
+        run: smalltalkci -s ${{ matrix.smalltalk }}
         timeout-minutes: 15
-      - run: echo "::set-env name=SCI_COVERAGE_FILE_LOCATION::${HOME}/.smalltalkCI/_builds/coveralls_results.json"
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v1
         with:
-          token: ${{ secrets.CODECOV_TOKEN }}
-          file: ${{ env.SCI_COVERAGE_FILE_LOCATION }}
+          name: ${{matrix.os}}-${{matrix.smalltalk}}
+          token: ${{ secrets.CODECOV_TOKEN }}}
