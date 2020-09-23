@@ -1,9 +1,15 @@
 Extension { #name : #JWTClaimsSet }
 
 { #category : #'*Stargate-Model' }
+JWTClaimsSet >> at: aKey ifAbsent: aBlock [
+
+	^ claims at: aKey ifAbsent: aBlock
+]
+
+{ #category : #'*Stargate-Model' }
 JWTClaimsSet >> permissions [
 
-	^ claims at: 'permissions' ifAbsent: [ ^ #() ]
+	^ self at: 'permissions' ifAbsent: [ ^ #() ]
 ]
 
 { #category : #'*Stargate-Model' }
@@ -15,7 +21,7 @@ JWTClaimsSet >> permissions: aCollection [
 { #category : #'*Stargate-Model' }
 JWTClaimsSet >> scope [
 
-	^ claims at: 'scope' ifAbsent: [ '' ]
+	^ self at: 'scope' ifAbsent: [ '' ]
 ]
 
 { #category : #'*Stargate-Model' }
