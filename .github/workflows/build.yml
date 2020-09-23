@@ -16,6 +16,8 @@ jobs:
           smalltalk-version: ${{ matrix.smalltalk }}
       - name: Load Image and Run Tests
         run: smalltalkci -s ${{ matrix.smalltalk }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         timeout-minutes: 15
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v1
