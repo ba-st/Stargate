@@ -37,12 +37,6 @@ ResourceRESTfulControllerTest >> assertExpiresHeaderFor: response with: aDuratio
 		assert: ( expiresString = oneMinuteBeforeFourHours or: [ expiresString = fourHoursInTheFuture ] )
 ]
 
-{ #category : #'private - asserting' }
-ResourceRESTfulControllerTest >> assertUrl: aStringOrUrl equals: anotherStringOrUrl [
-
-	self assert: aStringOrUrl asZnUrl equals: anotherStringOrUrl asZnUrl
-]
-
 { #category : #'private - support' }
 ResourceRESTfulControllerTest >> baseUrl [
 

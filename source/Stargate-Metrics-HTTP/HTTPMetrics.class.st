@@ -7,10 +7,24 @@ Class {
 	#instVars : [
 		'groupedRequestCount',
 		'groupedResponseSize',
-		'groupedRequestResponseDuration'
+		'groupedRequestResponseDuration',
+		'categoriesFilter'
 	],
 	#category : #'Stargate-Metrics-HTTP'
 }
+
+{ #category : #'instance creation' }
+HTTPMetrics class >> configuredBy: pluginConfiguration [
+
+	^ self basicNew
+		initializeConfiguredBy: ( pluginConfiguration at: self providerName ifAbsent: [ Dictionary new ] )
+]
+
+{ #category : #'instance creation' }
+HTTPMetrics class >> new [
+
+	^ self configuredBy: Dictionary new
+]
 
 { #category : #accessing }
 HTTPMetrics class >> providerName [
@@ -42,11 +56,7 @@ HTTPMetrics >> handleEvent: aZnServerTransactionEvent [
 
 	| labels |
 
-	labels := Array
-		with: #http_method -> aZnServerTransactionEvent request method
-		with: #url -> aZnServerTransactionEvent request url asString
-		with: #response_code -> aZnServerTransactionEvent response code
-		with: #url_template -> ( aZnServerTransactionEvent request urlTemplateIfAbsent: [ '' ] ).
+	labels := self labelsFor: aZnServerTransactionEvent.
 
 	self
 		increaseRequestCountAt: labels;
@@ -60,10 +70,7 @@ HTTPMetrics >> handleSimplifiedEvent: aZnSimplifiedServerTransactionEvent [
 
 	| labels |
 
-	labels := Array
-		with: #http_method -> aZnSimplifiedServerTransactionEvent method
-		with: #url -> aZnSimplifiedServerTransactionEvent url asString
-		with: #response_code -> aZnSimplifiedServerTransactionEvent responseCode.
+	labels := self labelsFor: aZnSimplifiedServerTransactionEvent.
 
 	self
 		increaseRequestCountAt: labels;
@@ -100,9 +107,12 @@ HTTPMetrics >> increaseResponseSizeAt: labels with: aByteCount [
 ]
 
 { #category : #initialization }
-HTTPMetrics >> initialize [
+HTTPMetrics >> initializeConfiguredBy: providerConfiguration [
 
-	super initialize.
+	categoriesFilter := providerConfiguration
+		at: #breakdownCategories
+		ifPresent: [ :categories | [ :labels | labels select: [ :label | categories includes: label key ] ] ]
+		ifAbsent: [ [ :labels | labels ] ].
 	groupedRequestCount := Dictionary new.
 	groupedResponseSize := Dictionary new.
 	groupedRequestResponseDuration := Dictionary new
@@ -115,7 +125,19 @@ HTTPMetrics >> installOn: teapotServer [
 		when: ZnSimplifiedServerTransactionEvent do: [ :event | self handleSimplifiedEvent: event ];
 		when: ZnServerTransactionEvent do: [ :event | self handleEvent: event ].
 
-	teapotServer server setLogLevelAtLeastTo: 1
+	teapotServer server setLogLevelAtLeastTo: 2
+]
+
+{ #category : #'private - metrics' }
+HTTPMetrics >> labelsFor: aServerTransactionEvent [
+
+	^ categoriesFilter
+		value:
+			( Array
+				with: #http_method -> aServerTransactionEvent method
+				with: #url -> aServerTransactionEvent url asString
+				with: #response_code -> aServerTransactionEvent responseCode
+				with: #url_template -> aServerTransactionEvent urlTemplate )
 ]
 
 { #category : #'private - metrics' }

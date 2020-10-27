@@ -13,6 +13,12 @@ MetricProvider class >> allProviderNames [
 	^ MetricProvider allSubclasses collect: [ :class | class providerName ] 
 ]
 
+{ #category : #'instance creation' }
+MetricProvider class >> configuredBy: pluginConfiguration [
+
+	^ self subclassResponsibility
+]
+
 { #category : #accessing }
 MetricProvider class >> providerName [
 

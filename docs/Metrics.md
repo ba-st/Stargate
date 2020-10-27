@@ -10,7 +10,8 @@ For example:
 Dictionary new
   at: #operations put: (
     Dictionary new
-      at: #metrics put: {#enabled -> true. #metrics -> #('memory')} asDictionary;
+      at: #metrics put: {#enabled -> true. #metrics -> #('memory' 'http')} asDictionary;
+      at: 'http' put: {#breakdownCategories -> #(http_method)}
       yourself
     );
   yourself
@@ -23,7 +24,7 @@ Available metric providers:
 - `memory` gathers metrics over the allocated memory (total, old space, free old space, eden space, young space)
 - `garbage collection` gathers metrics over the garbage collector (time spent on garbage collection, invokation count and tenure count)
 - `running system` gathers information over the running system (uptime, process count by status and priority, external semaphore table data)
-- `http` (optional group) gathers information over the incoming HTTP requests (request count, request duration, response size by HTTP method, response code and URL)
+- `http` (optional group) gathers information over the incoming HTTP requests (request count, request duration, response size by HTTP method, response code, URL and URL template). The categories used for the breakdown can be filtered by using the operations configuration, valid options are `#response_code`, `#http_method`, `#url` and `#url_template`. By default all categories are used for the breakdown.
 
 ## API
 
