@@ -9,7 +9,8 @@ SmalltalkCISpec {
   ],
   #testing : {
     #coverage : {
-       #packages : [ 'Stargate*' ]
+      #packages : [ 'Stargate*' ],
+      #format: #lcov
     }
   }
 }
