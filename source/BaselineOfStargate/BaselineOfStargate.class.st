@@ -119,7 +119,7 @@ BaselineOfStargate >> setUpPackages: spec [
 		package: 'Stargate-Examples' with: [ spec requires: 'Stargate-Model' ];
 		group: 'Examples' with: 'Stargate-Examples'.
 	spec
-		package: 'Stargate-SUnit-Model' with: [ spec requires: #('Stargate-Model' 'Buoy-SUnit') ];
+		package: 'Stargate-SUnit-Model' with: [ spec requires: #('Stargate-Model' 'Buoy-SUnit' 'Hyperspace-SUnit') ];
 		group: 'Dependent-SUnit-Extensions' with: 'Stargate-SUnit-Model'.
 	self setUpTestPackages: spec
 ]
