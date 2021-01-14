@@ -76,6 +76,7 @@ CrossOriginResourceSharingPreflightHandlerBuilder >> expose: exposedHeaders [
 { #category : #initialization }
 CrossOriginResourceSharingPreflightHandlerBuilder >> initialize [
 
+	super initialize.
 	allowOriginPolicyBinding := Binding 
 		undefinedExplainedBy: 'You must define an allow origin policy'.
 	allowedMethodsBinding := Binding
