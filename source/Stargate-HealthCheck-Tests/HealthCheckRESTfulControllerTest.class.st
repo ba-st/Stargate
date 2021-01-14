@@ -65,11 +65,11 @@ HealthCheckRESTfulControllerTest >> testRunHealthChecksWithFailuresAskingDetaile
 			| lowDiskSpace |
 
 			self assert: json status equals: 'FAIL'.
-			lowDiskSpace := json details at: 'low-disk-space'.
+			lowDiskSpace := json details at: #'low-disk-space'.
 			self
 				assert: lowDiskSpace status equals: 'FAIL';
-				assert: ( lowDiskSpace details at: 'free-space' ) equals: 50000;
-				assert: ( lowDiskSpace details at: 'total' ) equals: 60000
+				assert: ( lowDiskSpace details at: #'free-space' ) equals: 50000;
+				assert: ( lowDiskSpace details at: #'total' ) equals: 60000
 			]
 ]
 
