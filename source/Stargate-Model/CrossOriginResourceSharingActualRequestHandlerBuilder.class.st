@@ -51,6 +51,7 @@ CrossOriginResourceSharingActualRequestHandlerBuilder >> expose: exposedHeaders 
 { #category : #initialization }
 CrossOriginResourceSharingActualRequestHandlerBuilder >> initialize [
 
+	super initialize.
 	allowOriginPolicyBinding := Binding undefinedExplainedBy: 'You must choose an allow origin policy'.
 	addHeaderCommands := OrderedCollection new
 ]

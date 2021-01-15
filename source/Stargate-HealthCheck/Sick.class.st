@@ -29,7 +29,7 @@ Sick >> details [
 	^ details
 ]
 
-{ #category : #initalize }
+{ #category : #initialization }
 Sick >> initializeDetailedBy: aDetailsObject onHealthCheckNamed: aName [
 
 	details := aDetailsObject.
