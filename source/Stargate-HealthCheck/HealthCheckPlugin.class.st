@@ -68,7 +68,7 @@ HealthCheckPlugin >> includeControllersIn: api [
 		addController: ( HealthCheckRESTfulController over: self configuredBy: api operationsConfiguration )
 ]
 
-{ #category : #initalize }
+{ #category : #initialization }
 HealthCheckPlugin >> initializeRunningAll: aHealthCheckCollection [
 
 	healthChecks := aHealthCheckCollection

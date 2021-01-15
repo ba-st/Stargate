@@ -6,8 +6,7 @@ Class {
 	#name : #ApplicationInfoPlugin,
 	#superclass : #OperationalPlugin,
 	#instVars : [
-		'informationProviders',
-		'infoProviders'
+		'informationProviders'
 	],
 	#category : #'Stargate-Application-Info'
 }
@@ -52,7 +51,7 @@ ApplicationInfoPlugin class >> pluginName [
 { #category : #accessing }
 ApplicationInfoPlugin >> gatherInformation [
 
-	^ infoProviders
+	^ informationProviders
 		inject: OrderedDictionary new
 		into: [ :information :provider | 
 			information
@@ -71,7 +70,7 @@ ApplicationInfoPlugin >> includeControllersIn: api [
 { #category : #initialization }
 ApplicationInfoPlugin >> initializeGatheringAll: enabledInformationProviderNames [
 
-	infoProviders := ApplicationInformationProvider allSubclasses
+	informationProviders := ApplicationInformationProvider allSubclasses
 		select: [ :provider | enabledInformationProviderNames includes: provider providerName ]
 		thenCollect: [ :providerClass | providerClass new ]
 ]
