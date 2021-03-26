@@ -2,9 +2,9 @@
 
 One of the operational plugins. It's usually exercised by monitoring software to alert if a running instance gets unhealthy for some reason.
 
-In the future this plugin will allow additional checks to be run. The infrastructure is almost ready just new checks needs to be implemented.
+In the future, this plugin will allow additional checks to be run. The infrastructure is almost ready just new checks need to be implemented.
 
-In case there are multiple checks, the general status will be the worst status of the checks run. Every check status can be accessed asking for the details media type and looking at the details object.
+In case there are multiple checks, the general status will be the worst status of the checks run. Every check status can be accessed by asking for the details media type and looking at the details object.
 
 Supported Statuses:
 - `PASS` represents a healthy condition for the check run
