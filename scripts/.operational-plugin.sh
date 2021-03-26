@@ -8,7 +8,7 @@ usage()
 
    cat << EOF
 Usage: $(basename $0) [-b BASE_URL] [-p PORT] -t JWT
-This program will interact with an Stargate powered API using some operational plugin endpoint.
+This program will interact with a Stargate-powered API using some operational plugin endpoint.
 Options:
 -b BASE_URL         Base URL where the API is hosted. Defaults to http://localhost
 -p PORT             Port where the API is running. Defaults to 8080.

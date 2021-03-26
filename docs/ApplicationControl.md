@@ -16,7 +16,7 @@ Dictionary new
   yourself
 ```
 
-To get a list of supported commands print the result of `ApplicationControlPlugin availableCommands collect: #methodName as: Array`.
+To get a list of supported commands, print the result of `ApplicationControlPlugin availableCommands collect: #methodName as: Array`.
 
 Available commands:
 

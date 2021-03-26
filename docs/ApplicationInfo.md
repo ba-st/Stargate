@@ -18,7 +18,7 @@ Dictionary new
 
 Available information providers:
 
-- `application` Reports the application name, description and version
+- `application` Reports the application name, description, and version
 - `pharo` Reports information about the Pharo image and VM
 - `os` Reports information about the underlying operating system
 
