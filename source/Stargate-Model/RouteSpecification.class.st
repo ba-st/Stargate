@@ -19,6 +19,16 @@ RouteSpecification class >> handling: anHttpMethod at: anUrlTemplate evaluating:
 	^ self new initializeHandling: anHttpMethod at: anUrlTemplate evaluating: aBlock
 ]
 
+{ #category : #converting }
+RouteSpecification >> asCorsAware [
+
+	self
+		deprecated: 'CORS has to be configured site-wide since v6'
+		transformWith: '`@receiver asCorsAware' -> '@receiver'.
+
+	^ self
+]
+
 { #category : #configuring }
 RouteSpecification >> authenticatedBy: anAuthorizationFilter [
 
