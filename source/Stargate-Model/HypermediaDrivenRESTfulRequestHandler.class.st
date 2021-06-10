@@ -25,14 +25,14 @@ HypermediaDrivenRESTfulRequestHandler class >> resourceLocator: aResouceLocator 
 ]
 
 { #category : #private }
-HypermediaDrivenRESTfulRequestHandler >> encodeResource: resource to: mediaType within: requestContext [
+HypermediaDrivenRESTfulRequestHandler >> encodeResource: resource within: requestContext [
 
 	self holdResource: resource controlsWithin: requestContext.
-	^ super encodeResource: resource to: mediaType within: requestContext
+	^ super encodeResource: resource within: requestContext
 ]
 
 { #category : #private }
-HypermediaDrivenRESTfulRequestHandler >> encodeResourceCollection: resourceCollection to: mediaType basedOn: httpRequest within: requestContext [
+HypermediaDrivenRESTfulRequestHandler >> encodeResourceCollection: resourceCollection basedOn: httpRequest within: requestContext [
 
 	requestContext
 		holdAsHypermediaControls:
@@ -43,7 +43,6 @@ HypermediaDrivenRESTfulRequestHandler >> encodeResourceCollection: resourceColle
 	resourceCollection do: [ :resource | self holdResource: resource controlsWithin: requestContext ].
 	^ super
 		encodeResourceCollection: ( ResourceCollection wrapping: resourceCollection )
-		to: mediaType
 		basedOn: httpRequest
 		within: requestContext
 ]

@@ -44,27 +44,27 @@ RESTfulRequestHandlerBehavior >> decode: httpRequest within: requestContext [
 ]
 
 { #category : #'decoding/encoding' }
-RESTfulRequestHandlerBehavior >> encode: resource to: mediaType within: requestContext [
+RESTfulRequestHandlerBehavior >> encode: resource within: requestContext [
 
 	| encodingRule |
 
 	encodingRule := encodingRules
-		at: mediaType
+		at: requestContext targetMediaType
 		ifAbsent: [ HTTPClientError unsupportedMediaType signal: 'Encoder not found for given media type' ].
 
 	^ encodingRule encode: resource within: requestContext
 ]
 
 { #category : #private }
-RESTfulRequestHandlerBehavior >> encodeResource: resource to: mediaType within: requestContext [
+RESTfulRequestHandlerBehavior >> encodeResource: resource within: requestContext [
 
-	^ self encode: resource to: mediaType within: requestContext
+	^ self encode: resource within: requestContext
 ]
 
 { #category : #private }
-RESTfulRequestHandlerBehavior >> encodeResourceCollection: resourceCollection to: mediaType basedOn: httpRequest within: requestContext [
+RESTfulRequestHandlerBehavior >> encodeResourceCollection: resourceCollection basedOn: httpRequest within: requestContext [
 
-	^ self encode: resourceCollection to: mediaType within: requestContext
+	^ self encode: resourceCollection within: requestContext
 ]
 
 { #category : #accessing }
@@ -102,16 +102,17 @@ RESTfulRequestHandlerBehavior >> exceptionHandler [
 { #category : #API }
 RESTfulRequestHandlerBehavior >> from: httpRequest within: requestContext get: aQueryEvaluationBlock [
 
-	| mediaType resource response |
+	| resource response |
 
-	mediaType := self targetMediaTypeFrom: httpRequest.
+	self holdTargetMediaTypeFrom: httpRequest within: requestContext.
 	resource := resourceLocator
 		lookupResourceIdentifiedBy: httpRequest
 		evaluating: aQueryEvaluationBlock.
 	self
 		ifNoneMatchHeaderPresentIn: httpRequest
 		do: [ :etag | 
-			etag = ( self entityTagOf: resource encodedAs: mediaType within: requestContext )
+			etag
+				= ( self entityTagOf: resource encodedAs: requestContext targetMediaType within: requestContext )
 				ifTrue: [ response := ZnResponse notModified
 						setEntityTag: etag;
 						yourself.
@@ -119,12 +120,8 @@ RESTfulRequestHandlerBehavior >> from: httpRequest within: requestContext get: a
 					^ response
 					]
 			].
-	response := ZnResponse ok: ( self encodeResource: resource to: mediaType within: requestContext ).
-	self
-		putEntityTagOf: resource
-		encodedAs: mediaType
-		in: response
-		within: requestContext.
+	response := ZnResponse ok: ( self encodeResource: resource within: requestContext ).
+	self putEntityTagOf: resource in: response within: requestContext.
 	self applyCachingDirectivesTo: response within: requestContext.
 	^ response
 ]
@@ -170,19 +167,24 @@ RESTfulRequestHandlerBehavior >> from: httpRequest within: requestContext get: f
 { #category : #API }
 RESTfulRequestHandlerBehavior >> from: httpRequest within: requestContext getCollection: aQueryEvaluationBlock [
 
-	| mediaType resourceCollection encodedResourceCollection response |
+	|  resourceCollection encodedResourceCollection response |
 
-	mediaType := self targetMediaTypeFrom: httpRequest.
+	self holdTargetMediaTypeFrom: httpRequest within: requestContext.
 	resourceCollection := paginationPolicy evaluateQuery: aQueryEvaluationBlock basedOn: httpRequest.
 	encodedResourceCollection := self
 		encodeResourceCollection: resourceCollection
-		to: mediaType
 		basedOn: httpRequest
 		within: requestContext.
 	response := ZnResponse ok: encodedResourceCollection.
 	self paginationPolicy affect: response within: requestContext.
 	self applyCachingDirectivesTo: response within: requestContext.
 	^ response
+]
+
+{ #category : #private }
+RESTfulRequestHandlerBehavior >> holdTargetMediaTypeFrom: httpRequest within: requestContext [
+
+	^ requestContext targetMediaType: ( acceptNegotiator bestRepresentationFor: httpRequest )
 ]
 
 { #category : #private }
@@ -224,21 +226,22 @@ RESTfulRequestHandlerBehavior >> paginationPolicy [
 ]
 
 { #category : #private }
-RESTfulRequestHandlerBehavior >> putEntityTagOf: resource encodedAs: mediaType in: response within: requestContext [
+RESTfulRequestHandlerBehavior >> putEntityTagOf: resource in: response within: requestContext [
 
-	response setEntityTag: ( self entityTagOf: resource encodedAs: mediaType within: requestContext )
+	response
+		setEntityTag: ( self entityTagOf: resource encodedAs: requestContext targetMediaType within: requestContext )
 ]
 
 { #category : #private }
-RESTfulRequestHandlerBehavior >> resourceCreationPolicyBasedOn: httpRequest [
+RESTfulRequestHandlerBehavior >> resourceCreationPolicyBasedOn: httpRequest within: requestContext [
 
 	[ httpRequest accept ]
 		on: KeyNotFound
 		do: [ :signal | ^ RESTfulControllerDoNotRespondCreatedEntityPolicy for: self ].
 
-	^ RESTfulControllerRespondCreatedEntityPolicy
-		for: self
-		encodedAs: ( self targetMediaTypeFrom: httpRequest )
+	self holdTargetMediaTypeFrom: httpRequest within: requestContext.
+
+	^ RESTfulControllerRespondCreatedEntityPolicy for: self
 ]
 
 { #category : #accessing }
@@ -251,12 +254,6 @@ RESTfulRequestHandlerBehavior >> resourceLocator [
 RESTfulRequestHandlerBehavior >> serverUrl: aServerUrl [
 
 	resourceLocator baseUrl: aServerUrl
-]
-
-{ #category : #private }
-RESTfulRequestHandlerBehavior >> targetMediaTypeFrom: httpRequest [
-
-	^ acceptNegotiator bestRepresentationFor: httpRequest
 ]
 
 { #category : #API }
@@ -276,7 +273,7 @@ RESTfulRequestHandlerBehavior >> withResourceCreatedFrom: httpRequest within: re
 
 	| creationPolicy decodedRepresentation newResource |
 
-	creationPolicy := self resourceCreationPolicyBasedOn: httpRequest.
+	creationPolicy := self resourceCreationPolicyBasedOn: httpRequest within: requestContext.
 	decodedRepresentation := self decode: httpRequest within: requestContext.
 	newResource := self exceptionHandler handleConflictsDuring: [ aBlock value: decodedRepresentation ].
 	^ creationPolicy responseFor: newResource basedOn: httpRequest within: requestContext

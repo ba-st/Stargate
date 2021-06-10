@@ -75,7 +75,7 @@ RESTfulRequestHandlerBuilder >> createEntityTagHashingEncodedResource [
 	self
 		createEntityTagWith: [ :resource :mediaType :requestContext :requestHandler | 
 			EntityTagHasher new
-				include: ( requestHandler encodeResource: resource to: mediaType within: requestContext );
+				include: ( requestHandler encodeResource: resource within: requestContext );
 				calculateHash
 			]
 ]

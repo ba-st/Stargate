@@ -122,17 +122,14 @@ HealthCheckRESTfulController >> runHealthChecksBasedOn: httpRequest within: requ
 
 	| healthCondition entity targetMediaType |
 
-	targetMediaType := requestHandler targetMediaTypeFrom: httpRequest.
+	targetMediaType := requestHandler holdTargetMediaTypeFrom: httpRequest within: requestContext.	
 	"The summary media type can be requested without authorization credentials"
 	[ self assert: httpRequest isAuthorizedWithin: requestContext ]
-		unless: targetMediaType = self healthCheckSummaryVersion1dot0dot0MediaType .
+		unless: targetMediaType = self healthCheckSummaryVersion1dot0dot0MediaType.
 
 	healthCondition := plugin runHealthChecks.
 
-	entity := requestHandler
-		encodeResource: healthCondition
-		to: targetMediaType
-		within: requestContext.
+	entity := requestHandler encodeResource: healthCondition within: requestContext.
 
 	^ healthCondition isNotCritical
 		then: [ ZnResponse ok: entity ]

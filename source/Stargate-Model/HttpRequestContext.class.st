@@ -103,3 +103,15 @@ HttpRequestContext >> permissions: aPermissionCollection [
 
 	self hold: aPermissionCollection under: #permissions
 ]
+
+{ #category : #accessing }
+HttpRequestContext >> targetMediaType [
+
+	^ self objectUnder: #targetMediaType
+]
+
+{ #category : #accessing }
+HttpRequestContext >> targetMediaType: aMediaType [
+
+	^ self hold: aMediaType under: #targetMediaType
+]
