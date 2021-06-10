@@ -1,0 +1,13 @@
+SmalltalkCISpec {
+  #loading : [
+    SCIMetacelloLoadSpec {
+      #baseline : 'Stargate',
+      #directory : '../source',
+      #load : [ 'Dependent-SUnit-Extensions' ],
+      #platforms : [  #pharo ]
+    }
+  ],
+  #testing : {
+    #failOnZeroTests : false
+  }
+}
