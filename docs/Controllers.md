@@ -92,7 +92,7 @@ must be configured to produce a valid request handler:
   ```smalltalk
   builder
       handling: 'currencies'
-      extractingIdentifierWith: 
+      extractingIdentifierWith:
       [ :httpRequest | self identifierIn: httpRequest ];
   ```
 
@@ -120,7 +120,7 @@ must be configured to produce a valid request handler:
   ```smalltalk
   builder
       handling: 'orders'
-      locatingResourcesWith: 
+      locatingResourcesWith:
         [ :order :requestContext | ordersRepository identifierOf: order ]
       extractingIdentifierWith: [ :httpRequest | self identifierIn: httpRequest ];
   ```
@@ -138,7 +138,7 @@ must be configured to produce a valid request handler:
       locatingSubresourcesWith: [ :comment :requestContext |
         self commentIdentifierOf: comment relatedTo: requestContext parentResource
       ]
-      extractingIdentifierWith: 
+      extractingIdentifierWith:
         [ :httpRequest | self commentIdentifierIn: httpRequest ]
       locatingParentResourceWith: parentRequestHandler resourceLocator
   ```

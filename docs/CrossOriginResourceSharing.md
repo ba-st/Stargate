@@ -52,9 +52,9 @@ one or more origins.
 ```smalltalk
 api := HTTPBasedRESTfulAPI
   configuredBy: { "configuration"  }
-  installing: { "controllers to install" } .
+  installing: { "controllers to install" }.
 
-api allowCrossOriginSharingApplying: 
+api allowCrossOriginSharingApplying:
   [:cors | cors allowOnlyFrom: { 'http://website.com '} ]
 ```
 

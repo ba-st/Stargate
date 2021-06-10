@@ -14,8 +14,8 @@ Dictionary new
     Dictionary new
       at: 'application-configuration'
       put: {
-        #enabled -> true. 
-        #definitions -> application definitions. 
+        #enabled -> true.
+        #definitions -> application definitions.
         #provider -> application configuration } asDictionary;
       yourself
     );

@@ -11,9 +11,9 @@ For example:
 Dictionary new
   at: #operations put: (
     Dictionary new
-      at: 'application-control' 
+      at: 'application-control'
       put: {
-        #enabled -> true. 
+        #enabled -> true.
         #commands -> #('shutdown')} asDictionary;
       yourself
     );
