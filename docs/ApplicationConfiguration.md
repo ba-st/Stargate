@@ -1,8 +1,10 @@
 # Application Configuration
 
-One of the operational plugins. It exposes information about the configuration of the running application.
+One of the operational plugins. It exposes information about the configuration
+of the running application.
 
-This plugin is disabled by default and allows configuring the available configuration providers. This configuration is made via the `#operations` config.
+This plugin is disabled by default and allows configuring the available
+configuration providers. This configuration is made via the `#operations` config.
 
 For example:
 
@@ -11,7 +13,10 @@ Dictionary new
   at: #operations put: (
     Dictionary new
       at: 'application-configuration'
-      put: {#enabled -> true. #'definitions' -> application definitions. #provider -> application configuration } asDictionary;
+      put: {
+        #enabled -> true.
+        #definitions -> application definitions.
+        #provider -> application configuration } asDictionary;
       yourself
     );
   yourself
@@ -56,7 +61,7 @@ HTTP/1.1 200 OK
 ]
 ```
 
-```
+```http
 HTTP/1.1 200 OK
 ...
 

@@ -2,7 +2,8 @@
 
 One of the operational plugins. It exposes information about the running application.
 
-This plugin is disabled by default and allows configuring the available information providers. This configuration is made via the `#operations` config.
+This plugin is disabled by default and allows configuring the available
+information providers. This configuration is made via the `#operations` config.
 
 For example:
 
@@ -10,7 +11,10 @@ For example:
 Dictionary new
   at: #operations put: (
     Dictionary new
-      at: 'application-info' put: {#enabled -> true. #'info-providers' -> #('application')} asDictionary;
+      at: 'application-info'
+      put: {
+        #enabled -> true.
+        #'info-providers' -> #('application')} asDictionary;
       yourself
     );
   yourself
@@ -52,7 +56,12 @@ Content-Type: application/vnd.stargate.operational-application-info+json;version
       "location": "Pharo.image"
     },
     "vm": {
-      "version": "CoInterpreter VMMaker.oscog-eem.2504 uuid: a00b0fad-c04c-47a6-8a11-5dbff110ac11 Jan  5 2019\rStackToRegisterMappingCogit VMMaker.oscog-eem.2504 uuid: a00b0fad-c04c-47a6-8a11-5dbff110ac11 Jan  5 2019\rVM: 201901051900 https://github.com/OpenSmalltalk/opensmalltalk-vm.git Date: Sat Jan 5 20:00:11 2019 CommitHash: 7a3c6b64 Plugins: 201901051900 https://github.com/OpenSmalltalk/opensmalltalk-vm.git\r",
+      "version": "CoInterpreter VMMaker.oscog-eem.2504
+      uuid: a00b0fad-c04c-47a6-8a11-5dbff110ac11 Jan  5 2019
+      StackToRegisterMappingCogit VMMaker.oscog-eem.2504
+      uuid: a00b0fad-c04c-47a6-8a11-5dbff110ac11 Jan  5 2019
+      VM: 201901051900 https://github.com/OpenSmalltalk/opensmalltalk-vm.git
+      Date: Sat Jan 5 20:00:11 2019 CommitHash: 7a3c6b64 Plugins: 201901051900 https://github.com/OpenSmalltalk/opensmalltalk-vm.git",
       "architecture": "64 bits",
       "image-version-format": 68021,
       "location": "pharo-vm/lib/pharo/5.0-201901051900/pharo",
@@ -110,7 +119,8 @@ Content-Type: application/vnd.stargate.operational-application-info+json;version
           "SoundPlugin VMMaker.oscog-eem.2495 (i)",
           "SqueakFFIPrims",
           "StarSqueakPlugin VMMaker.oscog-eem.2480 (i)",
-          "UnixOSProcessPlugin VMConstruction-Plugins-OSProcessPlugin.oscog-eem.61 (i)",
+          "UnixOSProcessPlugin
+          VMConstruction-Plugins-OSProcessPlugin.oscog-eem.61 (i)",
           "VMProfileLinuxSupportPlugin VMMaker.oscog-eem.2480 (i)",
           "ZipPlugin VMMaker.oscog-eem.2480 (i)"
         ]
@@ -200,7 +210,10 @@ Content-Type: application/vnd.stargate.operational-application-info+json;version
       "subtype": "x86_64"
     },
     "details": {
-      "version": "Linux version 4.15.0-70-generic (buildd@lgw01-amd64-057) (gcc version 5.4.0 20160609 (Ubuntu 5.4.0-6ubuntu1~16.04.12)) #79~16.04.1-Ubuntu SMP Tue Nov 12 14:01:10 UTC 2019\n",
+      "version": "Linux version 4.15.0-70-generic (buildd@lgw01-amd64-057)
+      (gcc version 5.4.0 20160609
+      (Ubuntu 5.4.0-6ubuntu1~16.04.12)) #79~16.04.1-Ubuntu SMP
+      Tue Nov 12 14:01:10 UTC 2019",
       "release": {
         "distrib_id": "Ubuntu",
         "distrib_release": "16.04",

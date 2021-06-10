@@ -2,7 +2,8 @@
 
 One of the operational plugins. It's usually exercised by monitoring software.
 
-This plugin is disabled by default and allows configuring the metrics to gather. This configuration is made via the `#operations` config.
+This plugin is disabled by default and allows configuring the metrics to gather.
+This configuration is made via the `#operations` config.
 
 For example:
 
@@ -21,10 +22,18 @@ To get a list of supported metric providers print the result of `MetricProvider 
 
 Available metric providers:
 
-- `memory` gathers metrics over the allocated memory (total, old space, free old space, eden space, young space)
-- `garbage collection` gathers metrics over the garbage collector (time spent on garbage collection, invokation count and tenure count)
-- `running system` gathers information over the running system (uptime, process count by status and priority, external semaphore table data)
-- `http` (optional group) gathers information over the incoming HTTP requests (request count, request duration, response size by HTTP method, response code, URL and URL template). The categories used for the breakdown can be filtered by using the operations configuration, valid options are `#response_code`, `#http_method`, `#url` and `#url_template`. By default all categories are used for the breakdown.
+- `memory` gathers metrics over the allocated memory (total, old space, free
+  old space, eden space, young space)
+- `garbage collection` gathers metrics over the garbage collector (time spent
+  on garbage collection, invokation count and tenure count)
+- `running system` gathers information over the running system (uptime,
+  process count by status and priority, external semaphore table data)
+- `http` (optional group) gathers information over the incoming HTTP requests
+  (request count, request duration, response size by HTTP method, response code,
+  URL and URL template). The categories used for the breakdown can be filtered
+  by using the operations configuration, valid options are `#response_code`,
+  `#http_method`, `#url` and `#url_template`. By default all categories are
+  used for the breakdown.
 
 ## API
 
@@ -34,7 +43,8 @@ Available metric providers:
 - Allowed HTTP methods: `GET`
 - Supported media types:
   - `text/plain`: In prometheus client data exposition format
-  - `text/vnd.stargate.prometheus.client-data-exposition;version=0.0.4`: The same as plain text but more explicit on the format
+  - `text/vnd.stargate.prometheus.client-data-exposition;version=0.0.4`: The
+    same as plain text but more explicit on the format
   - `application/vnd.stargate.operational-metrics+json`
 - Authentication: Required
 - Authorization: Requires `read:metrics`
@@ -43,7 +53,7 @@ Available metric providers:
 
 Example responses:
 
-```
+```http
 HTTP/1.1 200 OK
 ...
 Content-Type: text/plain;version=0.0.4
@@ -55,7 +65,8 @@ smalltalk_memory_in_bytes{category="old space"} 123307808 1573497970976
 smalltalk_memory_in_bytes{category="free old space"} 26455232 1573497970976
 smalltalk_memory_in_bytes{category="eden space"} 6854880 1573497970976
 smalltalk_memory_in_bytes{category="young space"} 5384936 1573497970976
-# HELP garbage_collection_time_in_milliseconds Cumulative number of milliseconds spent on Garbage Collection
+# HELP garbage_collection_time_in_milliseconds Cumulative number of milliseconds
+# spent on Garbage Collection
 # TYPE garbage_collection_time_in_milliseconds counter
 garbage_collection_time_in_milliseconds{type="full"} 10119 1573497970976
 garbage_collection_time_in_milliseconds{type="incremental"} 35656 1573497970976
@@ -63,7 +74,8 @@ garbage_collection_time_in_milliseconds{type="incremental"} 35656 1573497970976
 # TYPE garbage_collector_invokations counter
 garbage_collector_invokations{type="full"} 84 1573497970976
 garbage_collector_invokations{type="incremental"} 42741 1573497970976
-# HELP tenured_objects_count Cummulative number of objects tenured by the Garbage Collector
+# HELP tenured_objects_count Cummulative number of objects tenured by the
+# Garbage Collector
 # TYPE tenured_objects_count counter
 tenured_objects_count 16250055
 # HELP uptime_in_seconds Number of seconds since the system is started.
