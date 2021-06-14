@@ -9,7 +9,7 @@ Class {
 }
 
 { #category : #'instance creation' }
-RESTfulRequestHandler class >> resourceLocator: aResouceLocator paginationPolicy: aPaginationPolicy decodingRules: theDecodingRules encodingRules: theEncodingRules calculateEntityTagsWith: entityTagCalculator cachingDirectives: theCachingDirectives handleErrorsWith: anExceptionHandler [
+RESTfulRequestHandler class >> resourceLocator: aResouceLocator paginationPolicy: aPaginationPolicy decodingRules: theDecodingRules encodingRules: theEncodingRules calculateEntityTagsWith: entityTagCalculator cachingDirectives: theCachingDirectives allowedLanguageTags: allowedLanguageTags handleErrorsWith: anExceptionHandler [
 
 	^ self new
 		initializeResourceLocator: aResouceLocator
@@ -18,5 +18,6 @@ RESTfulRequestHandler class >> resourceLocator: aResouceLocator paginationPolicy
 		encodingRules: theEncodingRules
 		calculateEntityTagsWith: entityTagCalculator
 		cachingDirectives: theCachingDirectives
+		allowedLanguageTags: allowedLanguageTags
 		handleErrorsWith: anExceptionHandler
 ]

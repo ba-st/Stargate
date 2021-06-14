@@ -8,10 +8,10 @@ Class {
 	#name : #SouthAmericanCurrenciesRESTfulController,
 	#superclass : #SingleResourceRESTfulController,
 	#instVars : [
-		'currencies',
 		'banknotesByCurrency',
 		'banknotesRequestHandler',
-		'currenciesRequestHandler'
+		'currenciesRequestHandler',
+		'currenciesByLanguage'
 	],
 	#category : #'Stargate-Examples-Currencies'
 }
@@ -25,7 +25,21 @@ SouthAmericanCurrenciesRESTfulController >> banknotesTemplate [
 { #category : #API }
 SouthAmericanCurrenciesRESTfulController >> currenciesBasedOn: httpRequest within: requestContext [
 
-	^ currenciesRequestHandler from: httpRequest within: requestContext getCollection: [ currencies ]
+	^ currenciesRequestHandler
+		from: httpRequest
+		within: requestContext
+		getCollection: [ self currenciesInLanguageAt: requestContext ]
+]
+
+{ #category : #private }
+SouthAmericanCurrenciesRESTfulController >> currenciesInLanguageAt: requestContext [
+
+	| targetLanguage |
+
+	targetLanguage := [ requestContext targetLanguageTag ]
+		on: NotFound
+		do: [ :error | error return: 'en-US' asLanguageTag ].
+	^ currenciesByLanguage at: targetLanguage
 ]
 
 { #category : #API }
@@ -43,8 +57,11 @@ SouthAmericanCurrenciesRESTfulController >> currencyBasedOn: httpRequest within:
 	^ currenciesRequestHandler
 		from: httpRequest
 		within: requestContext
-		get:
-			[ :isoCode | currencies detect: [ :currency | currency isoCode = isoCode ] ifNone: [ NotFound signal ] ]
+		get: [ :isoCode | 
+			( self currenciesInLanguageAt: requestContext )
+				detect: [ :currency | currency isoCode = isoCode ]
+				ifNone: [ NotFound signal ]
+			]
 ]
 
 { #category : #private }
@@ -132,19 +149,38 @@ SouthAmericanCurrenciesRESTfulController >> initializeBanknotesRequestHandler [
 { #category : #initialization }
 SouthAmericanCurrenciesRESTfulController >> initializeCurrencies [
 
-	currencies := OrderedCollection new
-		add: ( self currencyNamed: 'Argentine peso' symbol: '$' isoCode: 'ARS' );
-		add: ( self currencyNamed: 'Bolivian boliviano' symbol: 'Bs.' isoCode: 'BOB' );
-		add: ( self currencyNamed: 'Brazilian real' symbol: 'R$' isoCode: 'BRL' );
-		add: ( self currencyNamed: 'Chilean peso' symbol: '$' isoCode: 'CLP' );
-		add: ( self currencyNamed: 'Colombian peso' symbol: '$' isoCode: 'COP' );
-		add: ( self currencyNamed: 'Guyanese dollar' symbol: '$' isoCode: 'GYD' );
-		add: ( self currencyNamed: 'Paraguayan guaraní' symbol: '₲' isoCode: 'PYG' );
-		add: ( self currencyNamed: 'Peruvian sol' symbol: 'S/.' isoCode: 'PEN' );
-		add: ( self currencyNamed: 'Surinamese dollar' symbol: '$' isoCode: 'SRD' );
-		add: ( self currencyNamed: 'Uruguayan peso' symbol: '$' isoCode: 'UYU' );
-		add: ( self currencyNamed: 'Venezuelan bolívar soberano' symbol: 'Bs.S' isoCode: 'VES' );
-		asArray
+	currenciesByLanguage := Dictionary new
+		at: 'en-US' asLanguageTag
+			put:
+			( OrderedCollection new
+				add: ( self currencyNamed: 'Argentine peso' symbol: '$' isoCode: 'ARS' );
+				add: ( self currencyNamed: 'Bolivian boliviano' symbol: 'Bs.' isoCode: 'BOB' );
+				add: ( self currencyNamed: 'Brazilian real' symbol: 'R$' isoCode: 'BRL' );
+				add: ( self currencyNamed: 'Chilean peso' symbol: '$' isoCode: 'CLP' );
+				add: ( self currencyNamed: 'Colombian peso' symbol: '$' isoCode: 'COP' );
+				add: ( self currencyNamed: 'Guyanese dollar' symbol: '$' isoCode: 'GYD' );
+				add: ( self currencyNamed: 'Paraguayan guaraní' symbol: '₲' isoCode: 'PYG' );
+				add: ( self currencyNamed: 'Peruvian sol' symbol: 'S/.' isoCode: 'PEN' );
+				add: ( self currencyNamed: 'Surinamese dollar' symbol: '$' isoCode: 'SRD' );
+				add: ( self currencyNamed: 'Uruguayan peso' symbol: '$' isoCode: 'UYU' );
+				add: ( self currencyNamed: 'Venezuelan bolívar soberano' symbol: 'Bs.S' isoCode: 'VES' );
+				asArray );
+		at: 'es-AR' asLanguageTag
+			put:
+			( OrderedCollection new
+				add: ( self currencyNamed: 'Peso' symbol: '$' isoCode: 'ARS' );
+				add: ( self currencyNamed: 'Boliviano' symbol: 'Bs.' isoCode: 'BOB' );
+				add: ( self currencyNamed: 'Real brasileño' symbol: 'R$' isoCode: 'BRL' );
+				add: ( self currencyNamed: 'Peso chileno' symbol: '$' isoCode: 'CLP' );
+				add: ( self currencyNamed: 'Peso colombiano' symbol: '$' isoCode: 'COP' );
+				add: ( self currencyNamed: 'Dólar guyanés' symbol: '$' isoCode: 'GYD' );
+				add: ( self currencyNamed: 'Guaraní' symbol: '₲' isoCode: 'PYG' );
+				add: ( self currencyNamed: 'Sol' symbol: 'S/.' isoCode: 'PEN' );
+				add: ( self currencyNamed: 'Dólar surinamés' symbol: '$' isoCode: 'SRD' );
+				add: ( self currencyNamed: 'Peso uruguayo' symbol: '$' isoCode: 'UYU' );
+				add: ( self currencyNamed: 'Bolívar' symbol: 'Bs.S' isoCode: 'VES' );
+				asArray );
+		yourself
 ]
 
 { #category : #initialization }
@@ -164,6 +200,8 @@ SouthAmericanCurrenciesRESTfulController >> initializeCurrenciesRequestHandler [
 			];
 		handleExceptionsApplying: [ :handler | handler addAsNotFoundError: NotFound ];
 		directCachingWith: [ :caching | caching beImmutable ];
+		addAsSupportedLanguage: 'en-US';
+		addAsSupportedLanguage: 'es-AR';
 		build
 ]
 

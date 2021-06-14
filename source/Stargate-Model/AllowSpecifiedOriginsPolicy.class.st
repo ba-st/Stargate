@@ -28,7 +28,7 @@ AllowSpecifiedOriginsPolicy >> applyOn: aResponse for: aRequest using: aHandler 
 		ifFound: [ :allowedOrigin | 
 			aHandler set: allowedOrigin asAllowOriginOn: aResponse.
 			allowedOrigins size > 1
-				ifTrue: [ aHandler add: aHandler headerNames >> #origin toVaryOn: aResponse ]
+				ifTrue: [ aResponse addToVary: aHandler headerNames >> #origin ]
 			]
 		ifNone: [ aRequest abort: TeaResponse noContent ]
 ]

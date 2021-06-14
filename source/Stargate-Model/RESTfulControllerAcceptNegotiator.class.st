@@ -5,7 +5,8 @@ Class {
 	#name : #RESTfulControllerAcceptNegotiator,
 	#superclass : #Object,
 	#instVars : [
-		'availableMediaTypes'
+		'availableMediaTypes',
+		'availableLanguageTags'
 	],
 	#category : #'Stargate-Model-Controllers'
 }
@@ -13,7 +14,13 @@ Class {
 { #category : #'instance creation' }
 RESTfulControllerAcceptNegotiator class >> basedOn: aMediaTypeCollection [
 
-	^ self new initializeBasedOn: aMediaTypeCollection
+	^ self new initializeBasedOn: aMediaTypeCollection and: #()
+]
+
+{ #category : #'instance creation' }
+RESTfulControllerAcceptNegotiator class >> basedOn: aMediaTypeCollection and: aLanguageTagCollection [
+
+	^ self new initializeBasedOn: aMediaTypeCollection and: aLanguageTagCollection
 ]
 
 { #category : #'private - accessing' }
@@ -34,6 +41,41 @@ RESTfulControllerAcceptNegotiator >> acceptableMediaTypesIn: anHttpRequest [
 		otherwise: [ self splitMediaTypesIn: acceptHeaderContent ]
 ]
 
+{ #category : #'private - accessing' }
+RESTfulControllerAcceptNegotiator >> acceptableQualifiedLanguageRangesIn: anHttpRequest [
+
+	| acceptHeaderContent |
+
+	acceptHeaderContent := [ anHttpRequest acceptLanguage ]
+		on: KeyNotFound
+		do: [ :signal | signal return: '*' ].
+
+	^ acceptHeaderContent isArray
+		then: [ acceptHeaderContent
+				flatCollect: [ :acceptList | self splitQualifiedLanguageRangesIn: acceptList ]
+				as: OrderedCollection
+			]
+		otherwise: [ self splitQualifiedLanguageRangesIn: acceptHeaderContent ]
+]
+
+{ #category : #querying }
+RESTfulControllerAcceptNegotiator >> bestLanguageFor: anHttpRequest [
+
+	"This method returns the best suited language tag for the given request"
+
+	self
+		withAcceptableLanguageRangesIn: anHttpRequest
+		do: [ :languageRange | 
+			availableLanguageTags
+				detect: [ :languageTag | languageRange matches: languageTag ]
+				ifFound: [ :languageTag | ^ languageTag ]
+			].
+	HTTPNotAcceptable
+		signal: 'Cannot generate a response entity with acceptable characteristics.'
+		accepting: availableMediaTypes
+		and: availableLanguageTags
+]
+
 { #category : #querying }
 RESTfulControllerAcceptNegotiator >> bestRepresentationFor: anHttpRequest [
 
@@ -44,9 +86,10 @@ RESTfulControllerAcceptNegotiator >> bestRepresentationFor: anHttpRequest [
 ]
 
 { #category : #'initialize - release' }
-RESTfulControllerAcceptNegotiator >> initializeBasedOn: aMediaTypeCollection [
+RESTfulControllerAcceptNegotiator >> initializeBasedOn: aMediaTypeCollection and: aLanguageTagCollection [
 
-	availableMediaTypes := aMediaTypeCollection 
+	availableMediaTypes := aMediaTypeCollection.
+	availableLanguageTags := aLanguageTagCollection
 ]
 
 { #category : #'private - accessing' }
@@ -92,6 +135,21 @@ RESTfulControllerAcceptNegotiator >> splitMediaTypesIn: acceptList [
 ]
 
 { #category : #'private - accessing' }
+RESTfulControllerAcceptNegotiator >> splitQualifiedLanguageRangesIn: acceptLanguageList [
+
+	^ ( acceptLanguageList splitOn: ',' )
+		inject: OrderedCollection new
+		into: [ :qualifiedLanguageRanges :each | 
+			"Be lenient here, ignore everything that is garbage in the header"
+			[ qualifiedLanguageRanges add: ( QualifiedLanguageRange fromString: each ) ]
+				on: Error
+				except: MessageNotUnderstood
+				do: [ :error | error return ].
+			qualifiedLanguageRanges
+			]
+]
+
+{ #category : #'private - accessing' }
 RESTfulControllerAcceptNegotiator >> versionIn: acceptable canBeHandledBy: available [
 
 	| acceptVersion availableVersion acceptVersionParts availableVersionParts |
@@ -107,6 +165,20 @@ RESTfulControllerAcceptNegotiator >> versionIn: acceptable canBeHandledBy: avail
 			acceptPart ~= availablePart
 				ifTrue: [ ^ false ] ].
 	^ true
+]
+
+{ #category : #'private - accessing' }
+RESTfulControllerAcceptNegotiator >> withAcceptableLanguageRangesIn: anHttpRequest do: aBlock [
+
+	| acceptable grouped |
+
+	"Parse Accept-Language header"
+	acceptable := self acceptableQualifiedLanguageRangesIn: anHttpRequest.	
+	"Group it by quality"
+	grouped := acceptable groupedBy: [ :qualifiedLanguageRange | qualifiedLanguageRange quality ].	
+	"Iterate it by max to minimum quality and for each quality group"
+	grouped keys sorted reverse
+		do: [ :quality | ( grouped at: quality ) do: [ :qualifiedRange | aBlock value: qualifiedRange range ] ]
 ]
 
 { #category : #'private - accessing' }

@@ -5,8 +5,7 @@ Class {
 	#name : #RESTfulControllerRespondCreatedEntityPolicy,
 	#superclass : #RESTfulControllerResourceCreationPolicy,
 	#instVars : [
-		'requestHandler',
-		'targetMediaType'
+		'requestHandler'
 	],
 	#category : #'Stargate-Model-Controllers'
 }
@@ -31,6 +30,9 @@ RESTfulControllerRespondCreatedEntityPolicy >> responseFor: resource basedOn: ht
 	response := ZnResponse
 		created: ( requestHandler locationOf: resource within: requestContext )
 		entity: ( requestHandler encodeResource: resource within: requestContext ).
-	requestHandler putEntityTagOf: resource in: response within: requestContext.
+	requestHandler
+		putEntityTagOf: resource in: response within: requestContext;
+		applyCachingDirectivesTo: response within: requestContext;
+		putLanguageContentTagIn: response within: requestContext.
 	^ response
 ]

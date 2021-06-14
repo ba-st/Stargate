@@ -7,12 +7,6 @@ Class {
 	#category : #'Stargate-Model-CORS'
 }
 
-{ #category : #'private - evaluating' }
-CrossOriginResourceSharingHandler >> add: aHeaderNamed toVaryOn: aResponse [
-
-	aResponse headers at: self headerNames >> #vary addSeparatedWithComma: aHeaderNamed
-]
-
 { #category : #accessing }
 CrossOriginResourceSharingHandler >> headerNames [
 

@@ -47,6 +47,7 @@ ApplicationControlPlugin class >> endpoint [
 { #category : #'class initialization' }
 ApplicationControlPlugin class >> initialize [
 
+	<ignoreForCoverage>
 	AvailableCommands := OrderedCollection new.
 	self
 		registerAsAvailableCommand:

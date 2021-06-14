@@ -20,6 +20,30 @@ SouthAmericanCurrenciesRESTfulControllerTest >> setUpResourceController [
 ]
 
 { #category : #tests }
+SouthAmericanCurrenciesRESTfulControllerTest >> testCantGetArgentinePesoAskingForUnsupportedLanguage [
+
+	| request |
+
+	request := self
+		requestToGETResourceIdentifiedBy: 'ARS'
+		accepting: resourceController currencyVersion1dot0dot0MediaType.
+	request setAcceptLanguage: 'de'.
+
+	self
+		should: [ resourceController currencyBasedOn: request within: self newHttpRequestContext ]
+		raise: HTTPNotAcceptable
+		withExceptionDo: [ :error | 
+			self
+				assert: error messageText
+					equals: 'Cannot generate a response entity with acceptable characteristics.';
+				assert: error code equals: 406;
+				assert: error allowedLanguageTags size equals: 2;
+				assert: error allowedLanguageTags includes: 'en-US' asLanguageTag;
+				assert: error allowedLanguageTags includes: 'es-AR' asLanguageTag
+			]
+]
+
+{ #category : #tests }
 SouthAmericanCurrenciesRESTfulControllerTest >> testGetArgentinePeso [
 
 	| response |
@@ -36,6 +60,9 @@ SouthAmericanCurrenciesRESTfulControllerTest >> testGetArgentinePeso [
 		assert: response status equals: 200;
 		assert: response contentType asMediaType
 			equals: resourceController currencyVersion1dot0dot0MediaType;
+		assert: response contentLanguageTags isEmpty;
+		deny: response varyHeaderNames includes: 'Accept-Language';
+		assert: response varyHeaderNames includes: 'Accept';
 		assert: response entityTag equals: '"5dd07a40a75ea23fa44e641a92a6dd1ec7999a36"' asETag.
 
 	self
@@ -75,6 +102,74 @@ SouthAmericanCurrenciesRESTfulControllerTest >> testGetArgentinePesoBanknotes [
 ]
 
 { #category : #tests }
+SouthAmericanCurrenciesRESTfulControllerTest >> testGetArgentinePesoInEnglish [
+
+	| response request |
+
+	request := self
+		requestToGETResourceIdentifiedBy: 'ARS'
+		accepting: resourceController currencyVersion1dot0dot0MediaType.
+	request setAcceptLanguage: 'en'.
+
+	response := resourceController currencyBasedOn: request within: self newHttpRequestContext.
+
+	self
+		assert: response isSuccess;
+		assert: response status equals: 200;
+		assert: response contentType asMediaType
+			equals: resourceController currencyVersion1dot0dot0MediaType;
+		withTheOnlyOneIn: response contentLanguageTags
+			do: [ :tag | self assert: tag equals: 'en-US' asLanguageTag ];
+		assert: response varyHeaderNames includes: 'Accept-Language';
+		assert: response varyHeaderNames includes: 'Accept';
+		assert: response entityTag equals: '"5dd07a40a75ea23fa44e641a92a6dd1ec7999a36"' asETag.
+
+	self
+		withJsonFromContentsIn: response
+		do: [ :json | 
+			self
+				assert: json name equals: 'Argentine peso';
+				assert: json symbol equals: '$';
+				assert: json isoCode equals: 'ARS';
+				assert: json links isNil
+			]
+]
+
+{ #category : #tests }
+SouthAmericanCurrenciesRESTfulControllerTest >> testGetArgentinePesoInSpanish [
+
+	| response request |
+
+	request := self
+		requestToGETResourceIdentifiedBy: 'ARS'
+		accepting: resourceController currencyVersion1dot0dot0MediaType.
+	request setAcceptLanguage: 'es'.
+
+	response := resourceController currencyBasedOn: request within: self newHttpRequestContext.
+
+	self
+		assert: response isSuccess;
+		assert: response status equals: 200;
+		assert: response contentType asMediaType
+			equals: resourceController currencyVersion1dot0dot0MediaType;
+		withTheOnlyOneIn: response contentLanguageTags
+			do: [ :tag | self assert: tag equals: 'es-AR' asLanguageTag ];
+		assert: response varyHeaderNames includes: 'Accept-Language';
+		assert: response varyHeaderNames includes: 'Accept';
+		assert: response entityTag equals: '"fd65007599711248b85d86917bd24c5aa29e610b"' asETag.
+
+	self
+		withJsonFromContentsIn: response
+		do: [ :json | 
+			self
+				assert: json name equals: 'Peso';
+				assert: json symbol equals: '$';
+				assert: json isoCode equals: 'ARS';
+				assert: json links isNil
+			]
+]
+
+{ #category : #tests }
 SouthAmericanCurrenciesRESTfulControllerTest >> testGetBrazilianReal [
 
 	| response |
@@ -91,6 +186,8 @@ SouthAmericanCurrenciesRESTfulControllerTest >> testGetBrazilianReal [
 		assert: response status equals: 200;
 		assert: response contentType asMediaType
 			equals: resourceController currencyVersion1dot0dot0MediaType;
+		assert: response contentLanguageTags isEmpty;
+		assert: response varyHeaderNames includes: 'Accept';
 		assert: response entityTag equals: '"13bd1a73c317563852cbb2858e39a0af77699f60"' asETag.
 
 	self
@@ -98,6 +195,74 @@ SouthAmericanCurrenciesRESTfulControllerTest >> testGetBrazilianReal [
 		do: [ :json | 
 			self
 				assert: json name equals: 'Brazilian real';
+				assert: json symbol equals: 'R$';
+				assert: json isoCode equals: 'BRL';
+				assert: json links isNil
+			]
+]
+
+{ #category : #tests }
+SouthAmericanCurrenciesRESTfulControllerTest >> testGetBrazilianRealInEnglish [
+
+	| response request |
+
+	request := self
+		requestToGETResourceIdentifiedBy: 'BRL'
+		accepting: resourceController currencyVersion1dot0dot0MediaType.
+	request setAcceptLanguage: 'en'.
+
+	response := resourceController currencyBasedOn: request within: self newHttpRequestContext.
+
+	self
+		assert: response isSuccess;
+		assert: response status equals: 200;
+		assert: response contentType asMediaType
+			equals: resourceController currencyVersion1dot0dot0MediaType;
+		withTheOnlyOneIn: response contentLanguageTags
+			do: [ :tag | self assert: tag equals: 'en-US' asLanguageTag ];
+		assert: response varyHeaderNames includes: 'Accept-Language';
+		assert: response varyHeaderNames includes: 'Accept';
+		assert: response entityTag equals: '"13bd1a73c317563852cbb2858e39a0af77699f60"' asETag.
+
+	self
+		withJsonFromContentsIn: response
+		do: [ :json | 
+			self
+				assert: json name equals: 'Brazilian real';
+				assert: json symbol equals: 'R$';
+				assert: json isoCode equals: 'BRL';
+				assert: json links isNil
+			]
+]
+
+{ #category : #tests }
+SouthAmericanCurrenciesRESTfulControllerTest >> testGetBrazilianRealInSpanish [
+
+	| response request |
+
+	request := self
+		requestToGETResourceIdentifiedBy: 'BRL'
+		accepting: resourceController currencyVersion1dot0dot0MediaType.
+	request setAcceptLanguage: 'es' asLanguageTag.
+
+	response := resourceController currencyBasedOn: request within: self newHttpRequestContext.
+
+	self
+		assert: response isSuccess;
+		assert: response status equals: 200;
+		assert: response contentType asMediaType
+			equals: resourceController currencyVersion1dot0dot0MediaType;
+		withTheOnlyOneIn: response contentLanguageTags
+			do: [ :tag | self assert: tag equals: 'es-AR' asLanguageTag ];
+		assert: response varyHeaderNames includes: 'Accept-Language';
+		assert: response varyHeaderNames includes: 'Accept';
+		assert: response entityTag equals: '"f74a6f30f3c09515114aa5aa2a47253dfcd59d49"' asETag.
+
+	self
+		withJsonFromContentsIn: response
+		do: [ :json | 
+			self
+				assert: json name equals: 'Real brasileño';
 				assert: json symbol equals: 'R$';
 				assert: json isoCode equals: 'BRL';
 				assert: json links isNil
@@ -120,7 +285,10 @@ SouthAmericanCurrenciesRESTfulControllerTest >> testGetCurrencies [
 		assert: response isSuccess;
 		assert: response status equals: 200;
 		assert: response contentType asMediaType
-			equals: resourceController currencyVersion1dot0dot0MediaType.
+			equals: resourceController currencyVersion1dot0dot0MediaType;
+		assert: response contentLanguageTags isEmpty;
+		deny: response varyHeaderNames includes: 'Accept-Language';
+		assert: response varyHeaderNames includes: 'Accept'.
 	self assertCachingDirectivesFor: response with: #('immutable').
 
 	self
@@ -130,6 +298,40 @@ SouthAmericanCurrenciesRESTfulControllerTest >> testGetCurrencies [
 				assert: currencies size equals: 11;
 				assert: ( currencies collect: #isoCode )
 					equals: #('ARS' 'BOB' 'BRL' 'CLP' 'COP' 'GYD' 'PYG' 'PEN' 'SRD' 'UYU' 'VES')
+			]
+]
+
+{ #category : #tests }
+SouthAmericanCurrenciesRESTfulControllerTest >> testGetCurrenciesInSpanish [
+
+	| response request |
+
+	request := self
+		requestToGET: self resourceUrl
+		accepting: resourceController currencyVersion1dot0dot0MediaType.
+	request setAcceptLanguage: 'es'.
+
+	response := resourceController currenciesBasedOn: request within: self newHttpRequestContext.
+
+	self
+		assert: response isSuccess;
+		assert: response status equals: 200;
+		assert: response contentType asMediaType
+			equals: resourceController currencyVersion1dot0dot0MediaType;
+		withTheOnlyOneIn: response contentLanguageTags
+			do: [ :tag | self assert: tag equals: 'es-AR' asLanguageTag ];
+		assert: response varyHeaderNames includes: 'Accept-Language';
+		assert: response varyHeaderNames includes: 'Accept'.
+	self assertCachingDirectivesFor: response with: #('immutable').
+
+	self
+		withJsonFromContentsIn: response
+		do: [ :currencies | 
+			self
+				assert: currencies size equals: 11;
+				assert: ( currencies collect: #isoCode )
+					equals: #('ARS' 'BOB' 'BRL' 'CLP' 'COP' 'GYD' 'PYG' 'PEN' 'SRD' 'UYU' 'VES');
+				assert: ( currencies anySatisfy: [ :currency | currency name = 'Real brasileño' ] )
 			]
 ]
 
@@ -171,7 +373,8 @@ SouthAmericanCurrenciesRESTfulControllerTest >> testGetNotModifiedWhenValidETag 
 
 	self
 		assert: response code equals: 304;
-		assert: response entityTag equals: '"5dd07a40a75ea23fa44e641a92a6dd1ec7999a36"' asETag
+		assert: response entityTag equals: '"5dd07a40a75ea23fa44e641a92a6dd1ec7999a36"' asETag;
+		assert: response varyHeaderNames includes: 'Accept'
 ]
 
 { #category : #tests }
