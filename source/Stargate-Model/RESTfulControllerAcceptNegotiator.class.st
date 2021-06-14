@@ -73,7 +73,7 @@ RESTfulControllerAcceptNegotiator >> bestLanguageFor: anHttpRequest [
 	HTTPNotAcceptable
 		signal: 'Cannot generate a response entity with acceptable characteristics.'
 		accepting: availableMediaTypes
-		and: availableLanguageTags
+		inAnyOf: availableLanguageTags
 ]
 
 { #category : #querying }
