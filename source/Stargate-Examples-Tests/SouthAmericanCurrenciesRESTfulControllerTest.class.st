@@ -8,6 +8,12 @@ Class {
 }
 
 { #category : #'private - support' }
+SouthAmericanCurrenciesRESTfulControllerTest >> assertThereAreNoLinksIn: json [
+
+	self assert: json links isNil
+]
+
+{ #category : #'private - support' }
 SouthAmericanCurrenciesRESTfulControllerTest >> baseUrl [
 
 	^ 'https://currencies.example.com' asUrl
@@ -72,7 +78,7 @@ SouthAmericanCurrenciesRESTfulControllerTest >> testGetArgentinePeso [
 				assert: json name equals: 'Argentine peso';
 				assert: json symbol equals: '$';
 				assert: json isoCode equals: 'ARS';
-				assert: json links isNil
+				assertThereAreNoLinksIn: json
 			]
 ]
 
@@ -131,7 +137,7 @@ SouthAmericanCurrenciesRESTfulControllerTest >> testGetArgentinePesoInEnglish [
 				assert: json name equals: 'Argentine peso';
 				assert: json symbol equals: '$';
 				assert: json isoCode equals: 'ARS';
-				assert: json links isNil
+				assertThereAreNoLinksIn: json
 			]
 ]
 
@@ -165,7 +171,7 @@ SouthAmericanCurrenciesRESTfulControllerTest >> testGetArgentinePesoInSpanish [
 				assert: json name equals: 'Peso';
 				assert: json symbol equals: '$';
 				assert: json isoCode equals: 'ARS';
-				assert: json links isNil
+				assertThereAreNoLinksIn: json
 			]
 ]
 
@@ -197,7 +203,7 @@ SouthAmericanCurrenciesRESTfulControllerTest >> testGetBrazilianReal [
 				assert: json name equals: 'Brazilian real';
 				assert: json symbol equals: 'R$';
 				assert: json isoCode equals: 'BRL';
-				assert: json links isNil
+				assertThereAreNoLinksIn: json
 			]
 ]
 
@@ -231,7 +237,7 @@ SouthAmericanCurrenciesRESTfulControllerTest >> testGetBrazilianRealInEnglish [
 				assert: json name equals: 'Brazilian real';
 				assert: json symbol equals: 'R$';
 				assert: json isoCode equals: 'BRL';
-				assert: json links isNil
+				assertThereAreNoLinksIn: json
 			]
 ]
 
@@ -265,7 +271,7 @@ SouthAmericanCurrenciesRESTfulControllerTest >> testGetBrazilianRealInSpanish [
 				assert: json name equals: 'Real brasileño';
 				assert: json symbol equals: 'R$';
 				assert: json isoCode equals: 'BRL';
-				assert: json links isNil
+				assertThereAreNoLinksIn: json
 			]
 ]
 

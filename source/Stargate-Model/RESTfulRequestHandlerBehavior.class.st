@@ -219,7 +219,7 @@ RESTfulRequestHandlerBehavior >> initializeResourceLocator: aResouceLocator
 	paginationPolicy := aPaginationPolicy cull: self.
 	decodingRules := theDecodingRules.
 	encodingRules := theEncodingRules.
-	acceptNegotiator := RESTfulControllerAcceptNegotiator basedOn: encodingRules keys and: allowedLanguageTags.
+	acceptNegotiator := RESTfulControllerAcceptNegotiator accepting: encodingRules keys inAnyOf: allowedLanguageTags.
 	entityTagCalculator := anEntityTagCalculator.
 	cachingDirectives := theCachingDirectives
 ]

@@ -31,7 +31,7 @@ RESTfulControllerAcceptNegotiatorTest >> assertBestRepresentationFor: anAcceptHe
 { #category : #'private - accessing' }
 RESTfulControllerAcceptNegotiatorTest >> bestLanguageFor: aLanguageProrityList given: theAvailableLanguageTags [
 
-	^ ( RESTfulControllerAcceptNegotiator basedOn: #() and: theAvailableLanguageTags )
+	^ ( RESTfulControllerAcceptNegotiator accepting: #() inAnyOf: theAvailableLanguageTags )
 		bestLanguageFor:
 			( ( ZnRequest get: '/example' asZnUrl )
 				setAcceptLanguage: aLanguageProrityList;
@@ -41,7 +41,7 @@ RESTfulControllerAcceptNegotiatorTest >> bestLanguageFor: aLanguageProrityList g
 { #category : #'private - accessing' }
 RESTfulControllerAcceptNegotiatorTest >> bestRepresentationFor: anAcceptHeaderContent given: theAvailableMediaTypes [
 
-	^ (RESTfulControllerAcceptNegotiator basedOn: theAvailableMediaTypes)
+	^ (RESTfulControllerAcceptNegotiator accepting: theAvailableMediaTypes)
 		bestRepresentationFor:
 			((ZnRequest get: '/example' asZnUrl)
 				setAccept: anAcceptHeaderContent;
@@ -94,7 +94,7 @@ RESTfulControllerAcceptNegotiatorTest >> testAcceptHeaderContentIsAnArray [
 				with: Character lf asString ) readStream.
 
 	self
-		assert: ( ( RESTfulControllerAcceptNegotiator basedOn: apiMediaTypes ) bestRepresentationFor: request )
+		assert: ( ( RESTfulControllerAcceptNegotiator accepting: apiMediaTypes ) bestRepresentationFor: request )
 		equals: 'application/vnd.stargate.pet+json;version=2.0.0' asMediaType
 ]
 

@@ -12,15 +12,15 @@ Class {
 }
 
 { #category : #'instance creation' }
-RESTfulControllerAcceptNegotiator class >> basedOn: aMediaTypeCollection [
+RESTfulControllerAcceptNegotiator class >> accepting: aMediaTypeCollection [
 
-	^ self new initializeBasedOn: aMediaTypeCollection and: #()
+	^ self accepting: aMediaTypeCollection inAnyOf: #()
 ]
 
 { #category : #'instance creation' }
-RESTfulControllerAcceptNegotiator class >> basedOn: aMediaTypeCollection and: aLanguageTagCollection [
+RESTfulControllerAcceptNegotiator class >> accepting: aMediaTypeCollection inAnyOf: aLanguageTagCollection [
 
-	^ self new initializeBasedOn: aMediaTypeCollection and: aLanguageTagCollection
+	^ self new initializeAccepting: aMediaTypeCollection inAnyOf: aLanguageTagCollection
 ]
 
 { #category : #'private - accessing' }
@@ -86,7 +86,7 @@ RESTfulControllerAcceptNegotiator >> bestRepresentationFor: anHttpRequest [
 ]
 
 { #category : #'initialize - release' }
-RESTfulControllerAcceptNegotiator >> initializeBasedOn: aMediaTypeCollection and: aLanguageTagCollection [
+RESTfulControllerAcceptNegotiator >> initializeAccepting: aMediaTypeCollection inAnyOf: aLanguageTagCollection [
 
 	availableMediaTypes := aMediaTypeCollection.
 	availableLanguageTags := aLanguageTagCollection
