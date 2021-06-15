@@ -12,10 +12,17 @@ Class {
 		'handlerFactory',
 		'resourceLocator',
 		'exceptionHandler',
-		'cachingDirectives'
+		'cachingDirectives',
+		'allowedLanguageTags'
 	],
 	#category : #'Stargate-Model-Controllers'
 }
+
+{ #category : #configuring }
+RESTfulRequestHandlerBuilder >> addAsSupportedLanguage: aLanguageTag [
+
+	allowedLanguageTags add: aLanguageTag asLanguageTag
+]
 
 { #category : #configuring }
 RESTfulRequestHandlerBuilder >> beHypermediaDriven [
@@ -36,6 +43,7 @@ RESTfulRequestHandlerBuilder >> beHypermediaDrivenBy: aMediaControlsFactoryBlock
 		encodingRules: encodingRules
 		calculateEntityTagsWith: entityTagFactoryBinding content
 		cachingDirectives: cachingDirectives
+		allowedLanguageTags: allowedLanguageTags
 		drivenBy: [ :builder :resource :requestContext :resourceLocation | 
 			builder addAsSelfLink: resourceLocation.
 			aMediaControlsFactoryBlock
@@ -75,7 +83,7 @@ RESTfulRequestHandlerBuilder >> createEntityTagHashingEncodedResource [
 	self
 		createEntityTagWith: [ :resource :mediaType :requestContext :requestHandler | 
 			EntityTagHasher new
-				include: ( requestHandler encodeResource: resource to: mediaType within: requestContext );
+				include: ( requestHandler encodeResource: resource within: requestContext );
 				calculateHash
 			]
 ]
@@ -154,6 +162,7 @@ RESTfulRequestHandlerBuilder >> initialize [
 	encodingRules := Dictionary new.
 	entityTagFactoryBinding := Binding undefinedExplainedBy: 'Missing ETag calculation'.
 	cachingDirectives := #().
+	allowedLanguageTags := OrderedCollection new.
 	paginationPolicyFactory := [ :requestHandler | RESTfulControllerDoNotPaginateCollectionsPolicy for: requestHandler ].
 	exceptionHandler := RESTfulRequestExceptionHandler new.
 	handlerFactory := [ RESTfulRequestHandler
@@ -163,6 +172,7 @@ RESTfulRequestHandlerBuilder >> initialize [
 		encodingRules: encodingRules
 		calculateEntityTagsWith: entityTagFactoryBinding content
 		cachingDirectives: cachingDirectives
+		allowedLanguageTags: allowedLanguageTags
 		handleErrorsWith: exceptionHandler
 	]
 ]

@@ -103,3 +103,33 @@ HttpRequestContext >> permissions: aPermissionCollection [
 
 	self hold: aPermissionCollection under: #permissions
 ]
+
+{ #category : #accessing }
+HttpRequestContext >> targetLanguageTag [
+
+	^ self objectUnder: #targetLanguageTag
+]
+
+{ #category : #accessing }
+HttpRequestContext >> targetLanguageTag: aLanguageTag [
+
+	^ self hold: aLanguageTag under: #targetLanguageTag
+]
+
+{ #category : #accessing }
+HttpRequestContext >> targetMediaType [
+
+	^ self objectUnder: #targetMediaType
+]
+
+{ #category : #accessing }
+HttpRequestContext >> targetMediaType: aMediaType [
+
+	^ self hold: aMediaType under: #targetMediaType
+]
+
+{ #category : #accessing }
+HttpRequestContext >> withTargetLanguageTagDo: aBlock [
+
+	knownObjects at: #targetLanguageTag ifPresent: aBlock
+]

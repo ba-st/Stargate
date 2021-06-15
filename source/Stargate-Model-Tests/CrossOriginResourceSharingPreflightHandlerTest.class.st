@@ -233,7 +233,7 @@ CrossOriginResourceSharingPreflightHandlerTest >> testAllowMoreThanOneOrigin [
 			self
 				assertUrl: ( response headers at: 'Access-Control-Allow-Origin' ) equals: self websiteLocation;
 				assert: ( response headers at: 'Access-Control-Allow-Headers' ) equals: 'Content-Type';
-				assert: ( response headers at: 'Vary' ) equals: 'Origin, Access-Control-Allow-Headers';
+				assert: response varyHeaderNames equals: #('Origin' 'Access-Control-Allow-Headers');
 				assert: ( response headers at: 'Access-Control-Allow-Methods' ) equals: 'GET, POST'
 			]
 ]

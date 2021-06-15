@@ -11,7 +11,7 @@ Class {
 }
 
 { #category : #'instance creation' }
-HypermediaDrivenRESTfulRequestHandler class >> resourceLocator: aResouceLocator paginationPolicy: aPaginationPolicy decodingRules: theDecodingRules encodingRules: theEncodingRules calculateEntityTagsWith: entityTagCalculator cachingDirectives: theCachingDirectives drivenBy: aMediaControlsFactory handleErrorsWith: anExceptionHandler [
+HypermediaDrivenRESTfulRequestHandler class >> resourceLocator: aResouceLocator paginationPolicy: aPaginationPolicy decodingRules: theDecodingRules encodingRules: theEncodingRules calculateEntityTagsWith: entityTagCalculator cachingDirectives: theCachingDirectives allowedLanguageTags: allowedLanguageTags drivenBy: aMediaControlsFactory handleErrorsWith: anExceptionHandler [
 
 	^ self new
 		initializeResourceLocator: aResouceLocator
@@ -20,19 +20,20 @@ HypermediaDrivenRESTfulRequestHandler class >> resourceLocator: aResouceLocator 
 		encodingRules: theEncodingRules
 		calculateEntityTagsWith: entityTagCalculator
 		cachingDirectives: theCachingDirectives
+		allowedLanguageTags: allowedLanguageTags
 		drivenBy: aMediaControlsFactory
 		handleErrorsWith: anExceptionHandler
 ]
 
 { #category : #private }
-HypermediaDrivenRESTfulRequestHandler >> encodeResource: resource to: mediaType within: requestContext [
+HypermediaDrivenRESTfulRequestHandler >> encodeResource: resource within: requestContext [
 
 	self holdResource: resource controlsWithin: requestContext.
-	^ super encodeResource: resource to: mediaType within: requestContext
+	^ super encodeResource: resource within: requestContext
 ]
 
 { #category : #private }
-HypermediaDrivenRESTfulRequestHandler >> encodeResourceCollection: resourceCollection to: mediaType basedOn: httpRequest within: requestContext [
+HypermediaDrivenRESTfulRequestHandler >> encodeResourceCollection: resourceCollection basedOn: httpRequest within: requestContext [
 
 	requestContext
 		holdAsHypermediaControls:
@@ -43,7 +44,6 @@ HypermediaDrivenRESTfulRequestHandler >> encodeResourceCollection: resourceColle
 	resourceCollection do: [ :resource | self holdResource: resource controlsWithin: requestContext ].
 	^ super
 		encodeResourceCollection: ( ResourceCollection wrapping: resourceCollection )
-		to: mediaType
 		basedOn: httpRequest
 		within: requestContext
 ]
@@ -63,6 +63,7 @@ HypermediaDrivenRESTfulRequestHandler >> initializeResourceLocator: aResouceLoca
 	encodingRules: theEncodingRules
 	calculateEntityTagsWith: anEntityTagCalculator
 	cachingDirectives: theCachingDirectives
+	allowedLanguageTags: allowedLanguageTags
 	drivenBy: aMediaControlsFactory
 	handleErrorsWith: anExceptionHandler [
 
@@ -74,6 +75,7 @@ HypermediaDrivenRESTfulRequestHandler >> initializeResourceLocator: aResouceLoca
 		encodingRules: theEncodingRules
 		calculateEntityTagsWith: anEntityTagCalculator
 		cachingDirectives: theCachingDirectives
+		allowedLanguageTags: allowedLanguageTags
 		handleErrorsWith: anExceptionHandler.
 
 	mediaControlsFactory := aMediaControlsFactory

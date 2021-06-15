@@ -275,3 +275,26 @@ example classes and their respective tests:
 - `SouthAmericanCurrenciesRESTfulController` offers `/currencies` as an
   _immutable_ resource, and `/currencies/<id>/banknotes` as an _immutable_
   resource fresh for _365.000.000 seconds_.
+
+## Language negotiation
+
+For APIs requiring the support of several languages, Stargate offers support to
+consider `Accept-Language` headers in the content negotiation. To enable
+this, the request builder needs to be configured with the supported language tags.
+
+```smalltalk
+builder
+  addAsSupportedLanguage: 'en-US';
+  addAsSupportedLanguage: 'es-AR'
+```
+
+As soon as a language is supported, Stargate will consider the
+`Accept-Language` header and make the negotiated language available in the
+request context.
+
+To access the negotiated language, send `targetLanguageTag` or
+`withTargetLanguageTagDo:` to the request context. API implementors can then use
+it to produce a response in the corresponding language.
+
+Once language negotiation is enabled, the `Content-Language` header will
+contain the negotiated language in the response.

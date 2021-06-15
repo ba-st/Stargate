@@ -5,10 +5,22 @@ Class {
 	#name : #RESTfulControllerAcceptNegotiatorTest,
 	#superclass : #TestCase,
 	#instVars : [
-		'apiMediaTypes'
+		'apiMediaTypes',
+		'allowedLanguageTags'
 	],
 	#category : #'Stargate-Model-Tests-Controllers'
 }
+
+{ #category : #'private - asserting' }
+RESTfulControllerAcceptNegotiatorTest >> assertBestLanguageFor: aLanguageProrityList given: theAvailableLanguageTags is: expectedLanguage [
+
+	self
+		assert:
+			( self
+				bestLanguageFor: aLanguageProrityList
+				given: ( theAvailableLanguageTags collect: #asLanguageTag ) )
+		equals: expectedLanguage asLanguageTag
+]
 
 { #category : #'private - asserting' }
 RESTfulControllerAcceptNegotiatorTest >> assertBestRepresentationFor: anAcceptHeaderContent given: theAvailableMediaTypes is: aMediaType [
@@ -17,9 +29,19 @@ RESTfulControllerAcceptNegotiatorTest >> assertBestRepresentationFor: anAcceptHe
 ]
 
 { #category : #'private - accessing' }
+RESTfulControllerAcceptNegotiatorTest >> bestLanguageFor: aLanguageProrityList given: theAvailableLanguageTags [
+
+	^ ( RESTfulControllerAcceptNegotiator accepting: #() inAnyOf: theAvailableLanguageTags )
+		bestLanguageFor:
+			( ( ZnRequest get: '/example' asZnUrl )
+				setAcceptLanguage: aLanguageProrityList;
+				yourself )
+]
+
+{ #category : #'private - accessing' }
 RESTfulControllerAcceptNegotiatorTest >> bestRepresentationFor: anAcceptHeaderContent given: theAvailableMediaTypes [
 
-	^ (RESTfulControllerAcceptNegotiator basedOn: theAvailableMediaTypes)
+	^ (RESTfulControllerAcceptNegotiator accepting: theAvailableMediaTypes)
 		bestRepresentationFor:
 			((ZnRequest get: '/example' asZnUrl)
 				setAccept: anAcceptHeaderContent;
@@ -46,7 +68,8 @@ RESTfulControllerAcceptNegotiatorTest >> setUp [
 		with: 'application/vnd.stargate.pet+json;version=1.0.0' asMediaType
 		with: 'application/vnd.stargate.pet+json;version=1.1.0' asMediaType
 		with: 'application/vnd.stargate.pet+json;version=2.0.0' asMediaType
-		with: 'application/vnd.stargate.pet.summary+json;version=1.0.0' asMediaType
+		with: 'application/vnd.stargate.pet.summary+json;version=1.0.0' asMediaType.
+	allowedLanguageTags := #('en' 'es-AR' 'es-MX') collect: #asLanguageTag
 ]
 
 { #category : #tests }
@@ -71,7 +94,7 @@ RESTfulControllerAcceptNegotiatorTest >> testAcceptHeaderContentIsAnArray [
 				with: Character lf asString ) readStream.
 
 	self
-		assert: ( ( RESTfulControllerAcceptNegotiator basedOn: apiMediaTypes ) bestRepresentationFor: request )
+		assert: ( ( RESTfulControllerAcceptNegotiator accepting: apiMediaTypes ) bestRepresentationFor: request )
 		equals: 'application/vnd.stargate.pet+json;version=2.0.0' asMediaType
 ]
 
@@ -84,12 +107,70 @@ RESTfulControllerAcceptNegotiatorTest >> testAcceptingAnything [
 		is: 'application/vnd.stargate.pet+json;version=2.0.0' asMediaType
 ]
 
+{ #category : #'tests - languages' }
+RESTfulControllerAcceptNegotiatorTest >> testInvalidLanguageRangesAreIgnored [
+
+	self
+		assertBestLanguageFor: ';q=1, en-nz' given: #('en-us' 'en-nz' 'en-au') is: 'en-nz';
+		assertBestLanguageFor: '-, en' given: #('en-us' 'en-nz' 'en-au') is: 'en-us'
+]
+
+{ #category : #'tests - languages' }
+RESTfulControllerAcceptNegotiatorTest >> testLanguageWithQualityLevel [
+
+	self
+		assertBestLanguageFor: 'en-au;q=0.6, en-us' given: #('en-us' 'en-nz' 'en-au') is: 'en-us';
+		assertBestLanguageFor: 'en-au;q=0.6, en-nz;q=0.6' given: #('en-us' 'en-nz' 'en-au') is: 'en-au';
+		assertBestLanguageFor: 'en;q=0.1, es;q=0.7, es-ar;q=0.8'
+			given: #('en-us' 'en-nz' 'en-au' 'es-ES' 'es-ar')
+			is: 'es-AR'
+]
+
+{ #category : #'tests - languages' }
+RESTfulControllerAcceptNegotiatorTest >> testLanguageWithoutQualityLevel [
+
+	self
+		assertBestLanguageFor: 'en-us' given: #('en-us' 'en-nz' 'en-au') is: 'en-us';
+		assertBestLanguageFor: 'en' given: #('en-us' 'en-nz' 'en-au') is: 'en-us';
+		assertBestLanguageFor: 'en-au' given: #('en-us' 'en-nz' 'en-au') is: 'en-au';
+		assertBestLanguageFor: 'es-au, en ' given: #('en-us' 'en-nz' 'en-au') is: 'en-us';
+		assertBestLanguageFor: 'en-au, en-us ' given: #('en-us' 'en-nz' 'en-au') is: 'en-au';
+		assertBestLanguageFor: '*' given: #('en-us' 'en-nz' 'en-au') is: 'en-us';
+		assertBestLanguageFor: 'es, *' given: #('en-us' 'en-nz' 'en-au') is: 'en-us'
+]
+
 { #category : #tests }
 RESTfulControllerAcceptNegotiatorTest >> testMissingVersionSelectsTheNewOne [
 
 	self
 		assertBestRepresentationFor: 'application/vnd.stargate.pet+json' given: apiMediaTypes is: 'application/vnd.stargate.pet+json;version=2.0.0' asMediaType;
 		assertBestRepresentationFor: 'application/vnd.stargate.pet.summary+json' given: apiMediaTypes is: 'application/vnd.stargate.pet.summary+json;version=1.0.0' asMediaType
+]
+
+{ #category : #'tests - languages' }
+RESTfulControllerAcceptNegotiatorTest >> testNoLanguageIsAcceptable [
+
+	self
+		should: [ self bestLanguageFor: 'en-us' given: #() ]
+			raise: HTTPNotAcceptable
+			withExceptionDo: [ :error | 
+			self
+				assert: error messageText
+					equals: 'Cannot generate a response entity with acceptable characteristics.';
+				assert: error allowedLanguageTags isEmpty
+			];
+		should: [ self bestLanguageFor: 'en-us' given: {'en' asLanguageTag} ]
+			raise: HTTPNotAcceptable
+			withExceptionDo: [ :error | 
+			self
+				assert: error messageText
+					equals: 'Cannot generate a response entity with acceptable characteristics.';
+				withTheOnlyOneIn: error allowedLanguageTags
+					do: [ :languageTag | self assert: languageTag equals: 'en' asLanguageTag ]
+			];
+		should: [ self bestLanguageFor: '' given: {'en' asLanguageTag} ]
+			raise: HTTPNotAcceptable
+			withMessageText: 'Cannot generate a response entity with acceptable characteristics.'
 ]
 
 { #category : #tests }

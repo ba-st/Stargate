@@ -25,12 +25,18 @@ HyperspaceExtensionsTest >> testNotAcceptableAsJSON [
 
 	| error json |
 
-	error := HTTPNotAcceptable messageText: 'Ouch!' accepting: {'application/xml' asMediaType}.
+	error := HTTPNotAcceptable
+		messageText: 'Ouch!'
+		accepting: {'application/xml' asMediaType}
+		inAnyOf: ( #('en-us' 'es-ar') collect: #asLanguageTag ).
 	json := NeoJSONObject fromString: ( NeoJSONWriter toStringPretty: error ).
 
 	self
 		assert: json message equals: 'Ouch!';
 		assert: json code equals: 406;
 		assert: json allowedMediaTypes size equals: 1;
-		assert: json allowedMediaTypes first equals: 'application/xml'
+		assert: json allowedMediaTypes first equals: 'application/xml';
+		assert: json allowedLanguageTags size equals: 2;
+		assert: json allowedLanguageTags first equals: 'en-US';
+		assert: json allowedLanguageTags last equals: 'es-AR'
 ]

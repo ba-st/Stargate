@@ -5,23 +5,21 @@ Class {
 	#name : #RESTfulControllerRespondCreatedEntityPolicy,
 	#superclass : #RESTfulControllerResourceCreationPolicy,
 	#instVars : [
-		'requestHandler',
-		'targetMediaType'
+		'requestHandler'
 	],
 	#category : #'Stargate-Model-Controllers'
 }
 
 { #category : #'instance creation' }
-RESTfulControllerRespondCreatedEntityPolicy class >> for: aRequestHandler encodedAs: aTargetMediaType [
+RESTfulControllerRespondCreatedEntityPolicy class >> for: aRequestHandler [
 
-	^ self new initializeFor: aRequestHandler encodedAs: aTargetMediaType
+	^ self new initializeFor: aRequestHandler
 ]
 
 { #category : #initialization }
-RESTfulControllerRespondCreatedEntityPolicy >> initializeFor: aRequestHandler encodedAs: aTargetMediaType [
+RESTfulControllerRespondCreatedEntityPolicy >> initializeFor: aRequestHandler [
 
-	requestHandler := aRequestHandler.
-	targetMediaType := aTargetMediaType
+	requestHandler := aRequestHandler
 ]
 
 { #category : #processing }
@@ -31,11 +29,10 @@ RESTfulControllerRespondCreatedEntityPolicy >> responseFor: resource basedOn: ht
 
 	response := ZnResponse
 		created: ( requestHandler locationOf: resource within: requestContext )
-		entity: ( requestHandler encodeResource: resource to: targetMediaType within: requestContext ).
+		entity: ( requestHandler encodeResource: resource within: requestContext ).
 	requestHandler
-		putEntityTagOf: resource
-		encodedAs: targetMediaType
-		in: response
-		within: requestContext.
+		putEntityTagOf: resource in: response within: requestContext;
+		applyCachingDirectivesTo: response within: requestContext;
+		putLanguageContentTagIn: response within: requestContext.
 	^ response
 ]

@@ -39,7 +39,7 @@ CrossOriginResourceSharingPreflightHandler >> setAllowedHeadersOn: aResponse fro
 						at: self headerNames >> #accessControlAllowHeaders
 						addSeparatedWithComma: header trimBoth
 					].
-			self add: self headerNames >> #accessControlAllowHeaders toVaryOn: aResponse
+			aResponse addToVary: self headerNames >> #accessControlAllowHeaders
 			]
 ]
 

@@ -24,7 +24,6 @@ CrossOriginResourceSharing class >> inializeHeaders [
 	Headers := Namespace new.
 	Headers
 		bind: #origin to: 'Origin';
-		bind: #vary to: 'Vary';
 		bind: #accessControlRequestHeaders to: 'Access-Control-Request-Headers';
 		bind: #accessControlRequestMethod to: 'Access-Control-Request-Method';
 		bind: #accessControlAllowOrigin to: 'Access-Control-Allow-Origin';

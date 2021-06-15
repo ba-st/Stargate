@@ -36,7 +36,7 @@ JsonRPCRequestHandler >> initialize [
 	super initialize.
 	messageProcessor := JRPCMessageProcessor new.
 	acceptNegotiator := RESTfulControllerAcceptNegotiator
-		basedOn: ( Array with: ZnMimeType applicationJson )
+		accepting: ( Array with: ZnMimeType applicationJson )
 ]
 
 { #category : #initialization }

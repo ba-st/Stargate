@@ -44,27 +44,27 @@ RESTfulRequestHandlerBehavior >> decode: httpRequest within: requestContext [
 ]
 
 { #category : #'decoding/encoding' }
-RESTfulRequestHandlerBehavior >> encode: resource to: mediaType within: requestContext [
+RESTfulRequestHandlerBehavior >> encode: resource within: requestContext [
 
 	| encodingRule |
 
 	encodingRule := encodingRules
-		at: mediaType
+		at: requestContext targetMediaType
 		ifAbsent: [ HTTPClientError unsupportedMediaType signal: 'Encoder not found for given media type' ].
 
 	^ encodingRule encode: resource within: requestContext
 ]
 
 { #category : #private }
-RESTfulRequestHandlerBehavior >> encodeResource: resource to: mediaType within: requestContext [
+RESTfulRequestHandlerBehavior >> encodeResource: resource within: requestContext [
 
-	^ self encode: resource to: mediaType within: requestContext
+	^ self encode: resource within: requestContext
 ]
 
 { #category : #private }
-RESTfulRequestHandlerBehavior >> encodeResourceCollection: resourceCollection to: mediaType basedOn: httpRequest within: requestContext [
+RESTfulRequestHandlerBehavior >> encodeResourceCollection: resourceCollection basedOn: httpRequest within: requestContext [
 
-	^ self encode: resourceCollection to: mediaType within: requestContext
+	^ self encode: resourceCollection within: requestContext
 ]
 
 { #category : #accessing }
@@ -102,30 +102,32 @@ RESTfulRequestHandlerBehavior >> exceptionHandler [
 { #category : #API }
 RESTfulRequestHandlerBehavior >> from: httpRequest within: requestContext get: aQueryEvaluationBlock [
 
-	| mediaType resource response |
+	| resource response |
 
-	mediaType := self targetMediaTypeFrom: httpRequest.
+	self holdTargetMediaTypeAndLanguageFrom: httpRequest within: requestContext.
 	resource := resourceLocator
 		lookupResourceIdentifiedBy: httpRequest
 		evaluating: aQueryEvaluationBlock.
 	self
 		ifNoneMatchHeaderPresentIn: httpRequest
 		do: [ :etag | 
-			etag = ( self entityTagOf: resource encodedAs: mediaType within: requestContext )
-				ifTrue: [ response := ZnResponse notModified
+			etag
+				= ( self entityTagOf: resource encodedAs: requestContext targetMediaType within: requestContext )
+				ifTrue: [ response := ZnResponse notModified.
+					response
 						setEntityTag: etag;
-						yourself.
-					self applyCachingDirectivesTo: response within: requestContext.
+						addToVary: 'Accept'.
+					self
+						applyCachingDirectivesTo: response within: requestContext;
+						putLanguageContentTagIn: response within: requestContext.
 					^ response
 					]
 			].
-	response := ZnResponse ok: ( self encodeResource: resource to: mediaType within: requestContext ).
+	response := ZnResponse ok: ( self encodeResource: resource within: requestContext ).
+	self putEntityTagOf: resource in: response within: requestContext.
 	self
-		putEntityTagOf: resource
-		encodedAs: mediaType
-		in: response
-		within: requestContext.
-	self applyCachingDirectivesTo: response within: requestContext.
+		applyCachingDirectivesTo: response within: requestContext;
+		putLanguageContentTagIn: response within: requestContext.
 	^ response
 ]
 
@@ -170,19 +172,30 @@ RESTfulRequestHandlerBehavior >> from: httpRequest within: requestContext get: f
 { #category : #API }
 RESTfulRequestHandlerBehavior >> from: httpRequest within: requestContext getCollection: aQueryEvaluationBlock [
 
-	| mediaType resourceCollection encodedResourceCollection response |
+	| resourceCollection encodedResourceCollection response |
 
-	mediaType := self targetMediaTypeFrom: httpRequest.
+	self holdTargetMediaTypeAndLanguageFrom: httpRequest within: requestContext.
 	resourceCollection := paginationPolicy evaluateQuery: aQueryEvaluationBlock basedOn: httpRequest.
 	encodedResourceCollection := self
 		encodeResourceCollection: resourceCollection
-		to: mediaType
 		basedOn: httpRequest
 		within: requestContext.
 	response := ZnResponse ok: encodedResourceCollection.
+	response addToVary: 'Accept'.
 	self paginationPolicy affect: response within: requestContext.
-	self applyCachingDirectivesTo: response within: requestContext.
+	self
+		applyCachingDirectivesTo: response within: requestContext;
+		putLanguageContentTagIn: response within: requestContext.
 	^ response
+]
+
+{ #category : #private }
+RESTfulRequestHandlerBehavior >> holdTargetMediaTypeAndLanguageFrom: httpRequest within: requestContext [
+
+	httpRequest hasLanguageProrityList
+		then: [ requestContext targetLanguageTag: ( acceptNegotiator bestLanguageFor: httpRequest ) ].
+
+	^ requestContext targetMediaType: ( acceptNegotiator bestRepresentationFor: httpRequest )
 ]
 
 { #category : #private }
@@ -198,15 +211,15 @@ RESTfulRequestHandlerBehavior >> initializeResourceLocator: aResouceLocator
 	encodingRules: theEncodingRules
 	calculateEntityTagsWith: anEntityTagCalculator
 	cachingDirectives: theCachingDirectives
+	allowedLanguageTags: allowedLanguageTags
 	handleErrorsWith: anExceptionHandler [
-
 
 	resourceLocator := aResouceLocator.
 	resourceLocator handleExceptionsWith: anExceptionHandler.
 	paginationPolicy := aPaginationPolicy cull: self.
 	decodingRules := theDecodingRules.
 	encodingRules := theEncodingRules.
-	acceptNegotiator := RESTfulControllerAcceptNegotiator basedOn: encodingRules keys.
+	acceptNegotiator := RESTfulControllerAcceptNegotiator accepting: encodingRules keys inAnyOf: allowedLanguageTags.
 	entityTagCalculator := anEntityTagCalculator.
 	cachingDirectives := theCachingDirectives
 ]
@@ -224,21 +237,34 @@ RESTfulRequestHandlerBehavior >> paginationPolicy [
 ]
 
 { #category : #private }
-RESTfulRequestHandlerBehavior >> putEntityTagOf: resource encodedAs: mediaType in: response within: requestContext [
+RESTfulRequestHandlerBehavior >> putEntityTagOf: resource in: response within: requestContext [
 
-	response setEntityTag: ( self entityTagOf: resource encodedAs: mediaType within: requestContext )
+	response
+		setEntityTag: ( self entityTagOf: resource encodedAs: requestContext targetMediaType within: requestContext );
+		addToVary: 'Accept'
 ]
 
 { #category : #private }
-RESTfulRequestHandlerBehavior >> resourceCreationPolicyBasedOn: httpRequest [
+RESTfulRequestHandlerBehavior >> putLanguageContentTagIn: response within: requestContext [
+
+	requestContext
+		withTargetLanguageTagDo: [ :languageTag | 
+			response
+				addContentLanguage: languageTag;
+				addToVary: 'Accept-Language'
+			]
+]
+
+{ #category : #private }
+RESTfulRequestHandlerBehavior >> resourceCreationPolicyBasedOn: httpRequest within: requestContext [
 
 	[ httpRequest accept ]
 		on: KeyNotFound
 		do: [ :signal | ^ RESTfulControllerDoNotRespondCreatedEntityPolicy for: self ].
 
-	^ RESTfulControllerRespondCreatedEntityPolicy
-		for: self
-		encodedAs: ( self targetMediaTypeFrom: httpRequest )
+	self holdTargetMediaTypeAndLanguageFrom: httpRequest within: requestContext.
+
+	^ RESTfulControllerRespondCreatedEntityPolicy for: self
 ]
 
 { #category : #accessing }
@@ -251,12 +277,6 @@ RESTfulRequestHandlerBehavior >> resourceLocator [
 RESTfulRequestHandlerBehavior >> serverUrl: aServerUrl [
 
 	resourceLocator baseUrl: aServerUrl
-]
-
-{ #category : #private }
-RESTfulRequestHandlerBehavior >> targetMediaTypeFrom: httpRequest [
-
-	^ acceptNegotiator bestRepresentationFor: httpRequest
 ]
 
 { #category : #API }
@@ -276,7 +296,7 @@ RESTfulRequestHandlerBehavior >> withResourceCreatedFrom: httpRequest within: re
 
 	| creationPolicy decodedRepresentation newResource |
 
-	creationPolicy := self resourceCreationPolicyBasedOn: httpRequest.
+	creationPolicy := self resourceCreationPolicyBasedOn: httpRequest within: requestContext.
 	decodedRepresentation := self decode: httpRequest within: requestContext.
 	newResource := self exceptionHandler handleConflictsDuring: [ aBlock value: decodedRepresentation ].
 	^ creationPolicy responseFor: newResource basedOn: httpRequest within: requestContext
