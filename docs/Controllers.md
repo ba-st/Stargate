@@ -280,7 +280,7 @@ example classes and their respective tests:
 
 For APIs requiring the support of several languages, Stargate offers support to
 consider `Accept-Language` headers in the content negotiation. To enable
-that the request builder needs to be configured with the supported language tags.
+this, the request builder needs to be configured with the supported language tags.
 
 ```smalltalk
 builder
