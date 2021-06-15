@@ -283,7 +283,7 @@ consider `Accept-Language` headers in the content negotiation. To enable
 that the request builder needs to be configured with the supported language tags.
 
 ```smalltalk
-builder 
+builder
   addAsSupportedLanguage: 'en-US';
   addAsSupportedLanguage: 'es-AR'
 ```
