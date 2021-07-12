@@ -3,7 +3,7 @@ I'm responsible for locating specific subresource instances and generating locat
 "
 Class {
 	#name : #SubresourceLocator,
-	#superclass : #ResourceLocatorBehavior,
+	#superclass : #AbstractResourceLocator,
 	#instVars : [
 		'endpoint',
 		'identifierLookupAction',

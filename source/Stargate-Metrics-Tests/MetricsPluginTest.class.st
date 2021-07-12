@@ -32,7 +32,7 @@ MetricsPluginTest >> testConfiguredRunningAllMetrics [
 	| plugin |
 
 	plugin := MetricsPlugin
-		configuredBy: ( self asPluginConfigurationGathering: MetricProvider allProviderNames ).
+		configuredBy: ( self asPluginConfigurationGathering: MetricsProvider allProviderNames ).
 
 	self assert: plugin gatherMetrics size equals: 7
 ]
@@ -43,7 +43,7 @@ MetricsPluginTest >> testConfiguredRunningGarbageCollectionMetrics [
 	| plugin |
 
 	plugin := MetricsPlugin
-		configuredBy: ( self asPluginConfigurationGathering: ( Array with: GarbageCollectionMetrics providerName ) ).
+		configuredBy: ( self asPluginConfigurationGathering: ( Array with: GarbageCollectionMetricsProvider providerName ) ).
 
 	self assert: plugin gatherMetrics size equals: 3
 ]

@@ -1,59 +1,65 @@
 Class {
-	#name : #ResourceLocatorBehavior,
+	#name : #AbstractResourceLocator,
 	#superclass : #Object,
 	#category : #'Stargate-Model-Controllers'
 }
 
+{ #category : #testing }
+AbstractResourceLocator class >> isAbstract [
+
+	^ self = AbstractResourceLocator
+]
+
 { #category : #accessing }
-ResourceLocatorBehavior >> baseUrl [
+AbstractResourceLocator >> baseUrl [
 
 	^ self subclassResponsibility
 ]
 
 { #category : #accessing }
-ResourceLocatorBehavior >> baseUrl: aServerUrl [
+AbstractResourceLocator >> baseUrl: aServerUrl [
 
 	self subclassResponsibility
 ]
 
 { #category : #testing }
-ResourceLocatorBehavior >> canLookupResources [
+AbstractResourceLocator >> canLookupResources [
 
 	self subclassResponsibility
 ]
 
 { #category : #accessing }
-ResourceLocatorBehavior >> endpoint [
+AbstractResourceLocator >> endpoint [
 
 	^ self subclassResponsibility
 ]
 
 { #category : #private }
-ResourceLocatorBehavior >> exceptionHandler [
+AbstractResourceLocator >> exceptionHandler [
 
 	^ self subclassResponsibility
 ]
 
 { #category : #accessing }
-ResourceLocatorBehavior >> handleExceptionsWith: anExceptionHandler [
+AbstractResourceLocator >> handleExceptionsWith: anExceptionHandler [
 
 	self subclassResponsibility
 ]
 
 { #category : #private }
-ResourceLocatorBehavior >> identifierLookupAction [
+AbstractResourceLocator >> identifierLookupAction [
 
 	^ self subclassResponsibility
 ]
 
 { #category : #querying }
-ResourceLocatorBehavior >> locationOf: resource within: requestContext [
+AbstractResourceLocator >> locationOf: resource within: requestContext [
 
 	self subclassResponsibility
 ]
 
 { #category : #querying }
-ResourceLocatorBehavior >> lookupResourceIdentifiedBy: httpRequest evaluating: aQueryBlock [
+AbstractResourceLocator >> lookupResourceIdentifiedBy: httpRequest evaluating: aQueryBlock [
 
 	^ self exceptionHandler
 		handleNotFoundAndMissingParametersDuring: [ 

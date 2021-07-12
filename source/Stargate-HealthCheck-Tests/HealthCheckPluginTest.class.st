@@ -11,7 +11,7 @@ Class {
 HealthCheckPluginTest >> failedHealthCheck [
 
 	^ TestHealthCheck
-		responding: ( CriticalHealth detailedBy: self failureDetails onHealthCheckNamed: 'failing' )
+		responding: ( Critical detailedBy: self failureDetails onHealthCheckNamed: 'failing' )
 ]
 
 { #category : #private }

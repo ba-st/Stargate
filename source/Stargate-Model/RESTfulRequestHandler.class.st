@@ -4,7 +4,7 @@ I provide the standard machinery to handle REST requests, and I'm supposed to be
 "
 Class {
 	#name : #RESTfulRequestHandler,
-	#superclass : #RESTfulRequestHandlerBehavior,
+	#superclass : #AbstractRESTfulRequestHandler,
 	#category : #'Stargate-Model-Controllers'
 }
 

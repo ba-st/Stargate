@@ -3,7 +3,7 @@ I represent a RESTful handler supporting hypermedia driven controllers.
 "
 Class {
 	#name : #HypermediaDrivenRESTfulRequestHandler,
-	#superclass : #RESTfulRequestHandlerBehavior,
+	#superclass : #AbstractRESTfulRequestHandler,
 	#instVars : [
 		'mediaControlsFactory'
 	],

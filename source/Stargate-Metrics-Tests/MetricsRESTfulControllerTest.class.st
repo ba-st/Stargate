@@ -15,7 +15,7 @@ MetricsRESTfulControllerTest >> operationsConfiguration [
 			put:
 			( Dictionary new
 				at: #enabled put: true;
-				at: #metrics put: MetricProvider allProviderNames;
+				at: #metrics put: MetricsProvider allProviderNames;
 				yourself );
 		yourself
 ]

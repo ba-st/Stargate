@@ -2,17 +2,17 @@
 A MemoryMetricsTest is a test class for testing the behavior of MemoryMetrics
 "
 Class {
-	#name : #MemoryMetricsTest,
+	#name : #MemoryMetricsProviderTest,
 	#superclass : #TestCase,
 	#category : #'Stargate-Metrics-Tests'
 }
 
 { #category : #test }
-MemoryMetricsTest >> testGatherMetrics [
+MemoryMetricsProviderTest >> testGatherMetrics [
 
 	| metrics |
 
-	metrics := MemoryMetrics new gatherMetrics.
+	metrics := MemoryMetricsProvider new gatherMetrics.
 
 	self
 		withTheOnlyOneIn: metrics
