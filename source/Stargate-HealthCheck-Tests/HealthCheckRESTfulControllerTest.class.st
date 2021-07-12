@@ -44,7 +44,7 @@ HealthCheckRESTfulControllerTest >> testRunHealthChecksWithFailuresAskingDetaile
 		add:
 			( TestHealthCheck
 				responding:
-					( CriticalHealth
+					( Critical
 						detailedBy:
 							( Dictionary new
 								at: 'free-space' put: 50000;
@@ -81,7 +81,7 @@ HealthCheckRESTfulControllerTest >> testRunHealthChecksWithFailuresAskingSummari
 	healthChecks
 		add:
 			( TestHealthCheck
-				responding: ( CriticalHealth detailedBy: Dictionary new onHealthCheckNamed: 'low disk space' ) ).
+				responding: ( Critical detailedBy: Dictionary new onHealthCheckNamed: 'low disk space' ) ).
 
 	response := resourceController
 		runHealthChecksBasedOn: ( self requestToPOSTAccepting: resourceController healthCheckSummaryVersion1dot0dot0MediaType )
@@ -146,7 +146,7 @@ HealthCheckRESTfulControllerTest >> testRunSeveralHealthChecksAskingDetailedData
 	healthChecks
 		add:
 			( TestHealthCheck
-				responding: ( CriticalHealth detailedBy: Dictionary new onHealthCheckNamed: 'failed' ) );
+				responding: ( Critical detailedBy: Dictionary new onHealthCheckNamed: 'failed' ) );
 		add: ( TestHealthCheck responding: ( Sick detailedBy: Dictionary new onHealthCheckNamed: 'warning' ) );
 		add: ( TestHealthCheck responding: ( Healthy onHealthCheckNamed: 'success' ) ).
 

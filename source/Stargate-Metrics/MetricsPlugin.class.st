@@ -63,7 +63,7 @@ MetricsPlugin >> initializeConfiguredBy: pluginConfiguration [
 
 	enabledMetricNames := pluginConfiguration at: #metrics ifAbsent: [ #() ].
 
-	metricProviders := MetricProvider allSubclasses
+	metricProviders := MetricsProvider allSubclasses
 		select: [ :provider | enabledMetricNames includes: provider providerName ]
 		thenCollect: [ :providerClass | providerClass configuredBy: pluginConfiguration ]
 ]

@@ -2,13 +2,13 @@
 A RunningSystemMetricsTest is a test class for testing the behavior of RunningSystemMetrics
 "
 Class {
-	#name : #RunningSystemMetricsTest,
+	#name : #RunningSystemMetricsProviderTest,
 	#superclass : #TestCase,
 	#category : #'Stargate-Metrics-Tests'
 }
 
 { #category : #private }
-RunningSystemMetricsTest >> assertExternalSemaphoreMetrics: composite [
+RunningSystemMetricsProviderTest >> assertExternalSemaphoreMetrics: composite [
 
 	self
 		assert: composite name equals: 'External semaphore count';
@@ -26,7 +26,7 @@ RunningSystemMetricsTest >> assertExternalSemaphoreMetrics: composite [
 ]
 
 { #category : #private }
-RunningSystemMetricsTest >> assertProcessMetrics: composite [
+RunningSystemMetricsProviderTest >> assertProcessMetrics: composite [
 
 	self
 		assert: composite name equals: 'Process count';
@@ -48,7 +48,7 @@ RunningSystemMetricsTest >> assertProcessMetrics: composite [
 ]
 
 { #category : #private }
-RunningSystemMetricsTest >> assertUptimeMetric: counter [
+RunningSystemMetricsProviderTest >> assertUptimeMetric: counter [
 
 	self
 		assert: counter name equals: 'Uptime in seconds';
@@ -58,11 +58,11 @@ RunningSystemMetricsTest >> assertUptimeMetric: counter [
 ]
 
 { #category : #test }
-RunningSystemMetricsTest >> testGatherMetrics [
+RunningSystemMetricsProviderTest >> testGatherMetrics [
 
 	| metrics |
 
-	metrics := RunningSystemMetrics new gatherMetrics.
+	metrics := RunningSystemMetricsProvider new gatherMetrics.
 	self assert: metrics size equals: 3.
 	self
 		assertUptimeMetric: metrics first;

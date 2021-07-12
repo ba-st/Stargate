@@ -2,7 +2,7 @@
 I represent a critical health condition. An API in this state is unable to work correctly.
 "
 Class {
-	#name : #CriticalHealth,
+	#name : #Critical,
 	#superclass : #HealthCondition,
 	#instVars : [
 		'details',
@@ -12,38 +12,38 @@ Class {
 }
 
 { #category : #'Instance Creation' }
-CriticalHealth class >> detailedBy: aDetailsObject onHealthCheckNamed: aName [
+Critical class >> detailedBy: aDetailsObject onHealthCheckNamed: aName [
 
 	^ self new initializeDetailedBy: aDetailsObject onHealthCheckNamed: aName
 ]
 
 { #category : #accessing }
-CriticalHealth >> concern [
+Critical >> concern [
 
 	^ concern
 ]
 
 { #category : #accessing }
-CriticalHealth >> details [
+Critical >> details [
 
 	^ details
 ]
 
 { #category : #initialization }
-CriticalHealth >> initializeDetailedBy: aDetailsObject onHealthCheckNamed: aName [
+Critical >> initializeDetailedBy: aDetailsObject onHealthCheckNamed: aName [
 
 	details := aDetailsObject.
 	concern := aName
 ]
 
 { #category : #testing }
-CriticalHealth >> isNotCritical [
+Critical >> isNotCritical [
 
 	^ false
 ]
 
 { #category : #accessing }
-CriticalHealth >> riskScore [
+Critical >> riskScore [
 
 	^ 3
 ]

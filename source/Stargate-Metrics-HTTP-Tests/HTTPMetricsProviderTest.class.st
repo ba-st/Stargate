@@ -2,13 +2,13 @@
 A HTTPMetricsTest is a test class for testing the behavior of HTTPMetrics
 "
 Class {
-	#name : #HTTPMetricsTest,
+	#name : #HTTPMetricsProviderTest,
 	#superclass : #TestCase,
 	#category : #'Stargate-Metrics-HTTP-Tests'
 }
 
 { #category : #'private - asserting' }
-HTTPMetricsTest >> assertMetricValuesIn: composite byCategoryAre: anArrayOfValues [
+HTTPMetricsProviderTest >> assertMetricValuesIn: composite byCategoryAre: anArrayOfValues [
 
 	self assert: composite metrics size equals: 4.
 
@@ -52,7 +52,7 @@ HTTPMetricsTest >> assertMetricValuesIn: composite byCategoryAre: anArrayOfValue
 ]
 
 { #category : #'private - asserting' }
-HTTPMetricsTest >> assertMetricValuesIn: composite byMethodAre: anArrayOfValues [
+HTTPMetricsProviderTest >> assertMetricValuesIn: composite byMethodAre: anArrayOfValues [
 
 	self assert: composite metrics size equals: 2.
 
@@ -66,7 +66,7 @@ HTTPMetricsTest >> assertMetricValuesIn: composite byMethodAre: anArrayOfValues 
 ]
 
 { #category : #private }
-HTTPMetricsTest >> getEventAt: anUrl respondingOkWith: text [
+HTTPMetricsProviderTest >> getEventAt: anUrl respondingOkWith: text [
 
 	^ ZnSimplifiedServerTransactionEvent new
 		request: ( ZnRequest get: anUrl );
@@ -79,7 +79,7 @@ HTTPMetricsTest >> getEventAt: anUrl respondingOkWith: text [
 ]
 
 { #category : #private }
-HTTPMetricsTest >> getEventRespondingNotFoundAt: anUrl [
+HTTPMetricsProviderTest >> getEventRespondingNotFoundAt: anUrl [
 
 	^ ZnSimplifiedServerTransactionEvent new
 		request: ( ZnRequest get: anUrl );
@@ -92,13 +92,13 @@ HTTPMetricsTest >> getEventRespondingNotFoundAt: anUrl [
 ]
 
 { #category : #private }
-HTTPMetricsTest >> is: aTimestampedMetric labeledWith: anHTTPMethod [
+HTTPMetricsProviderTest >> is: aTimestampedMetric labeledWith: anHTTPMethod [
 
 	^ ( aTimestampedMetric metric labelAt: #http_method ) = anHTTPMethod
 ]
 
 { #category : #private }
-HTTPMetricsTest >> is: aTimestampedMetric labeledWith: anHTTPMethod at: aUrl responding: aStatusCode [
+HTTPMetricsProviderTest >> is: aTimestampedMetric labeledWith: anHTTPMethod at: aUrl responding: aStatusCode [
 
 	^ ( self is: aTimestampedMetric labeledWith: anHTTPMethod )
 		and: [ ( aTimestampedMetric metric labelAt: #url ) = aUrl asString
@@ -107,7 +107,7 @@ HTTPMetricsTest >> is: aTimestampedMetric labeledWith: anHTTPMethod at: aUrl res
 ]
 
 { #category : #private }
-HTTPMetricsTest >> optionsEventRespondingNotFoundAt: anUrl [
+HTTPMetricsProviderTest >> optionsEventRespondingNotFoundAt: anUrl [
 
 	^ ZnServerTransactionEvent new
 		request:
@@ -123,17 +123,17 @@ HTTPMetricsTest >> optionsEventRespondingNotFoundAt: anUrl [
 ]
 
 { #category : #tests }
-HTTPMetricsTest >> testEmptyMetricsWhenNoEventsWhereReceived [
+HTTPMetricsProviderTest >> testEmptyMetricsWhenNoEventsWhereReceived [
 
-	self assert: HTTPMetrics new gatherMetrics isEmpty
+	self assert: HTTPMetricsProvider new gatherMetrics isEmpty
 ]
 
 { #category : #tests }
-HTTPMetricsTest >> testGatherMetrics [
+HTTPMetricsProviderTest >> testGatherMetrics [
 
 	| provider metrics countMetric sizeMetric durationMetric |
 
-	provider := HTTPMetrics new.
+	provider := HTTPMetricsProvider new.
 
 	provider
 		handleSimplifiedEvent: ( self getEventAt: '/secure' asUrl respondingOkWith: 'OK' );
@@ -173,11 +173,11 @@ HTTPMetricsTest >> testGatherMetrics [
 ]
 
 { #category : #tests }
-HTTPMetricsTest >> testGatherMetricsIncludingTemplates [
+HTTPMetricsProviderTest >> testGatherMetricsIncludingTemplates [
 
 	| provider metrics countMetric |
 
-	provider := HTTPMetrics new.
+	provider := HTTPMetricsProvider new.
 
 	provider
 		handleSimplifiedEvent: ( self getEventAt: '/secure' asUrl respondingOkWith: 'OK' );
@@ -198,14 +198,14 @@ HTTPMetricsTest >> testGatherMetricsIncludingTemplates [
 ]
 
 { #category : #tests }
-HTTPMetricsTest >> testGatherMetricsProvidingBreakdownConfiguration [
+HTTPMetricsProviderTest >> testGatherMetricsProvidingBreakdownConfiguration [
 
 	| provider metrics countMetric sizeMetric durationMetric |
 
-	provider := HTTPMetrics
+	provider := HTTPMetricsProvider
 		configuredBy:
 			( Dictionary new
-				at: HTTPMetrics providerName
+				at: HTTPMetricsProvider providerName
 					put:
 					( Dictionary new
 						at: #breakdownCategories put: #(#http_method);
@@ -250,7 +250,7 @@ HTTPMetricsTest >> testGatherMetricsProvidingBreakdownConfiguration [
 ]
 
 { #category : #tests }
-HTTPMetricsTest >> testProviderName [
+HTTPMetricsProviderTest >> testProviderName [
 
-	self assert: HTTPMetrics providerName equals: 'http'
+	self assert: HTTPMetricsProvider providerName equals: 'http'
 ]

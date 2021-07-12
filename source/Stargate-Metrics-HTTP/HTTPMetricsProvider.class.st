@@ -2,8 +2,8 @@
 I'm a provider of metrics related to HTTP requests
 "
 Class {
-	#name : #HTTPMetrics,
-	#superclass : #MetricProvider,
+	#name : #HTTPMetricsProvider,
+	#superclass : #MetricsProvider,
 	#instVars : [
 		'groupedRequestCount',
 		'groupedResponseSize',
@@ -14,33 +14,33 @@ Class {
 }
 
 { #category : #'instance creation' }
-HTTPMetrics class >> configuredBy: pluginConfiguration [
+HTTPMetricsProvider class >> configuredBy: pluginConfiguration [
 
 	^ self basicNew
 		initializeConfiguredBy: ( pluginConfiguration at: self providerName ifAbsent: [ Dictionary new ] )
 ]
 
 { #category : #'instance creation' }
-HTTPMetrics class >> new [
+HTTPMetricsProvider class >> new [
 
 	^ self configuredBy: Dictionary new
 ]
 
 { #category : #accessing }
-HTTPMetrics class >> providerName [
+HTTPMetricsProvider class >> providerName [
 
 	^ 'http'
 ]
 
 { #category : #initialization }
-HTTPMetrics >> finalize [
+HTTPMetricsProvider >> finalize [
 
 	super finalize.
 	self uninstall
 ]
 
 { #category : #calculating }
-HTTPMetrics >> gatherMetrics [
+HTTPMetricsProvider >> gatherMetrics [
 
 	^ groupedRequestCount
 		ifEmpty: [ #() ]
@@ -52,7 +52,7 @@ HTTPMetrics >> gatherMetrics [
 ]
 
 { #category : #'event handling' }
-HTTPMetrics >> handleEvent: aZnServerTransactionEvent [
+HTTPMetricsProvider >> handleEvent: aZnServerTransactionEvent [
 
 	| labels |
 
@@ -66,7 +66,7 @@ HTTPMetrics >> handleEvent: aZnServerTransactionEvent [
 ]
 
 { #category : #'event handling' }
-HTTPMetrics >> handleSimplifiedEvent: aZnSimplifiedServerTransactionEvent [
+HTTPMetricsProvider >> handleSimplifiedEvent: aZnSimplifiedServerTransactionEvent [
 
 	| labels |
 
@@ -79,7 +79,7 @@ HTTPMetrics >> handleSimplifiedEvent: aZnSimplifiedServerTransactionEvent [
 ]
 
 { #category : #'private - accumulating' }
-HTTPMetrics >> increaseRequestCountAt: labels [
+HTTPMetricsProvider >> increaseRequestCountAt: labels [
 
 	| previousCount |
 
@@ -89,7 +89,7 @@ HTTPMetrics >> increaseRequestCountAt: labels [
 ]
 
 { #category : #'private - accumulating' }
-HTTPMetrics >> increaseRequestResponseDurationAt: labels with: aMillisecondsCount [
+HTTPMetricsProvider >> increaseRequestResponseDurationAt: labels with: aMillisecondsCount [
 
 	| previousDuration |
 
@@ -98,7 +98,7 @@ HTTPMetrics >> increaseRequestResponseDurationAt: labels with: aMillisecondsCoun
 ]
 
 { #category : #'private - accumulating' }
-HTTPMetrics >> increaseResponseSizeAt: labels with: aByteCount [
+HTTPMetricsProvider >> increaseResponseSizeAt: labels with: aByteCount [
 
 	| previousSize |
 
@@ -107,7 +107,7 @@ HTTPMetrics >> increaseResponseSizeAt: labels with: aByteCount [
 ]
 
 { #category : #initialization }
-HTTPMetrics >> initializeConfiguredBy: providerConfiguration [
+HTTPMetricsProvider >> initializeConfiguredBy: providerConfiguration [
 
 	categoriesFilter := providerConfiguration
 		at: #breakdownCategories
@@ -119,7 +119,7 @@ HTTPMetrics >> initializeConfiguredBy: providerConfiguration [
 ]
 
 { #category : #actions }
-HTTPMetrics >> installOn: teapotServer [
+HTTPMetricsProvider >> installOn: teapotServer [
 
 	ZnLogEvent announcer
 		when: ZnSimplifiedServerTransactionEvent do: [ :event | self handleSimplifiedEvent: event ];
@@ -129,7 +129,7 @@ HTTPMetrics >> installOn: teapotServer [
 ]
 
 { #category : #'private - metrics' }
-HTTPMetrics >> labelsFor: aServerTransactionEvent [
+HTTPMetricsProvider >> labelsFor: aServerTransactionEvent [
 
 	^ categoriesFilter
 		value:
@@ -141,7 +141,7 @@ HTTPMetrics >> labelsFor: aServerTransactionEvent [
 ]
 
 { #category : #'private - metrics' }
-HTTPMetrics >> requestCountMetric [
+HTTPMetricsProvider >> requestCountMetric [
 
 	| builder |
 
@@ -156,7 +156,7 @@ HTTPMetrics >> requestCountMetric [
 ]
 
 { #category : #'private - metrics' }
-HTTPMetrics >> requestResponseDurationMetric [
+HTTPMetricsProvider >> requestResponseDurationMetric [
 
 	| builder |
 
@@ -171,7 +171,7 @@ HTTPMetrics >> requestResponseDurationMetric [
 ]
 
 { #category : #'private - metrics' }
-HTTPMetrics >> responseSizeMetric [
+HTTPMetricsProvider >> responseSizeMetric [
 
 	| builder |
 
@@ -186,7 +186,7 @@ HTTPMetrics >> responseSizeMetric [
 ]
 
 { #category : #actions }
-HTTPMetrics >> uninstall [
+HTTPMetricsProvider >> uninstall [
 
 	ZnLogEvent announcer unsubscribe: self
 ]

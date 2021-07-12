@@ -2,45 +2,45 @@
 I'm a provider of metrics
 "
 Class {
-	#name : #MetricProvider,
+	#name : #MetricsProvider,
 	#superclass : #Object,
 	#category : #'Stargate-Metrics'
 }
 
 { #category : #accessing }
-MetricProvider class >> allProviderNames [
+MetricsProvider class >> allProviderNames [
 
-	^ MetricProvider allSubclasses collect: [ :class | class providerName ] 
+	^ MetricsProvider allSubclasses collect: [ :class | class providerName ] 
 ]
 
 { #category : #'instance creation' }
-MetricProvider class >> configuredBy: pluginConfiguration [
+MetricsProvider class >> configuredBy: pluginConfiguration [
 
 	^ self subclassResponsibility
 ]
 
 { #category : #accessing }
-MetricProvider class >> providerName [
+MetricsProvider class >> providerName [
 
 	^ self subclassResponsibility
 ]
 
 { #category : #private }
-MetricProvider >> currentTimestamp [
+MetricsProvider >> currentTimestamp [
 		
 	^ DateAndTime now
 ]
 
 { #category : #calculating }
-MetricProvider >> gatherMetrics [
+MetricsProvider >> gatherMetrics [
 
 	self subclassResponsibility
 ]
 
 { #category : #actions }
-MetricProvider >> installOn: teapotServer [
+MetricsProvider >> installOn: teapotServer [
 ]
 
 { #category : #actions }
-MetricProvider >> uninstall [
+MetricsProvider >> uninstall [
 ]

@@ -2,25 +2,25 @@
 I'm a provider of metrics related to the garbage collector
 "
 Class {
-	#name : #GarbageCollectionMetrics,
-	#superclass : #MetricProvider,
+	#name : #GarbageCollectionMetricsProvider,
+	#superclass : #MetricsProvider,
 	#category : #'Stargate-Metrics'
 }
 
 { #category : #'instance creation' }
-GarbageCollectionMetrics class >> configuredBy: pluginConfiguration [
+GarbageCollectionMetricsProvider class >> configuredBy: pluginConfiguration [
 
 	^ self new
 ]
 
 { #category : #accessing }
-GarbageCollectionMetrics class >> providerName [
+GarbageCollectionMetricsProvider class >> providerName [
 
 	^ 'garbage collection'
 ]
 
 { #category : #private }
-GarbageCollectionMetrics >> garbageCollectionCount [
+GarbageCollectionMetricsProvider >> garbageCollectionCount [
 
 	^ CompositeMetricBuilder forCounter
 		named: 'Garbage Collector invokations';
@@ -33,7 +33,7 @@ GarbageCollectionMetrics >> garbageCollectionCount [
 ]
 
 { #category : #private }
-GarbageCollectionMetrics >> garbageCollectionTime [
+GarbageCollectionMetricsProvider >> garbageCollectionTime [
 
 	^ CompositeMetricBuilder forCounter
 		named: 'Garbage Collection Time in Milliseconds';
@@ -46,13 +46,13 @@ GarbageCollectionMetrics >> garbageCollectionTime [
 ]
 
 { #category : #calculating }
-GarbageCollectionMetrics >> gatherMetrics [
+GarbageCollectionMetricsProvider >> gatherMetrics [
 
 	^ Array with: self garbageCollectionTime with: self garbageCollectionCount with: self tenuringCount
 ]
 
 { #category : #private }
-GarbageCollectionMetrics >> tenuringCount [
+GarbageCollectionMetricsProvider >> tenuringCount [
 
 	^ Counter
 		named: 'Tenured objects count'

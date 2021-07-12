@@ -2,25 +2,25 @@
 I'm a provider of metrics related to the running system
 "
 Class {
-	#name : #RunningSystemMetrics,
-	#superclass : #MetricProvider,
+	#name : #RunningSystemMetricsProvider,
+	#superclass : #MetricsProvider,
 	#category : #'Stargate-Metrics'
 }
 
 { #category : #'instance creation' }
-RunningSystemMetrics class >> configuredBy: pluginConfiguration [
+RunningSystemMetricsProvider class >> configuredBy: pluginConfiguration [
 
 	^ self new
 ]
 
 { #category : #accessing }
-RunningSystemMetrics class >> providerName [
+RunningSystemMetricsProvider class >> providerName [
 	
 	^ 'running system'
 ]
 
 { #category : #private }
-RunningSystemMetrics >> externalSemaphores [
+RunningSystemMetricsProvider >> externalSemaphores [
 
 	^ CompositeMetricBuilder forCounter
 		named: 'External semaphore count';
@@ -38,13 +38,13 @@ RunningSystemMetrics >> externalSemaphores [
 ]
 
 { #category : #calculating }
-RunningSystemMetrics >> gatherMetrics [
+RunningSystemMetricsProvider >> gatherMetrics [
 
 	^ Array with: self uptime with: self processesCount with: self externalSemaphores
 ]
 
 { #category : #private }
-RunningSystemMetrics >> groupProcessesByStatusAndPriority [
+RunningSystemMetricsProvider >> groupProcessesByStatusAndPriority [
 
 	| activeProcessData activeProcess groupedProcesses |
 
@@ -60,7 +60,7 @@ RunningSystemMetrics >> groupProcessesByStatusAndPriority [
 ]
 
 { #category : #private }
-RunningSystemMetrics >> processesCount [
+RunningSystemMetricsProvider >> processesCount [
 
 	| builder |
 
@@ -79,7 +79,7 @@ RunningSystemMetrics >> processesCount [
 ]
 
 { #category : #private }
-RunningSystemMetrics >> statusOf: aProcess [
+RunningSystemMetricsProvider >> statusOf: aProcess [
 
 	aProcess isTerminated
 		ifTrue: [ ^ 'TERMINATED' ].
@@ -93,7 +93,7 @@ RunningSystemMetrics >> statusOf: aProcess [
 ]
 
 { #category : #private }
-RunningSystemMetrics >> uptime [
+RunningSystemMetricsProvider >> uptime [
 
 	^ Counter
 		named: 'Uptime in seconds'

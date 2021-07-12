@@ -2,13 +2,13 @@
 A GarbageCollectionMetricsTest is a test class for testing the behavior of GarbageCollectionMetrics
 "
 Class {
-	#name : #GarbageCollectionMetricsTest,
+	#name : #GarbageCollectionMetricsProviderTest,
 	#superclass : #TestCase,
 	#category : #'Stargate-Metrics-Tests'
 }
 
 { #category : #private }
-GarbageCollectionMetricsTest >> assertGarbageCollectionCountMetrics: composite [
+GarbageCollectionMetricsProviderTest >> assertGarbageCollectionCountMetrics: composite [
 
 	self
 		assert: composite name equals: 'Garbage Collector invokations';
@@ -26,7 +26,7 @@ GarbageCollectionMetricsTest >> assertGarbageCollectionCountMetrics: composite [
 ]
 
 { #category : #private }
-GarbageCollectionMetricsTest >> assertGarbageCollectionTimeMetrics: composite [
+GarbageCollectionMetricsProviderTest >> assertGarbageCollectionTimeMetrics: composite [
 
 	self
 		assert: composite name equals: 'Garbage Collection Time in Milliseconds';
@@ -45,7 +45,7 @@ GarbageCollectionMetricsTest >> assertGarbageCollectionTimeMetrics: composite [
 ]
 
 { #category : #private }
-GarbageCollectionMetricsTest >> assertTenureCountMetrics: counter [
+GarbageCollectionMetricsProviderTest >> assertTenureCountMetrics: counter [
 
 	self
 		assert: counter name equals: 'Tenured objects count';
@@ -56,11 +56,11 @@ GarbageCollectionMetricsTest >> assertTenureCountMetrics: counter [
 ]
 
 { #category : #test }
-GarbageCollectionMetricsTest >> testGatherMetrics [
+GarbageCollectionMetricsProviderTest >> testGatherMetrics [
 
 	| metrics |
 
-	metrics := GarbageCollectionMetrics new gatherMetrics.
+	metrics := GarbageCollectionMetricsProvider new gatherMetrics.
 	self assert: metrics size equals: 3.
 	self
 		assertGarbageCollectionTimeMetrics: metrics first;

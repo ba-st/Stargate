@@ -2,31 +2,31 @@
 I'm a provider of metrics related to memory
 "
 Class {
-	#name : #MemoryMetrics,
-	#superclass : #MetricProvider,
+	#name : #MemoryMetricsProvider,
+	#superclass : #MetricsProvider,
 	#category : #'Stargate-Metrics'
 }
 
 { #category : #'instance creation' }
-MemoryMetrics class >> configuredBy: pluginConfiguration [
+MemoryMetricsProvider class >> configuredBy: pluginConfiguration [
 
 	^ self new
 ]
 
 { #category : #accessing }
-MemoryMetrics class >> providerName [
+MemoryMetricsProvider class >> providerName [
 
 	^ 'memory'
 ]
 
 { #category : #calculating }
-MemoryMetrics >> gatherMetrics [
+MemoryMetricsProvider >> gatherMetrics [
 
 	^ Array with: self memoryAllocation
 ]
 
 { #category : #private }
-MemoryMetrics >> memoryAllocation [
+MemoryMetricsProvider >> memoryAllocation [
 
 	^ CompositeMetricBuilder forGauge
 		named: 'Smalltalk Memory in Bytes';
