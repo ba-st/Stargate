@@ -26,7 +26,7 @@ AllowSpecifiedOriginsPolicy >> applyOn: aResponse for: aRequest using: aHandler 
 	allowedOrigins
 		detect: [ :origin | origin = requestOrigin ]
 		ifFound: [ :allowedOrigin | 
-			aHandler set: allowedOrigin asAllowOriginOn: aResponse.
+			aHandler set: ( self withoutLastSlash: allowedOrigin ) asAllowOriginOn: aResponse.
 			allowedOrigins size > 1
 				ifTrue: [ aResponse addToVary: aHandler headerNames >> #origin ]
 			]
@@ -36,5 +36,11 @@ AllowSpecifiedOriginsPolicy >> applyOn: aResponse for: aRequest using: aHandler 
 { #category : #initialization }
 AllowSpecifiedOriginsPolicy >> initializeOnlyFrom: origins [
 
-	allowedOrigins := origins 
+	allowedOrigins := origins collect: #asUrl
+]
+
+{ #category : #'configuring headers' }
+AllowSpecifiedOriginsPolicy >> withoutLastSlash: allowedOrigin [
+
+	^ allowedOrigin asString allButLast
 ]

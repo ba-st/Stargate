@@ -11,6 +11,14 @@ Class {
 	#category : #'Stargate-Examples-Tests-PetStore'
 }
 
+{ #category : #'tests - support' }
+PetStoreAPITest >> assert: aResponse canBeSharedWithRequestsFrom: anOriginLocation [
+
+	self
+		assert: ( aResponse headers at: 'Access-Control-Allow-Origin' )
+		equals: anOriginLocation asString allButLast
+]
+
 { #category : #private }
 PetStoreAPITest >> controllersToInstall [
 
@@ -94,7 +102,7 @@ PetStoreAPITest >> testCORSAllowingExactlyOneOrigin [
 
 	self
 		assert: response isNoContent;
-		assertUrl: ( response headers at: 'Access-Control-Allow-Origin' ) equals: self baseUrl;
+		assert: response canBeSharedWithRequestsFrom: self baseUrl;
 		assert: ( response headers at: 'Access-Control-Allow-Headers' ) equals: 'Content-Type';
 		assert: response varyHeaderNames includes: 'Access-Control-Allow-Headers';
 		deny: response varyHeaderNames includes: 'Access-Control-Allow-Origin';
@@ -109,7 +117,7 @@ PetStoreAPITest >> testCORSAllowingExactlyOneOrigin [
 	self
 		deny: response varyHeaderNames includes: 'Access-Control-Allow-Headers';
 		deny: response varyHeaderNames includes: 'Access-Control-Allow-Origin';
-		assertUrl: ( response headers at: 'Access-Control-Allow-Origin' ) equals: self baseUrl
+		assert: response canBeSharedWithRequestsFrom: self baseUrl
 ]
 
 { #category : #'tests - CORS' }
@@ -134,7 +142,7 @@ PetStoreAPITest >> testCORSAllowingMoreThanOneOrigin [
 
 	self
 		assert: response isNoContent;
-		assertUrl: ( response headers at: 'Access-Control-Allow-Origin' ) equals: self baseUrl;
+		assert: response canBeSharedWithRequestsFrom: self baseUrl;
 		assert: ( response headers at: 'Access-Control-Allow-Headers' ) equals: 'Content-Type';
 		assert: response varyHeaderNames includes: 'Origin';
 		assert: response varyHeaderNames includes: 'Access-Control-Allow-Headers';
@@ -149,7 +157,7 @@ PetStoreAPITest >> testCORSAllowingMoreThanOneOrigin [
 	self
 		assert: response varyHeaderNames includes: 'Origin';
 		deny: response varyHeaderNames includes: 'Access-Control-Allow-Headers';
-		assertUrl: ( response headers at: 'Access-Control-Allow-Origin' ) equals: self baseUrl
+		assert: response canBeSharedWithRequestsFrom:  self baseUrl
 ]
 
 { #category : #'tests - CORS' }

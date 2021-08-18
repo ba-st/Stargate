@@ -5,6 +5,14 @@ Class {
 }
 
 { #category : #'tests - support' }
+CrossOriginResourceSharingActualRequestHandlerTest >> assert: aResponse canBeSharedWithRequestsFrom: anOriginLocation [
+
+	self
+		assert: ( aResponse headers at: 'Access-Control-Allow-Origin' )
+		equals: anOriginLocation asString allButLast
+]
+
+{ #category : #'tests - support' }
 CrossOriginResourceSharingActualRequestHandlerTest >> assert: aHandlerBuilderConfiguration handles: aRequest byResponding: responseAssertions [
 
 	| handler response |
@@ -97,7 +105,7 @@ CrossOriginResourceSharingActualRequestHandlerTest >> testAllowExactlyOneOrigin 
 		byResponding: [ :response | 
 			self
 				assert: response isCreated;
-				assertUrl: ( response headers at: 'Access-Control-Allow-Origin' ) equals: self websiteLocation;
+				assert: response canBeSharedWithRequestsFrom: self websiteLocation;
 				should: [ response headers at: 'Vary' ] raise: KeyNotFound
 			]
 ]
@@ -120,7 +128,7 @@ CrossOriginResourceSharingActualRequestHandlerTest >> testAllowMoreThanOneOrigin
 		byResponding: [ :response | 
 			self
 				assert: response isCreated;
-				assertUrl: ( response headers at: 'Access-Control-Allow-Origin' ) equals: self websiteLocation;
+				assert: response canBeSharedWithRequestsFrom: self websiteLocation;
 				assert: ( response headers at: 'Vary' ) equals: 'Origin'
 			]
 ]
