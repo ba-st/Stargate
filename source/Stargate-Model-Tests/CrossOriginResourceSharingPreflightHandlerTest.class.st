@@ -12,7 +12,7 @@ CrossOriginResourceSharingPreflightHandlerTest >> assert: aResponse canBeSharedW
 
 	self
 		assert: ( aResponse headers at: 'Access-Control-Allow-Origin' )
-		equals: anOriginLocation asString allButLast
+		equals: anOriginLocation origin asString
 ]
 
 { #category : #'tests - support' }

@@ -16,7 +16,7 @@ PetStoreAPITest >> assert: aResponse canBeSharedWithRequestsFrom: anOriginLocati
 
 	self
 		assert: ( aResponse headers at: 'Access-Control-Allow-Origin' )
-		equals: anOriginLocation asString allButLast
+		equals: anOriginLocation origin asString
 ]
 
 { #category : #private }

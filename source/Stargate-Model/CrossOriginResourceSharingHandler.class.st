@@ -14,7 +14,13 @@ CrossOriginResourceSharingHandler >> headerNames [
 ]
 
 { #category : #'private - evaluating' }
-CrossOriginResourceSharingHandler >> set: anyOrAnOrigin asAllowOriginOn: aResponse [
+CrossOriginResourceSharingHandler >> set: anOrigin asAllowOriginOn: aResponse [
 	
-	aResponse headers at: self headerNames >> #accessControlAllowOrigin put: anyOrAnOrigin
+	aResponse headers at: self headerNames >> #accessControlAllowOrigin put: anOrigin asString
+]
+
+{ #category : #'private - evaluating' }
+CrossOriginResourceSharingHandler >> setAnyOriginAllowedOn: aResponse [
+	
+	aResponse headers at: self headerNames >> #accessControlAllowOrigin put: '*'
 ]
