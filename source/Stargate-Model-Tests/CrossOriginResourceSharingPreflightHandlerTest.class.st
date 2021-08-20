@@ -8,6 +8,14 @@ Class {
 }
 
 { #category : #'tests - support' }
+CrossOriginResourceSharingPreflightHandlerTest >> assert: aResponse canBeSharedWithRequestsFrom: anOriginLocation [
+
+	self
+		assert: ( aResponse headers at: 'Access-Control-Allow-Origin' )
+		equals: anOriginLocation asWebOrigin asString
+]
+
+{ #category : #'tests - support' }
 CrossOriginResourceSharingPreflightHandlerTest >> assert: aHandlerBuilderConfiguration handles: aRequest byResponding: responseAssertions [
 
 	| handler response |
@@ -137,8 +145,7 @@ CrossOriginResourceSharingPreflightHandlerTest >> testAllowExactlyOneOrigin [
 		handles: request
 		byResponding: [ :response | 
 			self
-				assertUrl: ( response headers at: 'Access-Control-Allow-Origin' )
-					equals: self websiteLocation;
+				assert: response canBeSharedWithRequestsFrom: self websiteLocation;
 				assert: ( response headers at: 'Access-Control-Allow-Headers' ) equals: 'Content-Type';
 				assert: ( response headers at: 'Vary' ) equals: 'Access-Control-Allow-Headers';
 				assert: ( response headers at: 'Access-Control-Allow-Methods' ) equals: 'GET, POST'
@@ -168,7 +175,7 @@ CrossOriginResourceSharingPreflightHandlerTest >> testAllowHeadersMatchRequestHe
 		handles: request
 		byResponding: [ :response | 
 			self
-				assertUrl: ( response headers at: 'Access-Control-Allow-Origin' ) equals: self websiteLocation;
+				assert: response canBeSharedWithRequestsFrom: self websiteLocation;
 				assert: ( response headers at: 'Access-Control-Allow-Methods' ) equals: 'GET, POST';
 				assert: ( response headers at: 'Access-Control-Allow-Headers' )
 					equals: 'Content-Type, Authorization';
@@ -199,7 +206,7 @@ CrossOriginResourceSharingPreflightHandlerTest >> testAllowHeadersWithEmptyReque
 		handles: request
 		byResponding: [ :response | 
 			self
-				assertUrl: ( response headers at: 'Access-Control-Allow-Origin' ) equals: self websiteLocation;
+				assert: response canBeSharedWithRequestsFrom: self websiteLocation;
 				assert: ( response headers at: 'Access-Control-Allow-Methods' ) equals: 'GET, POST';
 				should: [ response headers at: 'Access-Control-Allow-Headers' ] raise: NotFound;
 				should: [ response headers at: 'Vary' ] raise: KeyNotFound
@@ -231,7 +238,7 @@ CrossOriginResourceSharingPreflightHandlerTest >> testAllowMoreThanOneOrigin [
 		handles: request
 		byResponding: [ :response | 
 			self
-				assertUrl: ( response headers at: 'Access-Control-Allow-Origin' ) equals: self websiteLocation;
+				assert: response canBeSharedWithRequestsFrom: self websiteLocation;
 				assert: ( response headers at: 'Access-Control-Allow-Headers' ) equals: 'Content-Type';
 				assert: response varyHeaderNames equals: #('Origin' 'Access-Control-Allow-Headers');
 				assert: ( response headers at: 'Access-Control-Allow-Methods' ) equals: 'GET, POST'
@@ -267,7 +274,7 @@ CrossOriginResourceSharingPreflightHandlerTest >> testAllowedMethodsReflectsDefi
 		handles: request
 		byResponding: [ :response | 
 			self
-				assertUrl: ( response headers at: 'Access-Control-Allow-Origin' ) equals: self websiteLocation;
+				assert: response canBeSharedWithRequestsFrom: self websiteLocation;
 				assert: ( response headers at: 'Access-Control-Allow-Headers' ) equals: 'Content-Type';
 				assert: ( response headers at: 'Vary' ) equals: 'Access-Control-Allow-Headers';
 				assert: ( response headers at: 'Access-Control-Allow-Methods' ) equals: 'GET'
@@ -292,8 +299,7 @@ CrossOriginResourceSharingPreflightHandlerTest >> testAllowedMethodsReflectsDefi
 		handles: request
 		byResponding: [ :response | 
 			self
-				assertUrl: ( response headers at: 'Access-Control-Allow-Origin' )
-					equals: self websiteLocation;
+				assert:  response canBeSharedWithRequestsFrom: self websiteLocation;
 				assert: ( response headers at: 'Access-Control-Allow-Headers' ) equals: 'Content-Type';
 				assert: ( response headers at: 'Vary' ) equals: 'Access-Control-Allow-Headers';
 				assert: ( response headers at: 'Access-Control-Allow-Methods' ) equals: 'GET, POST, PUT'
@@ -327,7 +333,7 @@ CrossOriginResourceSharingPreflightHandlerTest >> testAllowedMethodsReflectsDefi
 		handles: request
 		byResponding: [ :response | 
 			self
-				assertUrl: ( response headers at: 'Access-Control-Allow-Origin' ) equals: self websiteLocation;
+				assert: response canBeSharedWithRequestsFrom: self websiteLocation;
 				assert: ( response headers at: 'Access-Control-Allow-Headers' ) equals: 'Content-Type';
 				assert: ( response headers at: 'Vary' ) equals: 'Access-Control-Allow-Headers';
 				assert: ( response headers at: 'Access-Control-Allow-Methods' ) equals: 'GET, POST'

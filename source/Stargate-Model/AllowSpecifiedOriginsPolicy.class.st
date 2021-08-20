@@ -11,9 +11,9 @@ Class {
 }
 
 { #category : #'instance creation' }
-AllowSpecifiedOriginsPolicy class >> onlyFrom: origins [
-	
-	^ self new initializeOnlyFrom: origins
+AllowSpecifiedOriginsPolicy class >> onlyFrom: anUrlCollection [
+
+	^ self new initializeOnlyFrom: ( anUrlCollection collect: #asWebOrigin )
 ]
 
 { #category : #'configuring headers' }
@@ -21,7 +21,7 @@ AllowSpecifiedOriginsPolicy >> applyOn: aResponse for: aRequest using: aHandler 
 
 	| requestOrigin |
 
-	requestOrigin := ( aRequest headers at: aHandler headerNames >> #origin ) asUrl.
+	requestOrigin := ( aRequest headers at: aHandler headerNames >> #origin ) asWebOrigin.
 
 	allowedOrigins
 		detect: [ :origin | origin = requestOrigin ]
@@ -36,5 +36,5 @@ AllowSpecifiedOriginsPolicy >> applyOn: aResponse for: aRequest using: aHandler 
 { #category : #initialization }
 AllowSpecifiedOriginsPolicy >> initializeOnlyFrom: origins [
 
-	allowedOrigins := origins 
+	allowedOrigins := origins
 ]

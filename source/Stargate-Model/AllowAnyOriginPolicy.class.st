@@ -8,7 +8,7 @@ Class {
 }
 
 { #category : #'configuring headers' }
-AllowAnyOriginPolicy >> applyOn: aResponse for: aRequest using: aHandler [ 
+AllowAnyOriginPolicy >> applyOn: aResponse for: aRequest using: aHandler [
 
-	aHandler set: '*' asAllowOriginOn: aResponse 
+	aHandler setAnyOriginAllowedOn: aResponse
 ]
