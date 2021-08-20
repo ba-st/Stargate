@@ -15,9 +15,7 @@ Class {
 	#name : #WebOrigin,
 	#superclass : #Object,
 	#instVars : [
-		'scheme',
-		'host',
-		'port'
+		'url'
 	],
 	#category : #'Stargate-Model-CORS'
 }
@@ -25,20 +23,22 @@ Class {
 { #category : #'instance creation' }
 WebOrigin class >> basedOn: aUrl [
 
-	( self hasValidOrigin: aUrl )
-		ifFalse: [ InstanceCreationFailed signal: ( '<1p> does not comply with a valid origin' expandMacrosWith: aUrl ) ].
+	AssertionChecker
+		enforce: [ self hasValidOrigin: aUrl ]
+		because: [ '<1p> does not comply with a valid origin' expandMacrosWith: aUrl ]
+		raising: InstanceCreationFailed.
 
 	^ self new initializeBasedOn: aUrl
 ]
 
 { #category : #preconditions }
-WebOrigin class >> hasValidOrigin: aZnUrl [
+WebOrigin class >> hasValidOrigin: aUrl [
 
 	| validOriginSchemes |
 
 	validOriginSchemes := #(#http #https).
 
-	^ aZnUrl hasScheme and: [ ( validOriginSchemes includes: aZnUrl scheme ) and: [ aZnUrl hasHost ] ]
+	^ aUrl hasScheme and: [ ( validOriginSchemes includes: aUrl scheme ) and: [ aUrl hasHost ] ]
 ]
 
 { #category : #comparing }
@@ -54,23 +54,21 @@ WebOrigin >> hash [
 ]
 
 { #category : #initialization }
-WebOrigin >> initializeBasedOn: aZnUrl [ 
+WebOrigin >> initializeBasedOn: aUrl [ 
 	
-	scheme := aZnUrl scheme. 
-	host := aZnUrl host. 
-	port := aZnUrl port. 
+	url := aUrl
 ]
 
 { #category : #printing }
 WebOrigin >> printOn: stream [
 
 	stream
-		nextPutAll: scheme;
-		nextPutAll: '://'.
-	stream nextPutAll: host.
-	( port isNil or: [ port = 80 ] )
+		nextPutAll: url scheme;
+		nextPutAll: '://';
+		nextPutAll: url host.
+	url portOrDefault = ( ZnUrl defaultPortForScheme: url scheme )
 		ifFalse: [ stream
 				nextPut: $:;
-				print: port
+				print: url port
 			]
 ]

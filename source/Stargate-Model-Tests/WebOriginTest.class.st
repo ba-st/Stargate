@@ -13,7 +13,7 @@ WebOriginTest >> testComparing [
 	self assert: 'http://example.com/path/file' asWebOrigin equals: 'http://example.com'.
 	self assert: 'http://example.com:8080/' asWebOrigin equals: 'http://example.com:8080'.
 	self assert: 'http://www.example.com/' asWebOrigin equals: 'http://www.example.com'.
-	self assert: 'https://example.com:80/' asWebOrigin equals: 'https://example.com'.
+	self assert: 'https://example.com:443/' asWebOrigin equals: 'https://example.com'.
 	self assert: 'https://example.com/' asWebOrigin equals: 'https://example.com'.
 	self assert: 'http://example.org/' asWebOrigin equals: 'http://example.org'.
 	self assert: 'http://ietf.org/' asWebOrigin equals: 'http://ietf.org'.
