@@ -1,3 +1,16 @@
+"
+I represent a web origin as defined in the RFC 6454.
+I have the format 
+	scheme '://' host [ ':' port ]
+with <scheme>, <host>, <port> from RFC 3986.
+	
+The // precedes the authority component of the uri, and thus I accept the schemes
+that may have the authority component. Currently #(http https) but this can be extended at will. 
+	
+References
+	https://tools.ietf.org/html/rfc6454
+	https://tools.ietf.org/html/rfc3986
+"
 Class {
 	#name : #WebOrigin,
 	#superclass : #Object,
@@ -20,10 +33,6 @@ WebOrigin class >> basedOn: aUrl [
 
 { #category : #preconditions }
 WebOrigin class >> hasValidOrigin: aZnUrl [
-	" According RFC6454, the Origin should have the format -- scheme '://' host [ ':' port ] --
-   with <scheme>, <host>, <port> from RFC 3986.
-	The // precedes the authority component of the uri (RFC3986), and thus we filter the schemes
-	that may have the authority component. We may add any valid scheme as we want. "
 
 	| validOriginSchemes |
 

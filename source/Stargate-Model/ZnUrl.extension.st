@@ -1,13 +1,13 @@
 Extension { #name : #ZnUrl }
 
 { #category : #'*Stargate-Model' }
-ZnUrl >> hasValidOrigin [
+ZnUrl >> asWebOrigin [
 
-	^ WebOrigin hasValidOrigin: self
+	^ WebOrigin basedOn: self 
 ]
 
 { #category : #'*Stargate-Model' }
-ZnUrl >> origin [
+ZnUrl >> hasValidOrigin [
 
-	^ WebOrigin basedOn: self 
+	^ WebOrigin hasValidOrigin: self
 ]

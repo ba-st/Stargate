@@ -9,7 +9,7 @@ CrossOriginResourceSharingActualRequestHandlerTest >> assert: aResponse canBeSha
 
 	self
 		assert: ( aResponse headers at: 'Access-Control-Allow-Origin' )
-		equals: anOriginLocation origin asString
+		equals: anOriginLocation asWebOrigin asString
 ]
 
 { #category : #'tests - support' }
