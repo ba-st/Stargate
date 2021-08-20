@@ -66,8 +66,8 @@ WebOrigin >> printOn: stream [
 		nextPutAll: url scheme;
 		nextPutAll: '://';
 		nextPutAll: url host.
-	url portOrDefault = ( ZnUrl defaultPortForScheme: url scheme )
-		ifFalse: [ stream
+	url hasNonDefaultPort
+		then: [ stream
 				nextPut: $:;
 				print: url port
 			]
