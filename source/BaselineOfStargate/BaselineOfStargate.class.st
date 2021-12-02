@@ -31,14 +31,16 @@ BaselineOfStargate >> projectClass [
 BaselineOfStargate >> setUpDependencies: spec [
 
 	spec
-		baseline: 'Buoy' with: [ spec repository: 'github://ba-st/Buoy:v6/source' ];
+		baseline: 'Buoy' with: [ spec repository: 'github://ba-st/Buoy:v6' ];
 		project: 'Buoy-Deployment' copyFrom: 'Buoy' with: [ spec loads: 'Deployment' ];
 		project: 'Buoy-SUnit' copyFrom: 'Buoy' with: [ spec loads: 'Dependent-SUnit-Extensions' ].
 
 	spec
-		baseline: 'Hyperspace' with: [ spec repository: 'github://ba-st/Hyperspace:v2/source' ];
+		baseline: 'Hyperspace' with: [ spec repository: 'github://ba-st/Hyperspace:v2' ];
 		project: 'Hyperspace-Deployment' copyFrom: 'Hyperspace' with: [ spec loads: 'Deployment' ];
-		project: 'Hyperspace-SUnit' copyFrom: 'Hyperspace' with: [ spec loads: 'Dependent-SUnit-Extensions' ].
+		project: 'Hyperspace-SUnit'
+		copyFrom: 'Hyperspace'
+		with: [ spec loads: 'Dependent-SUnit-Extensions' ].
 
 	spec
 		baseline: 'Teapot' with: [ spec repository: 'github://zeroflag/Teapot:v2.6.0/source' ];
@@ -48,19 +50,16 @@ BaselineOfStargate >> setUpDependencies: spec [
 	spec
 		baseline: 'JSONWebToken' with: [ spec repository: 'github://noha/JSONWebToken:0.3/source' ];
 		project: 'JSONWebToken-Deployment'
-			copyFrom: 'JSONWebToken'
-			with: [ spec loads: 'JSONWebToken-Core' ].
+		copyFrom: 'JSONWebToken'
+		with: [ spec loads: 'JSONWebToken-Core' ].
 
 	spec
 		baseline: 'JRPC' with: [ spec repository: 'github://juliendelplanque/JRPC:v3.x.x/src' ];
 		project: 'JRPC-Deployment' copyFrom: 'JRPC' with: [ spec loads: 'Server-Deployment' ].
 
 	spec
-		baseline: 'Launchpad'
-			with: [ spec repository: 'github://ba-st/Launchpad:v3/source' ];
-		project: 'Launchpad-Deployment'
-			copyFrom: 'Launchpad'
-			with: [ spec loads: 'Deployment' ]
+		baseline: 'Launchpad' with: [ spec repository: 'github://ba-st/Launchpad:v4' ];
+		project: 'Launchpad-Deployment' copyFrom: 'Launchpad' with: [ spec loads: 'Deployment' ]
 ]
 
 { #category : #baselines }

@@ -20,39 +20,38 @@ ApplicationConfigurationRESTfulController class >> over: aPlugin configuredBy: c
 { #category : #private }
 ApplicationConfigurationRESTfulController >> configureConfigurationEncodingOn: writer [
 
-	CommandLineArgument
-		subclassesDo: [ :subclass | 
-			writer
-				for: subclass
-				do: [ :mapper | 
-					mapper
-						mapAccessor: #name;
-						mapProperty: #'current-value'
-							getter: [ :definition | self currentValueOrMaskFor: definition ]
-					]
-			].
+	ConfigurationParameter subclassesDo: [ :subclass | 
+		writer for: subclass do: [ :mapper | 
+			mapper
+				mapAccessor: #name;
+				mapAccessor: #summary;
+				mapAccessor: #attributeName;
+				mapAccessor: #commandLineArgumentName;
+				mapAccessor: #environmentVariableName;	
+				mapAccessor: #sections;
+				mapProperty: #'current-value' getter: [ :definition | self currentValueOrMaskFor: definition ]
+			]
+		].
 
 	writer
-		for: MandatoryArgument
-			do: [ :mapper | mapper mapProperty: #type getter: [ :definition | 'mandatory' ] ];
-		for: FlagArgument do: [ :mapper | mapper mapProperty: #type getter: [ :definition | 'flag' ] ];
-		for: OptionalArgument
-			do: [ :mapper | 
+		for: MandatoryConfigurationParameter
+		do: [ :mapper | mapper mapProperty: #type getter: [ :definition | 'mandatory' ] ];
+		for: OptionalConfigurationParameter do: [ :mapper | 
 			mapper
 				mapProperty: #type getter: [ :definition | 'optional' ];
-				mapAccessor: #default
+				mapInstVar: #default
 			];
-		for: SensitiveArgument
-			do: [ :mapper | mapper mapProperty: #type getter: [ :definition | 'sensitive' ] ];
+		for: SensitiveConfigurationParameter
+		do: [ :mapper | mapper mapProperty: #type getter: [ :definition | 'sensitive' ] ];
 		for: ZnUrl customDo: [ :mapping | mapping encoder: [ :url | url printString ] ]
 ]
 
 { #category : #private }
-ApplicationConfigurationRESTfulController >> currentValueOrMaskFor: definition [
+ApplicationConfigurationRESTfulController >> currentValueOrMaskFor: parameter [
 
-	^ ( definition isA: SensitiveArgument )
-		then: [ '********' ]
-		otherwise: [ plugin currentValueFor: definition ]
+	^ ( parameter isA: SensitiveConfigurationParameter ) 
+		  then: [ '********' ]
+		  otherwise: [ plugin currentValueFor: parameter ]
 ]
 
 { #category : #routes }
@@ -66,18 +65,18 @@ ApplicationConfigurationRESTfulController >> declareGetApplicationConfigurationR
 ]
 
 { #category : #private }
-ApplicationConfigurationRESTfulController >> encodeConfigurationInTextFormat: configurationDefinitions [
+ApplicationConfigurationRESTfulController >> encodeConfigurationInTextFormat: configurationParameters [
 
 	^ String
 		streamContents: [ :stream | 
-			configurationDefinitions
-				do: [ :definition | 
+			configurationParameters
+				do: [ :parameter | 
 					stream
-						nextPutAll: definition name;
+						nextPutAll: parameter commandLineArgumentName;
 						space;
 						nextPut: $=;
 						space;
-						nextPutAll: ( self currentValueOrMaskFor: definition ) asString
+						nextPutAll: ( self currentValueOrMaskFor: parameter ) asString
 					]
 				separatedBy: [ stream crlf ]
 			]
@@ -91,7 +90,7 @@ ApplicationConfigurationRESTfulController >> getApplicationConfigurationBasedOn:
 	^ requestHandler
 		from: httpRequest
 		within: requestContext
-		getCollection: [ plugin configurationDefinitions ]
+		getCollection: [ plugin configurationParameters ]
 ]
 
 { #category : #initialization }

@@ -7,7 +7,7 @@ Class {
 	#superclass : #OperationalPlugin,
 	#instVars : [
 		'valueProvider',
-		'configurationDefinitions'
+		'configurationParameters'
 	],
 	#category : #'Stargate-Application-Configuration'
 }
@@ -27,9 +27,10 @@ ApplicationConfigurationPlugin class >> configuredBy: configuration [
 
 	selfConfiguration := self pluginConfigurationOn: configuration.
 
-	^ self new
-		initializeDefinedBy: ( selfConfiguration at: #definitions ifAbsent: [ #() ] )
-		querying: ( selfConfiguration at: #provider ifAbsent: [ [ Dictionary new ] ] )
+	^ self new initializeDefinedBy: ( selfConfiguration at: #parameters ifAbsent: [ #(  ) ] )
+		  querying: ( selfConfiguration at: #provider
+				    ifAbsent: [ 
+				    [ ApplicationConfiguration forAll: #(  ) providedBy: NullConfigurationProvider new ] ] )
 ]
 
 { #category : #accessing }
@@ -45,15 +46,21 @@ ApplicationConfigurationPlugin class >> pluginName [
 ]
 
 { #category : #accessing }
-ApplicationConfigurationPlugin >> configurationDefinitions [
+ApplicationConfigurationPlugin >> configurationParameters [
 
-	^ configurationDefinitions
+	^ configurationParameters
+]
+
+{ #category : #private }
+ApplicationConfigurationPlugin >> currentConfiguration [
+
+	^ valueProvider value
 ]
 
 { #category : #accessing }
-ApplicationConfigurationPlugin >> currentValueFor: aDefinition [
+ApplicationConfigurationPlugin >> currentValueFor: parameter [
 
-	^ valueProvider value at: aDefinition name 
+	^ self currentConfiguration valueFor: parameter
 ]
 
 { #category : #configuring }
@@ -64,8 +71,8 @@ ApplicationConfigurationPlugin >> includeControllersIn: api [
 ]
 
 { #category : #initialization }
-ApplicationConfigurationPlugin >> initializeDefinedBy: configurationDefinition querying: aConfigurationProvider [
+ApplicationConfigurationPlugin >> initializeDefinedBy: parameters querying: aConfigurationProvider [
 
-	configurationDefinitions := configurationDefinition.
+	configurationParameters := parameters.
 	valueProvider := aConfigurationProvider
 ]

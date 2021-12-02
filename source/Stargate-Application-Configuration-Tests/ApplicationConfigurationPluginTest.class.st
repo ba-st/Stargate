@@ -14,59 +14,64 @@ ApplicationConfigurationPluginTest >> configuration [
 		at: ApplicationConfigurationPlugin endpoint
 			put: {
 				#enabled -> true .
-				#definitions -> self configurationDefinitions .
+				#parameters -> self configurationParameters .
 				#provider -> self configurationProvider 
 				} asDictionary;
 		yourself
 ]
 
 { #category : #accessing }
-ApplicationConfigurationPluginTest >> configurationDefinitions [
+ApplicationConfigurationPluginTest >> configurationParameters [
 
 	^ Array
-		with: ( OptionalArgument named: 'port' defaultingTo: 4000 )
-		with: ( MandatoryArgument named: 'base-url' )
-		with: ( FlagArgument named: 'debug-mode' )
+		  with: ( OptionalConfigurationParameter named: 'Port'
+				    describedBy: 'Listening Port'
+				    defaultingTo: 4000
+				    convertingWith: #asNumber )
+		  with: ( MandatoryConfigurationParameter named: 'Base URL' describedBy: 'Base URL' )
+		  with: ( OptionalConfigurationParameter named: 'Debug Mode'
+				    describedBy: 'Debugging Mode Flag'
+				    defaultingTo: false
+				    convertingWith: [ :value | value = 'true' ] )
 ]
 
 { #category : #accessing }
 ApplicationConfigurationPluginTest >> configurationProvider [
 
-	^ [ Dictionary new
-		at: 'port' put: 6000;
-		at: 'base-url' put: 'https://api.example.com';
-		at: 'debug-mode' put: true;
-		yourself
-	]
+	^ [ 
+	  ApplicationConfiguration forAll: self configurationParameters
+		  providedBy: ( ConfigurationFromCommandLineProvider over: ( CommandLineArguments withArguments:
+					      #( '--port=6000' '--base-url=https://api.example.com'
+					         '--debug-mode=true' ) ) )
+	  ]
 ]
 
 { #category : #tests }
 ApplicationConfigurationPluginTest >> testConfigurationAccessing [
 
-	| plugin definition |
+	| plugin parameter |
 
 	plugin := ApplicationConfigurationPlugin configuredBy: self configuration.
 
-	self assert: plugin configurationDefinitions size equals: 3.
+	self assert: plugin configurationParameters size equals: 3.
 
-	definition := plugin configurationDefinitions first.
-
-	self
-		assert: definition name equals: 'port';
-		assert: definition default equals: 4000;
-		assert: ( plugin currentValueFor: definition ) equals: 6000.
-
-	definition := plugin configurationDefinitions second.
+	parameter := plugin configurationParameters first.
 
 	self
-		assert: definition name equals: 'base-url';
-		assert: ( plugin currentValueFor: definition ) equals: 'https://api.example.com'.
+		assert: parameter name equals: 'Port';
+		assert: ( plugin currentValueFor: parameter ) equals: 6000.
 
-	definition := plugin configurationDefinitions last.
+	parameter := plugin configurationParameters second.
 
 	self
-		assert: definition name equals: 'debug-mode';
-		assert: ( plugin currentValueFor: definition )
+		assert: parameter name equals: 'Base URL';
+		assert: ( plugin currentValueFor: parameter ) equals: 'https://api.example.com'.
+
+	parameter := plugin configurationParameters last.
+
+	self
+		assert: parameter name equals: 'Debug Mode';
+		assert: ( plugin currentValueFor: parameter )
 ]
 
 { #category : #tests }
