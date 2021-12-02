@@ -8,25 +8,32 @@ Class {
 }
 
 { #category : #'private - support' }
-ApplicationConfigurationRESTfulControllerTest >> configurationDefinitions [
+ApplicationConfigurationRESTfulControllerTest >> configurationParameters [
 
 	^ Array
-		with: ( OptionalArgument named: 'port' defaultingTo: 4000 )
-		with: ( MandatoryArgument named: 'base-url' )
-		with: ( FlagArgument named: 'debug-mode' )
-		with: ( MandatoryArgument named: 'secret' ) asSensitive
+		  with: ( OptionalConfigurationParameter named: 'Port'
+				    describedBy: 'Listening Port'
+				    defaultingTo: 4000
+				    convertingWith: #asNumber )
+		  with: ( MandatoryConfigurationParameter named: 'Base URL' describedBy: 'Base URL' )
+		  with: ( OptionalConfigurationParameter named: 'Debug Mode'
+				    describedBy: 'Debugging Mode Flag'
+				    defaultingTo: false
+				    convertingWith: [ :value | value = 'true' ] )
+		  with:
+			  ( MandatoryConfigurationParameter named: 'Secret' describedBy: 'Secret' inside: #( 'Vault' ) )
+				  asSensitive
 ]
 
 { #category : #'private - support' }
 ApplicationConfigurationRESTfulControllerTest >> configurationProvider [
 
-	^ [ Dictionary new
-		at: 'port' put: 6000;
-		at: 'base-url' put: 'https://api.example.com';
-		at: 'debug-mode' put: true;
-		at: 'secret' put: 'XXX';
-		yourself
-	]
+	^ [ 
+	  ApplicationConfiguration forAll: self configurationParameters
+		  providedBy: ( ConfigurationFromCommandLineProvider over: ( CommandLineArguments withArguments:
+					      #( '--port=6000' '--base-url=https://api.example.com'
+					         '--debug-mode=true' '--vault.secret==XXX' ) ) )
+	  ]
 ]
 
 { #category : #'private - support' }
@@ -36,7 +43,7 @@ ApplicationConfigurationRESTfulControllerTest >> operationsConfiguration [
 		at: ApplicationConfigurationPlugin endpoint
 		put: {
 				#enabled -> true .
-				#definitions -> self configurationDefinitions .
+				#parameters -> self configurationParameters .
 				#provider -> self configurationProvider 
 				} asDictionary;
 		yourself
@@ -55,34 +62,59 @@ ApplicationConfigurationRESTfulControllerTest >> testGetConfigurationInJson [
 
 	| response |
 
-	response := resourceController
-		getApplicationConfigurationBasedOn: ( self requestToGET: self resourceUrl accepting: ZnMimeType applicationJson )
-		within: self newHttpRequestContext.
+	response := resourceController getApplicationConfigurationBasedOn:
+		            ( self requestToGET: self resourceUrl accepting: ZnMimeType applicationJson )
+		            within: self newHttpRequestContext.
 
 	self
 		assert: response isSuccess;
 		assert: response contentType asMediaType
-			equals: resourceController operationalApplicationConfigurationVersion1dot0dot0MediaType;
-		withJsonFromContentsIn: response
-			do: [ :configs | 
+		equals: resourceController operationalApplicationConfigurationVersion1dot0dot0MediaType;
+		withJsonFromContentsIn: response do: [ :configs | 
 			self
 				assert: configs size equals: 4;
-				withConfigurationNamed: 'port'
-					in: configs
-					do: [ :config | 
+				withConfigurationNamed: 'Port' in: configs do: [ :config | 
 					self
+						assert: config type equals: 'optional';
+						assert: config summary equals: 'Listening Port. Defaults to 4000';
+						assert: config attributeName equals: 'port';
+						assert: config commandLineArgumentName equals: 'port';
+						assert: config environmentVariableName equals: 'PORT';
+						assert: config sections isEmpty;
 						assert: ( config at: #'current-value' ) equals: 6000;
 						assert: config default equals: 4000
 					];
-				withConfigurationNamed: 'base-url'
-					in: configs
-					do: [ :config | self assert: ( config at: #'current-value' ) equals: 'https://api.example.com' ];
-				withConfigurationNamed: 'debug-mode'
-					in: configs
-					do: [ :config | self assert: ( config at: #'current-value' ) ];
-				withConfigurationNamed: 'secret'
-					in: configs
-					do: [ :config | self assert: ( config at: #'current-value' ) equals: '********' ]
+				withConfigurationNamed: 'Base URL' in: configs do: [ :config | 
+				self
+					assert: config type equals: 'mandatory';
+					assert: config summary equals: 'Base URL';
+					assert: config attributeName equals: 'baseURL';
+					assert: config commandLineArgumentName equals: 'base-url';
+					assert: config environmentVariableName equals: 'BASE_URL';
+					assert: config sections isEmpty;
+					assert: ( config at: #'current-value' ) equals: 'https://api.example.com'
+				];
+				withConfigurationNamed: 'Debug Mode' in: configs do: [ :config | 
+				self
+					assert: config type equals: 'optional';
+					assert: config summary equals: 'Debugging Mode Flag. Defaults to false';
+					assert: config attributeName equals: 'debugMode';
+					assert: config commandLineArgumentName equals: 'debug-mode';
+					assert: config environmentVariableName equals: 'DEBUG_MODE';
+					assert: config sections isEmpty;
+					assert: ( config at: #'current-value' );
+					deny: config default
+				];
+				withConfigurationNamed: 'Secret' in: configs do: [ :config | 
+				self
+					assert: config type equals: 'sensitive';
+					assert: config summary equals: 'Secret';
+					assert: config attributeName equals: 'secret';
+					assert: config commandLineArgumentName equals: 'vault.secret';
+					assert: config environmentVariableName equals: 'VAULT__SECRET';
+					assert: config sections equals: #( 'Vault' );
+					assert: ( config at: #'current-value' ) equals: '********'
+				]
 			]
 ]
 
@@ -100,7 +132,7 @@ ApplicationConfigurationRESTfulControllerTest >> testGetConfigurationInPlainText
 		assert: response contentType asMediaType equals: ( ZnMimeType textPlain version: '1.0.0' );
 		assert: response contents
 			equals:
-			( 'port = 6000<1s><2s>base-url = https://api.example.com<1s><2s>debug-mode = true<1s><2s>secret = ********'
+			( 'port = 6000<1s><2s>base-url = https://api.example.com<1s><2s>debug-mode = true<1s><2s>vault.secret = ********'
 				expandMacrosWith: String cr
 				with: String lf )
 ]

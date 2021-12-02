@@ -8,18 +8,19 @@ Class {
 }
 
 { #category : #private }
-ApplicationConfigurationPluginAPITest >> configurationDefinitions [
+ApplicationConfigurationPluginAPITest >> configurationParameters [
 
-	^ Array with: ( MandatoryArgument named: 'public-url' )
+	^ Array with: ( MandatoryConfigurationParameter named: 'Public URL' describedBy: 'Public URL' )
 ]
 
 { #category : #private }
 ApplicationConfigurationPluginAPITest >> configurationProvider [
 
-	^ [ Dictionary new
-		at: 'public-url' put: 'http://api.example.com' asUrl;
-		yourself
-	]
+	^ [ 
+	  ApplicationConfiguration forAll: self configurationParameters
+		  providedBy: ( ConfigurationFromCommandLineProvider over:
+				    ( CommandLineArguments withArguments: #( '--public-url=https://api.example.com' ) ) )
+	  ]
 ]
 
 { #category : #running }
@@ -29,7 +30,7 @@ ApplicationConfigurationPluginAPITest >> operationsConfiguration [
 		at: ApplicationConfigurationPlugin endpoint
 		put: {
 				#enabled -> true .
-				#definitions -> self configurationDefinitions .
+				#parameters -> self configurationParameters .
 				#provider -> self configurationProvider 
 				} asDictionary;
 		yourself
@@ -62,8 +63,8 @@ ApplicationConfigurationPluginAPITest >> testGetConfigurationWithPermissions [
 				withTheOnlyOneIn: configurations
 				do: [ :config | 
 					self
-						assert: config name equals: 'public-url';
-						assert: ( config at: #'current-value' ) equals: 'http://api.example.com/'
+						assert: config commandLineArgumentName equals: 'public-url';
+						assert: ( config at: #'current-value' ) equals: 'https://api.example.com'
 					]
 			]
 ]

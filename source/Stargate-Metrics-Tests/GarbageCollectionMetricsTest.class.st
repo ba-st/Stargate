@@ -11,7 +11,7 @@ Class {
 GarbageCollectionMetricsTest >> assertGarbageCollectionCountMetrics: composite [
 
 	self
-		assert: composite name equals: 'Garbage Collector invokations';
+		assert: composite name equals: 'Garbage Collector invocations';
 		assert: composite description equals: 'Number of times the garbage collector was invoked';
 		assert: composite type equals: Counter;
 		assert: composite metrics size equals: 2.
@@ -50,7 +50,7 @@ GarbageCollectionMetricsTest >> assertTenureCountMetrics: counter [
 	self
 		assert: counter name equals: 'Tenured objects count';
 		assert: counter description
-			equals: 'Cummulative number of objects tenured by the Garbage Collector';
+			equals: 'Cumulative number of objects tenured by the Garbage Collector';
 		assert: counter type equals: Counter;
 		assert: counter value positive
 ]

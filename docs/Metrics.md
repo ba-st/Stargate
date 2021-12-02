@@ -25,7 +25,7 @@ Available metric providers:
 - `memory` gathers metrics over the allocated memory (total, old space, free
   old space, eden space, young space)
 - `garbage collection` gathers metrics over the garbage collector (time spent
-  on garbage collection, invokation count and tenure count)
+  on garbage collection, invocation count and tenure count)
 - `running system` gathers information over the running system (uptime,
   process count by status and priority, external semaphore table data)
 - `http` (optional group) gathers information over the incoming HTTP requests
@@ -70,11 +70,11 @@ smalltalk_memory_in_bytes{category="young space"} 5384936 1573497970976
 # TYPE garbage_collection_time_in_milliseconds counter
 garbage_collection_time_in_milliseconds{type="full"} 10119 1573497970976
 garbage_collection_time_in_milliseconds{type="incremental"} 35656 1573497970976
-# HELP garbage_collector_invokations Number of times the garbage collector was invokated
-# TYPE garbage_collector_invokations counter
-garbage_collector_invokations{type="full"} 84 1573497970976
-garbage_collector_invokations{type="incremental"} 42741 1573497970976
-# HELP tenured_objects_count Cummulative number of objects tenured by the
+# HELP garbage_collector_invocations Number of times the garbage collector was invocated
+# TYPE garbage_collector_invocations counter
+garbage_collector_invocations{type="full"} 84 1573497970976
+garbage_collector_invocations{type="incremental"} 42741 1573497970976
+# HELP tenured_objects_count Cumulative number of objects tenured by the
 # Garbage Collector
 # TYPE tenured_objects_count counter
 tenured_objects_count 16250055
@@ -160,8 +160,8 @@ Content-Type: application/vnd.stargate.operational-metrics+json
       ]
    },
    {
-      "name":"Garbage Collector invokations",
-      "description":"Number of times the garbage collector was invokated",
+      "name":"Garbage Collector invocations",
+      "description":"Number of times the garbage collector was invocated",
       "type":"Counter",
       "value":43368,
       "metrics":[
@@ -179,7 +179,7 @@ Content-Type: application/vnd.stargate.operational-metrics+json
    },
    {
       "name":"Tenured objects count",
-      "description":"Cummulative number of objects tenured by the Garbage Collector",
+      "description":"Cumulative number of objects tenured by the Garbage Collector",
       "type":"Counter",
       "value":16299111
    },
