@@ -27,9 +27,9 @@ ApplicationConfigurationRESTfulController >> configureConfigurationEncodingOn: w
 				mapAccessor: #summary;
 				mapAccessor: #attributeName;
 				mapAccessor: #commandLineArgumentName;
-				mapAccessor: #environmentVariableName;	
+				mapAccessor: #environmentVariableName;
 				mapAccessor: #sections;
-				mapProperty: #'current-value' getter: [ :definition | self currentValueOrMaskFor: definition ]
+				mapProperty: #'current-value' getter: [ :definition | plugin currentValueFor: definition ]
 			]
 		].
 
@@ -46,14 +46,6 @@ ApplicationConfigurationRESTfulController >> configureConfigurationEncodingOn: w
 		for: ZnUrl customDo: [ :mapping | mapping encoder: [ :url | url printString ] ]
 ]
 
-{ #category : #private }
-ApplicationConfigurationRESTfulController >> currentValueOrMaskFor: parameter [
-
-	^ ( parameter isA: SensitiveConfigurationParameter ) 
-		  then: [ '********' ]
-		  otherwise: [ plugin currentValueFor: parameter ]
-]
-
 { #category : #routes }
 ApplicationConfigurationRESTfulController >> declareGetApplicationConfigurationRoute [
 
@@ -67,19 +59,18 @@ ApplicationConfigurationRESTfulController >> declareGetApplicationConfigurationR
 { #category : #private }
 ApplicationConfigurationRESTfulController >> encodeConfigurationInTextFormat: configurationParameters [
 
-	^ String
-		streamContents: [ :stream | 
-			configurationParameters
-				do: [ :parameter | 
-					stream
-						nextPutAll: parameter commandLineArgumentName;
-						space;
-						nextPut: $=;
-						space;
-						nextPutAll: ( self currentValueOrMaskFor: parameter ) asString
-					]
-				separatedBy: [ stream crlf ]
-			]
+	^ String streamContents: [ :stream | 
+		  configurationParameters
+			  do: [ :parameter | 
+				  stream
+					  nextPutAll: parameter commandLineArgumentName;
+					  space;
+					  nextPut: $=;
+					  space;
+					  nextPutAll: ( plugin currentValueFor: parameter ) asString
+				  ]
+			  separatedBy: [ stream crlf ]
+		  ]
 ]
 
 { #category : #API }
