@@ -60,7 +60,7 @@ ApplicationConfigurationPlugin >> currentConfiguration [
 { #category : #accessing }
 ApplicationConfigurationPlugin >> currentValueFor: parameter [
 
-	^ self currentConfiguration valueFor: parameter
+	^ parameter valueToLogFrom: self currentConfiguration
 ]
 
 { #category : #configuring }

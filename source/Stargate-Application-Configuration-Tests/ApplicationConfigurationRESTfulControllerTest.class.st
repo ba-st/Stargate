@@ -113,7 +113,7 @@ ApplicationConfigurationRESTfulControllerTest >> testGetConfigurationInJson [
 					assert: config commandLineArgumentName equals: 'vault.secret';
 					assert: config environmentVariableName equals: 'VAULT__SECRET';
 					assert: config sections equals: #( 'Vault' );
-					assert: ( config at: #'current-value' ) equals: '********'
+					assert: ( config at: #'current-value' ) equals: '**********'
 				]
 			]
 ]
@@ -132,7 +132,7 @@ ApplicationConfigurationRESTfulControllerTest >> testGetConfigurationInPlainText
 		assert: response contentType asMediaType equals: ( ZnMimeType textPlain version: '1.0.0' );
 		assert: response contents
 			equals:
-			( 'port = 6000<1s><2s>base-url = https://api.example.com<1s><2s>debug-mode = true<1s><2s>vault.secret = ********'
+			( 'port = 6000<1s><2s>base-url = https://api.example.com<1s><2s>debug-mode = true<1s><2s>vault.secret = **********'
 				expandMacrosWith: String cr
 				with: String lf )
 ]
