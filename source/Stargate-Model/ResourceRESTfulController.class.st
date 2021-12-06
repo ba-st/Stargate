@@ -13,6 +13,7 @@ Class {
 { #category : #testing }
 ResourceRESTfulController class >> isAbstract [
 
+	<ignoreForCoverage>
 	^ self = ResourceRESTfulController
 ]
 

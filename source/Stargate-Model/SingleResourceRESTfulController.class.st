@@ -10,6 +10,7 @@ Class {
 { #category : #testing }
 SingleResourceRESTfulController class >> isAbstract [
 
+	<ignoreForCoverage>
 	^ self = SingleResourceRESTfulController
 ]
 

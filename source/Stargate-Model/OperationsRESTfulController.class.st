@@ -19,6 +19,7 @@ OperationsRESTfulController class >> authenticationFilterBasedOn: configuration 
 { #category : #testing }
 OperationsRESTfulController class >> isAbstract [
 
+	<ignoreForCoverage>
 	^ self = OperationsRESTfulController
 ]
 
