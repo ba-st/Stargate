@@ -6,12 +6,11 @@ Stargate is a library supporting the creation of HTTP based RESTful APIs.
 
 [![Unit Tests](https://github.com/ba-st/Stargate/actions/workflows/unit-tests.yml/badge.svg)](https://github.com/ba-st/Stargate/actions/workflows/unit-tests.yml)
 [![Coverage Status](https://codecov.io/github/ba-st/Stargate/coverage.svg?branch=release-candidate)](https://codecov.io/gh/ba-st/Stargate/branch/release-candidate)
-[![Group loading check](https://github.com/ba-st/Stargate/actions/workflows/loading-groups.yml/badge.svg)](https://github.com/ba-st/Stargate/actions/workflows/loading-groups.yml)
+[![Baseline groups](https://github.com/ba-st/Stargate/actions/workflows/loading-groups.yml/badge.svg)](https://github.com/ba-st/Stargate/actions/workflows/loading-groups.yml)
 [![Markdown Lint](https://github.com/ba-st/Stargate/actions/workflows/markdown-lint.yml/badge.svg)](https://github.com/ba-st/Stargate/actions/workflows/markdown-lint.yml)
 [![Shellcheck](https://github.com/ba-st/Stargate/actions/workflows/shellcheck.yml/badge.svg)](https://github.com/ba-st/Stargate/actions/workflows/shellcheck.yml)
 
 [![GitHub release](https://img.shields.io/github/release/ba-st/Stargate.svg)](https://github.com/ba-st/Stargate/releases/latest)
-[![Pharo 7.0](https://img.shields.io/badge/Pharo-7.0-informational)](https://pharo.org)
 [![Pharo 8.0](https://img.shields.io/badge/Pharo-8.0-informational)](https://pharo.org)
 [![Pharo 9.0](https://img.shields.io/badge/Pharo-9.0-informational)](https://pharo.org)
 
