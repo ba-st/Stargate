@@ -46,12 +46,6 @@ OperationalPluginAPITest >> operationsUrl [
 ]
 
 { #category : #private }
-OperationalPluginAPITest >> port [
-
-	^ 9999
-]
-
-{ #category : #private }
 OperationalPluginAPITest >> requiredPermissions [
 
 	self subclassResponsibility

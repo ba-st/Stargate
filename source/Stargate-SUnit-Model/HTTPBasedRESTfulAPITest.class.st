@@ -5,7 +5,8 @@ Class {
 	#name : #HTTPBasedRESTfulAPITest,
 	#superclass : #TestCase,
 	#instVars : [
-		'api'
+		'api',
+		'port'
 	],
 	#category : #'Stargate-SUnit-Model'
 }
@@ -29,18 +30,6 @@ HTTPBasedRESTfulAPITest >> baseUrl [
 ]
 
 { #category : #private }
-HTTPBasedRESTfulAPITest >> checkPortAvailability [
-
-	[ | socket |
-
-	socket := ZnNetworkingUtils serverSocketOn: self port.
-	socket close
-	]
-		on: Error
-		do: [ :error | self fail: ( 'Port <1p> is not available' expandMacrosWith: self port ) ]
-]
-
-{ #category : #private }
 HTTPBasedRESTfulAPITest >> claimSet [
 
 	^ JWTClaimsSet new
@@ -50,14 +39,6 @@ HTTPBasedRESTfulAPITest >> claimSet [
 HTTPBasedRESTfulAPITest >> controllersToInstall [
 
 	^ self subclassResponsibility
-]
-
-{ #category : #'tests - support' }
-HTTPBasedRESTfulAPITest >> ifPortAvailableDo: ifAvailableBlock [
-	
-	( PortAvailabilityChecker on: self port )
-		checkIfAvailableDo: ifAvailableBlock
-		ifNot: [ :reason | self fail: reason ]
 ]
 
 { #category : #private }
@@ -103,7 +84,7 @@ HTTPBasedRESTfulAPITest >> operationsConfiguration [
 { #category : #private }
 HTTPBasedRESTfulAPITest >> port [
 
-	^ self subclassResponsibility
+	^ port
 ]
 
 { #category : #running }
@@ -116,6 +97,7 @@ HTTPBasedRESTfulAPITest >> secret [
 HTTPBasedRESTfulAPITest >> setUp [
 
 	super setUp.
+	port :=  self freeListeningTCPPort.
 	self setUpAPI.
 	api
 		install;
@@ -125,16 +107,14 @@ HTTPBasedRESTfulAPITest >> setUp [
 { #category : #running }
 HTTPBasedRESTfulAPITest >> setUpAPI [
 
-	self
-		ifPortAvailableDo: [ api := HTTPBasedRESTfulAPI
-				configuredBy:
-					{( #port -> self port ).
-					( #serverUrl -> self baseUrl ).
-					( #operations -> self operationsConfiguration )}
-				installing: self controllersToInstall.
+	api := HTTPBasedRESTfulAPI
+		       configuredBy: { 
+				       ( #port -> self port ).
+				       ( #serverUrl -> self baseUrl ).
+				       ( #operations -> self operationsConfiguration ) }
+		       installing: self controllersToInstall.
 
-			api on: Error addErrorHandler: [ :error :request | self fail ]
-			]
+	api on: Error addErrorHandler: [ :error :request | self fail ]
 ]
 
 { #category : #running }

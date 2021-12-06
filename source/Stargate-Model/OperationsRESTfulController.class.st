@@ -16,6 +16,13 @@ OperationsRESTfulController class >> authenticationFilterBasedOn: configuration 
 	^ self new initializeAuthenticationFilterBasedOn: configuration
 ]
 
+{ #category : #testing }
+OperationsRESTfulController class >> isAbstract [
+
+	<ignoreForCoverage>
+	^ self = OperationsRESTfulController
+]
+
 { #category : #private }
 OperationsRESTfulController >> assert: httpRequest isAuthorizedWithin: requestContext [
 

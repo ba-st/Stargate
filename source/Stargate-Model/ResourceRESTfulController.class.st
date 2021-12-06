@@ -10,6 +10,13 @@ Class {
 	#category : #'Stargate-Model-Controllers'
 }
 
+{ #category : #testing }
+ResourceRESTfulController class >> isAbstract [
+
+	<ignoreForCoverage>
+	^ self = ResourceRESTfulController
+]
+
 { #category : #private }
 ResourceRESTfulController >> jsonMediaType: aSubType vendoredBy: aVendorName version: aVersion [
 
