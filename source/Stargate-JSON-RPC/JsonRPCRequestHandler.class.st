@@ -24,6 +24,12 @@ JsonRPCRequestHandler >> addHandlerNamed: aString evaluating: aBlock [
 	messageProcessor addHandlerNamed: aString block: aBlock
 ]
 
+{ #category : #configuring }
+JsonRPCRequestHandler >> debugMode: aBoolean [
+
+	messageProcessor debugMode: aBoolean
+]
+
 { #category : #accessing }
 JsonRPCRequestHandler >> endpoint [
 

@@ -20,6 +20,14 @@ ApplicationControlRESTfulControllerTest >> operationsConfiguration [
 		yourself
 ]
 
+{ #category : #'private - support' }
+ApplicationControlRESTfulControllerTest >> requestToRunUnknownMethod [
+
+	^ ( ZnRequest post: self resourceUrl )
+		  entity: ( ZnEntity json: '{"jsonrpc":"2.0","id":1,"method":"xxx"}' );
+		  yourself
+]
+
 { #category : #running }
 ApplicationControlRESTfulControllerTest >> setUpResourceController [
 
@@ -95,30 +103,38 @@ ApplicationControlRESTfulControllerTest >> testRunUnknownCommand [
 
 	| response |
 
-	response := resourceController
-		runApplicationControlMethodBasedOn:
-			( ( ZnRequest post: self resourceUrl )
-				entity:
-					( ZnEntity
-						json:
-							'{
-	"jsonrpc" : "2.0",
-	"id" : 1,
-	"method" : "xxx"
-}' );
-				yourself )
-		within: self newHttpRequestContext.
+	response := resourceController runApplicationControlMethodBasedOn: self requestToRunUnknownMethod
+		            within: self newHttpRequestContext.
 
 	self
 		assert: response isSuccess;
 		assert: response code equals: 200;
 		assert: response contentType asMediaType equals: ZnMimeType applicationJson;
-		withJsonFromContentsIn: response
-			do: [ :json | 
+		withJsonFromContentsIn: response do: [ :json | 
 			self
 				assert: json jsonrpc equals: '2.0';
 				assert: json id equals: 1;
 				assert: ( json at: #error ) code equals: -32601;
 				assert: ( json at: #error ) message equals: 'The method does not exist / is not available.'
 			]
+]
+
+{ #category : #tests }
+ApplicationControlRESTfulControllerTest >> testRunUnknownCommandInDebugMode [
+
+	| debuggableController configuration |
+
+	configuration := self operationsConfiguration.
+	( configuration at: ApplicationControlPlugin endpoint ) at: #debugMode put: true.
+
+	debuggableController := ApplicationControlRESTfulController over:
+		                        ( ApplicationControlPlugin configuredBy: configuration )
+		                        configuredBy: configuration.
+
+	self
+		should: [ 
+			debuggableController runApplicationControlMethodBasedOn: self requestToRunUnknownMethod
+				within: self newHttpRequestContext
+			]
+		raise: JRPCNonExistentHandler
 ]
