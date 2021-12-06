@@ -6,7 +6,8 @@ Class {
 	#name : #ApplicationControlPlugin,
 	#superclass : #OperationalPlugin,
 	#instVars : [
-		'commands'
+		'commands',
+		'configuration'
 	],
 	#classVars : [
 		'AvailableCommands'
@@ -31,11 +32,7 @@ ApplicationControlPlugin class >> configureMediaControlsIn: builder within: requ
 { #category : #'instance creation' }
 ApplicationControlPlugin class >> configuredBy: configuration [
 
-	| selfConfiguration |
-
-	selfConfiguration := self pluginConfigurationOn: configuration.
-
-	^ self new initializeWithAll: ( selfConfiguration at: #commands ifAbsent: [ #() ] )
+	^ self new initializeConfiguredBy: ( self pluginConfigurationOn: configuration )
 ]
 
 { #category : #accessing }
@@ -77,19 +74,30 @@ ApplicationControlPlugin class >> unregisterCommandNamed: aMethodName [
 { #category : #configuring }
 ApplicationControlPlugin >> configureHandlersIn: aJsonRPCRequestHandler [
 
-	commands do: [ :command | command addTo: aJsonRPCRequestHandler ]
+	commands do: [ :command | command addTo: aJsonRPCRequestHandler ].
+	configuration at: #debugMode ifPresent: [ :boolean | aJsonRPCRequestHandler debugMode: boolean ]
 ]
 
 { #category : #configuring }
 ApplicationControlPlugin >> includeControllersIn: api [
 
-	api
-		addController: ( ApplicationControlRESTfulController over: self configuredBy: api operationsConfiguration )
+	api addController:
+		( ApplicationControlRESTfulController over: self configuredBy: api operationsConfiguration )
 ]
 
 { #category : #initialization }
-ApplicationControlPlugin >> initializeWithAll: enabledCommandNames [
+ApplicationControlPlugin >> initializeCommands [
 
-	commands := self class availableCommands
-		select: [ :command | enabledCommandNames includes: command methodName ]
+	| enabledCommandNames |
+
+	enabledCommandNames := configuration at: #commands ifAbsent: [ #(  ) ].
+	commands := self class availableCommands select: [ :command | 
+		            enabledCommandNames includes: command methodName ]
+]
+
+{ #category : #initialization }
+ApplicationControlPlugin >> initializeConfiguredBy: pluginConfiguration [
+
+	configuration := pluginConfiguration.
+	self initializeCommands
 ]
