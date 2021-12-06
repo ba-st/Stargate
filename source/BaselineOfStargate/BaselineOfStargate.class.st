@@ -66,9 +66,9 @@ BaselineOfStargate >> setUpDependencies: spec [
 BaselineOfStargate >> setUpDeploymentPackages: spec [
 
 	spec
-		package: 'Stargate-Model'
-			with: [ spec
-				requires: #('Buoy-Deployment' 'Hyperspace-Deployment' 'Teapot-Deployment' 'JSONWebToken-Deployment')
+		package: 'Stargate-Model' with: [ 
+			spec requires:
+					#( 'Buoy-Deployment' 'Hyperspace-Deployment' 'Teapot-Deployment' 'JSONWebToken-Deployment' )
 			];
 		group: 'Core' with: 'Stargate-Model';
 		group: 'Deployment' with: 'Stargate-Model'.
@@ -89,12 +89,13 @@ BaselineOfStargate >> setUpDeploymentPackages: spec [
 		group: 'Deployment' with: 'Metrics-HTTP'.
 
 	spec
-		package: 'Stargate-JSON-RPC' with: [ spec requires: #('Stargate-Model' 'JRPC-Deployment') ];
+		package: 'Stargate-JSON-RPC' with: [ spec requires: #( 'Stargate-Model' 'JRPC-Deployment' ) ];
 		group: 'JSON-RPC' with: 'Stargate-JSON-RPC';
 		group: 'Deployment' with: 'JSON-RPC'.
 
 	spec
-		package: 'Stargate-Application-Control' with: [ spec requires: #('Stargate-Model' 'JSON-RPC') ];
+		package: 'Stargate-Application-Control' with: [ spec requires: #( 'Stargate-Model'
+				   'JSON-RPC' ) ];
 		group: 'Application-Control' with: 'Stargate-Application-Control';
 		group: 'Deployment' with: 'Application-Control'.
 
@@ -105,9 +106,14 @@ BaselineOfStargate >> setUpDeploymentPackages: spec [
 
 	spec
 		package: 'Stargate-Application-Configuration'
-			with: [ spec requires: #('Stargate-Model' 'Launchpad-Deployment') ];
+		with: [ spec requires: #( 'Stargate-Model' 'Launchpad-Deployment' ) ];
 		group: 'Application-Configuration' with: 'Stargate-Application-Configuration';
-		group: 'Deployment' with: 'Application-Configuration'
+		group: 'Deployment' with: 'Application-Configuration'.
+
+	spec
+		package: 'Stargate-Loggers' with: [ spec requires: #( 'Stargate-Model' 'Launchpad-Deployment' ) ];
+		group: 'Loggers' with: 'Stargate-Loggers';
+		group: 'Deployment' with: 'Loggers'
 ]
 
 { #category : #baselines }
@@ -127,35 +133,39 @@ BaselineOfStargate >> setUpPackages: spec [
 BaselineOfStargate >> setUpTestPackages: spec [
 
 	spec
-		package: 'Stargate-Model-Tests'
-			with: [ spec requires: #('Stargate-Model' 'Stargate-Examples' 'Stargate-HealthCheck' 'Hyperspace-SUnit') ];
+		package: 'Stargate-Model-Tests' with: [ 
+			spec requires:
+					#( 'Stargate-Model' 'Stargate-Examples' 'Stargate-HealthCheck' 'Hyperspace-SUnit' ) ];
 		group: 'Tests' with: 'Stargate-Model-Tests'.
 	spec
 		package: 'Stargate-HealthCheck-Tests'
-			with: [ spec requires: #('Stargate-HealthCheck' 'Stargate-Model-Tests') ];
+		with: [ spec requires: #( 'Stargate-HealthCheck' 'Stargate-Model-Tests' ) ];
 		group: 'Tests' with: 'Stargate-HealthCheck-Tests'.
 	spec
 		package: 'Stargate-Metrics-Tests'
-			with: [ spec requires: #('Stargate-Metrics' 'Stargate-Model-Tests') ];
+		with: [ spec requires: #( 'Stargate-Metrics' 'Stargate-Model-Tests' ) ];
 		group: 'Tests' with: 'Stargate-Metrics-Tests'.
 	spec
 		package: 'Stargate-Metrics-HTTP-Tests'
-			with: [ spec requires: #('Stargate-Metrics-HTTP' 'Stargate-Model-Tests') ];
+		with: [ spec requires: #( 'Stargate-Metrics-HTTP' 'Stargate-Model-Tests' ) ];
 		group: 'Tests' with: 'Stargate-Metrics-HTTP-Tests'.
 	spec
 		package: 'Stargate-Application-Control-Tests'
-			with: [ spec requires: #('Stargate-Application-Control' 'Stargate-Model-Tests') ];
+		with: [ spec requires: #( 'Stargate-Application-Control' 'Stargate-Model-Tests' ) ];
 		group: 'Tests' with: 'Stargate-Application-Control-Tests'.
 	spec
 		package: 'Stargate-Application-Info-Tests'
-			with: [ spec requires: #('Application-Info' 'Stargate-Model-Tests') ];
+		with: [ spec requires: #( 'Application-Info' 'Stargate-Model-Tests' ) ];
 		group: 'Tests' with: 'Stargate-Application-Info-Tests'.
 	spec
 		package: 'Stargate-Application-Configuration-Tests'
-			with: [ spec requires: #('Application-Configuration' 'Stargate-Model-Tests') ];
+		with: [ spec requires: #( 'Application-Configuration' 'Stargate-Model-Tests' ) ];
 		group: 'Tests' with: 'Stargate-Application-Configuration-Tests'.
 	spec
+		package: 'Stargate-Loggers-Tests' with: [ spec requires: #( 'Loggers' 'Stargate-Model-Tests' ) ];
+		group: 'Tests' with: 'Stargate-Loggers-Tests'.
+	spec
 		package: 'Stargate-Examples-Tests'
-			with: [ spec requires: #('Dependent-SUnit-Extensions' 'Stargate-Examples' 'Hyperspace-SUnit') ];
+		with: [ spec requires: #( 'Dependent-SUnit-Extensions' 'Stargate-Examples' 'Hyperspace-SUnit' ) ];
 		group: 'Tests' with: 'Stargate-Examples-Tests'
 ]

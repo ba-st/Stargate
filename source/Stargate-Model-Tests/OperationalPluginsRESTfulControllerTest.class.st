@@ -64,6 +64,19 @@ OperationalPluginsRESTfulControllerTest >> assertHealthcheckStatusOn: plugins [
 ]
 
 { #category : #'private - asserting' }
+OperationalPluginsRESTfulControllerTest >> assertLoggersStatusOn: plugins [
+
+	^ plugins
+		  detect: [ :plugin | plugin name = LoggersPlugin pluginName ]
+		  ifFound: [ :plugin | 
+			  self
+				  assert: plugin status equals: 'DISABLED';
+				  assertUrl: plugin selfLocation equals: 'https://api.example.com/operations/plugins/loggers'
+			  ]
+		  ifNone: [ self fail ]
+]
+
+{ #category : #'private - asserting' }
 OperationalPluginsRESTfulControllerTest >> assertMetricsStatusOn: plugins [
 
 	^ plugins
@@ -137,12 +150,13 @@ OperationalPluginsRESTfulControllerTest >> testGetPlugins [
 	self
 		withJsonFromItemsIn: response
 		do: [ :plugins | 
-			self assert: plugins size equals: 5.
+			self assert: plugins size equals: 6.
 			self
 				assertHealthcheckStatusOn: plugins;
 				assertMetricsStatusOn: plugins;
 				assertApplicationControlStatusOn: plugins;
 				assertApplicationInfoStatusOn: plugins;
-				assertApplicationConfigurationStatusOn: plugins
+				assertApplicationConfigurationStatusOn: plugins;
+				assertLoggersStatusOn: plugins
 			]
 ]

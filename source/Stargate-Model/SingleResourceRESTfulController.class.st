@@ -7,6 +7,12 @@ Class {
 	#category : #'Stargate-Model-Controllers'
 }
 
+{ #category : #testing }
+SingleResourceRESTfulController class >> isAbstract [
+
+	^ self = SingleResourceRESTfulController
+]
+
 { #category : #private }
 SingleResourceRESTfulController >> endpoint [
 
