@@ -99,6 +99,12 @@ OperationalPluginsRESTfulControllerTest >> disable: aPluginEndpoint [
 ]
 
 { #category : #'private - support' }
+OperationalPluginsRESTfulControllerTest >> enable: aPluginEndpoint [
+
+	isPluginEnabled := true
+]
+
+{ #category : #'private - support' }
 OperationalPluginsRESTfulControllerTest >> isEnabled: aPlugin [
 
 	^ isPluginEnabled
@@ -155,6 +161,54 @@ OperationalPluginsRESTfulControllerTest >> testDisableHealtCheckPlugin [
 ]
 
 { #category : #tests }
+OperationalPluginsRESTfulControllerTest >> testEnablePreviouslyDisabledHealtCheckPlugin [
+
+	| getResponse disableResponse response |
+
+	getResponse := resourceController
+		               operationalPluginBasedOn:
+			               ( self requestToGETResourceIdentifiedBy: HealthCheckPlugin endpoint
+				                 accepting: resourceController operationalPluginVersion1dot0dot0MediaType )
+		               within: self newHttpRequestContext.
+
+	disableResponse := resourceController
+		                   changeOperationalPluginStatusBasedOn:
+			                   ( self requestToPATCHResourceIdentifiedBy: HealthCheckPlugin endpoint
+				                     with: '{"status":"DISABLED"}'
+				                     accepting: resourceController operationalPluginVersion1dot0dot0MediaType
+				                     conditionalTo: getResponse entityTag )
+		                   within: ( self newHttpRequestContext
+				                     permissions: { resourceController updatePermission };
+				                     yourself ).
+	self withJsonFromContentsIn: disableResponse
+		do: [ :healthcheck | self assert: healthcheck status equals: 'DISABLED' ].
+
+	response := resourceController
+		            changeOperationalPluginStatusBasedOn:
+			            ( self requestToPATCHResourceIdentifiedBy: HealthCheckPlugin endpoint
+				              with: '{"status":"ENABLED"}'
+				              accepting: resourceController operationalPluginVersion1dot0dot0MediaType
+				              conditionalTo: disableResponse entityTag )
+		            within: ( self newHttpRequestContext
+				              permissions: { resourceController updatePermission };
+				              yourself ).
+	self
+		assert: response isSuccess;
+		assert: response status equals: 200;
+		assert: response contentType asMediaType
+		equals: resourceController operationalPluginVersion1dot0dot0MediaType.
+
+	self withJsonFromContentsIn: response do: [ :healthcheck | 
+		self
+			assert: healthcheck name equals: HealthCheckPlugin pluginName;
+			assert: healthcheck status equals: 'ENABLED';
+			assertUrl: healthcheck selfLocation
+			equals: 'https://api.example.com/operations/plugins/health-check';
+			assertUrl: healthcheck links run equals: 'https://api.example.com/operations/health-check'
+		]
+]
+
+{ #category : #tests }
 OperationalPluginsRESTfulControllerTest >> testGetHealtCheckPlugin [
 
 	| response |
@@ -204,7 +258,7 @@ OperationalPluginsRESTfulControllerTest >> testGetPlugins [
 	self
 		withJsonFromItemsIn: response
 		do: [ :plugins | 
-			self assert: plugins size equals: 6.
+			self assert: plugins size >= 6.
 			self
 				assertHealthcheckStatusOn: plugins;
 				assertMetricsStatusOn: plugins;

@@ -79,6 +79,51 @@ OperationalPluginsAPITest >> testDisableHealtCheckPlugin [
 ]
 
 { #category : #tests }
+OperationalPluginsAPITest >> testEnablePreviouslyDisabledHealtCheckPlugin [
+
+	| json getResponse patchResponse |
+
+	getResponse := self newJWTAuthorizedClient
+		               url: self operationsPluginsUrl / HealthCheckPlugin endpoint asUrl;
+		               get;
+		               response.
+
+	json := NeoJSONObject fromString: getResponse contents.
+
+	self assert: json status equals: 'ENABLED'.
+
+	patchResponse := self newJWTAuthorizedClientForUpdates
+		                 url: json selfLocation;
+		                 setIfMatchTo: getResponse entityTag;
+		                 entity: ( ZnEntity with: '{"status":"DISABLED"}'
+				                   ofType:
+					                   'application/vnd.stargate.operational-plugin+json;version=1.0.0' asMediaType );
+		                 patch;
+		                 response.
+
+	json := NeoJSONObject fromString: patchResponse contents.
+
+	self assert: json status equals: 'DISABLED'.
+
+	patchResponse := self newJWTAuthorizedClientForUpdates
+		                 url: json selfLocation;
+		                 setIfMatchTo: patchResponse entityTag;
+		                 entity: ( ZnEntity with: '{"status":"ENABLED"}'
+				                   ofType:
+					                   'application/vnd.stargate.operational-plugin+json;version=1.0.0' asMediaType );
+		                 patch;
+		                 response.
+
+	self withJsonFromContentsIn: patchResponse do: [ :updatedJson | 
+		self
+			assert: updatedJson name equals: HealthCheckPlugin pluginName;
+			assert: updatedJson status equals: 'ENABLED';
+			assert: updatedJson links size equals: 2;
+			assert: ( updatedJson selfLocation endsWith: '/operations/plugins/health-check' )
+		]
+]
+
+{ #category : #tests }
 OperationalPluginsAPITest >> testGetHealtCheckPlugin [
 
 	| json healthCheckResponse |
