@@ -65,7 +65,7 @@ ApplicationInfoRESTfulController >> operationalApplicationInfoVersion1dot0dot0Me
 { #category : #private }
 ApplicationInfoRESTfulController >> pluginEndpoint [
 
-	^ plugin class endpoint
+	^ plugin endpoint
 ]
 
 { #category : #private }

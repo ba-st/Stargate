@@ -64,20 +64,21 @@ OperationalPluginsRESTfulController >> initializeOn: anHTTPBasedRESTfulAPI [
 OperationalPluginsRESTfulController >> initializeRequestHandler [
 
 	requestHandler := RESTfulRequestHandlerBuilder new
-		handling: 'operations/plugins'
-			locatingResourcesWith: [ :plugin | plugin endpoint ]
-			extractingIdentifierWith: [ :httpRequest | self identifierIn: httpRequest ];
-		beHypermediaDrivenBy:
-				[ :builder :plugin :requestContext :pluginLocation | plugin configureMediaControlsIn: builder within: requestContext ];
-		whenResponding: self operationalPluginVersion1dot0dot0MediaType
-			encodeToJsonApplying:
-				[ :resource :requestContext :writer | self configureOperationalPluginEncodingOn: writer within: requestContext ];
-		createEntityTagHashing: [ :hasher :plugin :requestContext | 
-			hasher
-				include: plugin pluginName;
-				include: ( self statusOf: plugin )
-			];
-		build
+		                  handling: 'operations/plugins'
+		                  locatingResourcesWith: [ :plugin | plugin endpoint ]
+		                  extractingIdentifierWith: [ :httpRequest | self identifierIn: httpRequest ];
+		                  beHypermediaDrivenBy: [ :builder :plugin :requestContext :pluginLocation | 
+			                  ( api isEnabled: plugin ) then: [ 
+					                  plugin configureMediaControlsIn: builder within: requestContext ] ];
+		                  whenResponding: self operationalPluginVersion1dot0dot0MediaType
+		                  encodeToJsonApplying: [ :resource :requestContext :writer | 
+			                  self configureOperationalPluginEncodingOn: writer within: requestContext ];
+		                  createEntityTagHashing: [ :hasher :plugin :requestContext | 
+			                  hasher
+				                  include: plugin pluginName;
+				                  include: ( self statusOf: plugin )
+			                  ];
+		                  build
 ]
 
 { #category : #API }

@@ -19,6 +19,13 @@ RouteSpecification class >> handling: anHttpMethod at: anUrlTemplate evaluating:
 	^ self new initializeHandling: anHttpMethod at: anUrlTemplate evaluating: aBlock
 ]
 
+{ #category : #converting }
+RouteSpecification >> asRequestMatcher [
+
+	^ TeaRequestMatcher method: ( TeaMethodMatcher exactly: httpMethod asSymbol )
+		  url: urlTemplate asTeaUrlPattern
+]
+
 { #category : #configuring }
 RouteSpecification >> authenticatedBy: anAuthorizationFilter [
 

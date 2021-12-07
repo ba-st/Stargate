@@ -18,26 +18,30 @@ OperationalPluginsAPITest >> testGetHealtCheckPlugin [
 
 	| json healthCheckResponse |
 
-	json := NeoJSONObject
-		fromString: ( self newJWTAuthorizedClient get: self operationsPluginsUrl / HealthCheckPlugin endpoint asUrl ).
+	json := NeoJSONObject fromString:
+		        ( self newJWTAuthorizedClient get:
+			          self operationsPluginsUrl / HealthCheckPlugin endpoint asUrl ).
 
 	self
 		assert: json status equals: 'ENABLED';
 		assert: json name equals: HealthCheckPlugin pluginName;
-		assert: json links size equals: 2.
+		assert: json links size equals: 2;
+		assert: ( json selfLocation endsWith: '/operations/plugins/health-check' ).
 
 	healthCheckResponse := self newJWTAuthorizedClient
-		url: json links run;
-		setAccept: 'application/vnd.stargate.health-check.summary+json;version=1.0.0' asMediaType;
-		post;
-		response.
+		                       url: json links run;
+		                       setAccept:
+			                       'application/vnd.stargate.health-check.summary+json;version=1.0.0'
+				                       asMediaType;
+		                       post;
+		                       response.
 
 	self
 		assert: healthCheckResponse isSuccess;
 		assert: healthCheckResponse contentType asMediaType
-			equals: 'application/vnd.stargate.health-check.summary+json;version=1.0.0' asMediaType;
+		equals: 'application/vnd.stargate.health-check.summary+json;version=1.0.0' asMediaType;
 		withJsonFromContentsIn: healthCheckResponse
-			do: [ :summary | self assert: summary status equals: 'PASS' ]
+		do: [ :summary | self assert: summary status equals: 'PASS' ]
 ]
 
 { #category : #tests }
@@ -58,6 +62,34 @@ OperationalPluginsAPITest >> testGetHealtCheckPluginUnauthorized [
 		should: [ self newClient get: self operationsPluginsUrl / HealthCheckPlugin endpoint asUrl ]
 		raise: ZnHttpUnsuccessful
 		withExceptionDo: [ :error | self assert: error response isAuthenticationRequired ]
+]
+
+{ #category : #tests }
+OperationalPluginsAPITest >> testGetHealtCheckPluginWhenDisabled [
+
+	| json |
+
+	api disable: HealthCheckPlugin endpoint.
+
+	json := NeoJSONObject fromString:
+		        ( self newJWTAuthorizedClient get:
+			          self operationsPluginsUrl / HealthCheckPlugin endpoint asUrl ).
+
+	self
+		assert: json status equals: 'DISABLED';
+		assert: json name equals: HealthCheckPlugin pluginName;
+		assert: json links size equals: 1;
+		assert: ( json selfLocation endsWith: '/operations/plugins/health-check' ).
+
+	self
+		should: [ 
+			self newJWTAuthorizedClient
+				url: self operationsUrl / HealthCheckPlugin endpoint;
+				setAccept: 'application/vnd.stargate.health-check.summary+json;version=1.0.0' asMediaType;
+				post
+			]
+		raise: ZnHttpUnsuccessful
+		withExceptionDo: [ :error | self assert: error response isNotFound ]
 ]
 
 { #category : #tests }

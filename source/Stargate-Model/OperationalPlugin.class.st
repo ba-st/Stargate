@@ -76,6 +76,12 @@ OperationalPlugin class >> pluginName [
 	^ self subclassResponsibility
 ]
 
+{ #category : #accessing }
+OperationalPlugin >> endpoint [
+
+	^ self class endpoint
+]
+
 { #category : #configuring }
 OperationalPlugin >> includeControllersIn: api [
 

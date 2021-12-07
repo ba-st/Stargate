@@ -9,7 +9,8 @@ Class {
 		'controllers',
 		'errorHandlers',
 		'enabledOperationalPlugins',
-		'operationsConfiguration'
+		'operationsConfiguration',
+		'disabledOperationalPlugins'
 	],
 	#category : #'Stargate-Model-Controllers'
 }
@@ -54,6 +55,27 @@ HTTPBasedRESTfulAPI >> configureRoutes [
 ]
 
 { #category : #configuring }
+HTTPBasedRESTfulAPI >> disable: anOperationalPluginEndpoint [
+
+	enabledOperationalPlugins
+		detect: [ :plugin | plugin endpoint = anOperationalPluginEndpoint ]
+		ifFound: [ :pluginToDisable | 
+			enabledOperationalPlugins remove: pluginToDisable ifAbsent: [  ].
+			disabledOperationalPlugins add: pluginToDisable.
+			self withConfigurationOf: pluginToDisable
+				do: [ :configuration | configuration at: #enabled put: false ]
+				ifAbsent: [  ].
+			self withRoutesDefinedByPlugin: anOperationalPluginEndpoint
+				do: [ :routeSpecification | 
+				teapotServer removeRoutesMatchedBy: routeSpecification asRequestMatcher ]
+			]
+		ifNone: [ 
+			ObjectNotFound signal:
+				( 'There''s no plugin "<1s>" enabled.' expandMacrosWith: anOperationalPluginEndpoint )
+			]
+]
+
+{ #category : #configuring }
 HTTPBasedRESTfulAPI >> enable: anOperationalPluginEndpoint configuredBy: configuration [
 
 	| pluginToEnable |
@@ -86,12 +108,13 @@ HTTPBasedRESTfulAPI >> initializeControllersWithAll: aRESTfulControllerCollectio
 { #category : #initialization }
 HTTPBasedRESTfulAPI >> initializeEnabledOperationalPlugins [
 
-	enabledOperationalPlugins := OrderedCollection new.
+	enabledOperationalPlugins := OrderedSet new.
+	disabledOperationalPlugins := OrderedSet new.
 	OperationalPlugin availablePlugins
 		select: [ :plugin | 
-			operationsConfiguration
-				at: plugin endpoint
-				ifPresent: [ :pluginConfiguration | pluginConfiguration at: #enabled ifAbsent: [ plugin enabledByDefault ] ]
+			self withConfigurationOf: plugin
+				do: [ :pluginConfiguration |
+				pluginConfiguration at: #enabled ifAbsent: [ plugin enabledByDefault ] ]
 				ifAbsent: [ plugin enabledByDefault ]
 			]
 		thenDo: [ :plugin | self enable: plugin endpoint configuredBy: operationsConfiguration ]
@@ -155,4 +178,21 @@ HTTPBasedRESTfulAPI >> stop [
 
 	teapotServer stop.
 	enabledOperationalPlugins do: #stop
+]
+
+{ #category : #'private - configuring' }
+HTTPBasedRESTfulAPI >> withConfigurationOf: plugin do: aPresentBlock ifAbsent: anAbsentBlock [
+
+	^ operationsConfiguration at: plugin endpoint ifPresent: aPresentBlock ifAbsent: anAbsentBlock
+]
+
+{ #category : #'private - configuring' }
+HTTPBasedRESTfulAPI >> withRoutesDefinedByPlugin: anOperationalPluginEndpoint do: aBlock [
+
+	controllers
+		select: [ :controller | 
+			( controller respondsTo: #pluginEndpoint ) and: [ 
+				controller pluginEndpoint = anOperationalPluginEndpoint ]
+			]
+		thenDo: [ :controller | controller routes do: aBlock ]
 ]

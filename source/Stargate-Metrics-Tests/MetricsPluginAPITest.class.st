@@ -27,6 +27,26 @@ MetricsPluginAPITest >> requiredPermissions [
 ]
 
 { #category : #tests }
+MetricsPluginAPITest >> testDisablePlugin [
+
+	self assert: ( api isEnabled: MetricsPlugin ).
+
+	api disable: MetricsPlugin endpoint.
+
+	self deny: ( api isEnabled: MetricsPlugin ).
+
+	self
+		should: [ 
+			self newJWTAuthorizedClient
+				url: self operationsUrl / MetricsPlugin endpoint asUrl;
+				setAccept: ZnMimeType textPlain;
+				get
+			]
+		raise: ZnHttpUnsuccessful
+		withExceptionDo: [ :error | self assert: error response isNotFound ]
+]
+
+{ #category : #tests }
 MetricsPluginAPITest >> testGetMetricsWithPermissions [
 
 	| metricsResponse |

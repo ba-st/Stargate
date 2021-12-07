@@ -119,7 +119,7 @@ MetricsRESTfulController >> operationalMetricsVersion1dot0dot0MediaType [
 { #category : #private }
 MetricsRESTfulController >> pluginEndpoint [
 
-	^ plugin class endpoint
+	^ plugin endpoint
 ]
 
 { #category : #private }

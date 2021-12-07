@@ -37,6 +37,27 @@ ApplicationInfoPluginAPITest >> setUp [
 ]
 
 { #category : #tests }
+ApplicationInfoPluginAPITest >> testDisablePlugin [
+
+	self assert: ( api isEnabled: ApplicationInfoPlugin ).
+
+	api disable: ApplicationInfoPlugin endpoint.
+
+	self deny: ( api isEnabled: ApplicationInfoPlugin ).
+
+	self
+		should: [ 
+			self newJWTAuthorizedClient
+				url: self operationsUrl / ApplicationInfoPlugin endpoint asUrl;
+				setAccept: ZnMimeType applicationJson;
+				get;
+				response
+			]
+		raise: ZnHttpUnsuccessful
+		withExceptionDo: [ :error | self assert: error response isNotFound ]
+]
+
+{ #category : #tests }
 ApplicationInfoPluginAPITest >> testGetInfoWithPermissions [
 
 	| response |

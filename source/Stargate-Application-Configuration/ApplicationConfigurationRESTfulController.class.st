@@ -122,7 +122,7 @@ ApplicationConfigurationRESTfulController >> plainTextVersion1dot0dot0MediaType 
 { #category : #private }
 ApplicationConfigurationRESTfulController >> pluginEndpoint [
 
-	^ plugin class endpoint
+	^ plugin endpoint
 ]
 
 { #category : #private }

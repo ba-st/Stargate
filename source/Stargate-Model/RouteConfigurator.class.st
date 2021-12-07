@@ -29,13 +29,10 @@ RouteConfigurator >> configure [
 { #category : #'private - configuring' }
 RouteConfigurator >> configureRouteFrom: aRouteSpecification [
 
-	teapot
-		addRouteMethod: (TeaMethodMatcher exactly: aRouteSpecification httpMethod asSymbol)
-		pattern: aRouteSpecification urlTemplate
-		action: [ :request | 
-			self withServerUrlDo: [ :url | request url: ( request url asHostedAt: url ) ].
-			aRouteSpecification handler value: request value: HttpRequestContext new
-			]
+	teapot addRouteMatchedBy: aRouteSpecification asRequestMatcher action: [ :request | 
+		self withServerUrlDo: [ :url | request url: ( request url asHostedAt: url ) ].
+		aRouteSpecification handler value: request value: HttpRequestContext new
+		]
 ]
 
 { #category : #initialization }
