@@ -47,6 +47,20 @@ MetricsPluginAPITest >> testDisablePlugin [
 ]
 
 { #category : #tests }
+MetricsPluginAPITest >> testEnablePreviouslyDisabledPlugin [
+
+	self assert: ( api isEnabled: MetricsPlugin ).
+
+	api disable: MetricsPlugin endpoint.
+	self deny: ( api isEnabled: MetricsPlugin ).
+
+	api enable: MetricsPlugin endpoint.
+	self assert: ( api isEnabled: MetricsPlugin ).
+
+	self testGetMetricsWithPermissions
+]
+
+{ #category : #tests }
 MetricsPluginAPITest >> testGetMetricsWithPermissions [
 
 	| metricsResponse |

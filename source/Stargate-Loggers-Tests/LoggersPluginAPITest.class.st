@@ -80,6 +80,20 @@ LoggersPluginAPITest >> testDisablePlugin [
 ]
 
 { #category : #running }
+LoggersPluginAPITest >> testEnablePreviouslyDisabledPlugin [
+
+	self assert: ( api isEnabled: LoggersPlugin ).
+
+	api disable: LoggersPlugin endpoint.
+	self deny: ( api isEnabled: LoggersPlugin ).
+
+	api enable: LoggersPlugin endpoint.
+	self assert: ( api isEnabled: LoggersPlugin ).
+
+	self testGetLoggerWithPermissions
+]
+
+{ #category : #running }
 LoggersPluginAPITest >> testGetLoggerMissingPermissions [
 
 	self

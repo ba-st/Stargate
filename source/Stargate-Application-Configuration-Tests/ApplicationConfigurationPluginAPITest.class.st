@@ -64,6 +64,20 @@ ApplicationConfigurationPluginAPITest >> testDisablePlugin [
 ]
 
 { #category : #tests }
+ApplicationConfigurationPluginAPITest >> testEnablePreviouslyDisabledPlugin [
+
+	self assert: ( api isEnabled: ApplicationConfigurationPlugin ).
+
+	api disable: ApplicationConfigurationPlugin endpoint.
+	self deny: ( api isEnabled: ApplicationConfigurationPlugin ).
+
+	api enable: ApplicationConfigurationPlugin endpoint.
+	self assert: ( api isEnabled: ApplicationConfigurationPlugin ).
+
+	self testGetConfigurationWithPermissions
+]
+
+{ #category : #tests }
 ApplicationConfigurationPluginAPITest >> testGetConfigurationWithPermissions [
 
 	| response |

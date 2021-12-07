@@ -58,6 +58,20 @@ ApplicationInfoPluginAPITest >> testDisablePlugin [
 ]
 
 { #category : #tests }
+ApplicationInfoPluginAPITest >> testEnablePreviouslyDisabledPlugin [
+
+	self assert: ( api isEnabled: ApplicationInfoPlugin ).
+
+	api disable: ApplicationInfoPlugin endpoint.
+	self deny: ( api isEnabled: ApplicationInfoPlugin ).
+
+	api enable: ApplicationInfoPlugin endpoint.
+	self assert: ( api isEnabled: ApplicationInfoPlugin ).
+
+	self testGetInfoWithPermissions
+]
+
+{ #category : #tests }
 ApplicationInfoPluginAPITest >> testGetInfoWithPermissions [
 
 	| response |

@@ -35,6 +35,20 @@ HealthCheckPluginAPITest >> testDisablePlugin [
 ]
 
 { #category : #tests }
+HealthCheckPluginAPITest >> testEnablePreviouslyDisabledPlugin [
+
+	self assert: ( api isEnabled: HealthCheckPlugin ).
+
+	api disable: HealthCheckPlugin endpoint.
+	self deny: ( api isEnabled: HealthCheckPlugin ).
+
+	api enable: HealthCheckPlugin endpoint.
+	self assert: ( api isEnabled: HealthCheckPlugin ).
+
+	self testRunHealtCheckPluginAskingDetailsWithPermissions
+]
+
+{ #category : #tests }
 HealthCheckPluginAPITest >> testRunHealtCheckPluginAskingDetailsWithPermissions [
 
 	| healthCheckResponse |

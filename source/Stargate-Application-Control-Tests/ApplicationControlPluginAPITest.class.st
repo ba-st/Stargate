@@ -88,6 +88,20 @@ ApplicationControlPluginAPITest >> testDisablePlugin [
 ]
 
 { #category : #tests }
+ApplicationControlPluginAPITest >> testEnablePreviouslyDisabledPlugin [
+
+	self assert: ( api isEnabled: ApplicationControlPlugin ).
+
+	api disable: ApplicationControlPlugin endpoint.
+	self deny: ( api isEnabled: ApplicationControlPlugin ).
+
+	api enable: ApplicationControlPlugin endpoint.
+	self assert: ( api isEnabled: ApplicationControlPlugin ).
+
+	self testRunCommandWithPermissions
+]
+
+{ #category : #tests }
 ApplicationControlPluginAPITest >> testInvalidFormat [
 
 	| response |

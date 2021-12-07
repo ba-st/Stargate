@@ -182,17 +182,19 @@ HTTPBasedRESTfulAPI >> isEnabled: aPluginType [
 ]
 
 { #category : #'private - configuring' }
-HTTPBasedRESTfulAPI >> markAsDisabled: pluginToDisable [
+HTTPBasedRESTfulAPI >> markAsDisabled: plugin [
 
-	enabledOperationalPlugins remove: pluginToDisable ifAbsent: [  ].
-	disabledOperationalPlugins add: pluginToDisable
+	plugin stop.
+	enabledOperationalPlugins remove: plugin ifAbsent: [  ].
+	disabledOperationalPlugins add: plugin
 ]
 
 { #category : #'private - configuring' }
-HTTPBasedRESTfulAPI >> markAsEnabled: pluginToEnable [
+HTTPBasedRESTfulAPI >> markAsEnabled: plugin [
 
-	disabledOperationalPlugins remove: pluginToEnable ifAbsent: [  ].
-	enabledOperationalPlugins add: pluginToEnable
+	disabledOperationalPlugins remove: plugin ifAbsent: [  ].
+	enabledOperationalPlugins add: plugin.
+	plugin startOn: teapotServer
 ]
 
 { #category : #configuring }

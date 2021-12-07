@@ -109,13 +109,11 @@ HTTPMetrics >> increaseResponseSizeAt: labels with: aByteCount [
 { #category : #initialization }
 HTTPMetrics >> initializeConfiguredBy: providerConfiguration [
 
-	categoriesFilter := providerConfiguration
-		at: #breakdownCategories
-		ifPresent: [ :categories | [ :labels | labels select: [ :label | categories includes: label key ] ] ]
-		ifAbsent: [ [ :labels | labels ] ].
-	groupedRequestCount := Dictionary new.
-	groupedResponseSize := Dictionary new.
-	groupedRequestResponseDuration := Dictionary new
+	categoriesFilter := providerConfiguration at: #breakdownCategories
+		                    ifPresent: [ :categories | 
+		                    [ :labels | labels select: [ :label | categories includes: label key ] ] ]
+		                    ifAbsent: [ [ :labels | labels ] ].
+	self resetCounters
 ]
 
 { #category : #actions }
@@ -170,6 +168,14 @@ HTTPMetrics >> requestResponseDurationMetric [
 	^ builder build
 ]
 
+{ #category : #initialization }
+HTTPMetrics >> resetCounters [
+
+	groupedRequestCount := Dictionary new.
+	groupedResponseSize := Dictionary new.
+	groupedRequestResponseDuration := Dictionary new
+]
+
 { #category : #'private - metrics' }
 HTTPMetrics >> responseSizeMetric [
 
@@ -188,5 +194,6 @@ HTTPMetrics >> responseSizeMetric [
 { #category : #actions }
 HTTPMetrics >> uninstall [
 
-	ZnLogEvent announcer unsubscribe: self
+	ZnLogEvent announcer unsubscribe: self.
+	self resetCounters
 ]
