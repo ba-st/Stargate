@@ -24,10 +24,16 @@ OperationsRESTfulController class >> isAbstract [
 ]
 
 { #category : #private }
+OperationsRESTfulController >> assert: httpRequest isAuthorizedTo: permission within: requestContext [
+
+	( requestContext includesPermission: permission ) ifFalse: [ 
+		httpRequest abort: ZnResponse forbidden ]
+]
+
+{ #category : #private }
 OperationsRESTfulController >> assert: httpRequest isAuthorizedWithin: requestContext [
 
-	( requestContext includesPermission: self requiredPermission )
-		ifFalse: [ httpRequest abort: ZnResponse forbidden ]
+	self assert: httpRequest isAuthorizedTo: self requiredPermission within: requestContext
 ]
 
 { #category : #initialization }

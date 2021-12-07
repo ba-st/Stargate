@@ -8,9 +8,74 @@ Class {
 }
 
 { #category : #private }
+OperationalPluginsAPITest >> newJWTAuthorizedClientForUpdates [
+
+	^ self newJWTAuthorizedClientClaiming: ( self claimSet
+			    permissions: #( 'update:operations' );
+			    yourself )
+]
+
+{ #category : #private }
 OperationalPluginsAPITest >> requiredPermissions [
 
 	^ #('read:operations')
+]
+
+{ #category : #tests }
+OperationalPluginsAPITest >> testCannotDisableHealtCheckPluginWhenMissingPermission [
+
+	| json getResponse |
+
+	getResponse := self newJWTAuthorizedClient
+		               url: self operationsPluginsUrl / HealthCheckPlugin endpoint asUrl;
+		               get;
+		               response.
+
+	json := NeoJSONObject fromString: getResponse contents.
+
+	self assert: json status equals: 'ENABLED'.
+
+	self
+		should: [ 
+			self newJWTAuthorizedClient
+				url: json selfLocation; 
+				entity: ( ZnEntity json: '{"status":"DISABLED"}' );
+				patch
+			]
+		raise: ZnHttpUnsuccessful
+		withExceptionDo: [ :error | self assert: error response code equals: 403 ]
+]
+
+{ #category : #tests }
+OperationalPluginsAPITest >> testDisableHealtCheckPlugin [
+
+	| json getResponse patchResponse |
+
+	getResponse := self newJWTAuthorizedClient
+		               url: self operationsPluginsUrl / HealthCheckPlugin endpoint asUrl;
+		               get;
+		               response.
+
+	json := NeoJSONObject fromString: getResponse contents.
+
+	self assert: json status equals: 'ENABLED'.
+
+	patchResponse := self newJWTAuthorizedClientForUpdates
+		                 url: json selfLocation;
+		                 setIfMatchTo: getResponse entityTag;
+		                 entity: ( ZnEntity with: '{"status":"DISABLED"}'
+				                   ofType:
+					                   'application/vnd.stargate.operational-plugin+json;version=1.0.0' asMediaType );
+		                 patch;
+		                 response.
+
+	self withJsonFromContentsIn: patchResponse do: [ :updatedJson | 
+		self
+			assert: updatedJson name equals: HealthCheckPlugin pluginName;
+			assert: updatedJson status equals: 'DISABLED';
+			assert: updatedJson links size equals: 1;
+			assert: ( updatedJson selfLocation endsWith: '/operations/plugins/health-check' )
+		]
 ]
 
 { #category : #tests }
