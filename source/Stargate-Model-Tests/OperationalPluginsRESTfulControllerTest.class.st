@@ -93,7 +93,7 @@ OperationalPluginsRESTfulControllerTest >> assertMetricsStatusOn: plugins [
 ]
 
 { #category : #'private - support' }
-OperationalPluginsRESTfulControllerTest >> disable: aPluginEndpoint [
+OperationalPluginsRESTfulControllerTest >> disable: anOperationalPluginType [
 
 	isPluginEnabled := false
 ]

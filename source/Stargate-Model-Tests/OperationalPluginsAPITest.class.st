@@ -8,6 +8,12 @@ Class {
 }
 
 { #category : #private }
+OperationalPluginsAPITest >> healthCheckSummaryMediaType [
+
+	^ 'application/vnd.stargate.health-check.summary+json;version=1.0.0' asMediaType
+]
+
+{ #category : #private }
 OperationalPluginsAPITest >> newJWTAuthorizedClientForUpdates [
 
 	^ self newJWTAuthorizedClientClaiming: ( self claimSet
@@ -19,6 +25,13 @@ OperationalPluginsAPITest >> newJWTAuthorizedClientForUpdates [
 OperationalPluginsAPITest >> requiredPermissions [
 
 	^ #('read:operations')
+]
+
+{ #category : #private }
+OperationalPluginsAPITest >> statusChangeEntityTo: status [
+
+	^ ZnEntity with: ( '{"status":"<1s>"}' expandMacrosWith: status )
+		  ofType: 'application/vnd.stargate.operational-plugin+json;version=1.0.0' asMediaType
 ]
 
 { #category : #tests }
@@ -38,8 +51,8 @@ OperationalPluginsAPITest >> testCannotDisableHealtCheckPluginWhenMissingPermiss
 	self
 		should: [ 
 			self newJWTAuthorizedClient
-				url: json selfLocation; 
-				entity: ( ZnEntity json: '{"status":"DISABLED"}' );
+				url: json selfLocation;
+				entity: ( self statusChangeEntityTo: 'DISABLED' );
 				patch
 			]
 		raise: ZnHttpUnsuccessful
@@ -63,9 +76,7 @@ OperationalPluginsAPITest >> testDisableHealtCheckPlugin [
 	patchResponse := self newJWTAuthorizedClientForUpdates
 		                 url: json selfLocation;
 		                 setIfMatchTo: getResponse entityTag;
-		                 entity: ( ZnEntity with: '{"status":"DISABLED"}'
-				                   ofType:
-					                   'application/vnd.stargate.operational-plugin+json;version=1.0.0' asMediaType );
+		                 entity: ( self statusChangeEntityTo: 'DISABLED' );
 		                 patch;
 		                 response.
 
@@ -95,9 +106,7 @@ OperationalPluginsAPITest >> testEnablePreviouslyDisabledHealtCheckPlugin [
 	patchResponse := self newJWTAuthorizedClientForUpdates
 		                 url: json selfLocation;
 		                 setIfMatchTo: getResponse entityTag;
-		                 entity: ( ZnEntity with: '{"status":"DISABLED"}'
-				                   ofType:
-					                   'application/vnd.stargate.operational-plugin+json;version=1.0.0' asMediaType );
+		                 entity: ( self statusChangeEntityTo: 'DISABLED' );
 		                 patch;
 		                 response.
 
@@ -108,9 +117,7 @@ OperationalPluginsAPITest >> testEnablePreviouslyDisabledHealtCheckPlugin [
 	patchResponse := self newJWTAuthorizedClientForUpdates
 		                 url: json selfLocation;
 		                 setIfMatchTo: patchResponse entityTag;
-		                 entity: ( ZnEntity with: '{"status":"ENABLED"}'
-				                   ofType:
-					                   'application/vnd.stargate.operational-plugin+json;version=1.0.0' asMediaType );
+		                 entity: ( self statusChangeEntityTo: 'ENABLED' );
 		                 patch;
 		                 response.
 
@@ -140,16 +147,13 @@ OperationalPluginsAPITest >> testGetHealtCheckPlugin [
 
 	healthCheckResponse := self newJWTAuthorizedClient
 		                       url: json links run;
-		                       setAccept:
-			                       'application/vnd.stargate.health-check.summary+json;version=1.0.0'
-				                       asMediaType;
+		                       setAccept: self healthCheckSummaryMediaType;
 		                       post;
 		                       response.
 
 	self
 		assert: healthCheckResponse isSuccess;
-		assert: healthCheckResponse contentType asMediaType
-		equals: 'application/vnd.stargate.health-check.summary+json;version=1.0.0' asMediaType;
+		assert: healthCheckResponse contentType asMediaType equals: self healthCheckSummaryMediaType;
 		withJsonFromContentsIn: healthCheckResponse
 		do: [ :summary | self assert: summary status equals: 'PASS' ]
 ]
@@ -179,7 +183,7 @@ OperationalPluginsAPITest >> testGetHealtCheckPluginWhenDisabled [
 
 	| json |
 
-	api disable: HealthCheckPlugin endpoint.
+	api disable: HealthCheckPlugin.
 
 	json := NeoJSONObject fromString:
 		        ( self newJWTAuthorizedClient get:
@@ -195,7 +199,7 @@ OperationalPluginsAPITest >> testGetHealtCheckPluginWhenDisabled [
 		should: [ 
 			self newJWTAuthorizedClient
 				url: self operationsUrl / HealthCheckPlugin endpoint;
-				setAccept: 'application/vnd.stargate.health-check.summary+json;version=1.0.0' asMediaType;
+				setAccept: self healthCheckSummaryMediaType;
 				post
 			]
 		raise: ZnHttpUnsuccessful

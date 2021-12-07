@@ -30,8 +30,8 @@ OperationalPluginsRESTfulController >> changeOperationalPluginStatusBasedOn: htt
 			  json
 				  at: #status
 				  ifPresent: [ :status | 
-					  status = 'DISABLED' then: [ api disable: plugin endpoint ].
-					  status = 'ENABLED' then: [ api enable: plugin endpoint ]
+					  status = 'DISABLED' then: [ api disable: plugin ].
+					  status = 'ENABLED' then: [ api enable: plugin ]
 					  ]
 				  ifAbsent: [ HTTPClientError unprocessableEntity signal: 'Missing #status key' ].
 			  plugin

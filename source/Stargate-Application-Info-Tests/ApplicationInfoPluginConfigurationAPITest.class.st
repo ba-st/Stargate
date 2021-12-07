@@ -25,12 +25,12 @@ ApplicationInfoPluginConfigurationAPITest >> requiredPermissions [
 ApplicationInfoPluginConfigurationAPITest >> testPluginIsDisabled [
 
 	self
-		deny: ( api isEnabled: ApplicationInfoPlugin );
-		should: [ self newJWTAuthorizedClient
+		assertIsDisabled: ApplicationInfoPlugin;
+		should: [ 
+			self newJWTAuthorizedClient
 				url: self operationsUrl / ApplicationInfoPlugin endpoint asUrl;
 				setAccept: ZnMimeType textPlain;
 				get
 			]
-			raise: ZnHttpUnsuccessful
-			withExceptionDo: [ :error | self assert: error response isNotFound ]
+		raise: ZnHttpUnsuccessful withExceptionDo: [ :error | self assert: error response isNotFound ]
 ]

@@ -22,12 +22,12 @@ MetricsPluginConfigurationAPITest >> requiredPermissions [
 MetricsPluginConfigurationAPITest >> testPluginIsDisabled [
 
 	self
-		deny: ( api isEnabled: MetricsPlugin );
-		should: [ self newJWTAuthorizedClient
+		assertIsDisabled: MetricsPlugin;
+		should: [ 
+			self newJWTAuthorizedClient
 				url: self operationsUrl / MetricsPlugin endpoint asUrl;
 				setAccept: ZnMimeType textPlain;
 				get
 			]
-			raise: ZnHttpUnsuccessful
-			withExceptionDo: [ :error | self assert: error response isNotFound ]
+		raise: ZnHttpUnsuccessful withExceptionDo: [ :error | self assert: error response isNotFound ]
 ]

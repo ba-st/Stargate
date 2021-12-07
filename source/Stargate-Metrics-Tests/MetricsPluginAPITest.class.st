@@ -29,11 +29,10 @@ MetricsPluginAPITest >> requiredPermissions [
 { #category : #tests }
 MetricsPluginAPITest >> testDisablePlugin [
 
-	self assert: ( api isEnabled: MetricsPlugin ).
+	self assertIsEnabled: MetricsPlugin.
 
-	api disable: MetricsPlugin endpoint.
-
-	self deny: ( api isEnabled: MetricsPlugin ).
+	api disable: MetricsPlugin.
+	self assertIsDisabled: MetricsPlugin.
 
 	self
 		should: [ 
@@ -49,13 +48,13 @@ MetricsPluginAPITest >> testDisablePlugin [
 { #category : #tests }
 MetricsPluginAPITest >> testEnablePreviouslyDisabledPlugin [
 
-	self assert: ( api isEnabled: MetricsPlugin ).
+	self assertIsEnabled: MetricsPlugin.
 
-	api disable: MetricsPlugin endpoint.
-	self deny: ( api isEnabled: MetricsPlugin ).
+	api disable: MetricsPlugin.
+	self assertIsDisabled: MetricsPlugin.
 
-	api enable: MetricsPlugin endpoint.
-	self assert: ( api isEnabled: MetricsPlugin ).
+	api enable: MetricsPlugin.
+	self assertIsEnabled: MetricsPlugin.
 
 	self testGetMetricsWithPermissions
 ]

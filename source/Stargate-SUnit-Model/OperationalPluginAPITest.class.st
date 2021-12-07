@@ -13,6 +13,18 @@ OperationalPluginAPITest class >> isAbstract [
 	^ self name = #OperationalPluginAPITest
 ]
 
+{ #category : #asserting }
+OperationalPluginAPITest >> assertIsDisabled: anOperationPluginType [
+
+	self deny: ( api isEnabled: anOperationPluginType )
+]
+
+{ #category : #asserting }
+OperationalPluginAPITest >> assertIsEnabled: anOperationPluginType [
+
+	self assert: ( api isEnabled: anOperationPluginType )
+]
+
 { #category : #private }
 OperationalPluginAPITest >> claimSet [
 

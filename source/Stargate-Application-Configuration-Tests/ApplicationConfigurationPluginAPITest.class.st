@@ -45,11 +45,10 @@ ApplicationConfigurationPluginAPITest >> requiredPermissions [
 { #category : #tests }
 ApplicationConfigurationPluginAPITest >> testDisablePlugin [
 
-	self assert: ( api isEnabled: ApplicationConfigurationPlugin ).
+	self assertIsEnabled: ApplicationConfigurationPlugin.
 
-	api disable: ApplicationConfigurationPlugin endpoint.
-
-	self deny: ( api isEnabled: ApplicationConfigurationPlugin ).
+	api disable: ApplicationConfigurationPlugin.
+	self assertIsDisabled: ApplicationConfigurationPlugin.
 
 	self
 		should: [ 
@@ -66,13 +65,13 @@ ApplicationConfigurationPluginAPITest >> testDisablePlugin [
 { #category : #tests }
 ApplicationConfigurationPluginAPITest >> testEnablePreviouslyDisabledPlugin [
 
-	self assert: ( api isEnabled: ApplicationConfigurationPlugin ).
+	self assertIsEnabled: ApplicationConfigurationPlugin.
 
-	api disable: ApplicationConfigurationPlugin endpoint.
-	self deny: ( api isEnabled: ApplicationConfigurationPlugin ).
+	api disable: ApplicationConfigurationPlugin.
+	self assertIsDisabled: ApplicationConfigurationPlugin.
 
-	api enable: ApplicationConfigurationPlugin endpoint.
-	self assert: ( api isEnabled: ApplicationConfigurationPlugin ).
+	api enable: ApplicationConfigurationPlugin.
+	self assertIsEnabled: ApplicationConfigurationPlugin.
 
 	self testGetConfigurationWithPermissions
 ]

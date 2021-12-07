@@ -69,11 +69,10 @@ ApplicationControlPluginAPITest >> tearDown [
 { #category : #tests }
 ApplicationControlPluginAPITest >> testDisablePlugin [
 
-	self assert: ( api isEnabled: ApplicationControlPlugin ).
+	self assertIsEnabled: ApplicationControlPlugin.
 
-	api disable: ApplicationControlPlugin endpoint.
-
-	self deny: ( api isEnabled: ApplicationControlPlugin ).
+	api disable: ApplicationControlPlugin.
+	self assertIsDisabled: ApplicationControlPlugin.
 
 	self
 		should: [ 
@@ -90,13 +89,13 @@ ApplicationControlPluginAPITest >> testDisablePlugin [
 { #category : #tests }
 ApplicationControlPluginAPITest >> testEnablePreviouslyDisabledPlugin [
 
-	self assert: ( api isEnabled: ApplicationControlPlugin ).
+	self assertIsEnabled: ApplicationControlPlugin.
 
-	api disable: ApplicationControlPlugin endpoint.
-	self deny: ( api isEnabled: ApplicationControlPlugin ).
+	api disable: ApplicationControlPlugin.
+	self assertIsDisabled: ApplicationControlPlugin.
 
-	api enable: ApplicationControlPlugin endpoint.
-	self assert: ( api isEnabled: ApplicationControlPlugin ).
+	api enable: ApplicationControlPlugin.
+	self assertIsEnabled: ApplicationControlPlugin.
 
 	self testRunCommandWithPermissions
 ]

@@ -16,11 +16,10 @@ HealthCheckPluginAPITest >> requiredPermissions [
 { #category : #tests }
 HealthCheckPluginAPITest >> testDisablePlugin [
 
-	self assert: ( api isEnabled: HealthCheckPlugin ).
+	self assertIsEnabled: HealthCheckPlugin.
 
-	api disable: HealthCheckPlugin endpoint.
-
-	self deny: ( api isEnabled: HealthCheckPlugin ).
+	api disable: HealthCheckPlugin.
+	self assertIsDisabled: HealthCheckPlugin.
 
 	self
 		should: [ 
@@ -37,13 +36,13 @@ HealthCheckPluginAPITest >> testDisablePlugin [
 { #category : #tests }
 HealthCheckPluginAPITest >> testEnablePreviouslyDisabledPlugin [
 
-	self assert: ( api isEnabled: HealthCheckPlugin ).
+	self assertIsEnabled: HealthCheckPlugin.
 
-	api disable: HealthCheckPlugin endpoint.
-	self deny: ( api isEnabled: HealthCheckPlugin ).
+	api disable: HealthCheckPlugin.
+	self assertIsDisabled: HealthCheckPlugin.
 
-	api enable: HealthCheckPlugin endpoint.
-	self assert: ( api isEnabled: HealthCheckPlugin ).
+	api enable: HealthCheckPlugin.
+	self assertIsEnabled: HealthCheckPlugin.
 
 	self testRunHealtCheckPluginAskingDetailsWithPermissions
 ]

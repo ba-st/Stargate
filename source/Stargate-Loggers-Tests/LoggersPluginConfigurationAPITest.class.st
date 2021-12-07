@@ -22,7 +22,7 @@ LoggersPluginConfigurationAPITest >> requiredPermissions [
 LoggersPluginConfigurationAPITest >> testPluginIsDisabled [
 
 	self
-		deny: ( api isEnabled: LoggersPlugin );
+		assertIsDisabled: LoggersPlugin;
 		should: [ 
 			self newJWTAuthorizedClient
 				url: self operationsUrl / LoggersPlugin endpoint asUrl;
