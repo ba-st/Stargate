@@ -59,6 +59,40 @@ LoggersPluginAPITest >> tearDown [
 ]
 
 { #category : #running }
+LoggersPluginAPITest >> testDisablePlugin [
+
+	self assertIsEnabled: LoggersPlugin.
+
+	api disable: LoggersPlugin.
+	self assertIsDisabled: LoggersPlugin.
+
+	self
+		should: [ 
+			self newJWTAuthorizedClient
+				url: self operationsUrl / LoggersPlugin endpoint asUrl;
+				setAccept: ZnMimeType applicationJson;
+				get;
+				response
+			]
+		raise: ZnHttpUnsuccessful
+		withExceptionDo: [ :error | self assert: error response isNotFound ]
+]
+
+{ #category : #running }
+LoggersPluginAPITest >> testEnablePreviouslyDisabledPlugin [
+
+	self assertIsEnabled: LoggersPlugin.
+
+	api disable: LoggersPlugin.
+	self assertIsDisabled: LoggersPlugin.
+
+	api enable: LoggersPlugin.
+	self assertIsEnabled: LoggersPlugin.
+
+	self testGetLoggerWithPermissions
+]
+
+{ #category : #running }
 LoggersPluginAPITest >> testGetLoggerMissingPermissions [
 
 	self

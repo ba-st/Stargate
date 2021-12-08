@@ -67,6 +67,40 @@ ApplicationControlPluginAPITest >> tearDown [
 ]
 
 { #category : #tests }
+ApplicationControlPluginAPITest >> testDisablePlugin [
+
+	self assertIsEnabled: ApplicationControlPlugin.
+
+	api disable: ApplicationControlPlugin.
+	self assertIsDisabled: ApplicationControlPlugin.
+
+	self
+		should: [ 
+			self newJWTAuthorizedClient
+				url: self operationsUrl / ApplicationControlPlugin endpoint asUrl;
+				entity: self echoCommandEntity;
+				post;
+				response
+			]
+		raise: ZnHttpUnsuccessful
+		withExceptionDo: [ :error | self assert: error response isNotFound ]
+]
+
+{ #category : #tests }
+ApplicationControlPluginAPITest >> testEnablePreviouslyDisabledPlugin [
+
+	self assertIsEnabled: ApplicationControlPlugin.
+
+	api disable: ApplicationControlPlugin.
+	self assertIsDisabled: ApplicationControlPlugin.
+
+	api enable: ApplicationControlPlugin.
+	self assertIsEnabled: ApplicationControlPlugin.
+
+	self testRunCommandWithPermissions
+]
+
+{ #category : #tests }
 ApplicationControlPluginAPITest >> testInvalidFormat [
 
 	| response |

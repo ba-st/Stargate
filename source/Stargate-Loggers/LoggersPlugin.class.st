@@ -31,12 +31,6 @@ LoggersPlugin class >> configuredBy: configuration [
 ]
 
 { #category : #accessing }
-LoggersPlugin class >> enabledByDefault [
-
-	^ false
-]
-
-{ #category : #accessing }
 LoggersPlugin class >> endpoint [
 
 	^ 'loggers'

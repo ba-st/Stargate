@@ -25,12 +25,12 @@ ApplicationControlPluginConfigurationAPITest >> requiredPermissions [
 ApplicationControlPluginConfigurationAPITest >> testPluginIsDisabled [
 
 	self
-		deny: ( api isEnabled: ApplicationControlPlugin );
-		should: [ self newJWTAuthorizedClient
+		assertIsDisabled: ApplicationControlPlugin;
+		should: [ 
+			self newJWTAuthorizedClient
 				url: self operationsUrl / ApplicationControlPlugin endpoint asUrl;
 				entity: ( ZnEntity json: '' );
 				post
 			]
-			raise: ZnHttpUnsuccessful
-			withExceptionDo: [ :error | self assert: error response isNotFound ]
+		raise: ZnHttpUnsuccessful withExceptionDo: [ :error | self assert: error response isNotFound ]
 ]

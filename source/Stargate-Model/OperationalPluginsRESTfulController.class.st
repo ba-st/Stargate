@@ -18,6 +18,26 @@ OperationalPluginsRESTfulController class >> on: anHTTPBasedRESTfulAPI [
 		initializeOn: anHTTPBasedRESTfulAPI
 ]
 
+{ #category : #API }
+OperationalPluginsRESTfulController >> changeOperationalPluginStatusBasedOn: httpRequest within: requestContext [
+
+	self assert: httpRequest isAuthorizedTo: self updatePermission within: requestContext.
+
+	^ requestHandler from: httpRequest
+		  within: requestContext
+		  get: [ :endpoint | OperationalPlugin pluginAt: endpoint ]
+		  thenUpdateWith: [ :plugin :json | 
+			  json
+				  at: #status
+				  ifPresent: [ :status | 
+					  status = 'DISABLED' then: [ api disable: plugin ].
+					  status = 'ENABLED' then: [ api enable: plugin ]
+					  ]
+				  ifAbsent: [ HTTPClientError unprocessableEntity signal: 'Missing #status key' ].
+			  plugin
+			  ]
+]
+
 { #category : #private }
 OperationalPluginsRESTfulController >> configureOperationalPluginEncodingOn: writer within: requestContext [
 
@@ -53,6 +73,15 @@ OperationalPluginsRESTfulController >> declareGetOperationalPluginsRoute [
 			[ :httpRequest :requestContext | self operationalPluginsBasedOn: httpRequest within: requestContext ]
 ]
 
+{ #category : #routes }
+OperationalPluginsRESTfulController >> declareUpdateOperationalPluginRoute [
+
+	^ RouteSpecification handling: #PATCH
+		  at: self identifierTemplate
+		  evaluating: [ :httpRequest :requestContext | 
+			  self changeOperationalPluginStatusBasedOn: httpRequest within: requestContext ]
+]
+
 { #category : #initialization }
 OperationalPluginsRESTfulController >> initializeOn: anHTTPBasedRESTfulAPI [
 
@@ -64,20 +93,23 @@ OperationalPluginsRESTfulController >> initializeOn: anHTTPBasedRESTfulAPI [
 OperationalPluginsRESTfulController >> initializeRequestHandler [
 
 	requestHandler := RESTfulRequestHandlerBuilder new
-		handling: 'operations/plugins'
-			locatingResourcesWith: [ :plugin | plugin endpoint ]
-			extractingIdentifierWith: [ :httpRequest | self identifierIn: httpRequest ];
-		beHypermediaDrivenBy:
-				[ :builder :plugin :requestContext :pluginLocation | plugin configureMediaControlsIn: builder within: requestContext ];
-		whenResponding: self operationalPluginVersion1dot0dot0MediaType
-			encodeToJsonApplying:
-				[ :resource :requestContext :writer | self configureOperationalPluginEncodingOn: writer within: requestContext ];
-		createEntityTagHashing: [ :hasher :plugin :requestContext | 
-			hasher
-				include: plugin pluginName;
-				include: ( self statusOf: plugin )
-			];
-		build
+		                  handling: 'operations/plugins'
+		                  locatingResourcesWith: [ :plugin | plugin endpoint ]
+		                  extractingIdentifierWith: [ :httpRequest | self identifierIn: httpRequest ];
+		                  beHypermediaDrivenBy: [ :builder :plugin :requestContext :pluginLocation | 
+			                  ( api isEnabled: plugin ) then: [ 
+					                  plugin configureMediaControlsIn: builder within: requestContext ] ];
+		                  whenResponding: self operationalPluginVersion1dot0dot0MediaType
+		                  encodeToJsonApplying: [ :resource :requestContext :writer | 
+			                  self configureOperationalPluginEncodingOn: writer within: requestContext ];
+		                  decodeToNeoJSONObjectWhenAccepting:
+			                  self operationalPluginVersion1dot0dot0MediaType;
+		                  createEntityTagHashing: [ :hasher :plugin :requestContext | 
+			                  hasher
+				                  include: plugin pluginName;
+				                  include: ( self statusOf: plugin )
+			                  ];
+		                  build
 ]
 
 { #category : #API }
@@ -124,4 +156,10 @@ OperationalPluginsRESTfulController >> requiredPermission [
 OperationalPluginsRESTfulController >> statusOf: aPluginType [
 
 	^ ( api isEnabled: aPluginType ) then: [ 'ENABLED' ] otherwise: [ 'DISABLED' ]
+]
+
+{ #category : #private }
+OperationalPluginsRESTfulController >> updatePermission [
+
+	^ 'update:operations'
 ]

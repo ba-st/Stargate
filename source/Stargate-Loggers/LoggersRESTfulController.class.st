@@ -95,7 +95,7 @@ LoggersRESTfulController >> loggerVersion1dor0dot0MediaType [
 { #category : #private }
 LoggersRESTfulController >> pluginEndpoint [
 
-	^ plugin class endpoint
+	^ plugin endpoint
 ]
 
 { #category : #private }

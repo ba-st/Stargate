@@ -102,7 +102,7 @@ HealthCheckRESTfulController >> initializeRequestHandler [
 { #category : #private }
 HealthCheckRESTfulController >> pluginEndpoint [
 
-	^ plugin class endpoint
+	^ plugin endpoint
 ]
 
 { #category : #private }

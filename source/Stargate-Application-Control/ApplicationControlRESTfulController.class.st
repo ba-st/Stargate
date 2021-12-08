@@ -38,7 +38,7 @@ ApplicationControlRESTfulController >> initializeOver: anApplicationControlPlugi
 { #category : #private }
 ApplicationControlRESTfulController >> pluginEndpoint [
 
-	^ plugin class endpoint
+	^ plugin endpoint
 ]
 
 { #category : #private }

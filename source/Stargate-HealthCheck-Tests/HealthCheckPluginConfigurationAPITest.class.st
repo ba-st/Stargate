@@ -25,12 +25,12 @@ HealthCheckPluginConfigurationAPITest >> requiredPermissions [
 HealthCheckPluginConfigurationAPITest >> testPluginIsDisabled [
 
 	self
-		deny: ( api isEnabled: HealthCheckPlugin );
-		should: [ self newJWTAuthorizedClient
+		assertIsDisabled: HealthCheckPlugin;
+		should: [ 
+			self newJWTAuthorizedClient
 				url: self operationsUrl / HealthCheckPlugin endpoint asUrl;
 				setAccept: 'application/vnd.stargate.health-check.details+json;version=1.0.0' asMediaType;
 				post
 			]
-			raise: ZnHttpUnsuccessful
-			withExceptionDo: [ :error | self assert: error response isNotFound ]
+		raise: ZnHttpUnsuccessful withExceptionDo: [ :error | self assert: error response isNotFound ]
 ]
