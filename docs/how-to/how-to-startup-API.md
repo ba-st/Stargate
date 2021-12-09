@@ -1,4 +1,4 @@
-# API startup
+# How to startup an API
 
 To start up an API you need to instantiate `HTTPBasedRESTfulAPI` providing the
 required configuration and the controllers to install.
@@ -46,31 +46,3 @@ generated properly. For example `#serverUrl -> 'http://api.example.com'`.
 It's a good idea to get these configuration options from a command line or
 environment variable, so the same code can be deployed locally for testing and
 in production with the real values.
-
-## Generating the operations tokens manually
-
-When using JWT as the authentication scheme, the incoming API calls need to
-provide a Bearer token with the required permissions encoded.
-
-In production, these tokens are usually coming from an Auth provider (like
-[Auth0](https://auth0.com)). But for testing you can generate tokens manually
-getting a Pharo image with Stargate loaded and printing the result of the
-following expression (replacing 'SECRET' by the actual secret key and tunning
-the permissions if required):
-
-```smalltalk
-| jws |
-
-jws := JsonWebSignature new.
-jws algorithmName: JWAHMACSHA256 parameterValue.
-jws
-  payload:
-    ( JWTClaimsSet new
-      permissions:
-        #('read:operations' 'read:metrics' 'execute:health-check'
-          'read:application-info' 'execute:application-control'
-          'read:application-configuration');
-      yourself ).
-jws key: 'SECRET'.
-jws compactSerialized
-```

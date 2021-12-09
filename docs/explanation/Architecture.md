@@ -22,7 +22,7 @@ The user must provide two objects on instance creation:
 
 - **CORS**: You can configure the CORS support by sending the message
   `allowCrossOriginSharingApplying:` to the API with a configuration block.
-  Follow this [link](CrossOriginResourceSharing.md) for more details.
+  Follow this [link](../reference/CrossOriginResourceSharing.md) for more details.
 - **Top Level Error Handlers**: The API always configures an error handler for
   `HTTPClientError` generating a response with the corresponding error code and
   additional details when available. However, users are allowed to configure

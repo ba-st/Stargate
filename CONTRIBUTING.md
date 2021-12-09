@@ -22,19 +22,13 @@ You can report issues [here](https://github.com/ba-st/Stargate/issues/new)
 - Code contributions without test cases have a lower probability of being merged
   into the main branch.
 
-### Using Iceberg
-
-1. Download a [Pharo Image and VM](https://get.pharo.org/64)
-2. Clone the project or your fork using Iceberg
-3. Open the Working Copy and using the contextual menu select `Metacello ->
-   Install baseline...`
-4. Input `Development`
-5. This will load the base code and the test cases
-6. Create a new branch to host your code changes
-7. Do the changes
-8. Run the test cases
-9. Commit and push your changes to the branch using the Iceberg UI
-10. Create a Pull Request against the `release-candidate` branch
+1. [Load the project code in a Pharo image](docs/how-to/how-to-load-in-pharo.md)
+2. Create a new branch to host your code changes
+3. Do the changes
+4. Run the test cases
+5. Commit and push your changes to the branch using the Iceberg UI. You may need
+  to add your fork if lacking the required permissions to push to the main repo.
+6. Create a Pull Request against the `release-candidate` branch
 
 ## Contributing documentation
 
