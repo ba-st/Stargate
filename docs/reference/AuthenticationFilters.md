@@ -11,11 +11,11 @@ There are two flavour of filters implemented:
   available through the `requestContext` the set of permissions encoded in the
   JWT.
 - `ZnAuthenticationFilter` is an adapter over `ZnBasicAuthenticator` instances
-  so it can be used as authentication filters in the library. This adapter will
+  so it can be used as authentication filter in the library. This adapter will
   send `isRequestAuthenticated:` to the authenticator to verify the authentication
   status.
 
-In any case, if the credentials are invalid the request is responded with a
+In any case, if the credentials are invalid the request responds with a
 `401/Unauthorized` error.
 
 ## Authenticating a single route
