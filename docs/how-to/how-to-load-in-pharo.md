@@ -30,6 +30,6 @@
   *Metacello -> Install baseline of Stargate ...*
 9. Type `Development` and click *Ok*
 
-> After Iceberg cloned a repository, it will be checked-out at the  default
+> After Iceberg cloned a repository, it will be checked-out at the default
 > branch (in this case `release-candidate`). If you want to work on a different
 > branch or commit, perform the checkout before the baseline installation step.
