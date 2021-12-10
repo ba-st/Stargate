@@ -39,6 +39,14 @@ HTTPBasedRESTfulAPI >> allowCrossOriginSharingApplying: aConfigurationBlock [
 	builder buildActualRequestFilter applyOn: teapotServer
 ]
 
+{ #category : #configuring }
+HTTPBasedRESTfulAPI >> authenticatedBy: anAuthorizationFilter [
+
+	teapotServer
+		before: '/*' -> anAuthorizationFilter;
+		when: [ :request | ( CrossOriginResourceSharingFilter isForPreflight: request ) not ]
+]
+
 { #category : #'private - configuring' }
 HTTPBasedRESTfulAPI >> configureErrorHandlers [
 

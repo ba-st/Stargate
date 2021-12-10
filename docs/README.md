@@ -19,6 +19,7 @@ Once you grasped the basics, lookup for details in the reference docs:
 - [Controllers](reference/Controllers.md)
 - [Operations](reference/Operations.md)
 - [CORS](reference/CrossOriginResourceSharing.md)
+- [Authentication Filters](AuthenticationFilters.md)
 
 or expand your understanding over specific topics:
 
