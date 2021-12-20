@@ -33,7 +33,7 @@ JsonRPCController >> configureAvailableProcedures [
 { #category : #accessing }
 JsonRPCController >> endpoint [
 
-	^ requestHandler endpoint
+	^ self requestHandler endpoint
 ]
 
 { #category : #initialization }
