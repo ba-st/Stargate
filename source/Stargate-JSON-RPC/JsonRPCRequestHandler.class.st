@@ -19,6 +19,12 @@ JsonRPCRequestHandler class >> handling: anEndpoint [
 ]
 
 { #category : #configuring }
+JsonRPCRequestHandler >> addErrorHandler: anErrorHandler [
+
+	messageProcessor addErrorHandler: anErrorHandler
+]
+
+{ #category : #configuring }
 JsonRPCRequestHandler >> addHandlerNamed: aString evaluating: aBlock [
 
 	messageProcessor addHandlerNamed: aString block: aBlock
