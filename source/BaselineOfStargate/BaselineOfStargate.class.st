@@ -167,7 +167,7 @@ BaselineOfStargate >> setUpTestPackages: spec [
 	spec
 		package: 'Stargate-JSON-RPC-Tests'
 		with: [ spec requires: #( 'JSON-RPC' 'Stargate-Model-Tests' ) ];
-		group: 'Tests' with: 'Stargate-JSON-RPC-Tests '.
+		group: 'Tests' with: 'Stargate-JSON-RPC-Tests'.
 	spec
 		package: 'Stargate-Examples-Tests'
 		with: [ spec requires: #( 'Dependent-SUnit-Extensions' 'Stargate-Examples' 'Hyperspace-SUnit' ) ];
