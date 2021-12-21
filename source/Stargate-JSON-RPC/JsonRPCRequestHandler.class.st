@@ -31,6 +31,14 @@ JsonRPCRequestHandler >> addHandlerNamed: aString evaluating: aBlock [
 ]
 
 { #category : #configuring }
+JsonRPCRequestHandler >> addHandlerNamed: aString withArgumentNames: argumentNames evaluating: aBlock [
+
+	messageProcessor addHandler: ( JRPCSelfContainedBlockHandler forProcedureNamed: aString
+			  withArgumentNames: argumentNames
+			  evaluating: aBlock )
+]
+
+{ #category : #configuring }
 JsonRPCRequestHandler >> debugMode: aBoolean [
 
 	messageProcessor debugMode: aBoolean
