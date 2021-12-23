@@ -6,15 +6,23 @@ Class {
 	#superclass : #TestCase,
 	#instVars : [
 		'logger',
-		'application'
+		'application',
+		'port',
+		'baseUrl'
 	],
 	#category : #'Stargate-API-Skeleton-Tests'
 }
 
+{ #category : #accessing }
+StargateAPISkeletonTest class >> defaultTimeLimit [
+
+	^5 minute
+]
+
 { #category : #private }
 StargateAPISkeletonTest >> baseUrl [
 
-	^ application configuration petStore stargate publicURL
+	^ baseUrl
 ]
 
 { #category : #private }
@@ -55,25 +63,48 @@ StargateAPISkeletonTest >> setUp [
 
 	super setUp.
 	logger := MemoryLogger new.
-	String streamContents: [ :stream | 
-		| context rootCommand port |
+	port := self freeListeningTCPPort.
+	StargateAPISkeleton logsDirectory ensureCreateDirectory
+]
 
-		port := self freeListeningTCPPort.
+{ #category : #private }
+StargateAPISkeletonTest >> start: aLaunchpadApplication withAll: arguments [
+
+	String streamContents: [ :stream | 
+		| context rootCommand |
+
 
 		rootCommand := LaunchpadRootCommand new.
 		context := LaunchpadCommandLineProcessingContext
 			           handling: ( CommandLineArguments withArguments: { 
 						             'launchpad'.
 						             'start'.
-						             PetStoreAPI commandName.
-						             '--pet-store.stargate.public-url=http://localhost:<1p>' expandMacrosWith: port.
-						             '--pet-store.stargate.port=<1p>' expandMacrosWith: port.
-						             '--pet-store.stargate.operations-secret=<1s>' expandMacrosWith: self secret } )
+						             aLaunchpadApplication commandName } , arguments )
 			           writingTo: stream.
 		self assert: ( rootCommand canHandle: ( context nextCommandLineArgumentIfNone: [ self fail ] ) ).
 		rootCommand evaluateWithin: context.
-		application := LaunchpadApplication currentlyRunning.
+		application := LaunchpadApplication currentlyRunning
 		]
+]
+
+{ #category : #private }
+StargateAPISkeletonTest >> startPetStoreAPI [
+
+	self start: PetStoreAPI withAll: { 
+			'--pet-store.stargate.public-url=http://localhost:<1p>' expandMacrosWith: port.
+			'--pet-store.stargate.port=<1p>' expandMacrosWith: port.
+			'--pet-store.stargate.operations-secret=<1s>' expandMacrosWith: self secret }.
+	baseUrl := application configuration petStore stargate publicURL
+]
+
+{ #category : #private }
+StargateAPISkeletonTest >> startSouthAmericanCurrenciesAPI [
+
+	self start: SouthAmericanCurrenciesAPI withAll: { 
+			'--stargate.public-url=http://localhost:<1p>' expandMacrosWith: port.
+			'--stargate.port=<1p>' expandMacrosWith: port.
+			'--stargate.operations-secret=<1s>' expandMacrosWith: self secret }.
+	baseUrl := application configuration stargate publicURL
 ]
 
 { #category : #running }
@@ -83,9 +114,16 @@ StargateAPISkeletonTest >> tearDown [
 	super tearDown
 ]
 
-{ #category : #tests }
+{ #category : #'tests - application' }
+StargateAPISkeletonTest >> testApplicationBaselineName [
+
+	self assert: PetStoreAPI applicationBaselineName equals: #BaselineOfStargate
+]
+
+{ #category : #'tests - api' }
 StargateAPISkeletonTest >> testBadRequest [
 
+	self startPetStoreAPI.
 	self
 		should: [ 
 			self newClient
@@ -98,9 +136,10 @@ StargateAPISkeletonTest >> testBadRequest [
 		withExceptionDo: [ :error | self assert: error response isBadRequest ]
 ]
 
-{ #category : #tests }
+{ #category : #'tests - api' }
 StargateAPISkeletonTest >> testConflict [
 
+	self startPetStoreAPI.
 	self newClient
 		url: self baseUrl / 'orders' asUrl;
 		entity:
@@ -126,11 +165,12 @@ StargateAPISkeletonTest >> testConflict [
 			]
 ]
 
-{ #category : #tests }
+{ #category : #'tests - api' }
 StargateAPISkeletonTest >> testCreatePet [
 
 	| response json |
 
+	self startPetStoreAPI.
 	response := self newClient
 		            url: self baseUrl / 'pets' asUrl;
 		            entity:
@@ -153,21 +193,47 @@ StargateAPISkeletonTest >> testCreatePet [
 		assert: json selfLocation equals: response location
 ]
 
-{ #category : #tests }
+{ #category : #'tests - application' }
+StargateAPISkeletonTest >> testFileReferenceToDumpStackTrace [
+
+	| segments |
+
+	segments := PetStoreAPI fileReferenceToDumpStackTrace asPath segments.
+	self
+		assert: segments size equals: 2;
+		assert: segments first equals: 'logs';
+		assert: (segments last beginsWith: PetStoreAPI commandName);
+		assert: (segments last endsWith: '.fuel')
+]
+
+{ #category : #'tests - api' }
+StargateAPISkeletonTest >> testGetCurrencies [
+
+	| currencies |
+
+	self startSouthAmericanCurrenciesAPI.
+	currencies := NeoJSONObject fromString: ( self newClient get: self baseUrl / 'currencies' asUrl ).
+
+	self assert: currencies size equals: 11
+]
+
+{ #category : #'tests - api' }
 StargateAPISkeletonTest >> testGetPets [
 
 	| json |
 
-	json := NeoJSONObject fromString: (self newClient get: self baseUrl / 'pets' asUrl).
+	self startPetStoreAPI.
+	json := NeoJSONObject fromString: ( self newClient get: self baseUrl / 'pets' asUrl ).
 
 	self
 		assert: json items isEmpty;
 		assert: json links size equals: 1
 ]
 
-{ #category : #tests }
+{ #category : #'tests - api' }
 StargateAPISkeletonTest >> testMethodNotAllowed [
 
+	self startPetStoreAPI.
 	self newClient
 		url: self baseUrl / 'pets' asUrl;
 		entity:
@@ -183,9 +249,10 @@ StargateAPISkeletonTest >> testMethodNotAllowed [
 			]
 ]
 
-{ #category : #tests }
+{ #category : #'tests - api' }
 StargateAPISkeletonTest >> testNotAcceptable [
 
+	self startPetStoreAPI.
 	self
 		should: [ 
 			self newClient
@@ -200,17 +267,62 @@ StargateAPISkeletonTest >> testNotAcceptable [
 			]
 ]
 
-{ #category : #tests }
+{ #category : #'tests - api' }
 StargateAPISkeletonTest >> testNotFound [
 
+	self startPetStoreAPI.
 	self should: [ self newClient get: self baseUrl / 'pets/1' asUrl ]
 		raise: ZnHttpUnsuccessful
 		withExceptionDo: [ :error | self assert: error response isNotFound ]
 ]
 
-{ #category : #tests }
+{ #category : #'tests - application' }
+StargateAPISkeletonTest >> testPrintHelpOn [
+
+	| help |
+
+	help := String streamContents: [ :stream | PetStoreAPI printHelpOn: stream ].
+
+	self assert: help equals: ('NAME
+		pet-store [<1s>] - A RESTful API for Pet stores
+SYNOPSYS
+		pet-store --pet-store.stargate.public-url=%<publicURL%> --pet-store.stargate.port=%<port%> --pet-store.stargate.operations-secret=%<operationsSecret%>
+PARAMETERS
+		--pet-store.stargate.public-url=%<publicURL%>
+			Public URL where the API is deployed. Used to create hypermedia links.
+		--pet-store.stargate.port=%<port%>
+			Listening port.
+		--pet-store.stargate.operations-secret=%<operationsSecret%>
+			Secret key for checking JWT signatures.
+ENVIRONMENT
+		PET_STORE__STARGATE__PUBLIC_URL
+			Public URL where the API is deployed. Used to create hypermedia links.
+		PET_STORE__STARGATE__PORT
+			Listening port.
+		PET_STORE__STARGATE__OPERATIONS_SECRET
+			Secret key for checking JWT signatures.
+' expandMacrosWith: PetStoreAPI version)
+]
+
+{ #category : #'tests - application' }
+StargateAPISkeletonTest >> testStackTraceDumper [
+
+	| dumper result |
+
+	dumper := PetStoreAPI new stackTraceDumper.
+
+	result := [ 1 / 0 ] on: ZeroDivide
+		          do: [ :zeroDivide | 
+			          dumper dumpStackTraceFor: zeroDivide.
+			          zeroDivide return: 5
+			          ].
+	self assert: result equals: 5
+]
+
+{ #category : #'tests - api' }
 StargateAPISkeletonTest >> testUnsupportedMediaType [
 
+	self startPetStoreAPI.
 	self
 		should: [ 
 			self newClient

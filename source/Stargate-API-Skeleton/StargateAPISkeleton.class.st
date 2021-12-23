@@ -1,6 +1,9 @@
 Class {
 	#name : #StargateAPISkeleton,
 	#superclass : #LaunchpadApplication,
+	#instVars : [
+		'apiOptional'
+	],
 	#classInstVars : [
 		'Version'
 	],
@@ -29,6 +32,7 @@ StargateAPISkeleton class >> fileReferenceToDumpStackTrace [
 { #category : #initialization }
 StargateAPISkeleton class >> initializeVersion [
 
+	<ignoreForCoverage>
 	Version := VersionFromRepositoryResolver new valueFor: self applicationBaselineName
 ]
 
@@ -48,15 +52,6 @@ StargateAPISkeleton class >> logsDirectory [
 StargateAPISkeleton class >> sectionsForStargateConfiguration [
 
 	^ #('Stargate')
-]
-
-{ #category : #initialization }
-StargateAPISkeleton class >> setAsCurrentlyRunning: application [
-
-	super setAsCurrentlyRunning: application.
-	BasicApplicationInformationProvider new applicationNamed: application class commandName
-		describedBy: application class description
-		version: application class version
 ]
 
 { #category : #private }
@@ -144,7 +139,7 @@ StargateAPISkeleton >> basicStartWithin: context [
 	self
 		configureGlobalErrorHandlerIn: api;
 		installAndStart: api.
-	^ api
+	apiOptional := Optional containing: api
 ]
 
 { #category : #'private - activation' }
@@ -184,6 +179,13 @@ StargateAPISkeleton >> createAPI [
 	^ api
 ]
 
+{ #category : #initialization }
+StargateAPISkeleton >> initializeRunningIn: anApplicationMode configuredBy: aConfigurationProvider [
+
+	super initializeRunningIn: anApplicationMode configuredBy: aConfigurationProvider.
+	apiOptional := Optional unused
+]
+
 { #category : #'private - activation' }
 StargateAPISkeleton >> installAndStart: api [
 
@@ -195,6 +197,9 @@ StargateAPISkeleton >> installAndStart: api [
 { #category : #'private - activation' }
 StargateAPISkeleton >> logAPIVersion [
 
+	BasicApplicationInformationProvider new applicationNamed: self class commandName
+		describedBy: self class description
+		version: self class version.
 	LaunchpadLogRecord emitInfo: ( 'API Version: <1s>' expandMacrosWith: self class version )
 ]
 
@@ -235,4 +240,10 @@ StargateAPISkeleton >> stackTraceDumper [
 StargateAPISkeleton >> stargateConfiguration [
 
 	^ self configuration stargate
+]
+
+{ #category : #'private - activation' }
+StargateAPISkeleton >> stop [
+
+	apiOptional withContentDo: [ :api | api stop ]
 ]
