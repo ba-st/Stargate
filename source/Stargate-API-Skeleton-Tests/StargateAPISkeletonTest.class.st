@@ -117,7 +117,9 @@ StargateAPISkeletonTest >> tearDown [
 { #category : #'tests - application' }
 StargateAPISkeletonTest >> testApplicationBaselineName [
 
-	self assert: PetStoreAPI applicationBaselineName equals: #BaselineOfStargate
+	self
+		assert: PetStoreAPI applicationBaselineName equals: #BaselineOfStargate;
+		assert: SouthAmericanCurrenciesAPI applicationBaselineName equals: #BaselineOfStargate
 ]
 
 { #category : #'tests - api' }
