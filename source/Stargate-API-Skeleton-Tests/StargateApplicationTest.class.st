@@ -2,7 +2,7 @@
 A StargateAPISkeletonTest is a test class for testing the behavior of StargateAPISkeleton
 "
 Class {
-	#name : #StargateAPISkeletonTest,
+	#name : #StargateApplicationTest,
 	#superclass : #TestCase,
 	#instVars : [
 		'logger',
@@ -14,19 +14,19 @@ Class {
 }
 
 { #category : #accessing }
-StargateAPISkeletonTest class >> defaultTimeLimit [
+StargateApplicationTest class >> defaultTimeLimit [
 
 	^5 minute
 ]
 
 { #category : #private }
-StargateAPISkeletonTest >> baseUrl [
+StargateApplicationTest >> baseUrl [
 
 	^ baseUrl
 ]
 
 { #category : #private }
-StargateAPISkeletonTest >> newClient [
+StargateApplicationTest >> newClient [
 
 	^ ZnClient new
 		  beOneShot;
@@ -35,40 +35,40 @@ StargateAPISkeletonTest >> newClient [
 ]
 
 { #category : #private }
-StargateAPISkeletonTest >> orderVersion1dot0dot0MediaType [
+StargateApplicationTest >> orderVersion1dot0dot0MediaType [
 
 	^ 'application/vnd.stargate.order+json;version=1.0.0' asMediaType
 ]
 
 { #category : #private }
-StargateAPISkeletonTest >> petVersion1dot0dot0MediaType [
+StargateApplicationTest >> petVersion1dot0dot0MediaType [
 
 	^ 'application/vnd.stargate.pet+json;version=1.0.0' asMediaType
 ]
 
 { #category : #running }
-StargateAPISkeletonTest >> runCase [
+StargateApplicationTest >> runCase [
 
 	self shouldnt: [ super runCase ] raise: Exit
 ]
 
 { #category : #private }
-StargateAPISkeletonTest >> secret [
+StargateApplicationTest >> secret [
 
 	^ 'secret'
 ]
 
 { #category : #running }
-StargateAPISkeletonTest >> setUp [
+StargateApplicationTest >> setUp [
 
 	super setUp.
 	logger := MemoryLogger new.
 	port := self freeListeningTCPPort.
-	StargateAPISkeleton logsDirectory ensureCreateDirectory
+	StargateApplication logsDirectory ensureCreateDirectory
 ]
 
 { #category : #private }
-StargateAPISkeletonTest >> start: aLaunchpadApplication withAll: arguments [
+StargateApplicationTest >> start: aLaunchpadApplication withAll: arguments [
 
 	String streamContents: [ :stream | 
 		| context rootCommand |
@@ -88,9 +88,9 @@ StargateAPISkeletonTest >> start: aLaunchpadApplication withAll: arguments [
 ]
 
 { #category : #private }
-StargateAPISkeletonTest >> startPetStoreAPI [
+StargateApplicationTest >> startPetStore [
 
-	self start: PetStoreAPI withAll: { 
+	self start: PetStoreApplication withAll: { 
 			'--pet-store.stargate.public-url=http://localhost:<1p>' expandMacrosWith: port.
 			'--pet-store.stargate.port=<1p>' expandMacrosWith: port.
 			'--pet-store.stargate.operations-secret=<1s>' expandMacrosWith: self secret }.
@@ -98,9 +98,9 @@ StargateAPISkeletonTest >> startPetStoreAPI [
 ]
 
 { #category : #private }
-StargateAPISkeletonTest >> startSouthAmericanCurrenciesAPI [
+StargateApplicationTest >> startSouthAmericanCurrencies [
 
-	self start: SouthAmericanCurrenciesAPI withAll: { 
+	self start: SouthAmericanCurrenciesApplication withAll: { 
 			'--stargate.public-url=http://localhost:<1p>' expandMacrosWith: port.
 			'--stargate.port=<1p>' expandMacrosWith: port.
 			'--stargate.operations-secret=<1s>' expandMacrosWith: self secret }.
@@ -108,24 +108,24 @@ StargateAPISkeletonTest >> startSouthAmericanCurrenciesAPI [
 ]
 
 { #category : #running }
-StargateAPISkeletonTest >> tearDown [
+StargateApplicationTest >> tearDown [
 
 	application ifNotNil: [ :theApplication | theApplication stop ].
 	super tearDown
 ]
 
 { #category : #'tests - application' }
-StargateAPISkeletonTest >> testApplicationBaselineName [
+StargateApplicationTest >> testApplicationBaselineName [
 
 	self
-		assert: PetStoreAPI applicationBaselineName equals: #BaselineOfStargate;
-		assert: SouthAmericanCurrenciesAPI applicationBaselineName equals: #BaselineOfStargate
+		assert: PetStoreApplication applicationBaselineName equals: #BaselineOfStargate;
+		assert: SouthAmericanCurrenciesApplication applicationBaselineName equals: #BaselineOfStargate
 ]
 
 { #category : #'tests - api' }
-StargateAPISkeletonTest >> testBadRequest [
+StargateApplicationTest >> testBadRequest [
 
-	self startPetStoreAPI.
+	self startPetStore.
 	self
 		should: [ 
 			self newClient
@@ -139,9 +139,9 @@ StargateAPISkeletonTest >> testBadRequest [
 ]
 
 { #category : #'tests - api' }
-StargateAPISkeletonTest >> testConflict [
+StargateApplicationTest >> testConflict [
 
-	self startPetStoreAPI.
+	self startPetStore.
 	self newClient
 		url: self baseUrl / 'orders' asUrl;
 		entity:
@@ -168,11 +168,11 @@ StargateAPISkeletonTest >> testConflict [
 ]
 
 { #category : #'tests - api' }
-StargateAPISkeletonTest >> testCreatePet [
+StargateApplicationTest >> testCreatePet [
 
 	| response json |
 
-	self startPetStoreAPI.
+	self startPetStore.
 	response := self newClient
 		            url: self baseUrl / 'pets' asUrl;
 		            entity:
@@ -196,35 +196,35 @@ StargateAPISkeletonTest >> testCreatePet [
 ]
 
 { #category : #'tests - application' }
-StargateAPISkeletonTest >> testFileReferenceToDumpStackTrace [
+StargateApplicationTest >> testFileReferenceToDumpStackTrace [
 
 	| segments |
 
-	segments := PetStoreAPI fileReferenceToDumpStackTrace asPath segments.
+	segments := PetStoreApplication fileReferenceToDumpStackTrace asPath segments.
 	self
 		assert: segments size equals: 2;
 		assert: segments first equals: 'logs';
-		assert: (segments last beginsWith: PetStoreAPI commandName);
+		assert: (segments last beginsWith: PetStoreApplication commandName);
 		assert: (segments last endsWith: '.fuel')
 ]
 
 { #category : #'tests - api' }
-StargateAPISkeletonTest >> testGetCurrencies [
+StargateApplicationTest >> testGetCurrencies [
 
 	| currencies |
 
-	self startSouthAmericanCurrenciesAPI.
+	self startSouthAmericanCurrencies.
 	currencies := NeoJSONObject fromString: ( self newClient get: self baseUrl / 'currencies' asUrl ).
 
 	self assert: currencies size equals: 11
 ]
 
 { #category : #'tests - api' }
-StargateAPISkeletonTest >> testGetPets [
+StargateApplicationTest >> testGetPets [
 
 	| json |
 
-	self startPetStoreAPI.
+	self startPetStore.
 	json := NeoJSONObject fromString: ( self newClient get: self baseUrl / 'pets' asUrl ).
 
 	self
@@ -233,9 +233,9 @@ StargateAPISkeletonTest >> testGetPets [
 ]
 
 { #category : #'tests - api' }
-StargateAPISkeletonTest >> testMethodNotAllowed [
+StargateApplicationTest >> testMethodNotAllowed [
 
-	self startPetStoreAPI.
+	self startPetStore.
 	self newClient
 		url: self baseUrl / 'pets' asUrl;
 		entity:
@@ -252,9 +252,9 @@ StargateAPISkeletonTest >> testMethodNotAllowed [
 ]
 
 { #category : #'tests - api' }
-StargateAPISkeletonTest >> testNotAcceptable [
+StargateApplicationTest >> testNotAcceptable [
 
-	self startPetStoreAPI.
+	self startPetStore.
 	self
 		should: [ 
 			self newClient
@@ -270,20 +270,20 @@ StargateAPISkeletonTest >> testNotAcceptable [
 ]
 
 { #category : #'tests - api' }
-StargateAPISkeletonTest >> testNotFound [
+StargateApplicationTest >> testNotFound [
 
-	self startPetStoreAPI.
+	self startPetStore.
 	self should: [ self newClient get: self baseUrl / 'pets/1' asUrl ]
 		raise: ZnHttpUnsuccessful
 		withExceptionDo: [ :error | self assert: error response isNotFound ]
 ]
 
 { #category : #'tests - application' }
-StargateAPISkeletonTest >> testPrintHelpOn [
+StargateApplicationTest >> testPrintHelpOn [
 
 	| help |
 
-	help := String streamContents: [ :stream | PetStoreAPI printHelpOn: stream ].
+	help := String streamContents: [ :stream | PetStoreApplication printHelpOn: stream ].
 
 	self assert: help equals: ('NAME
 		pet-store [<1s>] - A RESTful API for Pet stores
@@ -303,15 +303,15 @@ ENVIRONMENT
 			Listening port.
 		PET_STORE__STARGATE__OPERATIONS_SECRET
 			Secret key for checking JWT signatures.
-' expandMacrosWith: PetStoreAPI version)
+' expandMacrosWith: PetStoreApplication version)
 ]
 
 { #category : #'tests - application' }
-StargateAPISkeletonTest >> testStackTraceDumper [
+StargateApplicationTest >> testStackTraceDumper [
 
 	| dumper result |
 
-	dumper := PetStoreAPI new stackTraceDumper.
+	dumper := PetStoreApplication new stackTraceDumper.
 
 	result := [ 1 / 0 ] on: ZeroDivide
 		          do: [ :zeroDivide | 
@@ -322,9 +322,9 @@ StargateAPISkeletonTest >> testStackTraceDumper [
 ]
 
 { #category : #'tests - api' }
-StargateAPISkeletonTest >> testUnsupportedMediaType [
+StargateApplicationTest >> testUnsupportedMediaType [
 
-	self startPetStoreAPI.
+	self startPetStore.
 	self
 		should: [ 
 			self newClient

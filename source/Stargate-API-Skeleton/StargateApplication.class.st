@@ -1,5 +1,5 @@
 Class {
-	#name : #StargateAPISkeleton,
+	#name : #StargateApplication,
 	#superclass : #LaunchpadApplication,
 	#instVars : [
 		'apiOptional'
@@ -11,51 +11,51 @@ Class {
 }
 
 { #category : #private }
-StargateAPISkeleton class >> applicationBaselineName [
+StargateApplication class >> applicationBaselineName [
 
 	^ self subclassResponsibility
 ]
 
 { #category : #accessing }
-StargateAPISkeleton class >> configurationParameters [
+StargateApplication class >> configurationParameters [
 
 	^ self stargateConfigurationParameters
 ]
 
 { #category : #private }
-StargateAPISkeleton class >> fileReferenceToDumpStackTrace [
+StargateApplication class >> fileReferenceToDumpStackTrace [
 
 	^ self logsDirectory / ( '<1s>-<2s>.fuel' expandMacrosWith: self commandName
 		    with: ( ( ZTimestampFormat fromString: '2001-02-03_16-05-06.07' ) format: ZTimestamp now ) )
 ]
 
 { #category : #initialization }
-StargateAPISkeleton class >> initializeVersion [
+StargateApplication class >> initializeVersion [
 
 	<ignoreForCoverage>
 	Version := VersionFromRepositoryResolver new valueFor: self applicationBaselineName
 ]
 
 { #category : #testing }
-StargateAPISkeleton class >> isAbstract [
+StargateApplication class >> isAbstract [
 
-	^ self = StargateAPISkeleton
+	^ self = StargateApplication
 ]
 
 { #category : #private }
-StargateAPISkeleton class >> logsDirectory [
+StargateApplication class >> logsDirectory [
 
 	^ FileLocator workingDirectory / 'logs'
 ]
 
 { #category : #private }
-StargateAPISkeleton class >> sectionsForStargateConfiguration [
+StargateApplication class >> sectionsForStargateConfiguration [
 
 	^ #('Stargate')
 ]
 
 { #category : #private }
-StargateAPISkeleton class >> stargateConfigurationParameters [
+StargateApplication class >> stargateConfigurationParameters [
 
 	^ Array
 		  with: ( MandatoryConfigurationParameter named: 'Public URL'
@@ -73,13 +73,13 @@ StargateAPISkeleton class >> stargateConfigurationParameters [
 ]
 
 { #category : #accessing }
-StargateAPISkeleton class >> version [
+StargateApplication class >> version [
 
 	^ Version
 ]
 
 { #category : #'private - accessing' }
-StargateAPISkeleton >> apiConfiguration [
+StargateApplication >> apiConfiguration [
 
 	^ Array with: #serverUrl -> self stargateConfiguration publicURL
 		  with: #port -> self stargateConfiguration port
@@ -88,7 +88,7 @@ StargateAPISkeleton >> apiConfiguration [
 ]
 
 { #category : #'private - accessing' }
-StargateAPISkeleton >> applicationConfigurationConfiguration [
+StargateApplication >> applicationConfigurationConfiguration [
 
 	^ Dictionary new
 		  at: #enabled put: true;
@@ -98,7 +98,7 @@ StargateAPISkeleton >> applicationConfigurationConfiguration [
 ]
 
 { #category : #'private - accessing' }
-StargateAPISkeleton >> applicationControlCommandsToEnable [
+StargateApplication >> applicationControlCommandsToEnable [
 
 	"This method must return an array of application control command names to be enabled"
 
@@ -106,7 +106,7 @@ StargateAPISkeleton >> applicationControlCommandsToEnable [
 ]
 
 { #category : #'private - accessing' }
-StargateAPISkeleton >> applicationControlConfiguration [
+StargateApplication >> applicationControlConfiguration [
 
 	^ Dictionary new
 		  at: #enabled put: true;
@@ -115,7 +115,7 @@ StargateAPISkeleton >> applicationControlConfiguration [
 ]
 
 { #category : #'private - accessing' }
-StargateAPISkeleton >> applicationInfoConfiguration [
+StargateApplication >> applicationInfoConfiguration [
 
 	^ Dictionary new
 		at: #enabled put: true;
@@ -124,13 +124,13 @@ StargateAPISkeleton >> applicationInfoConfiguration [
 ]
 
 { #category : #'private - accessing' }
-StargateAPISkeleton >> authAlgorithm [
+StargateApplication >> authAlgorithm [
 
 	^ JWAHMACSHA256 parameterValue
 ]
 
 { #category : #'private - activation' }
-StargateAPISkeleton >> basicStartWithin: context [
+StargateApplication >> basicStartWithin: context [
 
 	| api |
 
@@ -143,7 +143,7 @@ StargateAPISkeleton >> basicStartWithin: context [
 ]
 
 { #category : #'private - activation' }
-StargateAPISkeleton >> configureGlobalErrorHandlerIn: api [
+StargateApplication >> configureGlobalErrorHandlerIn: api [
 
 	[ 
 	LaunchpadLogRecord emitInfo: 'Configuring error handlers' during: [ 
@@ -163,13 +163,13 @@ StargateAPISkeleton >> configureGlobalErrorHandlerIn: api [
 ]
 
 { #category : #'private - accessing' }
-StargateAPISkeleton >> controllersToInstall [
+StargateApplication >> controllersToInstall [
 
 	^ self subclassResponsibility
 ]
 
 { #category : #'private - activation' }
-StargateAPISkeleton >> createAPI [
+StargateApplication >> createAPI [
 
 	| api |
 
@@ -180,14 +180,14 @@ StargateAPISkeleton >> createAPI [
 ]
 
 { #category : #initialization }
-StargateAPISkeleton >> initializeRunningIn: anApplicationMode configuredBy: aConfigurationProvider [
+StargateApplication >> initializeRunningIn: anApplicationMode configuredBy: aConfigurationProvider [
 
 	super initializeRunningIn: anApplicationMode configuredBy: aConfigurationProvider.
 	apiOptional := Optional unused
 ]
 
 { #category : #'private - activation' }
-StargateAPISkeleton >> installAndStart: api [
+StargateApplication >> installAndStart: api [
 
 	LaunchpadLogRecord
 		emitInfo: 'Installing API' during: [ api install ];
@@ -195,7 +195,7 @@ StargateAPISkeleton >> installAndStart: api [
 ]
 
 { #category : #'private - activation' }
-StargateAPISkeleton >> logAPIVersion [
+StargateApplication >> logAPIVersion [
 
 	BasicApplicationInformationProvider new applicationNamed: self class commandName
 		describedBy: self class description
@@ -204,7 +204,7 @@ StargateAPISkeleton >> logAPIVersion [
 ]
 
 { #category : #'private - accessing' }
-StargateAPISkeleton >> metricsConfiguration [
+StargateApplication >> metricsConfiguration [
 
 	^ Dictionary new
 		  at: #enabled put: true;
@@ -216,7 +216,7 @@ StargateAPISkeleton >> metricsConfiguration [
 ]
 
 { #category : #'private - accessing' }
-StargateAPISkeleton >> operationsConfiguration [
+StargateApplication >> operationsConfiguration [
 
 	^ Dictionary new
 		  at: #authSchema put: 'jwt';
@@ -230,20 +230,20 @@ StargateAPISkeleton >> operationsConfiguration [
 ]
 
 { #category : #'error handling' }
-StargateAPISkeleton >> stackTraceDumper [
+StargateApplication >> stackTraceDumper [
 
 	^ StackTraceBinarySerializer on: [ :dumpAction | 
 		  self class fileReferenceToDumpStackTrace binaryWriteStreamDo: dumpAction ]
 ]
 
 { #category : #'private - accessing' }
-StargateAPISkeleton >> stargateConfiguration [
+StargateApplication >> stargateConfiguration [
 
 	^ self configuration stargate
 ]
 
 { #category : #'private - activation' }
-StargateAPISkeleton >> stop [
+StargateApplication >> stop [
 
 	apiOptional withContentDo: [ :api | api stop ]
 ]

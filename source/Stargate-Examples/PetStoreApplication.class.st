@@ -1,48 +1,48 @@
 Class {
-	#name : #PetStoreAPI,
-	#superclass : #StargateAPISkeleton,
+	#name : #PetStoreApplication,
+	#superclass : #StargateApplication,
 	#category : #'Stargate-Examples'
 }
 
 { #category : #private }
-PetStoreAPI class >> applicationBaselineName [
+PetStoreApplication class >> applicationBaselineName [
 
 	^ #BaselineOfStargate
 ]
 
 { #category : #accessing }
-PetStoreAPI class >> commandName [
+PetStoreApplication class >> commandName [
 
 	^ 'pet-store'
 ]
 
 { #category : #accessing }
-PetStoreAPI class >> description [
+PetStoreApplication class >> description [
 
 	^'A RESTful API for Pet stores'
 ]
 
 { #category : #accessing }
-PetStoreAPI class >> initialize [
+PetStoreApplication class >> initialize [
 
 	<ignoreForCoverage>
 	self initializeVersion
 ]
 
 { #category : #private }
-PetStoreAPI class >> sectionsForStargateConfiguration [
+PetStoreApplication class >> sectionsForStargateConfiguration [
 
 	^ #( 'Pet Store' ) , super sectionsForStargateConfiguration
 ]
 
 { #category : #'private - accessing' }
-PetStoreAPI >> controllersToInstall [
+PetStoreApplication >> controllersToInstall [
 
 	^ Array with: PetsRESTfulController new with: PetOrdersRESTfulController new
 ]
 
 { #category : #'private - accessing' }
-PetStoreAPI >> stargateConfiguration [
+PetStoreApplication >> stargateConfiguration [
 
 	^self configuration petStore stargate
 ]
