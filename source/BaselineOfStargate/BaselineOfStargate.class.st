@@ -59,7 +59,11 @@ BaselineOfStargate >> setUpDependencies: spec [
 
 	spec
 		baseline: 'Launchpad' with: [ spec repository: 'github://ba-st/Launchpad:v4' ];
-		project: 'Launchpad-Deployment' copyFrom: 'Launchpad' with: [ spec loads: 'Deployment' ]
+		project: 'Launchpad-Deployment' copyFrom: 'Launchpad' with: [ spec loads: 'Deployment' ].
+
+	spec
+		baseline: 'ZTimestamp' with: [ spec repository: 'github://svenvc/ztimestamp' ];
+		project: 'ZTimestamp-Core' copyFrom: 'ZTimestamp' with: [ spec loads: 'core' ]
 ]
 
 { #category : #baselines }
@@ -113,7 +117,15 @@ BaselineOfStargate >> setUpDeploymentPackages: spec [
 	spec
 		package: 'Stargate-Loggers' with: [ spec requires: #( 'Stargate-Model' 'Launchpad-Deployment' ) ];
 		group: 'Loggers' with: 'Stargate-Loggers';
-		group: 'Deployment' with: 'Loggers'
+		group: 'Deployment' with: 'Loggers'.
+
+	spec
+		package: 'Stargate-API-Skeleton' with: [ 
+			spec requires:
+					#( 'Metrics-HTTP' 'Application-Control' 'Application-Info' 'Application-Configuration'
+					   'Launchpad-Deployment' 'ZTimestamp-Core' )
+			];
+		group: 'Deployment' with: 'Stargate-API-Skeleton'
 ]
 
 { #category : #baselines }
@@ -121,7 +133,7 @@ BaselineOfStargate >> setUpPackages: spec [
 
 	self setUpDeploymentPackages: spec.
 	spec
-		package: 'Stargate-Examples' with: [ spec requires: 'Stargate-Model' ];
+		package: 'Stargate-Examples' with: [ spec requires: 'Stargate-API-Skeleton' ];
 		group: 'Examples' with: 'Stargate-Examples'.
 	spec
 		package: 'Stargate-SUnit-Model' with: [ spec requires: #('Stargate-Model' 'Buoy-SUnit' 'Hyperspace-SUnit') ];
@@ -168,6 +180,10 @@ BaselineOfStargate >> setUpTestPackages: spec [
 		package: 'Stargate-JSON-RPC-Tests'
 		with: [ spec requires: #( 'JSON-RPC' 'Stargate-Model-Tests' ) ];
 		group: 'Tests' with: 'Stargate-JSON-RPC-Tests'.
+	spec
+		package: 'Stargate-API-Skeleton-Tests'
+		with: [ spec requires: #( 'Dependent-SUnit-Extensions' 'Stargate-Examples' 'Hyperspace-SUnit' ) ];
+		group: 'Tests' with: 'Stargate-API-Skeleton-Tests'.
 	spec
 		package: 'Stargate-Examples-Tests'
 		with: [ spec requires: #( 'Dependent-SUnit-Extensions' 'Stargate-Examples' 'Hyperspace-SUnit' ) ];
