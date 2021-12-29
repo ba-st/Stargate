@@ -42,8 +42,9 @@ ApplicationControlPluginAPITest >> requiredPermissions [
 { #category : #running }
 ApplicationControlPluginAPITest >> setUp [
 
-	ApplicationControlPlugin
-		registerAsAvailableCommand: ( ApplicationControlCommand named: 'echo' executing: [ :message | message ] ).
+	ApplicationControlPlugin registerAsAvailableCommand: ( ApplicationControlCommand named: 'echo'
+			  withArgumentNames: #( message )
+			  executing: [ :message | message ] ).
 	super setUp
 ]
 

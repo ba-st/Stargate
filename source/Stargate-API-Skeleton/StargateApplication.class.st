@@ -155,7 +155,7 @@ StargateApplication >> configureGlobalErrorHandlerIn: api [
 					yourself
 				];
 			on: Exit addErrorHandler: [ :exit | 
-			exit isSuccess then: [ api stop ].
+			exit isSuccess then: [ self stop ].
 			exit pass
 			]
 		]
@@ -204,6 +204,14 @@ StargateApplication >> logAPIVersion [
 ]
 
 { #category : #'private - accessing' }
+StargateApplication >> loggersConfiguration [
+
+	^ Dictionary new
+		  at: #enabled put: true;
+		  yourself
+]
+
+{ #category : #'private - accessing' }
 StargateApplication >> metricsConfiguration [
 
 	^ Dictionary new
@@ -226,6 +234,7 @@ StargateApplication >> operationsConfiguration [
 		  at: ApplicationInfoPlugin endpoint put: self applicationInfoConfiguration;
 		  at: ApplicationConfigurationPlugin endpoint put: self applicationConfigurationConfiguration;
 		  at: ApplicationControlPlugin endpoint put: self applicationControlConfiguration;
+		  at: LoggersPlugin endpoint put: self loggersConfiguration;
 		  yourself
 ]
 
