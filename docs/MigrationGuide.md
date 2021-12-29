@@ -1,5 +1,22 @@
 # Migration Guide
 
+## Migration from v6 to v7
+
+- Pharo 7 support is now deprecated, use Pharo 8 or 9.
+- There's a new `Loggers` group in the baseline that's included now by default in
+  the `Deployment` group.
+- The garbage collector invocation count metric changed its name, both
+  in Prometheus and JSON formats
+  - `garbage_collector_invokations` is now `garbage_collector_invocations`
+  - `Garbage Collector invokations` is now `Garbage Collector invocations`
+
+  This name change can impact previously collected metrics or filters
+- Dependencies udpated:
+  - [`Launchpad`](https://github.com/ba-st/Launchpad) was updated to v4
+  - [`ZTimestamp`](https://github.com/svenvc/ztimestamp) is now a dependency
+- The application configuration plugin now needs that the `#provider` option
+  evaluates to an instance of `ApplicationConfiguration`
+
 ## Migration from v5 to v6
 
 Migration of APIs using CORS will be performed automatically via rewrite

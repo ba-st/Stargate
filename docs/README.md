@@ -19,7 +19,8 @@ Once you grasped the basics, lookup for details in the reference docs:
 - [Controllers](reference/Controllers.md)
 - [Operations](reference/Operations.md)
 - [CORS](reference/CrossOriginResourceSharing.md)
-- [Authentication Filters](AuthenticationFilters.md)
+- [Authentication Filters](reference/AuthenticationFilters.md)
+- [API Skeleton](reference/Skeleton.md)
 
 or expand your understanding over specific topics:
 
