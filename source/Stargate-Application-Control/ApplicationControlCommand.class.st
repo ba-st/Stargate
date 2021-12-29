@@ -7,7 +7,8 @@ Class {
 	#superclass : #Object,
 	#instVars : [
 		'methodName',
-		'actionBlock'
+		'actionBlock',
+		'parameterNames'
 	],
 	#category : #'Stargate-Application-Control'
 }
@@ -15,24 +16,39 @@ Class {
 { #category : #'instance creation' }
 ApplicationControlCommand class >> named: aMethodName executing: aBlockClosure [
 
-	AssertionChecker
-		enforce: [ aMethodName notEmpty ]
-		because: 'Cannot create an unnamed command'
-		raising: InstanceCreationFailed.
+	^ self named: aMethodName withArgumentNames: #(  ) executing: aBlockClosure
+]
 
-	^ self new initializeNamed: aMethodName executing: aBlockClosure
+{ #category : #'instance creation' }
+ApplicationControlCommand class >> named: aMethodName withArgumentNames: argumentNames executing: aBlockClosure [
+
+	AssertionCheckerBuilder new
+		raising: InstanceCreationFailed;
+		checking: [ :asserter | 
+			asserter
+				enforce: [ aMethodName notEmpty ] because: 'Cannot create an unnamed command';
+				enforce: [ argumentNames size = aBlockClosure argumentCount ]
+				because: 'The number of parameter names doesn''t match the block arity'
+			];
+		buildAndCheck.
+
+
+	^ self new initializeNamed: aMethodName withArgumentNames: argumentNames executing: aBlockClosure
 ]
 
 { #category : #configuring }
 ApplicationControlCommand >> addTo: aJsonRPCRequestHandler [
 
-	aJsonRPCRequestHandler addHandlerNamed: methodName evaluating: actionBlock
+	aJsonRPCRequestHandler addHandlerNamed: methodName
+		withArgumentNames: parameterNames
+		evaluating: actionBlock
 ]
 
 { #category : #initialization }
-ApplicationControlCommand >> initializeNamed: aMethodName executing: aBlockClosure [
+ApplicationControlCommand >> initializeNamed: aMethodName withArgumentNames: theArgumentNames executing: aBlockClosure [
 
 	methodName := aMethodName.
+	parameterNames := theArgumentNames.
 	actionBlock := aBlockClosure
 ]
 
@@ -45,5 +61,11 @@ ApplicationControlCommand >> methodName [
 { #category : #accessing }
 ApplicationControlCommand >> parameterCount [
 
-	^ actionBlock argumentCount
+	^ parameterNames size
+]
+
+{ #category : #accessing }
+ApplicationControlCommand >> parameterNames [
+
+	^ parameterNames
 ]
