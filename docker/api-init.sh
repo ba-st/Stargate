@@ -9,7 +9,7 @@ termination_handler() {
       --header "Content-Type:application/json" \
       --header "Accept: application/json" \
       --data '{"jsonrpc": "2.0" ,"method": "shutdown"}' \
-      http://localhost:"${PORT}"/operations/application-control
+      http://localhost:"${STARGATE_PORT}"/operations/application-control
     wait "$pid"
   fi
   exit 143; # 128 + 15 -- SIGTERM

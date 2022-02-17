@@ -35,6 +35,7 @@ while getopts "b:p:t:h" option; do
     p) PORT_OPTION=$OPTARG ;;
     t) JWT_OPTION=$OPTARG ;;
     h) usage ;;
+    *) usage "Invalid argument" ;;
   esac
 done
 shift $(($OPTIND - 1)); # take out the option flags
