@@ -47,6 +47,18 @@ WebOrigin >> = aWebOrigin [
 	^ self asString = aWebOrigin asString
 ]
 
+{ #category : #converting }
+WebOrigin >> asUrl [
+
+	^ url copy
+]
+
+{ #category : #converting }
+WebOrigin >> asWebOrigin [
+
+	^ self
+]
+
 { #category : #comparing }
 WebOrigin >> hash [
 
