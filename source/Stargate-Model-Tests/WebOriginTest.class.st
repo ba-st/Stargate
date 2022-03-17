@@ -1,8 +1,26 @@
 Class {
 	#name : #WebOriginTest,
 	#superclass : #TestCase,
-	#category : #'Stargate-Model-Tests-Routing'
+	#category : #'Stargate-Model-Tests-CORS'
 }
+
+{ #category : #tests }
+WebOriginTest >> testAsUrl [
+
+	| origin |
+	origin := 'http://example.com/' asWebOrigin.
+
+	self assertUrl: origin asUrl equals: 'http://example.com'
+]
+
+{ #category : #tests }
+WebOriginTest >> testAsWebOrigin [
+
+	| origin |
+	origin := 'http://example.com/' asWebOrigin.
+
+	self assert: origin asWebOrigin == origin
+]
 
 { #category : #tests }
 WebOriginTest >> testComparing [
@@ -23,6 +41,22 @@ WebOriginTest >> testComparing [
 		should: [ 'mailto:John.doe@example.com' asWebOrigin ]
 		raise: InstanceCreationFailed
 		withMessageText: 'mailto:John.doe@example.com does not comply with a valid origin'
+]
+
+{ #category : #tests }
+WebOriginTest >> testPrintString [
+
+	self
+		assert: 'http://example.com/' asWebOrigin printString
+		equals: 'http://example.com';
+		assert: 'http://example.com:80/' asWebOrigin printString
+		equals: 'http://example.com';
+		assert: 'http://example.com/path/file' asWebOrigin printString
+		equals: 'http://example.com';
+		assert:
+			'https://johndoe@www.example.com:123/forum/questions?id=1'
+				asWebOrigin printString
+		equals: 'https://www.example.com:123'
 ]
 
 { #category : #tests }
