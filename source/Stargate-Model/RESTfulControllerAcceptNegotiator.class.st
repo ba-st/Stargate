@@ -28,10 +28,7 @@ RESTfulControllerAcceptNegotiator >> acceptableMediaTypesIn: anHttpRequest [
 
 	| acceptHeaderContent |
 
-	"Per RFC 2616: If no Accept header field is present, then it is assumed that the client accepts all media types."
-	acceptHeaderContent := [ anHttpRequest accept ]
-		on: KeyNotFound
-		do: [ :signal | signal return: '*/*' ].
+	acceptHeaderContent :=  anHttpRequest accept .
 
 	^ acceptHeaderContent isArray
 		then: [ acceptHeaderContent
