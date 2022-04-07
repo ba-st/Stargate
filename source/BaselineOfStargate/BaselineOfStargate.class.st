@@ -16,7 +16,7 @@ BaselineOfStargate >> baseline: spec [
 			spec
 				group: 'CI' with: 'Tests';
 				group: 'Examples' with: #('Deployment' 'Stargate-Examples');
-				group: 'Tools' with: #('Teapot-Tools');
+				group: 'Tools' with: #('Hyperspace-Tools');
 				group: 'Development' with: #('Tests' 'Tools')
 			]
 ]
@@ -38,6 +38,7 @@ BaselineOfStargate >> setUpDependencies: spec [
 	spec
 		baseline: 'Hyperspace' with: [ spec repository: 'github://ba-st/Hyperspace:v3' ];
 		project: 'Hyperspace-Deployment' copyFrom: 'Hyperspace' with: [ spec loads: 'Deployment' ];
+    project: 'Hyperspace-Tools' copyFrom: 'Hyperspace' with: [ spec loads: 'Tools' ];
 		project: 'Hyperspace-SUnit'
 		copyFrom: 'Hyperspace'
 		with: [ spec loads: 'Dependent-SUnit-Extensions' ].
@@ -48,8 +49,7 @@ spec
 
 	spec
 		baseline: 'Teapot' with: [ spec repository: 'github://zeroflag/Teapot:v2.6.0/source' ];
-		project: 'Teapot-Deployment' copyFrom: 'Teapot' with: [ spec loads: 'Deployment' ];
-		project: 'Teapot-Tools' copyFrom: 'Teapot' with: [ spec loads: 'Tools' ].
+		project: 'Teapot-Deployment' copyFrom: 'Teapot' with: [ spec loads: 'Deployment' ].
 
 	spec
 		baseline: 'JSONWebToken' with: [ spec repository: 'github://noha/JSONWebToken:0.3/source' ];
