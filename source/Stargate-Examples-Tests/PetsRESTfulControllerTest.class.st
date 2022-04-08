@@ -162,63 +162,57 @@ PetsRESTfulControllerTest >> testComplexPagination [
 
 	| response |
 
-	self createSixPets.	"Get the 1st page"
+	self createSixPets "Get the 1st page".
 	response := resourceController
-		getPetsBasedOn:
-			( self
-				requestToGET: 'https://pets.example.com/pets?limit=2'
-				accepting: resourceController petSummaryVersion1dot0dot0MediaType )
-		within: self newHttpRequestContext.
+		            getPetsBasedOn: ( self
+				              requestToGET: 'https://pets.example.com/pets?limit=2'
+				              accepting: resourceController petSummaryVersion1dot0dot0MediaType )
+		            within: self newHttpRequestContext.
 	self
 		assert: response isSuccess;
 		assert: response status equals: 200;
 		assert: response contentType asMediaType
-			equals: resourceController petSummaryVersion1dot0dot0MediaType;
+		equals: resourceController petSummaryVersion1dot0dot0MediaType;
 		assert: response links size equals: 2;
 		assertUrl: response links first url equals: 'https://pets.example.com/pets?start=3&limit=2';
-		assert: response links first rel equals: 'next';
+		assert: response links first relationType equals: 'next';
 		assertUrl: response links second url equals: 'https://pets.example.com/pets?start=5&limit=2';
-		assert: response links second rel equals: 'last'.
-	self
-		withJsonFromContentsIn: response
-		do: [ :json | 
-			self
-				assertUrl: json selfLocation equals: 'https://pets.example.com/pets?limit=2';
-				assertUrl: json links next equals: 'https://pets.example.com/pets?start=3&limit=2';
-				assertUrl: json links last equals: 'https://pets.example.com/pets?start=5&limit=2';
-				assert: json items size equals: 2
-			].	"Get the 2nd page"
+		assert: response links second relationType equals: 'last'.
+	self withJsonFromContentsIn: response do: [ :json | 
+		self
+			assertUrl: json selfLocation equals: 'https://pets.example.com/pets?limit=2';
+			assertUrl: json links next equals: 'https://pets.example.com/pets?start=3&limit=2';
+			assertUrl: json links last equals: 'https://pets.example.com/pets?start=5&limit=2';
+			assert: json items size equals: 2
+		] "Get the 2nd page".
 	response := resourceController
-		getPetsBasedOn:
-			( self
-				requestToGET: 'https://pets.example.com/pets?start=3&limit=2'
-				accepting: resourceController petSummaryVersion1dot0dot0MediaType )
-		within: self newHttpRequestContext.
+		            getPetsBasedOn: ( self
+				              requestToGET: 'https://pets.example.com/pets?start=3&limit=2'
+				              accepting: resourceController petSummaryVersion1dot0dot0MediaType )
+		            within: self newHttpRequestContext.
 	self
 		assert: response isSuccess;
 		assert: response status equals: 200;
 		assert: response contentType asMediaType
-			equals: resourceController petSummaryVersion1dot0dot0MediaType;
+		equals: resourceController petSummaryVersion1dot0dot0MediaType;
 		assert: response links size equals: 4;
 		assertUrl: response links first url equals: 'https://pets.example.com/pets?start=1&limit=2';
-		assert: response links first rel equals: 'first';
+		assert: response links first relationType equals: 'first';
 		assertUrl: response links second url equals: 'https://pets.example.com/pets?start=1&limit=2';
-		assert: response links second rel equals: 'prev';
+		assert: response links second relationType equals: 'prev';
 		assertUrl: response links third url equals: 'https://pets.example.com/pets?start=5&limit=2';
-		assert: response links third rel equals: 'next';
+		assert: response links third relationType equals: 'next';
 		assertUrl: response links last url equals: 'https://pets.example.com/pets?start=5&limit=2';
-		assert: response links last rel equals: 'last'.
-	self
-		withJsonFromContentsIn: response
-		do: [ :json | 
-			self
-				assertUrl: json selfLocation asZnUrl equals: 'https://pets.example.com/pets?start=3&limit=2';
-				assertUrl: json links first asZnUrl equals: 'https://pets.example.com/pets?start=1&limit=2';
-				assertUrl: json links prev asZnUrl equals: 'https://pets.example.com/pets?start=1&limit=2';
-				assertUrl: json links next asZnUrl equals: 'https://pets.example.com/pets?start=5&limit=2';
-				assertUrl: json links last asZnUrl equals: 'https://pets.example.com/pets?start=5&limit=2';
-				assert: json items size equals: 2
-			]
+		assert: response links last relationType equals: 'last'.
+	self withJsonFromContentsIn: response do: [ :json | 
+		self
+			assertUrl: json selfLocation asZnUrl equals: 'https://pets.example.com/pets?start=3&limit=2';
+			assertUrl: json links first asZnUrl equals: 'https://pets.example.com/pets?start=1&limit=2';
+			assertUrl: json links prev asZnUrl equals: 'https://pets.example.com/pets?start=1&limit=2';
+			assertUrl: json links next asZnUrl equals: 'https://pets.example.com/pets?start=5&limit=2';
+			assertUrl: json links last asZnUrl equals: 'https://pets.example.com/pets?start=5&limit=2';
+			assert: json items size equals: 2
+		]
 ]
 
 { #category : #'tests - delete' }
@@ -244,24 +238,24 @@ PetsRESTfulControllerTest >> testGetNotModifiedWhenValidETag [
 	self createPet.
 
 	response := resourceController
-		getPetBasedOn: (self requestToGETResourceIdentifiedBy: 1 accepting: self defaultPetMediaType)
-		within: self newHttpRequestContext.
+		            getPetBasedOn:
+		            ( self requestToGETResourceIdentifiedBy: 1 accepting: self defaultPetMediaType )
+		            within: self newHttpRequestContext.
 
 	self
 		assert: response isSuccess;
-		assert: response entityTag equals: '"c051344b8c92c5ed8a2bd0752070c35ed3de3bab"' asETag.
+		assert: response entityTag equals: '"c051344b8c92c5ed8a2bd0752070c35ed3de3bab"' asEntityTag.
 
 	response := resourceController
-		getPetBasedOn:
-			(self
-				requestToGETResourceIdentifiedBy: 1
-				accepting: self defaultPetMediaType
-				conditionalTo: '"c051344b8c92c5ed8a2bd0752070c35ed3de3bab"' asETag)
-		within: self newHttpRequestContext.
+		            getPetBasedOn: ( self
+				              requestToGETResourceIdentifiedBy: 1
+				              accepting: self defaultPetMediaType
+				              conditionalTo: '"c051344b8c92c5ed8a2bd0752070c35ed3de3bab"' asEntityTag )
+		            within: self newHttpRequestContext.
 
 	self
 		assert: response code equals: 304;
-		assert: response entityTag equals: '"c051344b8c92c5ed8a2bd0752070c35ed3de3bab"' asETag
+		assert: response entityTag equals: '"c051344b8c92c5ed8a2bd0752070c35ed3de3bab"' asEntityTag
 ]
 
 { #category : #'tests - get individual' }
@@ -270,33 +264,31 @@ PetsRESTfulControllerTest >> testGetPetJustCreated [
 	| response |
 
 	self
-		assert:
-			( resourceController
-				createPetBasedOn: ( self requestToCreatePetFrom: '{"name":"Firulais","type":"dog"}' )
-				within: self newHttpRequestContext ) isSuccess;
+		assert: ( resourceController
+				  createPetBasedOn: ( self requestToCreatePetFrom: '{"name":"Firulais","type":"dog"}' )
+				  within: self newHttpRequestContext ) isSuccess;
 		assert: petRepository count equals: 1.
 
 	response := resourceController
-		getPetBasedOn: ( self requestToGETResourceIdentifiedBy: 1 accepting: self defaultPetMediaType )
-		within: self newHttpRequestContext.
+		            getPetBasedOn:
+		            ( self requestToGETResourceIdentifiedBy: 1 accepting: self defaultPetMediaType )
+		            within: self newHttpRequestContext.
 
 	self
 		assert: response isSuccess;
 		assert: response status equals: 200;
 		assert: response contentType asMediaType equals: self defaultPetMediaType;
-		assert: response entityTag equals: '"c051344b8c92c5ed8a2bd0752070c35ed3de3bab"' asETag.
+		assert: response entityTag equals: '"c051344b8c92c5ed8a2bd0752070c35ed3de3bab"' asEntityTag.
 	self assertExpiresHeaderFor: response with: 4 hours.
-	self assertCachingDirectivesFor: response with: #('public' 'no-transform' 'must-revalidate').
+	self assertCachingDirectivesFor: response with: #( 'public' 'no-transform' 'must-revalidate' ).
 
-	self
-		withJsonFromContentsIn: response
-		do: [ :json | 
-			self
-				assert: json name equals: 'Firulais';
-				assert: json type equals: 'dog';
-				assert: json status equals: 'new';
-				assertUrl: json selfLocation equals: 'https://pets.example.com/pets/1'
-			]
+	self withJsonFromContentsIn: response do: [ :json | 
+		self
+			assert: json name equals: 'Firulais';
+			assert: json type equals: 'dog';
+			assert: json status equals: 'new';
+			assertUrl: json selfLocation equals: 'https://pets.example.com/pets/1'
+		]
 ]
 
 { #category : #'tests - get individual' }
@@ -305,36 +297,36 @@ PetsRESTfulControllerTest >> testGetPetJustCreatedWhenNoAcceptHeaderPresentInReq
 	| getRequest response |
 
 	self
-		assert:
-			( resourceController
-				createPetBasedOn: ( self requestToCreatePetFrom: '{"name":"Firulais","type":"dog"}' )
-				within: self newHttpRequestContext ) isSuccess;
+		assert: ( resourceController
+				  createPetBasedOn: ( self requestToCreatePetFrom: '{"name":"Firulais","type":"dog"}' )
+				  within: self newHttpRequestContext ) isSuccess;
 		assert: petRepository count equals: 1.
 
 	getRequest := ZnRequest get: ( self urlForResourceIdentifiedBy: 1 ).
 	getRequest headers removeKey: 'Accept'.
 
 	response := resourceController
-		getPetBasedOn: ( TeaRequest fromZnRequest: getRequest pathParams: {( #identifier -> 1 )} asDictionary )
-		within: self newHttpRequestContext.
+		            getPetBasedOn:
+		            ( TeaRequest
+			              fromZnRequest: getRequest
+			              pathParams: { ( #identifier -> 1 ) } asDictionary )
+		            within: self newHttpRequestContext.
 
 	self
 		assert: response isSuccess;
 		assert: response status equals: 200;
 		assert: response contentType asMediaType
-			equals: self defaultPetMediaType
-			or: resourceController petSummaryVersion1dot0dot0MediaType;
+		equals: self defaultPetMediaType
+		or: resourceController petSummaryVersion1dot0dot0MediaType;
 		assert: response entityTag
-			equals: '"c051344b8c92c5ed8a2bd0752070c35ed3de3bab"' asETag
-			or: '"1323cdfb8bb0f9011fbd480c5a87c17d05883214"' asETag.
+		equals: '"c051344b8c92c5ed8a2bd0752070c35ed3de3bab"' asEntityTag
+		or: '"1323cdfb8bb0f9011fbd480c5a87c17d05883214"' asEntityTag.
 
-	self
-		withJsonFromContentsIn: response
-		do: [ :json | 
-			self
-				assert: json name equals: 'Firulais';
-				assertUrl: json selfLocation equals: 'https://pets.example.com/pets/1'
-			]
+	self withJsonFromContentsIn: response do: [ :json | 
+		self
+			assert: json name equals: 'Firulais';
+			assertUrl: json selfLocation equals: 'https://pets.example.com/pets/1'
+		]
 ]
 
 { #category : #'tests - get individual' }
@@ -355,37 +347,33 @@ PetsRESTfulControllerTest >> testGetPetSummaryJustCreated [
 	| response |
 
 	self
-		assert:
-			( resourceController
-				createPetBasedOn: ( self requestToCreatePetFrom: '{"name":"Firulais","type":"dog"}' )
-				within: self newHttpRequestContext ) isSuccess;
+		assert: ( resourceController
+				  createPetBasedOn: ( self requestToCreatePetFrom: '{"name":"Firulais","type":"dog"}' )
+				  within: self newHttpRequestContext ) isSuccess;
 		assert: petRepository count equals: 1.
 
 	response := resourceController
-		getPetBasedOn:
-			( self
-				requestToGETResourceIdentifiedBy: 1
-				accepting: resourceController petSummaryVersion1dot0dot0MediaType )
-		within: self newHttpRequestContext.
+		            getPetBasedOn: ( self
+				              requestToGETResourceIdentifiedBy: 1
+				              accepting: resourceController petSummaryVersion1dot0dot0MediaType )
+		            within: self newHttpRequestContext.
 
 	self
 		assert: response isSuccess;
 		assert: response status equals: 200;
 		assert: response contentType asMediaType
-			equals: resourceController petSummaryVersion1dot0dot0MediaType;
-		assert: response entityTag equals: '"1323cdfb8bb0f9011fbd480c5a87c17d05883214"' asETag.
+		equals: resourceController petSummaryVersion1dot0dot0MediaType;
+		assert: response entityTag equals: '"1323cdfb8bb0f9011fbd480c5a87c17d05883214"' asEntityTag.
 	self assertExpiresHeaderFor: response with: 4 hours.
-	self assertCachingDirectivesFor: response with: #('public' 'no-transform' 'must-revalidate').
+	self assertCachingDirectivesFor: response with: #( 'public' 'no-transform' 'must-revalidate' ).
 
-	self
-		withJsonFromContentsIn: response
-		do: [ :json | 
-			self
-				assert: json name equals: 'Firulais';
-				assertUrl: json selfLocation equals: 'https://pets.example.com/pets/1';
-				assert: json type isNil;
-				assert: json status isNil
-			]
+	self withJsonFromContentsIn: response do: [ :json | 
+		self
+			assert: json name equals: 'Firulais';
+			assertUrl: json selfLocation equals: 'https://pets.example.com/pets/1';
+			assert: json type isNil;
+			assert: json status isNil
+		]
 ]
 
 { #category : #'tests - get collection' }
@@ -461,54 +449,53 @@ PetsRESTfulControllerTest >> testGetPetsWithPagination [
 	self createSixPets.
 
 	response := resourceController
-		getPetsBasedOn: ( self requestToGetPetsAccepting: resourceController petSummaryVersion1dot0dot0MediaType )
-		within: self newHttpRequestContext.
+		            getPetsBasedOn:
+		            ( self requestToGetPetsAccepting:
+			              resourceController petSummaryVersion1dot0dot0MediaType )
+		            within: self newHttpRequestContext.
 
 	self
 		assert: response isSuccess;
 		assert: response status equals: 200;
 		assert: response contentType asMediaType
-			equals: resourceController petSummaryVersion1dot0dot0MediaType;
+		equals: resourceController petSummaryVersion1dot0dot0MediaType;
 		assert: response links size equals: 2;
 		assertUrl: response links first url equals: 'https://pets.example.com/pets?start=6&limit=5';
-		assert: response links first rel equals: 'next';
+		assert: response links first relationType equals: 'next';
 		assertUrl: response links second url equals: 'https://pets.example.com/pets?start=6&limit=5';
-		assert: response links second rel equals: 'last'.
+		assert: response links second relationType equals: 'last'.
 
-	self
-		withJsonFromContentsIn: response
-		do: [ :json | 
-			self
-				assertUrl: json selfLocation equals: 'https://pets.example.com/pets';
-				assertUrl: json links next equals: 'https://pets.example.com/pets?start=6&limit=5';
-				assertUrl: json links last equals: 'https://pets.example.com/pets?start=6&limit=5';
-				assert: json items size equals: 5.
+	self withJsonFromContentsIn: response do: [ :json | 
+		self
+			assertUrl: json selfLocation equals: 'https://pets.example.com/pets';
+			assertUrl: json links next equals: 'https://pets.example.com/pets?start=6&limit=5';
+			assertUrl: json links last equals: 'https://pets.example.com/pets?start=6&limit=5';
+			assert: json items size equals: 5.
 
-			response := resourceController
-				getPetsBasedOn: ( self requestToGET: json links next accepting: response contentType )
-				within: self newHttpRequestContext.
+		response := resourceController
+			            getPetsBasedOn:
+			            ( self requestToGET: json links next accepting: response contentType )
+			            within: self newHttpRequestContext.
+		self
+			assert: response isSuccess;
+			assert: response status equals: 200;
+			assert: response contentType asMediaType
+			equals: resourceController petSummaryVersion1dot0dot0MediaType;
+			assert: response links size equals: 2;
+			assertUrl: response links first url equals: 'https://pets.example.com/pets?start=1&limit=5';
+			assert: response links first relationType equals: 'first';
+			assertUrl: response links second url equals: 'https://pets.example.com/pets?start=1&limit=5';
+			assert: response links second relationType equals: 'prev'.
+		self withJsonFromContentsIn: response do: [ :json2 | 
 			self
-				assert: response isSuccess;
-				assert: response status equals: 200;
-				assert: response contentType asMediaType
-					equals: resourceController petSummaryVersion1dot0dot0MediaType;
-				assert: response links size equals: 2;
-				assertUrl: response links first url equals: 'https://pets.example.com/pets?start=1&limit=5';
-				assert: response links first rel equals: 'first';
-				assertUrl: response links second url equals: 'https://pets.example.com/pets?start=1&limit=5';
-				assert: response links second rel equals: 'prev'.
-			self
-				withJsonFromContentsIn: response
-				do: [ :json2 | 
-					self
-						assertUrl: json2 selfLocation equals: 'https://pets.example.com/pets?start=6&limit=5';
-						assertUrl: json2 links first equals: 'https://pets.example.com/pets?start=1&limit=5';
-						assertUrl: json2 links prev equals: 'https://pets.example.com/pets?start=1&limit=5';
-						assert: json2 links next isNil;
-						assert: json2 links last isNil;
-						assert: json2 items size equals: 1
-					]
+				assertUrl: json2 selfLocation equals: 'https://pets.example.com/pets?start=6&limit=5';
+				assertUrl: json2 links first equals: 'https://pets.example.com/pets?start=1&limit=5';
+				assertUrl: json2 links prev equals: 'https://pets.example.com/pets?start=1&limit=5';
+				assert: json2 links next isNil;
+				assert: json2 links last isNil;
+				assert: json2 items size equals: 1
 			]
+		]
 ]
 
 { #category : #'tests - creation' }

@@ -76,15 +76,19 @@ RESTfulRequestHandlerBehavior >> endpoint [
 { #category : #private }
 RESTfulRequestHandlerBehavior >> entityTagOf: resource encodedAs: mediaType within: requestContext [
 
-	^ ZnETag with: ( entityTagCalculator value: resource value: mediaType value: requestContext value: self )
+	^ EntityTag with: (entityTagCalculator
+			   value: resource
+			   value: mediaType
+			   value: requestContext
+			   value: self)
 ]
 
 { #category : #private }
 RESTfulRequestHandlerBehavior >> entityTagToMatchBasedOn: httpRequest [
 
-	^ ( httpRequest headers
-		at: #'If-Match'
-		ifAbsent: [ HTTPClientError preconditionRequired signal: 'Missing If-Match header.' ] ) asETag
+	^ (httpRequest headers at: #'If-Match' ifAbsent: [ 
+		   HTTPClientError preconditionRequired signal:
+			   'Missing If-Match header.' ]) asEntityTag
 ]
 
 { #category : #private }
@@ -201,7 +205,10 @@ RESTfulRequestHandlerBehavior >> holdTargetMediaTypeAndLanguageFrom: httpRequest
 { #category : #private }
 RESTfulRequestHandlerBehavior >> ifNoneMatchHeaderPresentIn: httpRequest do: aMonadycBlock [
 
-	httpRequest headers at: #'If-None-Match' ifPresent: [ :ifNoneMatchHeader | aMonadycBlock value: ifNoneMatchHeader asETag ]
+	httpRequest headers
+		at: #'If-None-Match'
+		ifPresent: [ :ifNoneMatchHeader | 
+			aMonadycBlock value: ifNoneMatchHeader asEntityTag ]
 ]
 
 { #category : #initialization }
@@ -258,13 +265,12 @@ RESTfulRequestHandlerBehavior >> putLanguageContentTagIn: response within: reque
 { #category : #private }
 RESTfulRequestHandlerBehavior >> resourceCreationPolicyBasedOn: httpRequest within: requestContext [
 
-	[ httpRequest accept ]
-		on: KeyNotFound
-		do: [ :signal | ^ RESTfulControllerDoNotRespondCreatedEntityPolicy for: self ].
-
-	self holdTargetMediaTypeAndLanguageFrom: httpRequest within: requestContext.
-
-	^ RESTfulControllerRespondCreatedEntityPolicy for: self
+	^ httpRequest
+		  withAcceptHeaderDo: [ 
+			  self holdTargetMediaTypeAndLanguageFrom: httpRequest within: requestContext.
+			  RESTfulControllerRespondCreatedEntityPolicy for: self
+			  ]
+		  ifAbsent: [ RESTfulControllerDoNotRespondCreatedEntityPolicy for: self ]
 ]
 
 { #category : #accessing }

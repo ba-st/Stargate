@@ -211,35 +211,33 @@ PetOrdersRESTfulControllerTest >> testCannotUpdateComment [
 { #category : #'tests - comments' }
 PetOrdersRESTfulControllerTest >> testCannotUpdateCommentWhenETagDoesNotMatch [
 
-	self
-		withJsonFromContentsIn: self createOrder
-		do: [ :order | 
-			| response |
+	self withJsonFromContentsIn: self createOrder do: [ :order | 
+		| response |
 
-			self
-				createCommentFor: order identifiedBy: 1 withContent: 'Hey!';
-				createCommentFor: order identifiedBy: 1 withContent: 'Mr. DJ'.
+		self
+			createCommentFor: order identifiedBy: 1 withContent: 'Hey!';
+			createCommentFor: order identifiedBy: 1 withContent: 'Mr. DJ'.
 
-			self
-				should: [ resourceController
-						updateOrderCommentBasedOn:
-							( self
-								requestToPUTComment: 'Hola!'
-								on: order links comments
-								at: 1
-								forOrder: 1
-								conditionalTo: '"XXX"' asETag )
-						within: self newHttpRequestContext
-					]
-				raise: HTTPClientError preconditionFailed.
+		self
+			should: [ 
+				resourceController
+					updateOrderCommentBasedOn: ( self
+							  requestToPUTComment: 'Hola!'
+							  on: order links comments
+							  at: 1
+							  forOrder: 1
+							  conditionalTo: '"XXX"' asEntityTag )
+					within: self newHttpRequestContext
+				]
+			raise: HTTPClientError preconditionFailed.
 
-			response := self commentsRelatedTo: order.
+		response := self commentsRelatedTo: order.
 
-			self
-				assert: response isSuccess;
-				assert: response contentType equals: ZnMimeType textPlain;
-				assert: response contents equals: '- Hey!<n>- Mr. DJ' expandMacros
-			]
+		self
+			assert: response isSuccess;
+			assert: response contentType equals: ZnMimeType textPlain;
+			assert: response contents equals: '- Hey!<n>- Mr. DJ' expandMacros
+		]
 ]
 
 { #category : #'tests - comments' }

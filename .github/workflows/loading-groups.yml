@@ -8,7 +8,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        smalltalk: [ Pharo64-9.0, Pharo64-8.0 ]
+        smalltalk: [ Pharo64-10, Pharo64-9.0, Pharo64-8.0 ]
         load-spec: [ deployment, dependent-sunit-extensions, tests, development, tools, examples, core, healthcheck, metrics, metrics-http, json-rpc, app-control, app-info, app-config, loggers ]
     name: ${{ matrix.smalltalk }} + ${{ matrix.load-spec }}
     steps:
