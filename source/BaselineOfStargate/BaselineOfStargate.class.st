@@ -36,16 +36,12 @@ BaselineOfStargate >> setUpDependencies: spec [
 		project: 'Buoy-SUnit' copyFrom: 'Buoy' with: [ spec loads: 'Dependent-SUnit-Extensions' ].
 
 	spec
-		baseline: 'Hyperspace' with: [ spec repository: 'github://ba-st/Hyperspace:v3' ];
+		baseline: 'Hyperspace' with: [ spec repository: 'github://ba-st/Hyperspace:v4' ];
 		project: 'Hyperspace-Deployment' copyFrom: 'Hyperspace' with: [ spec loads: 'Deployment' ];
     project: 'Hyperspace-Tools' copyFrom: 'Hyperspace' with: [ spec loads: 'Tools' ];
 		project: 'Hyperspace-SUnit'
 		copyFrom: 'Hyperspace'
 		with: [ spec loads: 'Dependent-SUnit-Extensions' ].
-
-spec
-		baseline: 'ZincHTTPComponents' with: [ spec repository: 'github://svenvc/zinc' ];
-		project: 'Zinc-Core' copyFrom: 'ZincHTTPComponents' with: [ spec loads: 'Core' ].
 
 	spec
 		baseline: 'Teapot' with: [ spec repository: 'github://zeroflag/Teapot:v2.6.0/source' ];
@@ -76,7 +72,7 @@ BaselineOfStargate >> setUpDeploymentPackages: spec [
 	spec
 		package: 'Stargate-Model' with: [ 
 			spec requires:
-					#( 'Buoy-Deployment' 'Hyperspace-Deployment' 'Zinc-Core' 'Teapot-Deployment' 'JSONWebToken-Deployment' )
+					#( 'Buoy-Deployment' 'Hyperspace-Deployment' 'Teapot-Deployment' 'JSONWebToken-Deployment' )
 			];
 		group: 'Core' with: 'Stargate-Model';
 		group: 'Deployment' with: 'Stargate-Model'.
