@@ -203,10 +203,18 @@ PetsRESTfulController >> initializeRequestHandler [
 			];
 		directCachingWith: [ :caching | 
 			caching
-				expireIn: 4 hours;
-				bePublic;
-				doNotTransform;
-				mustRevalidate
+				when: [ :response | response contentType = self petVersion1dot0dot0MediaType ]
+					apply: [ caching
+						expireIn: 4 hours;
+						bePublic;
+						doNotTransform;
+						mustRevalidate
+					];
+				when: [ :response | response contentType = self petSummaryVersion1dot0dot0MediaType ]
+					apply: [ caching
+						expireIn: 4 hours;
+						bePublic
+					]
 			];
 		build
 ]

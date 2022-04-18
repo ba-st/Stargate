@@ -365,7 +365,7 @@ PetsRESTfulControllerTest >> testGetPetSummaryJustCreated [
 		equals: resourceController petSummaryVersion1dot0dot0MediaType;
 		assert: response entityTag equals: '"1323cdfb8bb0f9011fbd480c5a87c17d05883214"' asEntityTag.
 	self assertExpiresHeaderFor: response with: 4 hours.
-	self assertCachingDirectivesFor: response with: #( 'public' 'no-transform' 'must-revalidate' ).
+	self assertCachingDirectivesFor: response with: #('public').
 
 	self withJsonFromContentsIn: response do: [ :json | 
 		self
@@ -391,7 +391,7 @@ PetsRESTfulControllerTest >> testGetPets [
 		assert: response contentType asMediaType
 			equals: resourceController petSummaryVersion1dot0dot0MediaType.
 	self assertExpiresHeaderFor: response with: 4 hours.
-	self assertCachingDirectivesFor: response with: #('public' 'no-transform' 'must-revalidate').
+	self assertCachingDirectivesFor: response with: #('public').
 
 	self
 		withJsonFromContentsIn: response
@@ -423,7 +423,7 @@ PetsRESTfulControllerTest >> testGetPetsNotEmpty [
 		assert: response contentType asMediaType
 			equals: resourceController petSummaryVersion1dot0dot0MediaType.
 	self assertExpiresHeaderFor: response with: 4 hours.
-	self assertCachingDirectivesFor: response with: #('public' 'no-transform' 'must-revalidate').
+	self assertCachingDirectivesFor: response with: #('public').
 
 	self
 		withJsonFromContentsIn: response
@@ -437,6 +437,45 @@ PetsRESTfulControllerTest >> testGetPetsNotEmpty [
 						assert: dogSummary name equals: 'Firulais';
 						assertUrl: dogSummary selfLocation equals: 'https://pets.example.com/pets/1';
 						assert: dogSummary type isNil
+					]
+			]
+]
+
+{ #category : #'tests - get collection' }
+PetsRESTfulControllerTest >> testGetPetsNotEmptyAcceptingCompleteMediaType [
+
+	| response |
+
+	resourceController
+		createPetBasedOn: ( self requestToCreatePetFrom: '{"name":"Firulais","type":"dog"}' )
+		within: self newHttpRequestContext.
+
+	self assert: petRepository findAll notEmpty.
+
+	response := resourceController
+		getPetsBasedOn: ( self requestToGetPetsAccepting: resourceController petVersion1dot0dot0MediaType )
+		within: self newHttpRequestContext.
+
+	self
+		assert: response isSuccess;
+		assert: response status equals: 200;
+		assert: response contentType asMediaType 
+			equals: resourceController petVersion1dot0dot0MediaType.
+	self assertExpiresHeaderFor: response with: 4 hours.
+	self assertCachingDirectivesFor: response with: #('public' 'no-transform' 'must-revalidate').
+
+	self
+		withJsonFromContentsIn: response
+			do: [ :json | self assertUrl: json selfLocation equals: 'https://pets.example.com/pets' ];
+		withJsonFromItemsIn: response
+			do: [ :items | 
+			self
+				withTheOnlyOneIn: items
+				do: [ :dogSummary | 
+					self
+						assert: dogSummary name equals: 'Firulais';
+						assertUrl: dogSummary selfLocation equals: 'https://pets.example.com/pets/1';
+						assert: dogSummary type equals: 'dog'.
 					]
 			]
 ]

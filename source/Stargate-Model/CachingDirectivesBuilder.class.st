@@ -5,7 +5,8 @@ Class {
 	#name : #CachingDirectivesBuilder,
 	#superclass : #Object,
 	#instVars : [
-		'directives'
+		'directives',
+		'currentCondition'
 	],
 	#category : #'Stargate-Model-Caching'
 }
@@ -13,7 +14,11 @@ Class {
 { #category : #private }
 CachingDirectivesBuilder >> addCacheControlNamed: aName [
 
-	directives add: [ :response :context | response addCachingDirective: aName ]
+	| condition |
+
+	condition := currentCondition.
+	directives
+		add: [ :response :context | ( condition value: response ) then: [ response addCachingDirective: aName ] ]
 ]
 
 { #category : #private }
@@ -26,6 +31,12 @@ CachingDirectivesBuilder >> addCacheControlNamed: aName withString: aString [
 CachingDirectivesBuilder >> addCacheControlNamed: aName withToken: aValue [
 
 	self addCacheControlNamed: ( '<1s>=<2p>' expandMacrosWith: aName with: aValue )
+]
+
+{ #category : #private }
+CachingDirectivesBuilder >> alwaysApplyDirectives [
+
+	currentCondition := [ :response | true ]
 ]
 
 { #category : #configuring }
@@ -119,10 +130,15 @@ CachingDirectivesBuilder >> doNotTransform [
 
 { #category : #configuring }
 CachingDirectivesBuilder >> expireIn: aDuration [
+		
+	| condition |
 
+	condition := currentCondition.
 	directives
-		add:
-			[ :response :context | response headers at: 'Expires' put: ( ZnUtils httpDate: DateAndTime now + aDuration ) ]
+		add: [ :response :context | 
+			( condition value: response )
+				then: [ response headers at: 'Expires' put: ( ZnUtils httpDate: DateAndTime now + aDuration ) ]
+			]
 ]
 
 { #category : #private }
@@ -141,9 +157,10 @@ CachingDirectivesBuilder >> fieldStringFor: aFieldNameCollection [
 
 { #category : #initialization }
 CachingDirectivesBuilder >> initialize [
-	
+
 	super initialize.
-	directives := OrderedCollection new
+	directives := OrderedCollection new.
+	self alwaysApplyDirectives
 ]
 
 { #category : #configuring }
@@ -158,6 +175,15 @@ CachingDirectivesBuilder >> requireRevalidation [
 	self
 		doNotCache;
 		beStaleAfter: 0 seconds
+]
+
+{ #category : #configuring }
+CachingDirectivesBuilder >> when: aResponseCondition apply: aDirectiveConfiguration [
+
+	[ currentCondition := aResponseCondition.
+	aDirectiveConfiguration cull: self
+	]
+		ensure: [ self alwaysApplyDirectives ]
 ]
 
 { #category : #configuring }

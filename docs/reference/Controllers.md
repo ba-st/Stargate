@@ -263,11 +263,15 @@ Both `private` and `no-cache` directives can specify a list of fields that
 restrict them using `bePrivateRestrictedTo: aFieldNameCollection` and
 `doNotCacheRestrictedTo: aFieldNameCollection` respectively.
 
+Additionally, if you may have different caching directive depending on the
+response, you can add a condition before configuring the builder.
+
 For specific examples on all the different options offered by Stargate, check the
 example classes and their respective tests:
 
-- `PetsRESTfulController` offers `/pets` as a _public_ resource for _4 hours_,
-  which _can't be transformed_, and _must be revalidated_ once stale.
+- `PetsRESTfulController` offers `/pets` as a _public_ resource for _4 hours_, but
+  when using a specific content-type it _can't be transformed_, and
+  _must be revalidated_ once stale.
 - `PetOrdersRESTfulController` offers `/orders` as a _public_ resource for
   _1 minute_, using both the `expires` header and the `max-age` directive.
 - `PetOrdersRESTfulController` offers `/orders/<id>/comments`, indicating
