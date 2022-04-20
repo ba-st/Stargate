@@ -18,9 +18,10 @@ Class {
 }
 
 { #category : #private }
-RESTfulRequestHandlerBehavior >> applyCachingDirectivesTo: response within: requestContext [
+RESTfulRequestHandlerBehavior >> applyCachingDirectivesFor: aResource to: response within: requestContext [
 
-	cachingDirectives do: [ :directive | directive cull: response cull: requestContext ]
+	cachingDirectives
+		do: [ :directive | directive cull: response cull: requestContext cull: aResource ]
 ]
 
 { #category : #private }
@@ -122,7 +123,7 @@ RESTfulRequestHandlerBehavior >> from: httpRequest within: requestContext get: a
 						setEntityTag: etag;
 						addToVary: 'Accept'.
 					self
-						applyCachingDirectivesTo: response within: requestContext;
+						applyCachingDirectivesFor: resource to: response within: requestContext;
 						putLanguageContentTagIn: response within: requestContext.
 					^ response
 					]
@@ -130,7 +131,7 @@ RESTfulRequestHandlerBehavior >> from: httpRequest within: requestContext get: a
 	response := ZnResponse ok: ( self encodeResource: resource within: requestContext ).
 	self putEntityTagOf: resource in: response within: requestContext.
 	self
-		applyCachingDirectivesTo: response within: requestContext;
+		applyCachingDirectivesFor: resource to: response within: requestContext;
 		putLanguageContentTagIn: response within: requestContext.
 	^ response
 ]
@@ -188,7 +189,7 @@ RESTfulRequestHandlerBehavior >> from: httpRequest within: requestContext getCol
 	response addToVary: 'Accept'.
 	self paginationPolicy affect: response within: requestContext.
 	self
-		applyCachingDirectivesTo: response within: requestContext;
+		applyCachingDirectivesFor: resourceCollection to: response within: requestContext;
 		putLanguageContentTagIn: response within: requestContext.
 	^ response
 ]

@@ -51,7 +51,7 @@ CachingDirectivesBuilderTest >> responseAffectedBy: directives [
 	| response |
 
 	response := ZnResponse ok: ( ZnStringEntity text: 'theResource' ).
-	directives do: [ :directive | directive cull: response cull: self ].
+	directives do: [ :directive | directive cull: response cull: self cull: self ].
 	^ response
 ]
 

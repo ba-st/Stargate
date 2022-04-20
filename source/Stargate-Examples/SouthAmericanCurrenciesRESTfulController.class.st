@@ -199,7 +199,13 @@ SouthAmericanCurrenciesRESTfulController >> initializeCurrenciesRequestHandler [
 				include: currency isoCode
 			];
 		handleExceptionsApplying: [ :handler | handler addAsNotFoundError: NotFound ];
-		directCachingWith: [ :caching | caching beImmutable ];
+		directCachingWith: [ :caching | 
+			caching
+				beImmutable;
+				when: [ :response :resource | resource isCollection ] apply: [ caching beStaleAfter: 1 day ];
+				when: [ :response :resource | resource isCollection not and: [ resource symbol = '$' ] ]
+					apply: [ caching bePublic ]
+			];
 		addAsSupportedLanguage: 'en-US';
 		addAsSupportedLanguage: 'es-AR';
 		build

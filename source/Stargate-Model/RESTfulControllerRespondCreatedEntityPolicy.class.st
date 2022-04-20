@@ -32,7 +32,7 @@ RESTfulControllerRespondCreatedEntityPolicy >> responseFor: resource basedOn: ht
 		entity: ( requestHandler encodeResource: resource within: requestContext ).
 	requestHandler
 		putEntityTagOf: resource in: response within: requestContext;
-		applyCachingDirectivesTo: response within: requestContext;
+		applyCachingDirectivesFor: resource to: response within: requestContext;
 		putLanguageContentTagIn: response within: requestContext.
 	^ response
 ]
