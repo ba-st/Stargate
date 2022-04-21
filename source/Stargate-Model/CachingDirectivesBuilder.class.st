@@ -18,7 +18,8 @@ CachingDirectivesBuilder >> addCacheControlNamed: aName [
 
 	condition := currentCondition.
 	directives
-		add: [ :response :context | ( condition value: response ) then: [ response addCachingDirective: aName ] ]
+		add:
+			[ :response :context :resource | ( condition cull: response cull: resource ) then: [ response addCachingDirective: aName ] ]
 ]
 
 { #category : #private }
@@ -130,13 +131,13 @@ CachingDirectivesBuilder >> doNotTransform [
 
 { #category : #configuring }
 CachingDirectivesBuilder >> expireIn: aDuration [
-		
+
 	| condition |
 
 	condition := currentCondition.
 	directives
-		add: [ :response :context | 
-			( condition value: response )
+		add: [ :response :context :resource | 
+			( condition cull: response cull: resource )
 				then: [ response headers at: 'Expires' put: ( ZnUtils httpDate: DateAndTime now + aDuration ) ]
 			]
 ]

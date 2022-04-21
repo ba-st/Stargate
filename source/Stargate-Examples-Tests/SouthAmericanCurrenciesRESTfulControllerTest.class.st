@@ -68,7 +68,8 @@ SouthAmericanCurrenciesRESTfulControllerTest >> testGetArgentinePeso [
 		assert: response contentLanguageTags isEmpty;
 		deny: response varyHeaderNames includes: 'Accept-Language';
 		assert: response varyHeaderNames includes: 'Accept';
-		assert: response entityTag equals: '"5dd07a40a75ea23fa44e641a92a6dd1ec7999a36"' asEntityTag.
+		assert: response entityTag equals: '"5dd07a40a75ea23fa44e641a92a6dd1ec7999a36"' asEntityTag;
+		assertCachingDirectivesFor: response with: #('immutable' 'public').
 
 	self withJsonFromContentsIn: response do: [ :json | 
 		self
@@ -191,7 +192,8 @@ SouthAmericanCurrenciesRESTfulControllerTest >> testGetBrazilianReal [
 		assert: response contentLanguageTags isEmpty;
 		assert: response varyHeaderNames includes: 'Accept';
 		assert: response entityTag
-		equals: '"13bd1a73c317563852cbb2858e39a0af77699f60"' asEntityTag.
+		equals: '"13bd1a73c317563852cbb2858e39a0af77699f60"' asEntityTag;
+		assertCachingDirectivesFor: response with: #('immutable').
 
 	self withJsonFromContentsIn: response do: [ :json | 
 		self
@@ -289,7 +291,7 @@ SouthAmericanCurrenciesRESTfulControllerTest >> testGetCurrencies [
 		assert: response contentLanguageTags isEmpty;
 		deny: response varyHeaderNames includes: 'Accept-Language';
 		assert: response varyHeaderNames includes: 'Accept'.
-	self assertCachingDirectivesFor: response with: #('immutable').
+	self assertCachingDirectivesFor: response with: #('immutable' 'Max-Age=86400').
 
 	self
 		withJsonFromContentsIn: response
@@ -322,7 +324,7 @@ SouthAmericanCurrenciesRESTfulControllerTest >> testGetCurrenciesInSpanish [
 			do: [ :tag | self assert: tag equals: 'es-AR' asLanguageTag ];
 		assert: response varyHeaderNames includes: 'Accept-Language';
 		assert: response varyHeaderNames includes: 'Accept'.
-	self assertCachingDirectivesFor: response with: #('immutable').
+	self assertCachingDirectivesFor: response with: #('immutable' 'Max-Age=86400').
 
 	self
 		withJsonFromContentsIn: response

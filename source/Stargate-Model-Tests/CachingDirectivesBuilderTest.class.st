@@ -46,12 +46,19 @@ CachingDirectivesBuilderTest >> assertThereAre: aNumber directivesFrom: aBuilder
 ]
 
 { #category : #'private - accessing' }
+CachingDirectivesBuilderTest >> requestContext [
+
+	^ HttpRequestContext new
+]
+
+{ #category : #'private - accessing' }
 CachingDirectivesBuilderTest >> responseAffectedBy: directives [
 
-	| response |
+	| response resource |
 
-	response := ZnResponse ok: ( ZnStringEntity text: 'theResource' ).
-	directives do: [ :directive | directive cull: response cull: self ].
+	resource := 'theResource'.
+	response := ZnResponse ok: ( ZnStringEntity text: resource ).
+	directives do: [ :directive | directive cull: response cull: self requestContext cull: resource ].
 	^ response
 ]
 
