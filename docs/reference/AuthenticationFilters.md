@@ -10,7 +10,7 @@ There are two flavour of filters implemented:
   provided to the filter. If the validation is successful it will also make
   available through the `requestContext` the set of permissions encoded in the
   JWT.
-- `ZnAuthenticationFilter` is an adapter over `ZnBasicAuthenticator` instances
+- `ZnAuthenticationFilter` is an adapter over `ZnBasicAuthenticator` instances,
   so it can be used as authentication filter in the library. This adapter will
   send `isRequestAuthenticated:` to the authenticator to verify the authentication
   status.

@@ -51,7 +51,7 @@ String streamContents: [ :s | YourApplication printHelpOn: s].
 
 ### Stack trace generation
 
-By default stack traces are written in a `logs` directory relative to
+By default, stack traces are written in a `logs` directory relative to
 the image's working directory in a filename whose name is `app-name-YYYY-MM-DD_HH-MM-SS.MS`,
 and in `Fuel` format.
 

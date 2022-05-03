@@ -12,7 +12,7 @@ loading targets:
   [Application Info plugin](ApplicationInfo.md)
 - `Application-Configuration`  will load the packages needed to support the
   [Application Configuration plugin](ApplicationConfiguration.md)
-- `Loggers`  will load the packages needed to support the [Loggers  plugin](Loggers.md)
+- `Loggers`  will load the packages needed to support the [Loggers plugin](Loggers.md)
 - `JSON-RPC`  will load the packages needed to support JSON RPC APIs.
 - `Deployment` will load all the packages needed in a deployed application,
   which in this case correspond to `Core` + `HealthCheck` + `Metrics` +

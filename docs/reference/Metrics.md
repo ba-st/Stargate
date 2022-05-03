@@ -31,8 +31,8 @@ Available metric providers:
 - `http` (optional group) gathers information over the incoming HTTP requests
   (request count, request duration, response size by HTTP method, response code,
   URL and URL template). The categories used for the breakdown can be filtered
-  by using the operations configuration, valid options are `#response_code`,
-  `#http_method`, `#url` and `#url_template`. By default all categories are
+  by using the operation's configuration, valid options are `#response_code`,
+  `#http_method`, `#url` and `#url_template`. By default, all categories are
   used for the breakdown.
 
 ## API
@@ -42,7 +42,7 @@ Available metric providers:
 - Endpoint: `/metrics`
 - Allowed HTTP methods: `GET`
 - Supported media types:
-  - `text/plain`: In prometheus client data exposition format
+  - `text/plain`: In Prometheus client data exposition format
   - `text/vnd.stargate.prometheus.client-data-exposition;version=0.0.4`: The
     same as plain text but more explicit on the format
   - `application/vnd.stargate.operational-metrics+json`

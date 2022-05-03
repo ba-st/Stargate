@@ -1,4 +1,4 @@
-# How to startup an API
+# How to start up an API
 
 To start up an API you need to instantiate `HTTPBasedRESTfulAPI` providing the
 required configuration and the controllers to install.
@@ -34,7 +34,7 @@ using port 9999.
 
 The configuration parameters are passed to `Teapot` so you can configure here
 any of the options accepted by `Teapot` or `Zinc` servers. The `operations`
-key is mandatory and it's used for the plugin system of Stargate. See [the
+key is mandatory, and it's used for the plugin system of Stargate. See [the
 operations and plugins documentation](Operations.md) to get a list of valid
 options. For deployment environments, the `jwt` authentication scheme is recommended.
 
