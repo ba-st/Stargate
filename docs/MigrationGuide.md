@@ -11,7 +11,7 @@
   - `Garbage Collector invokations` is now `Garbage Collector invocations`
 
   This name change can impact previously collected metrics or filters
-- Dependencies udpated:
+- Dependencies updated:
   - [`Launchpad`](https://github.com/ba-st/Launchpad) was updated to v4
   - [`ZTimestamp`](https://github.com/svenvc/ztimestamp) is now a dependency
 - The application configuration plugin now needs that the `#provider` option
@@ -26,7 +26,7 @@ expressions. To achieve this, manually load the package `Stargate-Deprecated-V6`
 
 Some changes can be automatically migrated from v2:
 
-Manually load the package `Stargate-Deprecated-V3`. It includes deprecations,
+Manually load the package `Stargate-Deprecated-V3`. It includes deprecation rules,
 some of them with automatic rewrite expressions.
 
 Other changes cannot be migrated in an automated fashion:
@@ -42,14 +42,14 @@ Other changes cannot be migrated in an automated fashion:
 - `ResourceRESTfulControllerSpecification` is now deprecated so if you have
   subclasses you need to adapt the code to the new structure.
 - The mapping rules you have defined in the specification are now
-  deprecated. But you can reuse the mappings configuring the requestHandlerBuilder.
+  deprecated. But you can reuse the mappings configuring the `requestHandlerBuilder`.
 - Hypermedia controls support in the context must be always tied to some
   object, so the methods supporting hypermedia controls not attached to
   anything are deprecated.
 - `holdAsHypermediaControls:forSubresource:` was replaced by `holdAsHypermediaControls:for:`
 - `addPaginationControl:` was replaced by `addPaginationControls:` that
   provides a builder to ease the control creation.
-- All the methods that were subclassResponsibility on
+- All the methods that were `subclassResponsibility` on
   `ResourceRESTfulController` are no longer needed, now you must configure
   the builder to create a request handler with the desired behavior.
 
@@ -74,7 +74,7 @@ Subclasses of `ResourceRESTfulController` must contemplate the following changes
 
 For the methods including the new argument, you can use your old implementation
 and ignore the context argument (Just change the method signature). For the
-remaining subclassResponsibility implement it as:
+remaining `subclassResponsibility` implement it as:
 
 ```smalltalk
 provideResourceCreationPolicy

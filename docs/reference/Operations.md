@@ -5,7 +5,7 @@ supporting the operations team.
 
 An operational plugin has the following characteristics:
 
-- Must expose operational information or allow to control some operation
+- Must expose operational information or allow controlling some operation
 - It's optional. It can be enabled by default but should be possible to disable it
 - Must expose at least one endpoint to access its functionality under `/operations/{{plugin-endpoint}}`
 - Must be secured with a proper authorization filter. In specific cases a

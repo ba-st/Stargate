@@ -23,7 +23,7 @@ For a more detailed explanation about CORS, see [MDN web docs](https://developer
 
 CORS support is disabled by default. To enable it, send
 `allowCrossOriginSharingApplying:` message along with a configuration block to
-the api. The simplest possible configuration is:
+the API. The simplest possible configuration is:
 
 ```smalltalk
 api := HTTPBasedRESTfulAPI
@@ -38,7 +38,7 @@ any origin.
 
 ### Configuring allowed origins
 
-Allowed origins configuration is mandatory. There are two options available.
+Allowed origin's configuration is mandatory. There are two options available.
 
 #### Allowing any origin
 
@@ -63,7 +63,7 @@ port, or protocol.
 
 ### Requests with credentials
 
-Optionally, to let the server to allow credentials, like cookies or basic HTTP
+Optionally, to allow credentials in the server, like cookies or basic HTTP
 authentication, send `allowCredentials` into the configuration block.
 
 ```smalltalk

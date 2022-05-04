@@ -4,7 +4,7 @@ One of the operational plugins. It exposes information about the active loggers
 of the running application.
 
 This plugin is disabled by default and allows configuring the `Beacon` instance
-to query. By default it will use the default `Beacon` instance.
+to query. By default, it will use the default `Beacon` instance.
 This configuration is made via the `#operations` config.
 
 For example:

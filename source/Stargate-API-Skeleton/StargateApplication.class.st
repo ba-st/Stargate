@@ -129,7 +129,7 @@ StargateApplication >> authAlgorithm [
 	^ JWAHMACSHA256 parameterValue
 ]
 
-{ #category : #'private - activation' }
+{ #category : #'private - activation/deactivation' }
 StargateApplication >> basicStartWithin: context [
 
 	| api |
@@ -142,7 +142,14 @@ StargateApplication >> basicStartWithin: context [
 	apiOptional := Optional containing: api
 ]
 
-{ #category : #'private - activation' }
+{ #category : #'private - activation/deactivation' }
+StargateApplication >> basicStop [
+
+	apiOptional withContentDo: [ :api | api stop ].
+	super basicStop
+]
+
+{ #category : #'private - activation/deactivation' }
 StargateApplication >> configureGlobalErrorHandlerIn: api [
 
 	[ 
@@ -168,7 +175,7 @@ StargateApplication >> controllersToInstall [
 	^ self subclassResponsibility
 ]
 
-{ #category : #'private - activation' }
+{ #category : #'private - activation/deactivation' }
 StargateApplication >> createAPI [
 
 	| api |
@@ -180,13 +187,13 @@ StargateApplication >> createAPI [
 ]
 
 { #category : #initialization }
-StargateApplication >> initializeRunningIn: anApplicationMode configuredBy: aConfigurationProvider [
+StargateApplication >> initialize [
 
-	super initializeRunningIn: anApplicationMode configuredBy: aConfigurationProvider.
+	super initialize.
 	apiOptional := Optional unused
 ]
 
-{ #category : #'private - activation' }
+{ #category : #'private - activation/deactivation' }
 StargateApplication >> installAndStart: api [
 
 	LaunchpadLogRecord
@@ -194,7 +201,7 @@ StargateApplication >> installAndStart: api [
 		emitInfo: 'Starting API' during: [ api start ]
 ]
 
-{ #category : #'private - activation' }
+{ #category : #'private - activation/deactivation' }
 StargateApplication >> logAPIVersion [
 
 	BasicApplicationInformationProvider new applicationNamed: self class commandName
@@ -249,10 +256,4 @@ StargateApplication >> stackTraceDumper [
 StargateApplication >> stargateConfiguration [
 
 	^ self configuration stargate
-]
-
-{ #category : #'private - activation' }
-StargateApplication >> stop [
-
-	apiOptional withContentDo: [ :api | api stop ]
 ]

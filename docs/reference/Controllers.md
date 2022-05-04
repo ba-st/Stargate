@@ -86,7 +86,7 @@ must be configured to produce a valid request handler:
 
 - For non-hypermedia driven controllers only implementing GET functionality over
   a resource, configure the builder using `handling:extractingIdentifierWith:`.
-  This method will receive an endpoint to handle and a block used to extract the
+  This method will receive an endpoint to handle, and a block used to extract the
   identifier of a resource instance from the request. For example:
 
   ```smalltalk
@@ -97,7 +97,7 @@ must be configured to produce a valid request handler:
   ```
 
 - For non-hypermedia driven controllers only implementing GET functionality over
-  a subresource, configure the builder using
+  a sub-resource, configure the builder using
   `handling:extractingIdentifierWith:locatingParentResourceWith:`. This method
   will receive additionally a resource locator to be used for locating the
   parent resource instance. For example:
@@ -126,10 +126,10 @@ must be configured to produce a valid request handler:
   ```
 
 - For hypermedia driven controllers or controllers implementing POST
-  functionality over a subresource, you will need to configure the builder using
+  functionality over a sub-resource, you will need to configure the builder using
   `handling:locatingSubresourcesWith:extractingIdentifierWith:locatingParentResourceWith:`.
   This method will require a configuration block used to produce the location of
-  the subresource. This block will receive the subresource instance and can
+  the sub-resource. This block will receive the sub-resource instance and can
   access the parent resource through the request context. For example:
 
   ```smalltalk
@@ -202,7 +202,7 @@ the builder with one of the following methods:
 
 ## Collection Pagination
 
-By default GET requests over collections will not be paginated. To get
+By default, GET requests over collections will not be paginated. To get
 collections paginated, configure the builder by sending the message
 `paginateCollectionsWithDefaultLimit:` providing the default page limit. A
 request handler will parse `start` and `limit` as query parameters during a GET
@@ -278,7 +278,7 @@ example classes and their respective tests:
   _shared_ caches _must revalidate_ the resources after _10 minutes_.
 - `SouthAmericanCurrenciesRESTfulController` offers `/currencies` as an
   _immutable_ resource, and `/currencies/<id>/banknotes` as an _immutable_
-  resource fresh for _365.000.000 seconds_.
+  resource fresh for _365'000'000 seconds_.
 
 ## Language negotiation
 

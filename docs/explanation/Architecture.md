@@ -75,7 +75,7 @@ the URI and the HTTP method involved in the request.
 - If a matching route is found:
   - A handler block is evaluated with the `HTTP request` and a new instance of
   `HttpRequestContext`. This context is carried over the whole response
-  computation so any component involved can share contextual information related
+  computation, so any component involved can share contextual information related
   to the current request. A handler block usually involves sending a message to
   a controller with the two mentioned arguments.
   - The receiving controller will collaborate with one of its request handlers
