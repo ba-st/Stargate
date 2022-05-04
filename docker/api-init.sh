@@ -1,7 +1,10 @@
 #!/usr/bin/env bash
+
 pid=0
+
 # SIGTERM-handler
 termination_handler() {
+  exit_status=0
   if [ $pid -ne 0 ]; then
     echo 'SIGTERM was received, stopping the API'
   	curl --silent --fail --request POST \
@@ -11,14 +14,12 @@ termination_handler() {
       --data '{"jsonrpc": "2.0" ,"method": "shutdown"}' \
       http://localhost:"${STARGATE__PORT}"/operations/application-control
     wait "$pid"
+    exit_status=$?
   fi
-  exit 143; # 128 + 15 -- SIGTERM
+  exit "$exit_status"
 }
-trap 'kill ${!}; termination_handler' SIGTERM
+
+trap 'termination_handler' SIGTERM
 ./api-start.sh &
 pid="$!"
-# wait forever
-while true
-do
-  tail -f /dev/null & wait ${!}
-done
+wait "$pid"
