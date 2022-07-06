@@ -21,6 +21,11 @@ Pet class >> named: aName ofType: aPetType [
 { #category : #'instance creation' }
 Pet class >> named: aName ofType: aPetType withStatus: status [
 
+	AssertionChecker
+		enforce: [ aName notEmpty ]
+		because: 'A pet must have a name'
+		raising: InstanceCreationFailed.
+
 	^ self new initializeNamed: aName ofType: aPetType withStatus: status
 ]
 

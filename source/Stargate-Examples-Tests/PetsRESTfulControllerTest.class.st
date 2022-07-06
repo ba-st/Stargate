@@ -148,6 +148,22 @@ PetsRESTfulControllerTest >> testCantUpdatePetIfMissingETag [
 ]
 
 { #category : #'tests - update' }
+PetsRESTfulControllerTest >> testCantUpdatePetNameWhenEmpty [
+
+	self
+		createPet;
+		assert: petRepository findAll first name equals: 'Firulais'.
+
+	self
+		should: [ 
+			resourceController
+				updatePetBasedOn: ( self requestToUpdatePetIdentifiedBy: 1 nameTo: '' )
+				within: self newHttpRequestContext
+			]
+		raise: HTTPClientError unprocessableEntity
+]
+
+{ #category : #'tests - update' }
 PetsRESTfulControllerTest >> testCantUpdatePetWhenETagDoesNotMatch [
 
 	self

@@ -159,19 +159,21 @@ RESTfulRequestHandlerBehavior >> from: httpRequest within: requestContext get: f
 		from: httpRequest
 		within: requestContext
 		get: [ :id | 
-			| resourceToUpdate updatedResource |
+		  | resourceToUpdate updatedResource |
 
-			resourceToUpdate := findBlock cull: id.
-			self
-				assert: etag
-				matchesEntityTagOf: resourceToUpdate
-				encodedAs: httpRequest contentType
-				within: requestContext.
+		  resourceToUpdate := findBlock cull: id.
+		  self
+			  assert: etag
+			  matchesEntityTagOf: resourceToUpdate
+			  encodedAs: httpRequest contentType
+			  within: requestContext.
 
-			updatedResource := self decode: httpRequest within: requestContext.
-			self exceptionHandler
-				handleConflictsDuring: [ updateBlock value: resourceToUpdate value: updatedResource ]
-			]
+		  updatedResource := self decode: httpRequest within: requestContext.
+		  self exceptionHandler handleConflictsDuring: [ 
+			  self exceptionHandler handleDecodingFailedDuring: [ 
+				  updateBlock value: resourceToUpdate value: updatedResource ]
+			  ]
+		  ]
 ]
 
 { #category : #API }
