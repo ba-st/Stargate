@@ -177,6 +177,17 @@ RESTfulRequestHandlerBuilder >> initialize [
 	]
 ]
 
+{ #category : #private }
+RESTfulRequestHandlerBuilder >> jsonFor: resource within: requestContext applying: aBlock writingResourceWith: aResourceWritingBlock [
+
+	^ String streamContents: [ :stream | 
+		  | writer |
+		  writer := NeoJSONWriter on: stream.
+		  aBlock value: resource value: requestContext value: writer.
+		  aResourceWritingBlock value: writer
+		  ]
+]
+
 { #category : #configuring }
 RESTfulRequestHandlerBuilder >> paginateCollectionsWithDefaultLimit: anInteger [
 
@@ -214,40 +225,43 @@ RESTfulRequestHandlerBuilder >> whenResponding: aMediaType encodeApplying: anEnc
 { #category : #encoding }
 RESTfulRequestHandlerBuilder >> whenResponding: aMediaType encodeToJsonApplying: aBlock [
 
-	self
-		whenResponding: aMediaType
-		encodeToJsonApplying: aBlock
-		writingResourceWith: [ :writer :resource | writer nextPut: resource ]
+	self whenResponding: aMediaType encodeApplying: [ :resource :requestContext | 
+		self
+			jsonFor: resource
+			within: requestContext
+			applying: aBlock
+			writingResourceWith: [ :writer | 
+				writer for: ResourceCollection do: [ :mapping | 
+					mapping
+						mapInstVar: #items;
+						mapAsHypermediaControls: [ :collection | 
+							requestContext hypermediaControlsFor: collection items ]
+					].
+				writer nextPut: resource
+				]
+		]
 ]
 
 { #category : #encoding }
 RESTfulRequestHandlerBuilder >> whenResponding: aMediaType encodeToJsonApplying: aBlock as: schema [
 
-	self
-		whenResponding: aMediaType
-		encodeToJsonApplying: aBlock
-		writingResourceWith: [ :writer :resource | writer nextPut: resource as: schema ]
-]
+	self whenResponding: aMediaType encodeApplying: [ :resource :requestContext | 
+		self
+			jsonFor: resource
+			within: requestContext
+			applying: aBlock
+			writingResourceWith: [ :writer | 
+				writer
+					for: ResourceCollection do: [ :mapping | 
+						( mapping mapInstVar: #items ) valueSchema: #ResourceCollectionItems.
+						mapping mapAsHypermediaControls: [ :collection | 
+								requestContext hypermediaControlsFor: collection items ]
+						];
+					for: #ResourceCollectionItems customDo: [ :mapping | mapping listOfElementSchema: schema ].
 
-{ #category : #encoding }
-RESTfulRequestHandlerBuilder >> whenResponding: aMediaType encodeToJsonApplying: aBlock writingResourceWith: aResourceWritingBlock [
-
-	self
-		whenResponding: aMediaType
-		encodeApplying: [ :resource :requestContext | 
-			String
-				streamContents: [ :stream | 
-					| writer |
-					writer := NeoJSONWriter on: stream.
-					aBlock value: resource value: requestContext value: writer.
-					writer
-						for: ResourceCollection
-						do: [ :mapping | 
-							mapping
-								mapInstVar: #items;
-								mapAsHypermediaControls: [ :collection | requestContext hypermediaControlsFor: collection items ]
-							].
-					aResourceWritingBlock value: writer value: resource
-					]
-			]
+				[ writer nextPut: resource as: schema ]
+					unless: ( resource isA: ResourceCollection )
+					inWhichCase: [ writer nextPut: resource ]
+				]
+		]
 ]

@@ -17,6 +17,12 @@ PetOrder class >> for: aPetReference on: aDateAndTime [
 	^self new initializeFor: aPetReference on: aDateAndTime
 ]
 
+{ #category : #accessing }
+PetOrder >> date [
+
+	^ date
+]
+
 { #category : #initialization }
 PetOrder >> initializeFor: aPetReference on: aDateAndTime [
 
