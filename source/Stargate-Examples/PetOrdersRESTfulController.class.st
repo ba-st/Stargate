@@ -126,12 +126,13 @@ PetOrdersRESTfulController >> configureOrderEncodingOn: writer within: requestCo
 
 	writer
 		for: ZnUrl customDo: [ :mapping | mapping encoder: [ :url | url printString ] ];
-		for: PetOrder
+		for: #Order
 			do: [ :mapping | 
 			mapping
-				mapInstVars;
+				mapProperty: #pet getter: #pet;
+				mapProperty: #name getter: #date;
 				mapProperty: #status getter: [ :object | requestContext objectUnder: #status ];
-				mapAsHypermediaControls: [ :pet | requestContext hypermediaControlsFor: pet ]
+				mapAsHypermediaControls: [ :order | requestContext hypermediaControlsFor: order ]
 			]
 ]
 
@@ -318,7 +319,8 @@ PetOrdersRESTfulController >> initializeOrdersRequestHandler [
 		whenAccepting: self orderVersion1dot0dot0MediaType
 			decodeFromJsonApplying: [ :json :reader | self configureOrderDecodingOn: reader ];
 		whenResponding: self orderVersion1dot0dot0MediaType
-			encodeToJsonApplying: [ :resource :requestContext :writer | self configureOrderEncodingOn: writer within: requestContext ];
+			encodeToJsonApplying: [ :resource :requestContext :writer | self configureOrderEncodingOn: writer within: requestContext ]
+			as: #Order;
 		createEntityTagHashing: [ :hasher :order :requestContext | 
 			hasher
 				include: ( ordersRepository identifierOf: order );
