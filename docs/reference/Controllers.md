@@ -217,6 +217,8 @@ HTTP errors:
 - `ConflictingObjectFound` will raise a 409/Conflict error
 - `KeyNotFound` and `NeoJSONParseError` will raise a 400/Bad Request error
 - `TeaNoSuchParam` will raise a 400/Bad Request error
+- `InstanceCreationFailed` will raise a 422/Unprocessable entity if happen during
+  resource creation
 
 The end user can configure additional exceptions to be automatically handled by
 sending `handleExceptionsApplying:` to the builder. For example:
