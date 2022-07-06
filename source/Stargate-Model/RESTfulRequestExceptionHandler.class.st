@@ -38,6 +38,12 @@ RESTfulRequestExceptionHandler >> addAsNotFoundError: anExceptionSelector [
 	exceptionsToHandle at: #notFound put: ( exceptionsToHandle at: #notFound ) , anExceptionSelector
 ]
 
+{ #category : #configuring }
+RESTfulRequestExceptionHandler >> addAsUnprocessableEntityError: anExceptionSelector [
+
+	exceptionsToHandle at: #unprocessableEntity put: ( exceptionsToHandle at: #unprocessableEntity ) , anExceptionSelector
+]
+
 { #category : #handling }
 RESTfulRequestExceptionHandler >> handleConflictsDuring: aBlock [
 
@@ -49,9 +55,13 @@ RESTfulRequestExceptionHandler >> handleConflictsDuring: aBlock [
 { #category : #handling }
 RESTfulRequestExceptionHandler >> handleDecodingFailedDuring: aBlock [
 
-	^ aBlock
-		on: ( exceptionsToHandle at: #decodingFailed )
-		do: [ :signal | HTTPClientError badRequest signal: signal messageText ]
+	^ [ 
+	  aBlock
+		  on: ( exceptionsToHandle at: #decodingFailed )
+		  do: [ :signal | HTTPClientError badRequest signal: signal messageText ]
+	  ]
+		  on: ( exceptionsToHandle at: #unprocessableEntity )
+		  do: [ :signal | HTTPClientError unprocessableEntity signal: signal messageText ]
 ]
 
 { #category : #handling }
@@ -84,6 +94,7 @@ RESTfulRequestExceptionHandler >> initialize [
 	exceptionsToHandle
 		at: #conflict put: ConflictingObjectFound;
 		at: #notFound put: ObjectNotFound;
-		at: #decodingFailed put: KeyNotFound , NeoJSONParseError ;
-		at: #missingQueryParameters put: TeaNoSuchParam 
+		at: #decodingFailed put: KeyNotFound , NeoJSONParseError;
+		at: #missingQueryParameters put: TeaNoSuchParam;
+		at: #unprocessableEntity put: InstanceCreationFailed
 ]
