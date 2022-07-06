@@ -57,6 +57,20 @@ RESTfulRequestExceptionHandlerTest >> testHandlingDecodingFailed [
 ]
 
 { #category : #tests }
+RESTfulRequestExceptionHandlerTest >> testHandlingDecodingFailedWhenEntityIsUnprocessable [
+
+	self
+		should: [ exceptionHandler handleDecodingFailedDuring: [ InstanceCreationFailed signal ] ]
+		raise: HTTPClientError unprocessableEntity.
+
+	exceptionHandler addAsUnprocessableEntityError: ZeroDivide.
+
+	self
+		should: [ exceptionHandler handleDecodingFailedDuring: [ 1 / 0 ] ]
+		raise: HTTPClientError unprocessableEntity
+]
+
+{ #category : #tests }
 RESTfulRequestExceptionHandlerTest >> testHandlingMissingQueryParameters [
 
 	self
