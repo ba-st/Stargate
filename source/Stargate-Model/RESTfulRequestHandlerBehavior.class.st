@@ -45,21 +45,38 @@ RESTfulRequestHandlerBehavior >> decode: httpRequest within: requestContext [
 ]
 
 { #category : #'decoding/encoding' }
-RESTfulRequestHandlerBehavior >> encode: resource within: requestContext [
+RESTfulRequestHandlerBehavior >> encode: resource as: targetMediaType within: requestContext [
 
 	| encodingRule |
-
-	encodingRule := encodingRules
-		at: requestContext targetMediaType
-		ifAbsent: [ HTTPClientError unsupportedMediaType signal: 'Encoder not found for given media type' ].
+	encodingRule := encodingRules at: targetMediaType ifAbsent: [ 
+		                HTTPClientError unsupportedMediaType signal:
+			                'Encoder not found for given media type' ].
 
 	^ encodingRule encode: resource within: requestContext
+]
+
+{ #category : #'decoding/encoding' }
+RESTfulRequestHandlerBehavior >> encode: resource within: requestContext [
+
+	^ self
+		  encode: resource
+		  as: requestContext targetMediaType
+		  within: requestContext
+]
+
+{ #category : #private }
+RESTfulRequestHandlerBehavior >> encodeResource: resource as: mediaType within: requestContext [
+
+	^ self encode: resource as: mediaType within: requestContext
 ]
 
 { #category : #private }
 RESTfulRequestHandlerBehavior >> encodeResource: resource within: requestContext [
 
-	^ self encode: resource within: requestContext
+	^ self
+		  encodeResource: resource
+		  as: requestContext targetMediaType
+		  within: requestContext
 ]
 
 { #category : #private }

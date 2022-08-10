@@ -298,6 +298,8 @@ PetOrdersRESTfulController >> initializeCommentsRequestHandler [
 		whenAccepting: ZnMimeType textPlain decodeApplying: [ :comment | comment ];
 		whenResponding: ZnMimeType textPlain
 			encodeApplying: [ :resource | self encodeComments: resource ];
+		whenResponding: ZnMimeType applicationJson 
+			encodeToJsonApplying: [ :resource :context :writer |  ];
 		createEntityTagHashingEncodedResource;
 		directCachingWith: [ :caching | 
 			caching

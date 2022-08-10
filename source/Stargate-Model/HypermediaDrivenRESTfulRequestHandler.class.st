@@ -26,10 +26,10 @@ HypermediaDrivenRESTfulRequestHandler class >> resourceLocator: aResouceLocator 
 ]
 
 { #category : #private }
-HypermediaDrivenRESTfulRequestHandler >> encodeResource: resource within: requestContext [
+HypermediaDrivenRESTfulRequestHandler >> encodeResource: resource as: mediaType within: requestContext [
 
 	self holdResource: resource controlsWithin: requestContext.
-	^ super encodeResource: resource within: requestContext
+	^ super encodeResource: resource as: mediaType within: requestContext
 ]
 
 { #category : #private }
