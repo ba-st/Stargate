@@ -550,3 +550,47 @@ PetOrdersRESTfulControllerTest >> testUpdateComment [
 				assert: response contents equals: '- Hola!<n>- Mr. DJ' expandMacros
 			]
 ]
+
+{ #category : #'tests - comments' }
+PetOrdersRESTfulControllerTest >> testUpdateCommentAcceptingADifferentMediaType [
+
+	"Test for https://github.com/ba-st/Stargate/issues/164"
+
+	self withJsonFromContentsIn: self createOrder do: [ :order | 
+		| response knownETag updateRequest |
+		knownETag := (self
+			              createCommentFor: order
+			              identifiedBy: 1
+			              withContent: 'Hey!') entityTag.
+		self createCommentFor: order identifiedBy: 1 withContent: 'Mr. DJ'.
+		updateRequest := self
+			                 requestToPUTComment: 'Hola!'
+			                 on: order links comments
+			                 at: 1
+			                 forOrder: 1
+			                 conditionalTo: knownETag.
+		updateRequest setAccept: ZnMimeType applicationJson.
+
+		response := resourceController
+			            updateOrderCommentBasedOn: updateRequest
+			            within: self newHttpRequestContext.
+
+		self
+			assert: response isSuccess;
+			deny: response entityTag equals: knownETag;
+			withJsonFromContentsIn: response
+			do: [ :json | self assert: json equals: 'Hola!' ].
+
+		response := resourceController
+			            orderCommentsBasedOn: (self
+					             requestToGETSubresource: order links comments
+					             identifiedBy: 1
+					             accepting: ZnMimeType applicationJson)
+			            within: self newHttpRequestContext.
+
+		self
+			assert: response isSuccess;
+			assert: response contentType equals: ZnMimeType applicationJson;
+			withJsonFromContentsIn: response
+			do: [ :json | self assert: json equals: #( 'Hola!' 'Mr. DJ' ) ] ]
+]
