@@ -8,7 +8,9 @@ Class {
 		'logger',
 		'application',
 		'port',
-		'baseUrl'
+		'baseUrl',
+		'enableHttpServerLogs',
+		'enableHttpClientLogs'
 	],
 	#category : #'Stargate-API-Skeleton-Tests'
 }
@@ -64,7 +66,10 @@ StargateApplicationTest >> setUp [
 	super setUp.
 	logger := MemoryLogger new.
 	port := self freeListeningTCPPort.
-	StargateApplication logsDirectory ensureCreateDirectory
+	StargateApplication logsDirectory ensureCreateDirectory.
+	
+	enableHttpServerLogs := false.
+	enableHttpClientLogs := false.
 ]
 
 { #category : #private }
@@ -93,7 +98,10 @@ StargateApplicationTest >> startPetStore [
 	self start: PetStoreApplication withAll: { 
 			'--pet-store.stargate.public-url=http://localhost:<1p>' expandMacrosWith: port.
 			'--pet-store.stargate.port=<1p>' expandMacrosWith: port.
-			'--pet-store.stargate.operations-secret=<1s>' expandMacrosWith: self secret }.
+			'--pet-store.stargate.operations-secret=<1s>' expandMacrosWith: self secret.
+			'--pet-store.stargate.enable-http-server-logging=<1p>' expandMacrosWith: enableHttpServerLogs .
+			'--pet-store.stargate.enable-http-client-logging=<1p>' expandMacrosWith: enableHttpClientLogs 
+			 }.
 	baseUrl := application configuration petStore stargate publicURL
 ]
 
@@ -232,6 +240,118 @@ StargateApplicationTest >> testGetPets [
 		assert: json links size equals: 1
 ]
 
+{ #category : #'tests - logs' }
+StargateApplicationTest >> testHTTPClientLogsDuringSucessfulGet [
+
+	| logRecord |
+
+	logger runDuring: [ 
+		enableHttpClientLogs := true.
+		self testGetPets].
+	
+	logRecord := NeoJSONObject fromString: 
+		( String streamContents: [:stream | logger recordings last printOneLineJsonOn: stream ] ).
+	
+	self
+		assert: logRecord level equals: 'DEBUG'; 
+		assert: logRecord message equals: 'HTTP Client event received'; 
+		assert: #( 'Morphic UI Process' 'CommandLine handler process' ) includes: logRecord process;  
+		assert: ( logRecord summary includesSubstring: 'GET /pets 200 59B' ); 
+		assert: logRecord request method equals: 'GET';
+		assert: logRecord request uri equals: ( 'http://localhost:<1p>/pets' expandMacrosWith: port );
+		assert: logRecord request headers size equals: 4;
+		assert: logRecord response code equals: 200;
+		assert: logRecord response totalSize equals: 59;
+		assert: logRecord response content 
+			equals: ( '{"items":[],"links":{"self":"http://localhost:<1p>/pets"}}' expandMacrosWith: port );
+		assert: logRecord response headers size equals: 8
+		
+]
+
+{ #category : #'tests - logs' }
+StargateApplicationTest >> testHTTPClientLogsDuringUnsucessfulPost [
+
+	| logRecord |
+
+	logger runDuring: [ 
+		enableHttpClientLogs := true.
+		self testUnsupportedMediaType].
+	
+	logRecord := NeoJSONObject fromString: 
+		( String streamContents: [:stream | logger recordings last printOneLineJsonOn: stream ] ).
+	
+	self
+		assert: logRecord level equals: 'DEBUG'; 
+		assert: logRecord message equals: 'HTTP Client event received'; 
+		assert: #( 'Morphic UI Process' 'CommandLine handler process' ) includes: logRecord process;  
+		assert: (logRecord summary includesSubstring: 'POST /pets 415 72B'); 
+		assert: logRecord request method equals: 'POST';
+		assert: logRecord request uri equals: ( 'http://localhost:<1p>/pets' expandMacrosWith: port );
+		assert: logRecord request headers size equals: 6;
+		assert: logRecord response code equals: 415;
+		assert: logRecord response totalSize equals: 72;
+		assert: (NeoJSONObject fromString: logRecord response content)
+			equals: (NeoJSONObject fromString:'{ "message" : "Decoder not found for given media type", "code" : 415 }');
+		assert: logRecord response headers size equals: 6
+		
+]
+
+{ #category : #'tests - logs' }
+StargateApplicationTest >> testHTTPServerLogsDuringSucessfulGet [
+
+	| logRecord |
+
+	logger runDuring: [ 
+		enableHttpServerLogs := true.
+		self testGetPets ].
+	
+	logRecord := NeoJSONObject fromString: 
+		( String streamContents: [:stream | logger recordings last printOneLineJsonOn: stream ] ).
+	
+	self
+		assert: logRecord level equals: 'DEBUG'; 
+		assert: logRecord message equals: 'HTTP Server event received'; 
+		assert: logRecord process equals: 'ZnManagingMultiThreadedServer HTTP worker'; 
+		assert: (logRecord summary includesSubstring: 'GET /pets 200 59B'); 
+		assert: logRecord request method equals: 'GET';
+		assert: logRecord request uri equals: ( 'http://localhost:<1p>/pets' expandMacrosWith: port );
+		assert: logRecord request headers size equals: 6;
+		assert: logRecord response code equals: 200;
+		assert: logRecord response totalSize equals: 59;
+		assert: logRecord response content 
+			equals: ( '{"items":[],"links":{"self":"http://localhost:<1p>/pets"}}' expandMacrosWith: port );
+		assert: logRecord response headers size equals: 8
+		
+]
+
+{ #category : #'tests - logs' }
+StargateApplicationTest >> testHTTPServerLogsDuringUnsucessfulPost [
+
+	| logRecord |
+
+	logger runDuring: [ 
+		enableHttpServerLogs := true.
+		self testUnsupportedMediaType ].
+	
+	logRecord := NeoJSONObject fromString: 
+		( String streamContents: [:stream | logger recordings last printOneLineJsonOn: stream ] ).
+	
+	self
+		assert: logRecord level equals: 'DEBUG'; 
+		assert: logRecord message equals: 'HTTP Server event received'; 
+		assert: logRecord process equals: 'ZnManagingMultiThreadedServer HTTP worker'; 
+		assert: (logRecord summary includesSubstring: 'POST /pets 415 72B'); 
+		assert: logRecord request method equals: 'POST';
+		assert: logRecord request uri equals: ( 'http://localhost:<1p>/pets' expandMacrosWith: port );
+		assert: logRecord request headers size equals: 8;
+		assert: logRecord response code equals: 415;
+		assert: logRecord response totalSize equals: 72;
+		assert: (NeoJSONObject fromString: logRecord response content)
+			equals: (NeoJSONObject fromString:'{ "message" : "Decoder not found for given media type", "code" : 415 }');
+		assert: logRecord response headers size equals: 6
+		
+]
+
 { #category : #'tests - api' }
 StargateApplicationTest >> testMethodNotAllowed [
 
@@ -288,7 +408,7 @@ StargateApplicationTest >> testPrintHelpOn [
 	self assert: help equals: ('NAME
 		pet-store [<1s>] - A RESTful API for Pet stores
 SYNOPSYS
-		pet-store --pet-store.stargate.public-url=%<publicURL%> --pet-store.stargate.port=%<port%> --pet-store.stargate.operations-secret=%<operationsSecret%>
+		pet-store --pet-store.stargate.public-url=%<publicURL%> --pet-store.stargate.port=%<port%> --pet-store.stargate.operations-secret=%<operationsSecret%> [--pet-store.stargate.enable-http-server-logging=%<enableHTTPServerLogging%>] [--pet-store.stargate.enable-http-client-logging=%<enableHTTPClientLogging%>]
 PARAMETERS
 		--pet-store.stargate.public-url=%<publicURL%>
 			Public URL where the API is deployed. Used to create hypermedia links.
@@ -296,6 +416,10 @@ PARAMETERS
 			Listening port.
 		--pet-store.stargate.operations-secret=%<operationsSecret%>
 			Secret key for checking JWT signatures.
+		--pet-store.stargate.enable-http-server-logging=%<enableHTTPServerLogging%>
+			Boolean that indicates whether to log all the HTTP Server requests. Defaults to false.
+		--pet-store.stargate.enable-http-client-logging=%<enableHTTPClientLogging%>
+			Boolean that indicates whether to log all the HTTP Clients requests. Defaults to false.
 ENVIRONMENT
 		PET_STORE__STARGATE__PUBLIC_URL
 			Public URL where the API is deployed. Used to create hypermedia links.
@@ -303,6 +427,10 @@ ENVIRONMENT
 			Listening port.
 		PET_STORE__STARGATE__OPERATIONS_SECRET
 			Secret key for checking JWT signatures.
+		PET_STORE__STARGATE__ENABLE_HTTP_SERVER_LOGGING
+			Boolean that indicates whether to log all the HTTP Server requests. Defaults to false.
+		PET_STORE__STARGATE__ENABLE_HTTP_CLIENT_LOGGING
+			Boolean that indicates whether to log all the HTTP Clients requests. Defaults to false.
 ' expandMacrosWith: PetStoreApplication version)
 ]
 
