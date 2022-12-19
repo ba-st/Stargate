@@ -9,8 +9,8 @@ Class {
 		'application',
 		'port',
 		'baseUrl',
-		'enableHttpServerLogs',
-		'enableHttpClientLogs'
+		'logServerEvents',
+		'logClientEvents'
 	],
 	#category : #'Stargate-API-Skeleton-Tests'
 }
@@ -68,8 +68,8 @@ StargateApplicationTest >> setUp [
 	port := self freeListeningTCPPort.
 	StargateApplication logsDirectory ensureCreateDirectory.
 	
-	enableHttpServerLogs := false.
-	enableHttpClientLogs := false.
+	logServerEvents := false.
+	logClientEvents := false.
 ]
 
 { #category : #private }
@@ -99,8 +99,8 @@ StargateApplicationTest >> startPetStore [
 			'--pet-store.stargate.public-url=http://localhost:<1p>' expandMacrosWith: port.
 			'--pet-store.stargate.port=<1p>' expandMacrosWith: port.
 			'--pet-store.stargate.operations-secret=<1s>' expandMacrosWith: self secret.
-			'--pet-store.stargate.enable-http-server-logging=<1p>' expandMacrosWith: enableHttpServerLogs .
-			'--pet-store.stargate.enable-http-client-logging=<1p>' expandMacrosWith: enableHttpClientLogs 
+			'--pet-store.stargate.log-server-events=<1p>' expandMacrosWith: logServerEvents .
+			'--pet-store.stargate.log-client-events=<1p>' expandMacrosWith: logClientEvents 
 			 }.
 	baseUrl := application configuration petStore stargate publicURL
 ]
@@ -241,12 +241,12 @@ StargateApplicationTest >> testGetPets [
 ]
 
 { #category : #'tests - logs' }
-StargateApplicationTest >> testHTTPClientLogsDuringSucessfulGet [
+StargateApplicationTest >> testLogClientEventsDuringSucessfulGet [
 
 	| logRecord |
 
 	logger runDuring: [ 
-		enableHttpClientLogs := true.
+		logClientEvents := true.
 		self testGetPets].
 	
 	logRecord := NeoJSONObject fromString: 
@@ -269,12 +269,12 @@ StargateApplicationTest >> testHTTPClientLogsDuringSucessfulGet [
 ]
 
 { #category : #'tests - logs' }
-StargateApplicationTest >> testHTTPClientLogsDuringUnsucessfulPost [
+StargateApplicationTest >> testLogClientEventsDuringUnsucessfulPost [
 
 	| logRecord |
 
 	logger runDuring: [ 
-		enableHttpClientLogs := true.
+		logClientEvents := true.
 		self testUnsupportedMediaType].
 	
 	logRecord := NeoJSONObject fromString: 
@@ -297,12 +297,12 @@ StargateApplicationTest >> testHTTPClientLogsDuringUnsucessfulPost [
 ]
 
 { #category : #'tests - logs' }
-StargateApplicationTest >> testHTTPServerLogsDuringSucessfulGet [
+StargateApplicationTest >> testLogServerEventsDuringSucessfulGet [
 
 	| logRecord |
 
 	logger runDuring: [ 
-		enableHttpServerLogs := true.
+		logServerEvents := true.
 		self testGetPets ].
 	
 	logRecord := NeoJSONObject fromString: 
@@ -325,12 +325,12 @@ StargateApplicationTest >> testHTTPServerLogsDuringSucessfulGet [
 ]
 
 { #category : #'tests - logs' }
-StargateApplicationTest >> testHTTPServerLogsDuringUnsucessfulPost [
+StargateApplicationTest >> testLogServerEventsDuringUnsucessfulPost [
 
 	| logRecord |
 
 	logger runDuring: [ 
-		enableHttpServerLogs := true.
+		logServerEvents := true.
 		self testUnsupportedMediaType ].
 	
 	logRecord := NeoJSONObject fromString: 
@@ -408,7 +408,7 @@ StargateApplicationTest >> testPrintHelpOn [
 	self assert: help equals: ('NAME
 		pet-store [<1s>] - A RESTful API for Pet stores
 SYNOPSYS
-		pet-store --pet-store.stargate.public-url=%<publicURL%> --pet-store.stargate.port=%<port%> --pet-store.stargate.operations-secret=%<operationsSecret%> [--pet-store.stargate.enable-http-server-logging=%<enableHTTPServerLogging%>] [--pet-store.stargate.enable-http-client-logging=%<enableHTTPClientLogging%>]
+		pet-store --pet-store.stargate.public-url=%<publicURL%> --pet-store.stargate.port=%<port%> --pet-store.stargate.operations-secret=%<operationsSecret%> [--pet-store.stargate.log-server-events=%<logServerEvents%>] [--pet-store.stargate.log-client-events=%<logClientEvents%>]
 PARAMETERS
 		--pet-store.stargate.public-url=%<publicURL%>
 			Public URL where the API is deployed. Used to create hypermedia links.
@@ -416,9 +416,9 @@ PARAMETERS
 			Listening port.
 		--pet-store.stargate.operations-secret=%<operationsSecret%>
 			Secret key for checking JWT signatures.
-		--pet-store.stargate.enable-http-server-logging=%<enableHTTPServerLogging%>
+		--pet-store.stargate.log-server-events=%<logServerEvents%>
 			Boolean that indicates whether to log all the HTTP Server requests. Defaults to false.
-		--pet-store.stargate.enable-http-client-logging=%<enableHTTPClientLogging%>
+		--pet-store.stargate.log-client-events=%<logClientEvents%>
 			Boolean that indicates whether to log all the HTTP Clients requests. Defaults to false.
 ENVIRONMENT
 		PET_STORE__STARGATE__PUBLIC_URL
@@ -427,9 +427,9 @@ ENVIRONMENT
 			Listening port.
 		PET_STORE__STARGATE__OPERATIONS_SECRET
 			Secret key for checking JWT signatures.
-		PET_STORE__STARGATE__ENABLE_HTTP_SERVER_LOGGING
+		PET_STORE__STARGATE__LOG_SERVER_EVENTS
 			Boolean that indicates whether to log all the HTTP Server requests. Defaults to false.
-		PET_STORE__STARGATE__ENABLE_HTTP_CLIENT_LOGGING
+		PET_STORE__STARGATE__LOG_CLIENT_EVENTS
 			Boolean that indicates whether to log all the HTTP Clients requests. Defaults to false.
 ' expandMacrosWith: PetStoreApplication version)
 ]

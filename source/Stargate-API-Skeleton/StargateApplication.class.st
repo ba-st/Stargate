@@ -71,13 +71,13 @@ StargateApplication class >> stargateConfigurationParameters [
 				    inside: self sectionsForStargateConfiguration
 				    convertingWith: #asByteArray ) asSensitive;
 		  add: ( OptionalConfigurationParameter
-				    named: 'Enable HTTP Server logging'
+				    named: 'Log server events'
 				    describedBy: 'Boolean that indicates whether to log all the HTTP Server requests'
 				    inside: self sectionsForStargateConfiguration
 				    defaultingTo: false
 				    convertingWith: [ :value | value = 'true' ] );
 		  add: ( OptionalConfigurationParameter
-				    named: 'Enable HTTP Client logging'
+				    named: 'Log client events'
 				    describedBy: 'Boolean that indicates whether to log all the HTTP Clients requests'
 				    inside: self sectionsForStargateConfiguration
 				    defaultingTo: false
@@ -189,7 +189,7 @@ StargateApplication >> configureGlobalErrorHandlerIn: api [
 { #category : #'private - activation/deactivation' }
 StargateApplication >> configureHTTPClientLogging [
 
-	self stargateConfiguration enableHTTPClientLogging then: [ 
+	self stargateConfiguration logClientEvents then: [ 
 		ZnLogEvent announcer when: ZnClientTransactionEvent do: [ :event | 
 			LaunchpadLogRecord
 				emitStructuredDebuggingInfo: 'HTTP Client event received'
@@ -199,7 +199,7 @@ StargateApplication >> configureHTTPClientLogging [
 { #category : #'private - activation/deactivation' }
 StargateApplication >> configureHTTPServerLogging [
 
-	self stargateConfiguration enableHTTPServerLogging then: [ 
+	self stargateConfiguration logServerEvents then: [ 
 		ZnLogEvent announcer
 			when: ZnServerTransactionEvent , ZnSimplifiedServerTransactionEvent
 			do: [ :event | 
