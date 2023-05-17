@@ -31,9 +31,10 @@ SouthAmericanCurrenciesRESTfulControllerTest >> testCantGetArgentinePesoAskingFo
 	| request |
 
 	request := self
-		requestToGETResourceIdentifiedBy: 'ARS'
-		accepting: resourceController currencyVersion1dot0dot0MediaType.
-	request setAcceptLanguage: 'de'.
+	           requestToGETResourceIdentifiedBy: 'ARS'
+	           representedAs:
+	           resourceController currencyVersion1dot0dot0MediaType
+	           in: 'de'.
 
 	self
 		should: [ resourceController currencyBasedOn: request within: self newHttpRequestContext ]
@@ -111,9 +112,9 @@ SouthAmericanCurrenciesRESTfulControllerTest >> testGetArgentinePesoInEnglish [
 	| response request |
 	request := self
 		           requestToGETResourceIdentifiedBy: 'ARS'
-		           accepting:
-		           resourceController currencyVersion1dot0dot0MediaType.
-	request setAcceptLanguage: 'en'.
+		           representedAs:
+		           resourceController currencyVersion1dot0dot0MediaType
+						 in: 'en'.
 
 	response := resourceController
 		            currencyBasedOn: request
@@ -145,9 +146,9 @@ SouthAmericanCurrenciesRESTfulControllerTest >> testGetArgentinePesoInSpanish [
 	| response request |
 	request := self
 		           requestToGETResourceIdentifiedBy: 'ARS'
-		           accepting:
-		           resourceController currencyVersion1dot0dot0MediaType.
-	request setAcceptLanguage: 'es'.
+		           representedAs:
+		           resourceController currencyVersion1dot0dot0MediaType
+						 in: 'es'.
 
 	response := resourceController
 		            currencyBasedOn: request
@@ -209,9 +210,10 @@ SouthAmericanCurrenciesRESTfulControllerTest >> testGetBrazilianRealInEnglish [
 	| response request |
 	request := self
 		           requestToGETResourceIdentifiedBy: 'BRL'
-		           accepting:
-		           resourceController currencyVersion1dot0dot0MediaType.
-	request setAcceptLanguage: 'en'.
+		           representedAs:
+		           resourceController currencyVersion1dot0dot0MediaType
+						 in: 'en'.
+	
 
 	response := resourceController
 		            currencyBasedOn: request
@@ -243,9 +245,9 @@ SouthAmericanCurrenciesRESTfulControllerTest >> testGetBrazilianRealInSpanish [
 	| response request |
 	request := self
 		           requestToGETResourceIdentifiedBy: 'BRL'
-		           accepting:
-		           resourceController currencyVersion1dot0dot0MediaType.
-	request setAcceptLanguage: 'es' asLanguageTag.
+		           representedAs:
+		           resourceController currencyVersion1dot0dot0MediaType
+						 in: 'es' asLanguageTag.
 
 	response := resourceController
 		            currencyBasedOn: request
@@ -310,8 +312,11 @@ SouthAmericanCurrenciesRESTfulControllerTest >> testGetCurrenciesInSpanish [
 
 	request := self
 		requestToGET: self resourceUrl
-		accepting: resourceController currencyVersion1dot0dot0MediaType.
-	request setAcceptLanguage: 'es'.
+		applying: [ :requestConfig | 
+			requestConfig
+				setAccept:
+					resourceController currencyVersion1dot0dot0MediaType;
+				setAcceptLanguage: 'es' ].
 
 	response := resourceController currenciesBasedOn: request within: self newHttpRequestContext.
 
