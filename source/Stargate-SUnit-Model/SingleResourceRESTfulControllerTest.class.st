@@ -38,11 +38,9 @@ SingleResourceRESTfulControllerTest >> requestToDELETEResourceIdentifiedBy: anId
 { #category : #'private - HTTP requests' }
 SingleResourceRESTfulControllerTest >> requestToGET: aUrl accepting: anAcceptHeader [
 
-	^ TeaRequest
-		fromZnRequest:
-			((ZnRequest get: aUrl)
-				setAccept: anAcceptHeader;
-				yourself)
+	^ self
+		  requestToGET: aUrl
+		  applying: [ :request | request setAccept: anAcceptHeader ]
 ]
 
 { #category : #'private - HTTP requests' }
@@ -80,24 +78,20 @@ SingleResourceRESTfulControllerTest >> requestToGETResourceFrom: aLocation ident
 { #category : #'private - HTTP requests' }
 SingleResourceRESTfulControllerTest >> requestToGETResourceIdentifiedBy: anIdentifier accepting: anAcceptHeader [
 
-	^ TeaRequest
-		fromZnRequest:
-			( ( ZnRequest get: ( self urlForResourceIdentifiedBy: anIdentifier ) )
-				setAccept: anAcceptHeader;
-				yourself )
-		pathParams: ( self parametersWith: anIdentifier )
+	^ self
+		  requestToGETResourceIdentifiedBy: anIdentifier
+		  applying: [ :request | request setAccept: anAcceptHeader ]
 ]
 
 { #category : #'private - HTTP requests' }
 SingleResourceRESTfulControllerTest >> requestToGETResourceIdentifiedBy: anIdentifier accepting: anAcceptHeader conditionalTo: anETag [
 
-	^ TeaRequest
-		fromZnRequest:
-			( ( ZnRequest get: ( self urlForResourceIdentifiedBy: anIdentifier ) )
-				setAccept: anAcceptHeader;
-				setIfNoneMatchTo: anETag;
-				yourself )
-		pathParams: ( self parametersWith: anIdentifier )
+	^ self
+		  requestToGETResourceIdentifiedBy: anIdentifier
+		  applying: [ :request | 
+			  request
+				  setAccept: anAcceptHeader;
+				  setIfNoneMatchTo: anETag ]
 ]
 
 { #category : #'private - HTTP requests' }
@@ -124,12 +118,10 @@ SingleResourceRESTfulControllerTest >> requestToGETResourceIdentifiedBy: anIdent
 { #category : #'private - HTTP requests' }
 SingleResourceRESTfulControllerTest >> requestToGETSubresource: aSubresourceUrl identifiedBy: anIdentifier accepting: anAcceptHeader [
 
-	^ TeaRequest
-		fromZnRequest:
-			( ( ZnRequest get: aSubresourceUrl )
-				setAccept: anAcceptHeader;
-				yourself )
-		pathParams: ( self parametersWith: anIdentifier )
+	^ self
+		  requestToGET: aSubresourceUrl
+		  withPathParams: (self parametersWith: anIdentifier)
+		  applying: [ :request | request setAccept: anAcceptHeader ]
 ]
 
 { #category : #'private - HTTP requests' }
