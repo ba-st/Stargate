@@ -46,6 +46,38 @@ SingleResourceRESTfulControllerTest >> requestToGET: aUrl accepting: anAcceptHea
 ]
 
 { #category : #'private - HTTP requests' }
+SingleResourceRESTfulControllerTest >> requestToGET: aUrl applying: aConfiguration [
+
+	^ self
+		  requestToGET: aUrl
+		  withPathParams: Dictionary new
+		  applying: aConfiguration
+]
+
+{ #category : #'private - HTTP requests' }
+SingleResourceRESTfulControllerTest >> requestToGET: aUrl withPathParams: aDictionary applying: aConfiguration [
+	
+	| request | 
+	
+	request := ZnRequest get: aUrl.
+	
+	aConfiguration value: request.
+	
+	^ TeaRequest
+		fromZnRequest: request
+		pathParams: aDictionary.
+]
+
+{ #category : #'private - HTTP requests' }
+SingleResourceRESTfulControllerTest >> requestToGETResourceFrom: aLocation identifiedBy: anIdentifier applying: aConfiguration [
+
+	^ self
+		  requestToGET: aLocation
+		  withPathParams: (self parametersWith: anIdentifier)
+		  applying: aConfiguration
+]
+
+{ #category : #'private - HTTP requests' }
 SingleResourceRESTfulControllerTest >> requestToGETResourceIdentifiedBy: anIdentifier accepting: anAcceptHeader [
 
 	^ TeaRequest
@@ -66,6 +98,27 @@ SingleResourceRESTfulControllerTest >> requestToGETResourceIdentifiedBy: anIdent
 				setIfNoneMatchTo: anETag;
 				yourself )
 		pathParams: ( self parametersWith: anIdentifier )
+]
+
+{ #category : #'private - HTTP requests' }
+SingleResourceRESTfulControllerTest >> requestToGETResourceIdentifiedBy: anIdentifier applying: aConfiguration [
+
+	^ self
+		  requestToGETResourceFrom:
+		  (self urlForResourceIdentifiedBy: anIdentifier)
+		  identifiedBy: anIdentifier
+		  applying: aConfiguration
+]
+
+{ #category : #'private - HTTP requests' }
+SingleResourceRESTfulControllerTest >> requestToGETResourceIdentifiedBy: anIdentifier representedAs: aMediaType in: aLanguageTag [
+
+	^ self
+		  requestToGETResourceIdentifiedBy: anIdentifier
+		  applying: [ :request | 
+			  request
+				  setAccept: aMediaType;
+				  setAcceptLanguage: aLanguageTag ]
 ]
 
 { #category : #'private - HTTP requests' }
