@@ -36,11 +36,11 @@ SingleResourceRESTfulControllerTest >> requestToDELETEResourceIdentifiedBy: anId
 ]
 
 { #category : #'private - HTTP requests' }
-SingleResourceRESTfulControllerTest >> requestToGET: aUrl accepting: anAcceptHeader [
+SingleResourceRESTfulControllerTest >> requestToGET: aUrl accepting: aMediaRange [
 
 	^ self
 		  requestToGET: aUrl
-		  applying: [ :request | request setAccept: anAcceptHeader ]
+		  applying: [ :request | request setAccept: aMediaRange ]
 ]
 
 { #category : #'private - HTTP requests' }
@@ -76,22 +76,33 @@ SingleResourceRESTfulControllerTest >> requestToGETResourceFrom: aLocation ident
 ]
 
 { #category : #'private - HTTP requests' }
-SingleResourceRESTfulControllerTest >> requestToGETResourceIdentifiedBy: anIdentifier accepting: anAcceptHeader [
+SingleResourceRESTfulControllerTest >> requestToGETResourceIdentifiedBy: anIdentifier accepting: aMediaRange [
 
 	^ self
 		  requestToGETResourceIdentifiedBy: anIdentifier
-		  applying: [ :request | request setAccept: anAcceptHeader ]
+		  applying: [ :request | request setAccept: aMediaRange ]
 ]
 
 { #category : #'private - HTTP requests' }
-SingleResourceRESTfulControllerTest >> requestToGETResourceIdentifiedBy: anIdentifier accepting: anAcceptHeader conditionalTo: anETag [
+SingleResourceRESTfulControllerTest >> requestToGETResourceIdentifiedBy: anIdentifier accepting: aMediaRange conditionalTo: anETag [
 
 	^ self
 		  requestToGETResourceIdentifiedBy: anIdentifier
 		  applying: [ :request | 
 			  request
-				  setAccept: anAcceptHeader;
+				  setAccept: aMediaRange;
 				  setIfNoneMatchTo: anETag ]
+]
+
+{ #category : #'private - HTTP requests' }
+SingleResourceRESTfulControllerTest >> requestToGETResourceIdentifiedBy: anIdentifier acceptingContentMatching: aMediaRange and: aLanguageRange [
+
+	^ self
+		  requestToGETResourceIdentifiedBy: anIdentifier
+		  applying: [ :request | 
+			  request
+				  setAccept: aMediaRange;
+				  setAcceptLanguage: aLanguageRange ]
 ]
 
 { #category : #'private - HTTP requests' }
@@ -105,34 +116,23 @@ SingleResourceRESTfulControllerTest >> requestToGETResourceIdentifiedBy: anIdent
 ]
 
 { #category : #'private - HTTP requests' }
-SingleResourceRESTfulControllerTest >> requestToGETResourceIdentifiedBy: anIdentifier representedAs: aMediaType in: aLanguageTag [
-
-	^ self
-		  requestToGETResourceIdentifiedBy: anIdentifier
-		  applying: [ :request | 
-			  request
-				  setAccept: aMediaType;
-				  setAcceptLanguage: aLanguageTag ]
-]
-
-{ #category : #'private - HTTP requests' }
-SingleResourceRESTfulControllerTest >> requestToGETSubresource: aSubresourceUrl identifiedBy: anIdentifier accepting: anAcceptHeader [
+SingleResourceRESTfulControllerTest >> requestToGETSubresource: aSubresourceUrl identifiedBy: anIdentifier accepting: aMediaRange [
 
 	^ self
 		  requestToGET: aSubresourceUrl
 		  withPathParams: (self parametersWith: anIdentifier)
-		  applying: [ :request | request setAccept: anAcceptHeader ]
+		  applying: [ :request | request setAccept: aMediaRange ]
 ]
 
 { #category : #'private - HTTP requests' }
-SingleResourceRESTfulControllerTest >> requestToPATCHResourceIdentifiedBy: anIdentifier with: aRequestBody accepting: anAcceptHeader conditionalTo: anETag [
+SingleResourceRESTfulControllerTest >> requestToPATCHResourceIdentifiedBy: anIdentifier with: aRequestBody accepting: aMediaRange conditionalTo: anETag [
 
 	^ TeaRequest
 		fromZnRequest:
 			( ( ZnRequest patch: ( self urlForResourceIdentifiedBy: anIdentifier ) )
-				setAccept: anAcceptHeader;
+				setAccept: aMediaRange;
 				setIfMatchTo: anETag;
-				entity: ( ZnEntity with: aRequestBody type: anAcceptHeader );
+				entity: ( ZnEntity with: aRequestBody type: aMediaRange );
 				yourself )
 		pathParams: ( self parametersWith: anIdentifier )
 ]
