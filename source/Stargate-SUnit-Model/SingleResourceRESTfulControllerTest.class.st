@@ -95,7 +95,7 @@ SingleResourceRESTfulControllerTest >> requestToGETResourceIdentifiedBy: anIdent
 ]
 
 { #category : #'private - HTTP requests' }
-SingleResourceRESTfulControllerTest >> requestToGETResourceIdentifiedBy: anIdentifier acceptingContentMatching: aMediaRange and: aLanguageRange [
+SingleResourceRESTfulControllerTest >> requestToGETResourceIdentifiedBy: anIdentifier acceptingContentMatching: aMediaRange inAnyOf: aLanguageRange [
 
 	^ self
 		  requestToGETResourceIdentifiedBy: anIdentifier
