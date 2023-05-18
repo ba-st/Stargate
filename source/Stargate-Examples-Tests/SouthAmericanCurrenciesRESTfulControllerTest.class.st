@@ -19,10 +19,22 @@ SouthAmericanCurrenciesRESTfulControllerTest >> baseUrl [
 	^ 'https://currencies.example.com' asUrl
 ]
 
+{ #category : #'private - support' }
+SouthAmericanCurrenciesRESTfulControllerTest >> english [
+
+	^ 'en'
+]
+
 { #category : #running }
 SouthAmericanCurrenciesRESTfulControllerTest >> setUpResourceController [
 
 	resourceController := SouthAmericanCurrenciesRESTfulController new
+]
+
+{ #category : #'private - support' }
+SouthAmericanCurrenciesRESTfulControllerTest >> spanish [
+
+	^ 'es'
 ]
 
 { #category : #tests }
@@ -34,7 +46,7 @@ SouthAmericanCurrenciesRESTfulControllerTest >> testCantGetArgentinePesoAskingFo
 	           requestToGETResourceIdentifiedBy: 'ARS'
 	           acceptingContentMatching:
 	           resourceController currencyVersion1dot0dot0MediaType
-	           and: ''.
+	           inAnyOf: ''.
 
 	self
 		should: [ resourceController currencyBasedOn: request within: self newHttpRequestContext ]
@@ -53,26 +65,30 @@ SouthAmericanCurrenciesRESTfulControllerTest >> testCantGetArgentinePesoAskingFo
 { #category : #tests }
 SouthAmericanCurrenciesRESTfulControllerTest >> testCantGetArgentinePesoAskingForUnsupportedLanguage [
 
-	| request |
+	| request unsupportedLanguage |
+	unsupportedLanguage := 'de'.
 
 	request := self
-	           requestToGETResourceIdentifiedBy: 'ARS'
-	           acceptingContentMatching:
-	           resourceController currencyVersion1dot0dot0MediaType
-	           and: 'de'.
+		           requestToGETResourceIdentifiedBy: 'ARS'
+		           acceptingContentMatching:
+		           resourceController currencyVersion1dot0dot0MediaType
+		           inAnyOf: unsupportedLanguage.
 
 	self
-		should: [ resourceController currencyBasedOn: request within: self newHttpRequestContext ]
+		should: [ 
+			resourceController
+				currencyBasedOn: request
+				within: self newHttpRequestContext ]
 		raise: HTTPNotAcceptable
 		withExceptionDo: [ :error | 
 			self
 				assert: error messageText
-					equals: 'Cannot generate a response entity with acceptable characteristics.';
+				equals:
+					'Cannot generate a response entity with acceptable characteristics.';
 				assert: error code equals: 406;
 				assert: error allowedLanguageTags size equals: 2;
 				assert: error allowedLanguageTags includes: 'en-US' asLanguageTag;
-				assert: error allowedLanguageTags includes: 'es-AR' asLanguageTag
-			]
+				assert: error allowedLanguageTags includes: 'es-AR' asLanguageTag ]
 ]
 
 { #category : #tests }
@@ -135,11 +151,12 @@ SouthAmericanCurrenciesRESTfulControllerTest >> testGetArgentinePesoBanknotes [
 SouthAmericanCurrenciesRESTfulControllerTest >> testGetArgentinePesoInEnglish [
 
 	| response request |
+	
 	request := self
 		           requestToGETResourceIdentifiedBy: 'ARS'
 		           acceptingContentMatching:
 		           resourceController currencyVersion1dot0dot0MediaType
-						 and: 'en'.
+		           inAnyOf: self english.
 
 	response := resourceController
 		            currencyBasedOn: request
@@ -173,7 +190,7 @@ SouthAmericanCurrenciesRESTfulControllerTest >> testGetArgentinePesoInEnglishBas
 		           requestToGETResourceIdentifiedBy: 'ARS'
 		           acceptingContentMatching:
 		           resourceController currencyVersion1dot0dot0MediaType
-						 and: '*'.
+						 inAnyOf: '*'.
 
 	response := resourceController
 		            currencyBasedOn: request
@@ -203,11 +220,12 @@ SouthAmericanCurrenciesRESTfulControllerTest >> testGetArgentinePesoInEnglishBas
 SouthAmericanCurrenciesRESTfulControllerTest >> testGetArgentinePesoInSpanish [
 
 	| response request |
+	
 	request := self
 		           requestToGETResourceIdentifiedBy: 'ARS'
 		           acceptingContentMatching:
 		           resourceController currencyVersion1dot0dot0MediaType
-						 and: 'es'.
+		           inAnyOf: self spanish.
 
 	response := resourceController
 		            currencyBasedOn: request
@@ -234,14 +252,15 @@ SouthAmericanCurrenciesRESTfulControllerTest >> testGetArgentinePesoInSpanish [
 ]
 
 { #category : #tests }
-SouthAmericanCurrenciesRESTfulControllerTest >> testGetArgentinePesoInSpanishBasedOnLanguageQualityPriority [
+SouthAmericanCurrenciesRESTfulControllerTest >> testGetArgentinePesoInSpanishBasedOnLanguagePriorityList [
 
-	| response request |
+	| response request languagePriorityList |
+	languagePriorityList := 'de,en;q=0.5,es;=0.6'.
 	request := self
 		           requestToGETResourceIdentifiedBy: 'ARS'
 		           acceptingContentMatching:
 		           resourceController currencyVersion1dot0dot0MediaType
-						 and: 'de,en;q=0.5,es;=0.6'.
+		           inAnyOf: languagePriorityList.
 
 	response := resourceController
 		            currencyBasedOn: request
@@ -305,7 +324,7 @@ SouthAmericanCurrenciesRESTfulControllerTest >> testGetBrazilianRealInEnglish [
 		           requestToGETResourceIdentifiedBy: 'BRL'
 		           acceptingContentMatching:
 		           resourceController currencyVersion1dot0dot0MediaType
-						 and: 'en'.
+						 inAnyOf: self english.
 	
 
 	response := resourceController
@@ -340,7 +359,7 @@ SouthAmericanCurrenciesRESTfulControllerTest >> testGetBrazilianRealInSpanish [
 		           requestToGETResourceIdentifiedBy: 'BRL'
 		           acceptingContentMatching:
 		           resourceController currencyVersion1dot0dot0MediaType
-						 and: 'es' asLanguageTag.
+						 inAnyOf: self spanish.
 
 	response := resourceController
 		            currencyBasedOn: request
@@ -409,7 +428,7 @@ SouthAmericanCurrenciesRESTfulControllerTest >> testGetCurrenciesInSpanish [
 			requestConfig
 				setAccept:
 					resourceController currencyVersion1dot0dot0MediaType;
-				setAcceptLanguage: 'es' ].
+				setAcceptLanguage: self spanish ].
 
 	response := resourceController currenciesBasedOn: request within: self newHttpRequestContext.
 
