@@ -137,6 +137,34 @@ PetsRESTfulControllerTest >> testCantDeleteInvalidPet [
 		withExceptionDo: [ :signal | self assert: signal code equals: 404 ]
 ]
 
+{ #category : #'tests - get individual' }
+PetsRESTfulControllerTest >> testCantGetPetSpecifyingLanguageRange [
+
+	self
+		assert: ( resourceController
+				  createPetBasedOn: ( self requestToCreatePetFrom: '{"name":"Firulais","type":"dog"}' )
+				  within: self newHttpRequestContext ) isSuccess;
+		assert: petRepository count equals: 1.
+
+	self
+		should: [ 
+			resourceController
+				getPetBasedOn: ( self
+						  requestToGETResourceIdentifiedBy: 1
+						  acceptingContentMatching: self defaultPetMediaType
+						  inAnyOf: '*' )
+				within: self newHttpRequestContext
+			]
+		raise: HTTPNotAcceptable
+		withExceptionDo: [ :error | 
+			self
+				assert: error messageText
+				equals: 'Cannot generate a response entity with acceptable characteristics.';
+				assert: error code equals: 406;
+				assert: error allowedLanguageTags isEmpty
+			]
+]
+
 { #category : #'tests - update' }
 PetsRESTfulControllerTest >> testCantUpdatePetIfMissingETag [
 
