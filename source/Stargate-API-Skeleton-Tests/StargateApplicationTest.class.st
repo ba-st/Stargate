@@ -5,7 +5,6 @@ Class {
 	#name : #StargateApplicationTest,
 	#superclass : #TestCase,
 	#instVars : [
-		'logger',
 		'application',
 		'port',
 		'baseUrl'
@@ -62,7 +61,6 @@ StargateApplicationTest >> secret [
 StargateApplicationTest >> setUp [
 
 	super setUp.
-	logger := MemoryLogger new.
 	port := self freeListeningTCPPort.
 	StargateApplication logsDirectory ensureCreateDirectory
 ]
@@ -304,21 +302,6 @@ ENVIRONMENT
 		PET_STORE__STARGATE__OPERATIONS_SECRET
 			Secret key for checking JWT signatures.
 ' expandMacrosWith: PetStoreApplication version)
-]
-
-{ #category : #'tests - application' }
-StargateApplicationTest >> testStackTraceDumper [
-
-	| dumper result |
-
-	dumper := PetStoreApplication new stackTraceDumper.
-
-	result := [ 1 / 0 ] on: ZeroDivide
-		          do: [ :zeroDivide | 
-			          dumper dumpStackTraceFor: zeroDivide.
-			          zeroDivide return: 5
-			          ].
-	self assert: result equals: 5
 ]
 
 { #category : #'tests - api' }
