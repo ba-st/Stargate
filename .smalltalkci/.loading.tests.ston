@@ -6,11 +6,5 @@ SmalltalkCISpec {
       #load : [ 'Tests' ],
       #platforms : [  #pharo ]
     }
-  ],
-  #testing : {
-    #coverage : {
-      #packages : [ 'Stargate*' ],
-      #format: #lcov
-    }
-  }
+  ]
 }

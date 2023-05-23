@@ -8,8 +8,19 @@ SmalltalkCISpec {
     }
   ],
   #testing : {
+    #exclude : {
+      #packages : [ 'Stargate-API-Skeleton*']
+    },
     #coverage : {
-      #packages : [ 'Stargate*' ],
+      #packages : [ 
+        'Stargate-Application*',
+        'Stargate-Examples*',
+        'Stargate-HealthCheck*',
+        'Stargate-JSON*',
+        'Stargate-Loggers*',
+        'Stargate-Metrics*',
+        'Stargate-Model*',
+        'Stargate-SUnit-Model*' ],
       #format: #lcov
     }
   }
