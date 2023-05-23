@@ -11,6 +11,9 @@ SmalltalkCISpec {
     #exclude : {
       #packages : [ 'Stargate-API-Skeleton*']
     },
+    #include: {
+      #classes: [ #StargateApplicationTest ]
+    },
     #coverage : {
       #packages : [ 
         'Stargate-Application*',
@@ -21,6 +24,7 @@ SmalltalkCISpec {
         'Stargate-Metrics*',
         'Stargate-Model*',
         'Stargate-SUnit-Model*' ],
+      #classes: [ #StargateApplicationTest ],
       #format: #lcov
     }
   }
