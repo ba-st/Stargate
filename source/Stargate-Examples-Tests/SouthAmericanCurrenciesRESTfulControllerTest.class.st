@@ -34,7 +34,7 @@ SouthAmericanCurrenciesRESTfulControllerTest >> english [
 { #category : #'private - language ranges' }
 SouthAmericanCurrenciesRESTfulControllerTest >> languageRange [
 
-	^ 'de,en;q=0.5,es;=0.6'
+	^ 'de,en;q=0.5,es;q=0.6'
 ]
 
 { #category : #running }
