@@ -36,58 +36,103 @@ SingleResourceRESTfulControllerTest >> requestToDELETEResourceIdentifiedBy: anId
 ]
 
 { #category : #'private - HTTP requests' }
-SingleResourceRESTfulControllerTest >> requestToGET: aUrl accepting: anAcceptHeader [
+SingleResourceRESTfulControllerTest >> requestToGET: aUrl accepting: aMediaRange [
 
-	^ TeaRequest
-		fromZnRequest:
-			((ZnRequest get: aUrl)
-				setAccept: anAcceptHeader;
-				yourself)
+	^ self
+		  requestToGET: aUrl
+		  applying: [ :request | request setAccept: aMediaRange ]
 ]
 
 { #category : #'private - HTTP requests' }
-SingleResourceRESTfulControllerTest >> requestToGETResourceIdentifiedBy: anIdentifier accepting: anAcceptHeader [
+SingleResourceRESTfulControllerTest >> requestToGET: aUrl applying: aConfiguration [
 
-	^ TeaRequest
-		fromZnRequest:
-			( ( ZnRequest get: ( self urlForResourceIdentifiedBy: anIdentifier ) )
-				setAccept: anAcceptHeader;
-				yourself )
-		pathParams: ( self parametersWith: anIdentifier )
+	^ self
+		  requestToGET: aUrl
+		  withPathParams: Dictionary new
+		  applying: aConfiguration
 ]
 
 { #category : #'private - HTTP requests' }
-SingleResourceRESTfulControllerTest >> requestToGETResourceIdentifiedBy: anIdentifier accepting: anAcceptHeader conditionalTo: anETag [
-
+SingleResourceRESTfulControllerTest >> requestToGET: aUrl withPathParams: aDictionary applying: aConfiguration [
+	
+	| request | 
+	
+	request := ZnRequest get: aUrl.
+	
+	aConfiguration value: request.
+	
 	^ TeaRequest
-		fromZnRequest:
-			( ( ZnRequest get: ( self urlForResourceIdentifiedBy: anIdentifier ) )
-				setAccept: anAcceptHeader;
-				setIfNoneMatchTo: anETag;
-				yourself )
-		pathParams: ( self parametersWith: anIdentifier )
+		fromZnRequest: request
+		pathParams: aDictionary.
 ]
 
 { #category : #'private - HTTP requests' }
-SingleResourceRESTfulControllerTest >> requestToGETSubresource: aSubresourceUrl identifiedBy: anIdentifier accepting: anAcceptHeader [
+SingleResourceRESTfulControllerTest >> requestToGETResourceFrom: aLocation identifiedBy: anIdentifier applying: aConfiguration [
 
-	^ TeaRequest
-		fromZnRequest:
-			( ( ZnRequest get: aSubresourceUrl )
-				setAccept: anAcceptHeader;
-				yourself )
-		pathParams: ( self parametersWith: anIdentifier )
+	^ self
+		  requestToGET: aLocation
+		  withPathParams: (self parametersWith: anIdentifier)
+		  applying: aConfiguration
 ]
 
 { #category : #'private - HTTP requests' }
-SingleResourceRESTfulControllerTest >> requestToPATCHResourceIdentifiedBy: anIdentifier with: aRequestBody accepting: anAcceptHeader conditionalTo: anETag [
+SingleResourceRESTfulControllerTest >> requestToGETResourceIdentifiedBy: anIdentifier accepting: aMediaRange [
+
+	^ self
+		  requestToGETResourceIdentifiedBy: anIdentifier
+		  applying: [ :request | request setAccept: aMediaRange ]
+]
+
+{ #category : #'private - HTTP requests' }
+SingleResourceRESTfulControllerTest >> requestToGETResourceIdentifiedBy: anIdentifier accepting: aMediaRange conditionalTo: anETag [
+
+	^ self
+		  requestToGETResourceIdentifiedBy: anIdentifier
+		  applying: [ :request | 
+			  request
+				  setAccept: aMediaRange;
+				  setIfNoneMatchTo: anETag ]
+]
+
+{ #category : #'private - HTTP requests' }
+SingleResourceRESTfulControllerTest >> requestToGETResourceIdentifiedBy: anIdentifier acceptingContentMatching: aMediaRange inAnyOf: aLanguageRange [
+
+	^ self
+		  requestToGETResourceIdentifiedBy: anIdentifier
+		  applying: [ :request | 
+			  request
+				  setAccept: aMediaRange;
+				  setAcceptLanguage: aLanguageRange ]
+]
+
+{ #category : #'private - HTTP requests' }
+SingleResourceRESTfulControllerTest >> requestToGETResourceIdentifiedBy: anIdentifier applying: aConfiguration [
+
+	^ self
+		  requestToGETResourceFrom:
+		  (self urlForResourceIdentifiedBy: anIdentifier)
+		  identifiedBy: anIdentifier
+		  applying: aConfiguration
+]
+
+{ #category : #'private - HTTP requests' }
+SingleResourceRESTfulControllerTest >> requestToGETSubresource: aSubresourceUrl identifiedBy: anIdentifier accepting: aMediaRange [
+
+	^ self
+		  requestToGET: aSubresourceUrl
+		  withPathParams: (self parametersWith: anIdentifier)
+		  applying: [ :request | request setAccept: aMediaRange ]
+]
+
+{ #category : #'private - HTTP requests' }
+SingleResourceRESTfulControllerTest >> requestToPATCHResourceIdentifiedBy: anIdentifier with: aRequestBody accepting: aMediaRange conditionalTo: anETag [
 
 	^ TeaRequest
 		fromZnRequest:
 			( ( ZnRequest patch: ( self urlForResourceIdentifiedBy: anIdentifier ) )
-				setAccept: anAcceptHeader;
+				setAccept: aMediaRange;
 				setIfMatchTo: anETag;
-				entity: ( ZnEntity with: aRequestBody type: anAcceptHeader );
+				entity: ( ZnEntity with: aRequestBody type: aMediaRange );
 				yourself )
 		pathParams: ( self parametersWith: anIdentifier )
 ]
