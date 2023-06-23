@@ -45,7 +45,7 @@ StargateApplication class >> isAbstract [
 { #category : #private }
 StargateApplication class >> logsDirectory [
 
-	^ FileLocator workingDirectory / 'logs'
+	^ ( FileLocator workingDirectory / 'logs' ) ensureCreateDirectory
 ]
 
 { #category : #private }
@@ -151,17 +151,18 @@ StargateApplication >> basicStop [
 
 { #category : #'private - activation/deactivation' }
 StargateApplication >> configureGlobalErrorHandlerIn: api [
-
-	[ 
-	LaunchpadLogRecord emitInfo: 'Configuring error handlers' during: [ 
+	 
+	[
+	LogRecord emitInfo: 'Configuring error handlers' during: [
 		api
-			on: Error addErrorHandler: [ :error | 
+			on: Error addErrorHandler: [ :error |
+				LogRecord emitError: ( 'Unexpected error: "<1s>"' expandMacrosWith: error messageText ).
 				self stackTraceDumper dumpStackTraceFor: error.
 				TeaResponse serverError
 					body: error messageText;
 					yourself
 				];
-			on: Exit addErrorHandler: [ :exit | 
+			on: Exit addErrorHandler: [ :exit |
 			exit isSuccess then: [ self stop ].
 			exit pass
 			]
@@ -180,7 +181,7 @@ StargateApplication >> createAPI [
 
 	| api |
 
-	LaunchpadLogRecord emitInfo: 'Creating API' during: [ 
+	LogRecord emitInfo: 'Creating API' during: [ 
 		api := HTTPBasedRESTfulAPI configuredBy: self apiConfiguration
 			       installing: self controllersToInstall ].
 	^ api
