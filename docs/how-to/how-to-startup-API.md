@@ -35,7 +35,7 @@ using port 9999.
 The configuration parameters are passed to `Teapot` so you can configure here
 any of the options accepted by `Teapot` or `Zinc` servers. The `operations`
 key is mandatory, and it's used for the plugin system of Stargate. See [the
-operations and plugins documentation](Operations.md) to get a list of valid
+operations and plugins documentation](../reference/Operations.md) to get a list of valid
 options. For deployment environments, the `jwt` authentication scheme is recommended.
 
 `#serverUrl` parameter is used as the base URL in the media controls. So, if
