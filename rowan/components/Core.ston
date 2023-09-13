@@ -12,7 +12,7 @@ RwSimpleProjectLoadComponentV2 {
     'Stargate-GS64-Extensions',
     'Stargate-JSONWebToken-Extensions',
     'Stargate-NeoJSON-Extensions',
-    'Stargate-Teapot-Extensions'.
+    'Stargate-Teapot-Extensions',
     'Stargate-Zinc-Extensions'
   ],
   #conditionalPackageMapSpecs : {
