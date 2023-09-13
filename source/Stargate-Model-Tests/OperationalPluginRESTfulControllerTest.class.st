@@ -29,7 +29,7 @@ OperationalPluginRESTfulControllerTest >> operationsConfiguration [
 
 	^ Dictionary new
 		at: #authSchema put: 'jwt';
-		at: #authAlgorithm put: JWAHMACSHA256 parameterValue;
+		at: #authAlgorithm put: 'HS256';
 		at: #authSecret put: 'secret';
 		yourself
 ]

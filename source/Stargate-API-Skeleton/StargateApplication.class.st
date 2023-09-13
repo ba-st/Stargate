@@ -126,7 +126,7 @@ StargateApplication >> applicationInfoConfiguration [
 { #category : #'private - accessing' }
 StargateApplication >> authAlgorithm [
 
-	^ JWAHMACSHA256 parameterValue
+	^ 'HS256'
 ]
 
 { #category : #'private - activation/deactivation' }

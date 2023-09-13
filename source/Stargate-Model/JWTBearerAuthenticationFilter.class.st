@@ -15,10 +15,11 @@ Class {
 JWTBearerAuthenticationFilter class >> canHandle: configuration [
 
 	| schema algorithm |
-
 	schema := configuration at: #authSchema ifAbsent: [ ^ false ].
 	algorithm := configuration at: #authAlgorithm ifAbsent: [ ^ false ].
-	^ schema = 'jwt' and: [ algorithm = JWAHMACSHA256 parameterValue ]
+	^ schema = 'jwt' and: [
+		  algorithm ~= JWANone parameterValue and: [
+			  JsonWebAlgorithm supportsAlgorithmNamed: algorithm ] ]
 ]
 
 { #category : #private }

@@ -10,7 +10,7 @@ Class {
 { #category : #private }
 JWTBearerAuthenticationFilterTest >> algorithmName [
 
-	^ JWAHMACSHA256 parameterValue
+	^ 'HS256'
 ]
 
 { #category : #private }
@@ -162,7 +162,7 @@ JWTBearerAuthenticationFilterTest >> tokenWithKey: aKey [
 		algorithmName: self algorithmName;
 		payload: JWTClaimsSet new.
 
-	jws key: aKey.
+	jws symmetricKey: aKey.
 
 	^ jws compactSerialized
 ]
@@ -176,7 +176,7 @@ JWTBearerAuthenticationFilterTest >> unsecuredTokenWithKey: aKey [
 		algorithmName: 'none';
 		payload: JWTClaimsSet new.
 
-	jws key: aKey.
+	jws symmetricKey: aKey.
 
 	^ jws compactSerialized
 ]
