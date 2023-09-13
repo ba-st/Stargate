@@ -1,6 +1,6 @@
 Extension { #name : #String }
 
-{ #category : #'*Stargate-Model' }
+{ #category : #'*Stargate-Extensions' }
 String >> asWebOrigin [ 
 
 	^ self asUrl asWebOrigin 
