@@ -1,6 +1,6 @@
 Extension { #name : #NeoJSONObject }
 
-{ #category : #'*Stargate-Model' }
+{ #category : #'*Stargate-NeoJSON-Extensions' }
 NeoJSONObject >> selfLocation [
 
 	^ self links self
