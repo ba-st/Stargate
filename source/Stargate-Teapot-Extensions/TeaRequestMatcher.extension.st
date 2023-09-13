@@ -1,6 +1,6 @@
 Extension { #name : #TeaRequestMatcher }
 
-{ #category : #'*Stargate-Model' }
+{ #category : #'*Stargate-Teapot-Extensions' }
 TeaRequestMatcher >> isEquivalentTo: aRequestMatcher [
 
 	^ self printString = aRequestMatcher printString

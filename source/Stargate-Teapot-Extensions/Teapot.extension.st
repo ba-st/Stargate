@@ -1,6 +1,6 @@
 Extension { #name : #Teapot }
 
-{ #category : #'*Stargate-Model' }
+{ #category : #'*Stargate-Teapot-Extensions' }
 Teapot >> addRouteMatchedBy: aTeaRequestMatcher action: aTeaAction [
 
 	current := dynamicRouter addRoute: ( TeaRoute matcher: aTeaRequestMatcher
@@ -9,7 +9,7 @@ Teapot >> addRouteMatchedBy: aTeaRequestMatcher action: aTeaAction [
 			             port: server port )
 ]
 
-{ #category : #'*Stargate-Model' }
+{ #category : #'*Stargate-Teapot-Extensions' }
 Teapot >> removeRoutesMatchedBy: aTeaRequestMatcher [
 
 	dynamicRouter removeRoutesMatchedBy: aTeaRequestMatcher

@@ -1,6 +1,6 @@
 Extension { #name : #TeaResponse }
 
-{ #category : #'*Stargate-Model' }
+{ #category : #'*Stargate-Teapot-Extensions' }
 TeaResponse class >> noContent [
 
 	^ self code: ZnStatusLine noContent code

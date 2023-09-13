@@ -38,11 +38,13 @@ BaselineOfStargate >> setUpCorePackages: spec [
 		group: 'Core' with: 'Stargate-Model';
 		group: 'Deployment' with: 'Stargate-Model'.
 
-	spec
-		package: 'Stargate-Zinc-Extensions'
-		with: [ spec requires: 'Stargate-Model' ];
-		group: 'Core' with: 'Stargate-Zinc-Extensions';
-		group: 'Deployment' with: 'Stargate-Zinc-Extensions'
+	#( 'Stargate-Zinc-Extensions' 'Stargate-Teapot-Extensions' ) do: [
+		:extensionPackageName |
+		spec
+			package: extensionPackageName
+			with: [ spec requires: 'Stargate-Model' ];
+			group: 'Core' with: extensionPackageName;
+			group: 'Deployment' with: extensionPackageName ]
 ]
 
 { #category : #baselines }
