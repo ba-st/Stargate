@@ -1,0 +1,21 @@
+name: 'GS64 Components Loading'
+on:
+  - push
+  - pull_request
+  - workflow_dispatch
+jobs:
+   component-loading:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        load-spec:
+          - Core
+    name: GS64 + ${{ matrix.load-spec }}
+    steps:
+      - uses: actions/checkout@v3
+      - name: Load component in image
+        uses: ba-st-actions/gs64-ci@v2
+        with:
+          project_name: 'Stargate'
+          load_spec: 'Stargate-${{ matrix.load-spec }}'

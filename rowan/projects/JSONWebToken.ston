@@ -1,0 +1,10 @@
+RwLoadSpecificationV2 {
+  #specName: 'JSONWebToken',
+  #projectName : 'JSONWebToken',
+  #gitUrl : 'https://github.com/ba-st-dependencies/JSONWebToken.git',
+  #revision : 'v1',
+  #projectSpecFile : 'rowan/project.ston',
+  #componentNames : [
+    'Deployment'
+  ]
+}

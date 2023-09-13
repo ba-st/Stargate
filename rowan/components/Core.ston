@@ -1,0 +1,33 @@
+RwSimpleProjectLoadComponentV2 {
+  #name : 'Core',
+  #projectNames : [
+    'Hyperspace',
+    'JSONWebToken',
+    'Teapot'
+  ],
+  #componentNames : [	],
+  #packageNames : [
+    'Stargate-Model',
+    'Stargate-Extensions',
+    'Stargate-GS64-Extensions',
+    'Stargate-JSONWebToken-Extensions',
+    'Stargate-NeoJSON-Extensions',
+    'Stargate-Teapot-Extensions'.
+    'Stargate-Zinc-Extensions'
+  ],
+  #conditionalPackageMapSpecs : {
+    'gemstone' : {
+      'allusers' : {
+        #packageNameToPlatformPropertiesMap : {
+          'Stargate-Model' : { 'symbolDictName' : 'Stargate' },
+          'Stargate-Extensions' : { 'symbolDictName' : 'Globals' },
+          'Stargate-GS64-Extensions' : { 'symbolDictName' : 'Globals' },
+          'Stargate-JSONWebToken-Extensions' : { 'symbolDictName' : 'JSONWebToken' },
+          'Stargate-NeoJSON-Extensions' : { 'symbolDictName' : 'NeoJSON' },
+          'Stargate-Teapot-Extensions' : { 'symbolDictName' : 'TeapotGS' },
+          'Stargate-Zinc-Extensions' : { 'symbolDictName' : 'Zinc' }
+        }
+      }
+    }
+  }
+}
