@@ -1,13 +1,13 @@
 Extension { #name : #HTTPNotAcceptable }
 
-{ #category : #'*Stargate-Model' }
+{ #category : #'*Stargate-Hyperspace-Extensions' }
 HTTPNotAcceptable >> neoJsonOn: neoJSONWriter [
 
 	( neoJSONWriter customMappingFor: ZnMimeType ) encoder: [ :mediaType | mediaType asString ].
 	( neoJSONWriter customMappingFor: LanguageTag ) encoder: [ :languageTag | languageTag asString ].
 	neoJSONWriter
 		writeMap:
-			( Dictionary new
+			( OrderedDictionary new
 				at: #code put: self code;
 				at: #message put: self messageText;
 				at: #allowedMediaTypes put: self allowedMediaTypes;

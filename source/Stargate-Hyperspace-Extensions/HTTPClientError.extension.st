@@ -1,6 +1,6 @@
 Extension { #name : #HTTPClientError }
 
-{ #category : #'*Stargate-Model' }
+{ #category : #'*Stargate-Hyperspace-Extensions' }
 HTTPClientError >> neoJsonOn: neoJSONWriter [
 
 	neoJSONWriter
