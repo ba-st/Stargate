@@ -1,18 +1,18 @@
 Extension { #name : #ZnRequest }
 
-{ #category : #'*Stargate-Model' }
+{ #category : #'*Stargate-Zinc-Extensions' }
 ZnRequest >> setUrlTemplate: urlTemplate [
 
 	self headers at: #'X-Stargate-URL-Template' put: urlTemplate asString
 ]
 
-{ #category : #'*Stargate-Model' }
+{ #category : #'*Stargate-Zinc-Extensions' }
 ZnRequest >> urlTemplateIfAbsent: aBlock [
 
 	^ self headers at: #'X-Stargate-URL-Template' ifAbsent: aBlock
 ]
 
-{ #category : #'*Stargate-Model' }
+{ #category : #'*Stargate-Zinc-Extensions' }
 ZnRequest >> withAcceptHeaderDo: aBlock ifAbsent: failBlock [
 
 	| headerValue |

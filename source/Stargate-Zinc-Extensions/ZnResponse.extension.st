@@ -1,6 +1,6 @@
 Extension { #name : #ZnResponse }
 
-{ #category : #'*Stargate-Model' }
+{ #category : #'*Stargate-Zinc-Extensions' }
 ZnResponse class >> forbidden [
 
 	^ self statusLine: ZnStatusLine forbidden

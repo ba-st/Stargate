@@ -1,12 +1,12 @@
 Extension { #name : #ZnUrl }
 
-{ #category : #'*Stargate-Model' }
+{ #category : #'*Stargate-Zinc-Extensions' }
 ZnUrl >> asWebOrigin [
 
 	^ WebOrigin basedOn: self 
 ]
 
-{ #category : #'*Stargate-Model' }
+{ #category : #'*Stargate-Zinc-Extensions' }
 ZnUrl >> hasValidOrigin [
 
 	^ WebOrigin hasValidOrigin: self

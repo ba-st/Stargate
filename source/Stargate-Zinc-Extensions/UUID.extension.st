@@ -1,6 +1,6 @@
 Extension { #name : #UUID }
 
-{ #category : #'*Stargate-Model' }
+{ #category : #'*Stargate-Zinc-Extensions' }
 UUID >> neoJsonOn: neoJSONWriter [
 
 	neoJSONWriter writeString: self printString
