@@ -1,0 +1,21 @@
+RwSimpleProjectLoadComponentV2 {
+  #name : 'JSON-RPC',
+  #projectNames : [
+    'JRPC'
+  ],
+  #componentNames : [
+    'Core'
+  ],
+  #packageNames : [
+    'Stargate-JSON-RPC'
+  ],
+  #conditionalPackageMapSpecs : {
+    'gemstone' : {
+      'allusers' : {
+        #packageNameToPlatformPropertiesMap : {
+          'Stargate-JSON-RPC' : { 'symbolDictName' : 'Stargate' }
+        }
+      }
+    }
+  }
+}

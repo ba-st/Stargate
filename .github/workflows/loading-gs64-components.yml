@@ -11,6 +11,9 @@ jobs:
       matrix:
         load-spec:
           - Core
+          - Dependent-SUnit-Extensions
+          - Deployment
+          - JSON-RPC
     name: GS64 + ${{ matrix.load-spec }}
     steps:
       - uses: actions/checkout@v3

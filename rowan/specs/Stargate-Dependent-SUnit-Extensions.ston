@@ -1,0 +1,12 @@
+RwLoadSpecificationV2 {
+  #specName: 'Stargate-Dependent-SUnit-Extensions',
+  #projectName : 'Stargate',
+  #diskUrl : 'Stargate',
+  #projectSpecFile : 'rowan/project.ston',
+  #componentNames : [
+    'Dependent-SUnit-Extensions'
+  ],
+  #customConditionalAttributes : [
+    'sunit'
+  ]
+}

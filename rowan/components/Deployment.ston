@@ -1,0 +1,8 @@
+RwSimpleProjectLoadComponentV2 {
+  #name : 'Deployment',
+  #projectNames : [ ],
+  #componentNames : [
+    'JSON-RPC'
+  ],
+  #packageNames : [ ]
+}

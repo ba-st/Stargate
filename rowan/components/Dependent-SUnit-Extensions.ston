@@ -1,0 +1,20 @@
+RwSimpleProjectLoadComponentV2 {
+  #name : 'Dependent-SUnit-Extensions',
+  #condition : 'sunit',
+  #projectNames : [ ],
+  #componentNames : [
+    'Core'
+  ],
+  #packageNames : [
+    'Stargate-SUnit-Model'
+  ],
+  #conditionalPackageMapSpecs : {
+    'gemstone' : {
+      'allusers' : {
+        #packageNameToPlatformPropertiesMap : {
+          'Stargate-SUnit-Model' : { 'symbolDictName' : 'Stargate' }
+        }
+      }
+    }
+  }
+}
