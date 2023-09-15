@@ -43,7 +43,7 @@ OperatingSystemInformationProvider >> includeLinuxDetailsOn: details [
 		linesDo: [ :line | 
 			| labelAndData |
 
-			labelAndData := line splitOn: $=.
+			labelAndData := $= split: line .
 			labelAndData size = 2
 				then: [ releaseInfo
 						at: labelAndData first asLowercase trimBoth

@@ -112,7 +112,7 @@ RESTfulControllerAcceptNegotiator >> precedenceFor: aMediaType [
 		ifTrue: [ precedence := precedence + 1 ].
 	version := aMediaType parameterAt: 'version' ifAbsent: [ ^ precedence ].
 	precedence := precedence + 2.
-	versionParts := version splitOn: $..
+	versionParts := $. split: version.
 	precedence := precedence + versionParts size.
 	versionParts doWithIndex: [ :part :index | precedence := precedence + (part asInteger * (2 raisedTo: 4 - index)) ].
 
@@ -128,13 +128,13 @@ RESTfulControllerAcceptNegotiator >> sortByPrecedence: mediaTypes [
 { #category : #'private - accessing' }
 RESTfulControllerAcceptNegotiator >> splitMediaTypesIn: acceptList [
 
-	^ ( acceptList splitOn: ',' ) collect: [ :type | type asMediaType ]
+	^ ( ',' split: acceptList ) collect: [ :type | type asMediaType ]
 ]
 
 { #category : #'private - accessing' }
 RESTfulControllerAcceptNegotiator >> splitQualifiedLanguageRangesIn: acceptLanguageList [
 
-	^ ( acceptLanguageList splitOn: ',' )
+	^ ( ',' split: acceptLanguageList )
 		inject: OrderedCollection new
 		into: [ :qualifiedLanguageRanges :each | 
 			"Be lenient here, ignore everything that is garbage in the header"
@@ -153,8 +153,8 @@ RESTfulControllerAcceptNegotiator >> versionIn: acceptable canBeHandledBy: avail
 
 	acceptVersion := acceptable parameterAt: 'version' ifAbsent: [ ^ true ].
 	availableVersion := available parameterAt: 'version' ifAbsent: [ ^ false ].
-	acceptVersionParts := acceptVersion splitOn: $..
-	availableVersionParts := availableVersion splitOn: $..
+	acceptVersionParts := $. split: acceptVersion.
+	availableVersionParts := $. split: availableVersion.
 	acceptVersionParts
 		doWithIndex: [ :acceptPart :index | 
 			| availablePart |
