@@ -3,6 +3,7 @@ RwSimpleProjectLoadComponentV2 {
   #projectNames : [
     'Hyperspace',
     'JSONWebToken',
+    'SortFunctions',
     'Teapot'
   ],
   #componentNames : [	],
