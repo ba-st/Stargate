@@ -1,0 +1,14 @@
+RwLoadSpecificationV2 {
+  #specName: 'Stargate-CI',
+  #projectName : 'Stargate',
+  #diskUrl : 'Stargate',
+  #projectSpecFile : 'rowan/project.ston',
+  #componentNames : [
+    'Tests'
+  ],
+  #customConditionalAttributes : [
+    'tests',
+    'sunit'
+  ],
+  #comment : 'Loading spec for the continuous integration setup'
+}
