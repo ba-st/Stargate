@@ -1,0 +1,21 @@
+RwSimpleProjectLoadComponentV2 {
+  #name : 'Application-Control',
+  #projectNames : [
+    'Launchpad'
+  ],
+  #componentNames : [
+    'JSON-RPC'
+  ],
+  #packageNames : [
+    'Stargate-Application-Control'
+  ],
+  #conditionalPackageMapSpecs : {
+    'gemstone' : {
+      'allusers' : {
+        #packageNameToPlatformPropertiesMap : {
+          'Stargate-Application-Control' : { 'symbolDictName' : 'Stargate' }
+        }
+      }
+    }
+  }
+}

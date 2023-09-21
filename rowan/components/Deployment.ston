@@ -3,7 +3,7 @@ RwSimpleProjectLoadComponentV2 {
   #projectNames : [ ],
   #componentNames : [
     'Application-Configuration',
-    'JSON-RPC'
+    'Application-Control'
   ],
   #packageNames : [ ]
 }

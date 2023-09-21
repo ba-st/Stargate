@@ -11,6 +11,7 @@ jobs:
       matrix:
         load-spec:
           - Application-Configuration
+          - Application-Control
           - Core
           - Dependent-SUnit-Extensions
           - Deployment
