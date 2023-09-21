@@ -10,6 +10,7 @@ jobs:
       fail-fast: false
       matrix:
         load-spec:
+          - Application-Configuration
           - Core
           - Dependent-SUnit-Extensions
           - Deployment

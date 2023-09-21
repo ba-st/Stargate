@@ -7,13 +7,15 @@ RwSimpleProjectLoadComponentV2 {
     'Dependent-SUnit-Extensions'
   ],
   #packageNames : [
+    'Stargate-Application-Configuration-Tests',
     'Stargate-JSON-RPC-Tests'
   ],
   #conditionalPackageMapSpecs : {
     'gemstone' : {
       'allusers' : {
         #packageNameToPlatformPropertiesMap : {
-          'Stargate-JSON-RPC-Tests' : { 'symbolDictName' : 'Stargate' }
+          'Stargate-JSON-RPC-Tests' : { 'symbolDictName' : 'Stargate' },
+          'Stargate-Application-Configuration-Tests' : { 'symbolDictName' : 'Stargate' }
         }
       }
     }
