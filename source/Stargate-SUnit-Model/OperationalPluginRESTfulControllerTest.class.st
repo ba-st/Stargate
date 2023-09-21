@@ -1,7 +1,7 @@
 Class {
 	#name : #OperationalPluginRESTfulControllerTest,
 	#superclass : #SingleResourceRESTfulControllerTest,
-	#category : #'Stargate-Model-Tests-Operations'
+	#category : #'Stargate-SUnit-Model'
 }
 
 { #category : #testing }
