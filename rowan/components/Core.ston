@@ -10,6 +10,7 @@ RwSimpleProjectLoadComponentV2 {
   #packageNames : [
     'Stargate-Model',
     'Stargate-Extensions',
+    'Stargate-Hyperspace-Extensions',
     'Stargate-GS64-Extensions',
     'Stargate-JSONWebToken-Extensions',
     'Stargate-NeoJSON-Extensions',
@@ -22,6 +23,7 @@ RwSimpleProjectLoadComponentV2 {
         #packageNameToPlatformPropertiesMap : {
           'Stargate-Model' : { 'symbolDictName' : 'Stargate' },
           'Stargate-Extensions' : { 'symbolDictName' : 'Globals' },
+          'Stargate-Hyperspace-Extensions' : { 'symbolDictName' : 'Hyperspace' },
           'Stargate-GS64-Extensions' : { 'symbolDictName' : 'Globals' },
           'Stargate-JSONWebToken-Extensions' : { 'symbolDictName' : 'JSONWebToken' },
           'Stargate-NeoJSON-Extensions' : { 'symbolDictName' : 'NeoJSON' },
