@@ -3,7 +3,8 @@ RwSimpleProjectLoadComponentV2 {
   #projectNames : [ ],
   #componentNames : [
     'Application-Configuration',
-    'Application-Control'
+    'Application-Control',
+    'Loggers'
   ],
   #packageNames : [ ]
 }

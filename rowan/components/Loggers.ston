@@ -1,0 +1,21 @@
+RwSimpleProjectLoadComponentV2 {
+  #name : 'Loggers',
+  #projectNames : [
+    'Launchpad'
+  ],
+  #componentNames : [
+    'Core'
+  ],
+  #packageNames : [
+    'Stargate-Loggers'
+  ],
+  #conditionalPackageMapSpecs : {
+    'gemstone' : {
+      'allusers' : {
+        #packageNameToPlatformPropertiesMap : {
+          'Stargate-Loggers' : { 'symbolDictName' : 'Stargate' }
+        }
+      }
+    }
+  }
+}
