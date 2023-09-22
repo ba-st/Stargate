@@ -34,21 +34,28 @@ ApplicationInfoRESTfulControllerTest >> testGetInfoInJson [
 	| response |
 
 	response := resourceController
-		getApplicationInfoBasedOn:
-			( self
-				requestToGET: self resourceUrl
-				accepting: resourceController operationalApplicationInfoVersion1dot0dot0MediaType )
-		within: self newHttpRequestContext.
+		            getApplicationInfoBasedOn: ( self
+				              requestToGET: self resourceUrl
+				              accepting: resourceController operationalApplicationInfoVersion1dot0dot0MediaType )
+		            within: self newHttpRequestContext.
 
 	self
 		assert: response isSuccess;
 		assert: response contentType asMediaType
-			equals: resourceController operationalApplicationInfoVersion1dot0dot0MediaType;
-		withJsonFromContentsIn: response
-			do: [ :info | 
+		equals: resourceController operationalApplicationInfoVersion1dot0dot0MediaType;
+		withJsonFromContentsIn: response do: [ :info |
+			self assert: info os general platform notEmpty.
 			self
-				assert: info os general platform notEmpty;
-				assert: info pharo image version notEmpty;
-				assert: info pharo vm version notEmpty
+				runOnlyInPharo: [
+					self
+						assert: info pharo image version notEmpty;
+						assert: info pharo vm version notEmpty
+					];
+				runOnlyInGemStone64: [
+					self
+						assert: info gs64 gem notEmpty;
+						assert: info gs64 sharedPageCache notEmpty;
+						assert: info gs64 stone notEmpty
+					]
 			]
 ]

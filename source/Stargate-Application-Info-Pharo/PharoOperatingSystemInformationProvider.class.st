@@ -2,25 +2,25 @@
 I'm a provider of information about the Operating System running this application
 "
 Class {
-	#name : #OperatingSystemInformationProvider,
+	#name : #PharoOperatingSystemInformationProvider,
 	#superclass : #ApplicationInformationProvider,
 	#category : #'Stargate-Application-Info-Pharo'
 }
 
 { #category : #accessing }
-OperatingSystemInformationProvider class >> providerName [
+PharoOperatingSystemInformationProvider class >> providerName [
 
 	^ 'os'
 ]
 
 { #category : #private }
-OperatingSystemInformationProvider >> environmentInfo [
+PharoOperatingSystemInformationProvider >> environmentInfo [
 
 	^ Smalltalk os environment asDictionary
 ]
 
 { #category : #querying }
-OperatingSystemInformationProvider >> gatherInformation [
+PharoOperatingSystemInformationProvider >> gatherInformation [
 
 	^ Dictionary new
 		at: 'general' put: self operatingSystemGeneralInfo;
@@ -30,7 +30,7 @@ OperatingSystemInformationProvider >> gatherInformation [
 ]
 
 { #category : #private }
-OperatingSystemInformationProvider >> includeLinuxDetailsOn: details [
+PharoOperatingSystemInformationProvider >> includeLinuxDetailsOn: details [
 
 	[ details at: 'version' put: '/proc/version' asFileReference contents ]
 		on: Error
@@ -57,7 +57,7 @@ OperatingSystemInformationProvider >> includeLinuxDetailsOn: details [
 ]
 
 { #category : #private }
-OperatingSystemInformationProvider >> operatingSystemDetails [
+PharoOperatingSystemInformationProvider >> operatingSystemDetails [
 
 	| details |
 
@@ -67,7 +67,7 @@ OperatingSystemInformationProvider >> operatingSystemDetails [
 ]
 
 { #category : #private }
-OperatingSystemInformationProvider >> operatingSystemGeneralInfo [
+PharoOperatingSystemInformationProvider >> operatingSystemGeneralInfo [
 
 	^ OrderedDictionary new
 		at: 'platform' put: Smalltalk os platformName;
