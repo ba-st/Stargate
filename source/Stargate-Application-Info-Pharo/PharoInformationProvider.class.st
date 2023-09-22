@@ -4,7 +4,7 @@ I'm a provider of information about the Pharo version running this application
 Class {
 	#name : #PharoInformationProvider,
 	#superclass : #ApplicationInformationProvider,
-	#category : #'Stargate-Application-Info'
+	#category : #'Stargate-Application-Info-Pharo'
 }
 
 { #category : #accessing }

@@ -118,7 +118,11 @@ BaselineOfStargate >> setUpDeploymentPackages: spec [
 	spec
 		package: 'Stargate-Application-Info'
 		with: [ spec requires: 'Core' ];
-		group: 'Application-Info' with: 'Stargate-Application-Info';
+		group: 'Application-Info' with: 'Stargate-Application-Info'.
+	spec
+		package: 'Stargate-Application-Info-Pharo'
+		with: [ spec requires: 'Stargate-Application-Info' ];
+		group: 'Application-Info' with: 'Stargate-Application-Info-Pharo';
 		group: 'Deployment' with: 'Application-Info'.
 	spec
 		package: 'Stargate-Application-Configuration'

@@ -4,7 +4,7 @@ I'm a provider of information about the Operating System running this applicatio
 Class {
 	#name : #OperatingSystemInformationProvider,
 	#superclass : #ApplicationInformationProvider,
-	#category : #'Stargate-Application-Info'
+	#category : #'Stargate-Application-Info-Pharo'
 }
 
 { #category : #accessing }
