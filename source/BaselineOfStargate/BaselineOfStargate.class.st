@@ -53,12 +53,12 @@ BaselineOfStargate >> setUpCorePackages: spec [
 BaselineOfStargate >> setUpDependencies: spec [
 
 	spec
-		baseline: 'Buoy' with: [ spec repository: 'github://ba-st/Buoy:v6' ];
+		baseline: 'Buoy' with: [ spec repository: 'github://ba-st/Buoy:v7' ];
 		project: 'Buoy-Deployment' copyFrom: 'Buoy' with: [ spec loads: 'Deployment' ];
 		project: 'Buoy-SUnit' copyFrom: 'Buoy' with: [ spec loads: 'Dependent-SUnit-Extensions' ].
 
 	spec
-		baseline: 'Hyperspace' with: [ spec repository: 'github://ba-st/Hyperspace:v4' ];
+		baseline: 'Hyperspace' with: [ spec repository: 'github://ba-st/Hyperspace:v5' ];
 		project: 'Hyperspace-Deployment' copyFrom: 'Hyperspace' with: [ spec loads: 'Deployment' ];
     project: 'Hyperspace-Tools' copyFrom: 'Hyperspace' with: [ spec loads: 'Tools' ];
 		project: 'Hyperspace-SUnit'
@@ -66,7 +66,7 @@ BaselineOfStargate >> setUpDependencies: spec [
 		with: [ spec loads: 'Dependent-SUnit-Extensions' ].
 
 	spec
-		baseline: 'Teapot' with: [ spec repository: 'github://zeroflag/Teapot:v2.7.0/source' ];
+		baseline: 'Teapot' with: [ spec repository: 'github://ba-st-dependencies/Teapot:v2' ];
 		project: 'Teapot-Deployment' copyFrom: 'Teapot' with: [ spec loads: 'Deployment' ].
 
 	spec
@@ -76,11 +76,11 @@ BaselineOfStargate >> setUpDependencies: spec [
 		with: [ spec loads: 'SSL' ].
 
 	spec
-		baseline: 'JRPC' with: [ spec repository: 'github://juliendelplanque/JRPC:v3.x.x/src' ];
+		baseline: 'JRPC' with: [ spec repository: 'github://ba-st-dependencies/JRPC:v4' ];
 		project: 'JRPC-Deployment' copyFrom: 'JRPC' with: [ spec loads: 'Server-Deployment' ].
 
 	spec
-		baseline: 'Launchpad' with: [ spec repository: 'github://ba-st/Launchpad:v4' ];
+		baseline: 'Launchpad' with: [ spec repository: 'github://ba-st/Launchpad:v5' ];
 		project: 'Launchpad-Deployment' copyFrom: 'Launchpad' with: [ spec loads: 'Deployment' ].
 
 	spec
