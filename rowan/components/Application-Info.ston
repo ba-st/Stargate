@@ -1,0 +1,19 @@
+RwSimpleProjectLoadComponentV2 {
+  #name : 'Application-Info',
+  #projectNames : [ ],
+  #componentNames : [
+    'Core'
+  ],
+  #packageNames : [
+    'Stargate-Application-Info'
+  ],
+  #conditionalPackageMapSpecs : {
+    'gemstone' : {
+      'allusers' : {
+        #packageNameToPlatformPropertiesMap : {
+          'Stargate-Application-Info' : { 'symbolDictName' : 'Stargate' }
+        }
+      }
+    }
+  }
+}

@@ -12,6 +12,7 @@ jobs:
         load-spec:
           - Application-Configuration
           - Application-Control
+          - Application-Info
           - Core
           - Dependent-SUnit-Extensions
           - Deployment
