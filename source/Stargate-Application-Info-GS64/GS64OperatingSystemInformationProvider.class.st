@@ -30,7 +30,7 @@ GS64OperatingSystemInformationProvider >> environmentInfo [
 { #category : #querying }
 GS64OperatingSystemInformationProvider >> gatherInformation [
 
-	^ Dictionary new
+	^ OrderedDictionary new
 		at: 'general' put: self operatingSystemGeneralInfo;
 		at: 'details' put: self operatingSystemDetails;
 		at: 'environment' put: self environmentInfo;
