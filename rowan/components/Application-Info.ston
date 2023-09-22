@@ -5,13 +5,15 @@ RwSimpleProjectLoadComponentV2 {
     'Core'
   ],
   #packageNames : [
-    'Stargate-Application-Info'
+    'Stargate-Application-Info',
+    'Stargate-Application-Info-GS64'
   ],
   #conditionalPackageMapSpecs : {
     'gemstone' : {
       'allusers' : {
         #packageNameToPlatformPropertiesMap : {
-          'Stargate-Application-Info' : { 'symbolDictName' : 'Stargate' }
+          'Stargate-Application-Info' : { 'symbolDictName' : 'Stargate' },
+          'Stargate-Application-Info-GS64' : { 'symbolDictName' : 'Stargate' }
         }
       }
     }
