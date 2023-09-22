@@ -2,15 +2,16 @@
 A LoggersRESTfulControllerTest is a test class for testing the behavior of LoggersRESTfulController
 "
 Class {
-	#name : #LoggersRESTfulControllerTest,
-	#superclass : #OperationalPluginRESTfulControllerTest,
+	#name : 'LoggersRESTfulControllerTest',
+	#superclass : 'OperationalPluginRESTfulControllerTest',
 	#instVars : [
 		'beacon'
 	],
-	#category : #'Stargate-Loggers-Tests'
+	#category : 'Stargate-Loggers-Tests',
+	#package : 'Stargate-Loggers-Tests'
 }
 
-{ #category : #'private - support' }
+{ #category : 'private - support' }
 LoggersRESTfulControllerTest >> operationsConfiguration [
 
 	^ super operationsConfiguration
@@ -21,14 +22,14 @@ LoggersRESTfulControllerTest >> operationsConfiguration [
 		  yourself
 ]
 
-{ #category : #running }
+{ #category : 'running' }
 LoggersRESTfulControllerTest >> setUp [
 	
 	beacon := Beacon new.
 	super setUp.
 ]
 
-{ #category : #running }
+{ #category : 'running' }
 LoggersRESTfulControllerTest >> setUpResourceController [
 
 	resourceController := LoggersRESTfulController over:
@@ -36,7 +37,7 @@ LoggersRESTfulControllerTest >> setUpResourceController [
 		                      configuredBy: self operationsConfiguration
 ]
 
-{ #category : #'private - support' }
+{ #category : 'private - support' }
 LoggersRESTfulControllerTest >> startLoggersDuring: aBlock [
 
 	| stdoutLogger stderrLogger |
@@ -48,8 +49,8 @@ LoggersRESTfulControllerTest >> startLoggersDuring: aBlock [
 	stderrLogger name: self stderrLoggerName.
 
 	[ 
-	stdoutLogger startFor: ( LaunchpadLogRecord where: [ :record | record isInformational ] ).
-	stderrLogger startFor: ( LaunchpadLogRecord where: [ :record | record isInformational not ] ).
+	stdoutLogger startFor: ( LogRecord where: [ :record | record isInformational ] ).
+	stderrLogger startFor: ( LogRecord where: [ :record | record isInformational not ] ).
 	aBlock value
 	] ensure: [ 
 		stdoutLogger stop.
@@ -57,26 +58,26 @@ LoggersRESTfulControllerTest >> startLoggersDuring: aBlock [
 		]
 ]
 
-{ #category : #'private - support' }
+{ #category : 'private - support' }
 LoggersRESTfulControllerTest >> stderrLoggerName [
 
 	^ 'stderr-logger'
 ]
 
-{ #category : #'private - support' }
+{ #category : 'private - support' }
 LoggersRESTfulControllerTest >> stdoutLoggerName [
 
 	^ 'stdout-logger'
 ]
 
-{ #category : #running }
+{ #category : 'running' }
 LoggersRESTfulControllerTest >> tearDown [
 
 	super tearDown.
 	beacon announcer subscriptions reset
 ]
 
-{ #category : #tests }
+{ #category : 'tests' }
 LoggersRESTfulControllerTest >> testGetLoggerWhenNotFound [
 
 	self
@@ -89,7 +90,7 @@ LoggersRESTfulControllerTest >> testGetLoggerWhenNotFound [
 		raise: HTTPClientError notFound
 ]
 
-{ #category : #tests }
+{ #category : 'tests' }
 LoggersRESTfulControllerTest >> testGetLoggersWhenEmpty [
 
 	| response |
@@ -108,7 +109,7 @@ LoggersRESTfulControllerTest >> testGetLoggersWhenEmpty [
 		withJsonFromItemsIn: response do: [ :loggers | self assert: loggers isEmpty ]
 ]
 
-{ #category : #tests }
+{ #category : 'tests' }
 LoggersRESTfulControllerTest >> testGetLoggersWhenNotEmpty [
 
 	self startLoggersDuring: [ 
@@ -147,7 +148,7 @@ LoggersRESTfulControllerTest >> testGetLoggersWhenNotEmpty [
 		]
 ]
 
-{ #category : #tests }
+{ #category : 'tests' }
 LoggersRESTfulControllerTest >> testGetStderrLogger [
 
 	self startLoggersDuring: [ 
@@ -173,7 +174,7 @@ LoggersRESTfulControllerTest >> testGetStderrLogger [
 		]
 ]
 
-{ #category : #tests }
+{ #category : 'tests' }
 LoggersRESTfulControllerTest >> testGetStdoutLogger [
 
 	self startLoggersDuring: [ 

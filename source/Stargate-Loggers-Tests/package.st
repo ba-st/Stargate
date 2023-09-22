@@ -1,1 +1,1 @@
-Package { #name : #'Stargate-Loggers-Tests' }
+Package { #name : 'Stargate-Loggers-Tests' }

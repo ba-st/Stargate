@@ -1,6 +1,6 @@
-Extension { #name : #StandardStreamLogger }
+Extension { #name : 'StandardStreamLogger' }
 
-{ #category : #'*Stargate-Loggers-Tests' }
+{ #category : '*Stargate-Loggers-Tests' }
 StandardStreamLogger class >> onStandardErrorFor: beacon [
 
 	^ ( StandardErrorLogger for: beacon )
@@ -8,7 +8,7 @@ StandardStreamLogger class >> onStandardErrorFor: beacon [
 		  yourself
 ]
 
-{ #category : #'*Stargate-Loggers-Tests' }
+{ #category : '*Stargate-Loggers-Tests' }
 StandardStreamLogger class >> onStandardOutputFor: beacon [
 
 	^ ( StandardOutputLogger for: beacon )

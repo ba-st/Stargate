@@ -1,13 +1,14 @@
 Class {
-	#name : #LoggersPluginAPITest,
-	#superclass : #OperationalPluginAPITest,
+	#name : 'LoggersPluginAPITest',
+	#superclass : 'OperationalPluginAPITest',
 	#instVars : [
 		'beacon'
 	],
-	#category : #'Stargate-Loggers-Tests'
+	#category : 'Stargate-Loggers-Tests',
+	#package : 'Stargate-Loggers-Tests'
 }
 
-{ #category : #running }
+{ #category : 'running' }
 LoggersPluginAPITest >> operationsConfiguration [
 
 	^ super operationsConfiguration
@@ -18,20 +19,20 @@ LoggersPluginAPITest >> operationsConfiguration [
 		  yourself
 ]
 
-{ #category : #running }
+{ #category : 'running' }
 LoggersPluginAPITest >> requiredPermissions [
 
 	^ #('read:loggers')
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 LoggersPluginAPITest >> setUp [
 
 	beacon := Beacon new.
 	super setUp
 ]
 
-{ #category : #'private - support' }
+{ #category : 'private - support' }
 LoggersPluginAPITest >> startLoggersDuring: aBlock [
 
 	| stderrLogger |
@@ -40,25 +41,25 @@ LoggersPluginAPITest >> startLoggersDuring: aBlock [
 	stderrLogger name: self stderrLoggerName.
 
 	[ 
-	stderrLogger startFor: ( LaunchpadLogRecord where: [ :record | record isInformational not ] ).
+	stderrLogger startFor: ( LogRecord where: [ :record | record isInformational not ] ).
 	aBlock value
 	] ensure: [ stderrLogger stop ]
 ]
 
-{ #category : #'private - support' }
+{ #category : 'private - support' }
 LoggersPluginAPITest >> stderrLoggerName [
 
 	^ 'stderr-logger'
 ]
 
-{ #category : #running }
+{ #category : 'running' }
 LoggersPluginAPITest >> tearDown [
 
 	beacon announcer subscriptions reset.
 	super tearDown
 ]
 
-{ #category : #running }
+{ #category : 'running' }
 LoggersPluginAPITest >> testDisablePlugin [
 
 	self assertIsEnabled: LoggersPlugin.
@@ -78,7 +79,7 @@ LoggersPluginAPITest >> testDisablePlugin [
 		withExceptionDo: [ :error | self assert: error response isNotFound ]
 ]
 
-{ #category : #running }
+{ #category : 'running' }
 LoggersPluginAPITest >> testEnablePreviouslyDisabledPlugin [
 
 	self assertIsEnabled: LoggersPlugin.
@@ -92,7 +93,7 @@ LoggersPluginAPITest >> testEnablePreviouslyDisabledPlugin [
 	self testGetLoggerWithPermissions
 ]
 
-{ #category : #running }
+{ #category : 'running' }
 LoggersPluginAPITest >> testGetLoggerMissingPermissions [
 
 	self
@@ -107,7 +108,7 @@ LoggersPluginAPITest >> testGetLoggerMissingPermissions [
 		withExceptionDo: [ :error | self assert: error response code equals: 403 ]
 ]
 
-{ #category : #running }
+{ #category : 'running' }
 LoggersPluginAPITest >> testGetLoggerNotFound [
 
 	self
@@ -122,7 +123,7 @@ LoggersPluginAPITest >> testGetLoggerNotFound [
 		withExceptionDo: [ :error | self assert: error response isNotFound ]
 ]
 
-{ #category : #running }
+{ #category : 'running' }
 LoggersPluginAPITest >> testGetLoggerWithPermissions [
 
 	self startLoggersDuring: [ 
@@ -143,7 +144,7 @@ LoggersPluginAPITest >> testGetLoggerWithPermissions [
 		]
 ]
 
-{ #category : #running }
+{ #category : 'running' }
 LoggersPluginAPITest >> testGetLoggersMissingPermissions [
 
 	self
@@ -158,7 +159,7 @@ LoggersPluginAPITest >> testGetLoggersMissingPermissions [
 		withExceptionDo: [ :error | self assert: error response code equals: 403 ]
 ]
 
-{ #category : #running }
+{ #category : 'running' }
 LoggersPluginAPITest >> testGetLoggersWhenNotEmptyWithPermissions [
 
 	self startLoggersDuring: [ 
@@ -185,7 +186,7 @@ LoggersPluginAPITest >> testGetLoggersWhenNotEmptyWithPermissions [
 		]
 ]
 
-{ #category : #running }
+{ #category : 'running' }
 LoggersPluginAPITest >> testGetLoggersWithPermissions [
 
 	| response |
