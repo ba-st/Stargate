@@ -7,12 +7,16 @@ RwSimpleProjectLoadComponentV2 {
     'Core'
   ],
   #packageNames : [
+    'Stargate-Beacon-Extensions',
+    'Stargate-Bell-Extensions',
     'Stargate-Loggers'
   ],
   #conditionalPackageMapSpecs : {
     'gemstone' : {
       'allusers' : {
         #packageNameToPlatformPropertiesMap : {
+          'Stargate-Beacon-Extensions' : { 'symbolDictName' : 'BeaconCore' },
+          'Stargate-Bell-Extensions' : { 'symbolDictName' : 'Bell' },
           'Stargate-Loggers' : { 'symbolDictName' : 'Stargate' }
         }
       }
