@@ -1,10 +1,11 @@
 Class {
-	#name : #BaselineOfStargate,
-	#superclass : #BaselineOf,
-	#category : #BaselineOfStargate
+	#name : 'BaselineOfStargate',
+	#superclass : 'BaselineOf',
+	#category : 'BaselineOfStargate',
+	#package : 'BaselineOfStargate'
 }
 
-{ #category : #baselines }
+{ #category : 'baselines' }
 BaselineOfStargate >> baseline: spec [
 
 	<baseline>
@@ -21,13 +22,13 @@ BaselineOfStargate >> baseline: spec [
 			]
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 BaselineOfStargate >> projectClass [
 
 	^ MetacelloCypressBaselineProject
 ]
 
-{ #category : #baselines }
+{ #category : 'baselines' }
 BaselineOfStargate >> setUpCorePackages: spec [
 
 	spec
@@ -49,7 +50,7 @@ BaselineOfStargate >> setUpCorePackages: spec [
 			group: 'Deployment' with: extensionPackageName ]
 ]
 
-{ #category : #baselines }
+{ #category : 'baselines' }
 BaselineOfStargate >> setUpDependencies: spec [
 
 	spec
@@ -88,7 +89,7 @@ BaselineOfStargate >> setUpDependencies: spec [
 		project: 'ZTimestamp-Core' copyFrom: 'ZTimestamp' with: [ spec loads: 'core' ]
 ]
 
-{ #category : #baselines }
+{ #category : 'baselines' }
 BaselineOfStargate >> setUpDeploymentPackages: spec [
 
 	self setUpCorePackages: spec.
@@ -132,6 +133,11 @@ BaselineOfStargate >> setUpDeploymentPackages: spec [
 		group: 'Loggers' with: 'Stargate-Loggers';
 		group: 'Deployment' with: 'Loggers'.
 	spec
+		package: 'Stargate-Beacon-Extensions'
+		with: [ spec requires: #( 'Core' 'Launchpad-Deployment' ) ];
+		group: 'Loggers' with: 'Stargate-Beacon-Extensions';
+		group: 'Deployment' with: 'Loggers'.
+	spec
 		package: 'Stargate-API-Skeleton' with: [
 			spec requires:
 					#( 'Metrics-HTTP' 'Application-Control' 'Application-Info'
@@ -140,7 +146,7 @@ BaselineOfStargate >> setUpDeploymentPackages: spec [
 		group: 'Deployment' with: 'Stargate-API-Skeleton'
 ]
 
-{ #category : #baselines }
+{ #category : 'baselines' }
 BaselineOfStargate >> setUpPackages: spec [
 
 	self setUpDeploymentPackages: spec.
@@ -153,7 +159,7 @@ BaselineOfStargate >> setUpPackages: spec [
 	self setUpTestPackages: spec
 ]
 
-{ #category : #baselines }
+{ #category : 'baselines' }
 BaselineOfStargate >> setUpTestPackages: spec [
 
 	spec

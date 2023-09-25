@@ -1,6 +1,6 @@
-Extension { #name : #StandardOutputLogger }
+Extension { #name : 'StandardOutputLogger' }
 
-{ #category : #'*Stargate-Loggers' }
+{ #category : '*Stargate-Loggers' }
 StandardOutputLogger class >> typeDescription [
 
 	^ 'stdout'

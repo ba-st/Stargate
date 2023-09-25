@@ -1,12 +1,12 @@
-Extension { #name : #StandardStreamLogger }
+Extension { #name : 'StandardStreamLogger' }
 
-{ #category : #'*Stargate-Loggers' }
+{ #category : '*Stargate-Loggers' }
 StandardStreamLogger class >> isSupportedInStargate [
 
 	^ true
 ]
 
-{ #category : #'*Stargate-Loggers' }
+{ #category : '*Stargate-Loggers' }
 StandardStreamLogger class >> typeDescription [
 
 	^ self subclassResponsibility

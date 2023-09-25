@@ -1,6 +1,6 @@
-Extension { #name : #StandardErrorLogger }
+Extension { #name : 'StandardErrorLogger' }
 
-{ #category : #'*Stargate-Loggers' }
+{ #category : '*Stargate-Loggers' }
 StandardErrorLogger class >> typeDescription [
 
 	^ 'stderr'
