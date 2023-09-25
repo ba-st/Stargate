@@ -58,12 +58,12 @@ LabeledMetric >> name [
 LabeledMetric >> printDetailsOn: stream [
 
 	stream nextPut: $[.
-	labels
-		keysAndValuesDo: [ :key :value | 
-			key printOn: stream.
-			stream nextPut: $=.
-			value printOn: stream
-			].
+	labels keysAndValuesDo: [ :key :value |
+		stream nextPut: $#.
+		stream nextPutAll: key asString.
+		stream nextPut: $=.
+		value printOn: stream
+		].
 	stream nextPut: $].
 	stream space.
 	metric printDetailsOn: stream
