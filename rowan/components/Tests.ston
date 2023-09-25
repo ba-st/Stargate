@@ -10,6 +10,7 @@ RwSimpleProjectLoadComponentV2 {
     'Stargate-Application-Configuration-Tests',
     'Stargate-Application-Control-Tests',
     'Stargate-Application-Info-Tests',
+    'Stargate-HealthCheck-Tests',
     'Stargate-JSON-RPC-Tests'
   ],
   #conditionalPackageMapSpecs : {
@@ -19,6 +20,7 @@ RwSimpleProjectLoadComponentV2 {
           'Stargate-Application-Configuration-Tests' : { 'symbolDictName' : 'Stargate' },
           'Stargate-Application-Control-Tests' : { 'symbolDictName' : 'Stargate' },
           'Stargate-Application-Info-Tests' : { 'symbolDictName' : 'Stargate' },
+          'Stargate-HealthCheck-Tests' : { 'symbolDictName' : 'Stargate' },
           'Stargate-JSON-RPC-Tests' : { 'symbolDictName' : 'Stargate' }
         }
       }
