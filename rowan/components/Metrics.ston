@@ -6,14 +6,18 @@ RwSimpleProjectLoadComponentV2 {
   ],
   #packageNames : [
     'Stargate-Metrics',
-    'Stargate-Metrics-GS64'
+    'Stargate-Metrics-GS64',
+    'Stargate-Metrics-HTTP',
+    'Stargate-Metrics-HTTP-Zinc-Extensions'
   ],
   #conditionalPackageMapSpecs : {
     'gemstone' : {
       'allusers' : {
         #packageNameToPlatformPropertiesMap : {
           'Stargate-Metrics' : { 'symbolDictName' : 'Stargate' },
-          'Stargate-Metrics-GS64' : { 'symbolDictName' : 'Stargate' }
+          'Stargate-Metrics-GS64' : { 'symbolDictName' : 'Stargate' },
+          'Stargate-Metrics-HTTP' : { 'symbolDictName' : 'Stargate' },
+          'Stargate-Metrics-HTTP-Zinc-Extensions' : { 'symbolDictName' : 'Zinc' }
         }
       }
     }
