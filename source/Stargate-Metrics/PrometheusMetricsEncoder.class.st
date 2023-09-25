@@ -98,13 +98,11 @@ PrometheusMetricsEncoder >> encodeMetricValue: aNumber on: aWriteStream [
 { #category : #'encoding - private' }
 PrometheusMetricsEncoder >> encodeName: aName on: aWriteStream [
 
-	aName
-		do: [ :character | 
-			( character isDigit
-				or: [ character asLowercase digitValue between: $a digitValue and: $z digitValue ] )
-				then: [ aWriteStream nextPut: character asLowercase ]
-				otherwise: [ aWriteStream nextPut: $_ ]
-			]
+	aName do: [ :character |
+		( character isDigit or: [ character asLowercase codePoint between: $a codePoint and: $z codePoint ] )
+			then: [ aWriteStream nextPut: character asLowercase ]
+			otherwise: [ aWriteStream nextPut: $_ ]
+		]
 ]
 
 { #category : #'encoding - private' }
