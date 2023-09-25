@@ -71,5 +71,5 @@ CompositeMetric >> type [
 { #category : #accessing }
 CompositeMetric >> value [
 
-	^ metrics sum: #value
+	^ metrics inject: 0 into: [ :sum :metric | sum + metric value ]
 ]
