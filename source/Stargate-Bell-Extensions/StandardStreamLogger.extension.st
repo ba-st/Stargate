@@ -1,12 +1,12 @@
 Extension { #name : 'StandardStreamLogger' }
 
-{ #category : '*Stargate-Loggers' }
+{ #category : '*Stargate-Bell-Extensions' }
 StandardStreamLogger class >> isSupportedInStargate [
 
 	^ true
 ]
 
-{ #category : '*Stargate-Loggers' }
+{ #category : '*Stargate-Bell-Extensions' }
 StandardStreamLogger class >> typeDescription [
 
 	^ self subclassResponsibility

@@ -138,6 +138,11 @@ BaselineOfStargate >> setUpDeploymentPackages: spec [
 		group: 'Loggers' with: 'Stargate-Beacon-Extensions';
 		group: 'Deployment' with: 'Loggers'.
 	spec
+		package: 'Stargate-Bell-Extensions'
+		with: [ spec requires: #( 'Core' 'Launchpad-Deployment' ) ];
+		group: 'Loggers' with: 'Stargate-Bell-Extensions';
+		group: 'Deployment' with: 'Loggers'.
+	spec
 		package: 'Stargate-API-Skeleton' with: [
 			spec requires:
 					#( 'Metrics-HTTP' 'Application-Control' 'Application-Info'
