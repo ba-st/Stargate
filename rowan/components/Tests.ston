@@ -11,7 +11,8 @@ RwSimpleProjectLoadComponentV2 {
     'Stargate-Application-Control-Tests',
     'Stargate-Application-Info-Tests',
     'Stargate-HealthCheck-Tests',
-    'Stargate-JSON-RPC-Tests'
+    'Stargate-JSON-RPC-Tests',
+    'Stargate-Metrics-Tests'
   ],
   #conditionalPackageMapSpecs : {
     'gemstone' : {
@@ -21,7 +22,8 @@ RwSimpleProjectLoadComponentV2 {
           'Stargate-Application-Control-Tests' : { 'symbolDictName' : 'Stargate' },
           'Stargate-Application-Info-Tests' : { 'symbolDictName' : 'Stargate' },
           'Stargate-HealthCheck-Tests' : { 'symbolDictName' : 'Stargate' },
-          'Stargate-JSON-RPC-Tests' : { 'symbolDictName' : 'Stargate' }
+          'Stargate-JSON-RPC-Tests' : { 'symbolDictName' : 'Stargate' },
+          'Stargate-Metrics-Tests' : { 'symbolDictName' : 'Stargate' }
         }
       }
     }

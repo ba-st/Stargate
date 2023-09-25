@@ -17,6 +17,7 @@ jobs:
           - Dependent-SUnit-Extensions
           - Deployment
           - HealthCheck
+          - Metrics
           - JSON-RPC
     name: GS64 + ${{ matrix.load-spec }}
     steps:

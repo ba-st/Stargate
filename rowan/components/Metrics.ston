@@ -1,0 +1,21 @@
+RwSimpleProjectLoadComponentV2 {
+  #name : 'Metrics',
+  #projectNames : [ ],
+  #componentNames : [
+    'Core'
+  ],
+  #packageNames : [
+    'Stargate-Metrics',
+    'Stargate-Metrics-GS64'
+  ],
+  #conditionalPackageMapSpecs : {
+    'gemstone' : {
+      'allusers' : {
+        #packageNameToPlatformPropertiesMap : {
+          'Stargate-Metrics' : { 'symbolDictName' : 'Stargate' },
+          'Stargate-Metrics-GS64' : { 'symbolDictName' : 'Stargate' }
+        }
+      }
+    }
+  }
+}
