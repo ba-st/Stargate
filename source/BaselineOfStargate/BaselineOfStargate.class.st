@@ -105,8 +105,11 @@ BaselineOfStargate >> setUpDeploymentPackages: spec [
 		group: 'Deployment' with: 'Metrics'.
 	spec
 		package: 'Stargate-Metrics-HTTP' with: [ spec requires: 'Stargate-Metrics' ];
-		group: 'Metrics-HTTP' with: 'Stargate-Metrics-HTTP';
-		group: 'Deployment' with: 'Metrics-HTTP'.
+		group: 'Metrics-HTTP' with: 'Stargate-Metrics-HTTP'.
+	spec
+		package: 'Stargate-Metrics-HTTP-Zinc-Extensions' with: [ spec requires: 'Stargate-Metrics-HTTP' ];
+		group: 'Metrics-HTTP' with: 'Stargate-Metrics-HTTP-Zinc-Extensions';
+		group: 'Deployment' with: 'Metrics-HTTP'.		
 	spec
 		package: 'Stargate-JSON-RPC' with: [ spec requires: #( 'Core' 'JRPC-Deployment' ) ];
 		group: 'JSON-RPC' with: 'Stargate-JSON-RPC';
