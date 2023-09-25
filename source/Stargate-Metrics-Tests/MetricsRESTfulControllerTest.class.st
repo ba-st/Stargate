@@ -34,27 +34,26 @@ MetricsRESTfulControllerTest >> testGetMetricsInJson [
 	| response |
 
 	response := resourceController
-		getMetricsBasedOn:
-			( self
-				requestToGET: self resourceUrl
-				accepting: resourceController operationalMetricsVersion1dot0dot0MediaType )
-		within: self newHttpRequestContext.
+		            getMetricsBasedOn: ( self
+				              requestToGET: self resourceUrl
+				              accepting: resourceController operationalMetricsVersion1dot0dot0MediaType )
+		            within: self newHttpRequestContext.
 
 	self
 		assert: response isSuccess;
 		assert: response contentType asMediaType
-			equals: resourceController operationalMetricsVersion1dot0dot0MediaType;
-		withJsonFromContentsIn: response
-			do: [ :metrics | 
-			self assert: metrics size equals: 7.
-			metrics
-				do: [ :metric | 
-					self
-						assert: metric name notEmpty;
-						assert: metric description notEmpty;
-						assert: metric value isNumber;
-						assert: ( #('Gauge' 'Counter') includes: metric type )
-					]
+		equals: resourceController operationalMetricsVersion1dot0dot0MediaType;
+		withJsonFromContentsIn: response do: [ :metrics |
+			self
+				runOnlyInPharo: [ self assert: metrics size equals: 7 ];
+				runOnlyInGemStone64: [ self assert: metrics size equals: 1 ].
+			metrics do: [ :metric |
+				self
+					assert: metric name notEmpty;
+					assert: metric description notEmpty;
+					assert: metric value isNumber;
+					assert: ( #( 'Gauge' 'Counter' ) includes: metric type )
+				]
 			]
 ]
 
