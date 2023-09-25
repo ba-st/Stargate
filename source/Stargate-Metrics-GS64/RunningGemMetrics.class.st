@@ -27,7 +27,6 @@ RunningGemMetrics >> groupProcessesByStatusAndPriority [
 
 	| activeProcessData activeProcess groupedProcesses |
 
-	Smalltalk garbageCollectMost.
 	activeProcess := Processor activeProcess.
 	activeProcessData := { 'ACTIVE'. activeProcess priority }.
 
