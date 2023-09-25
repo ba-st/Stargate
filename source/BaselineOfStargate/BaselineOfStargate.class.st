@@ -98,49 +98,45 @@ BaselineOfStargate >> setUpDeploymentPackages: spec [
 		group: 'Deployment' with: 'HealthCheck'.
 	spec
 		package: 'Stargate-Metrics' with: [ spec requires: 'Core' ];
-		group: 'Metrics' with: 'Stargate-Metrics';
+		group: 'Metrics' with: 'Stargate-Metrics'.
+	spec
+		package: 'Stargate-Metrics-Pharo' with: [ spec requires: 'Stargate-Metrics' ];
+		group: 'Metrics' with: 'Stargate-Metrics-Pharo';
 		group: 'Deployment' with: 'Metrics'.
 	spec
-		package: 'Stargate-Metrics-HTTP'
-		with: [ spec requires: 'Stargate-Metrics' ];
+		package: 'Stargate-Metrics-HTTP' with: [ spec requires: 'Stargate-Metrics' ];
 		group: 'Metrics-HTTP' with: 'Stargate-Metrics-HTTP';
 		group: 'Deployment' with: 'Metrics-HTTP'.
 	spec
-		package: 'Stargate-JSON-RPC'
-		with: [ spec requires: #( 'Core' 'JRPC-Deployment' ) ];
+		package: 'Stargate-JSON-RPC' with: [ spec requires: #( 'Core' 'JRPC-Deployment' ) ];
 		group: 'JSON-RPC' with: 'Stargate-JSON-RPC';
 		group: 'Deployment' with: 'JSON-RPC'.
 	spec
-		package: 'Stargate-Application-Control'
-		with: [ spec requires: #( 'Core' 'JSON-RPC' ) ];
+		package: 'Stargate-Application-Control' with: [ spec requires: #( 'Core' 'JSON-RPC' ) ];
 		group: 'Application-Control' with: 'Stargate-Application-Control';
 		group: 'Deployment' with: 'Application-Control'.
 	spec
-		package: 'Stargate-Application-Info'
-		with: [ spec requires: 'Core' ];
+		package: 'Stargate-Application-Info' with: [ spec requires: 'Core' ];
 		group: 'Application-Info' with: 'Stargate-Application-Info'.
 	spec
-		package: 'Stargate-Application-Info-Pharo'
-		with: [ spec requires: 'Stargate-Application-Info' ];
+		package: 'Stargate-Application-Info-Pharo' with: [ spec requires: 'Stargate-Application-Info' ];
 		group: 'Application-Info' with: 'Stargate-Application-Info-Pharo';
 		group: 'Deployment' with: 'Application-Info'.
 	spec
 		package: 'Stargate-Application-Configuration'
 		with: [ spec requires: #( 'Core' 'Launchpad-Deployment' ) ];
-		group: 'Application-Configuration'
-		with: 'Stargate-Application-Configuration';
+		group: 'Application-Configuration' with: 'Stargate-Application-Configuration';
 		group: 'Deployment' with: 'Application-Configuration'.
 	spec
-		package: 'Stargate-Loggers'
-		with: [ spec requires: #( 'Core' 'Launchpad-Deployment' ) ];
+		package: 'Stargate-Loggers' with: [ spec requires: #( 'Core' 'Launchpad-Deployment' ) ];
 		group: 'Loggers' with: 'Stargate-Loggers';
 		group: 'Deployment' with: 'Loggers'.
 	spec
 		package: 'Stargate-API-Skeleton' with: [
 			spec requires:
-					#( 'Metrics-HTTP' 'Application-Control' 'Application-Info'
-					   'Application-Configuration' 'Launchpad-Deployment'
-					   'ZTimestamp-Core' ) ];
+					#( 'Metrics-HTTP' 'Application-Control' 'Application-Info' 'Application-Configuration'
+					   'Launchpad-Deployment' 'ZTimestamp-Core' )
+			];
 		group: 'Deployment' with: 'Stargate-API-Skeleton'
 ]
 
@@ -173,6 +169,10 @@ BaselineOfStargate >> setUpTestPackages: spec [
 		package: 'Stargate-Metrics-Tests'
 		with: [ spec requires: #( 'Stargate-Metrics' 'Stargate-Model-Tests' ) ];
 		group: 'Tests' with: 'Stargate-Metrics-Tests'.
+	spec
+		package: 'Stargate-Metrics-Pharo-Tests'
+		with: [ spec requires: #( 'Stargate-Metrics-Pharo' 'Stargate-Model-Tests' ) ];
+		group: 'Tests' with: 'Stargate-Metrics-Pharo-Tests'.
 	spec
 		package: 'Stargate-Metrics-HTTP-Tests'
 		with: [ spec requires: #( 'Stargate-Metrics-HTTP' 'Stargate-Model-Tests' ) ];

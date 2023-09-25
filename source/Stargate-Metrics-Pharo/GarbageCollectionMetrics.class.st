@@ -4,7 +4,7 @@ I'm a provider of metrics related to the garbage collector
 Class {
 	#name : #GarbageCollectionMetrics,
 	#superclass : #MetricProvider,
-	#category : #'Stargate-Metrics'
+	#category : #'Stargate-Metrics-Pharo'
 }
 
 { #category : #'instance creation' }

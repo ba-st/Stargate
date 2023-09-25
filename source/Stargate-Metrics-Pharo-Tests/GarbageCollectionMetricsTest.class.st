@@ -4,7 +4,7 @@ A GarbageCollectionMetricsTest is a test class for testing the behavior of Garba
 Class {
 	#name : #GarbageCollectionMetricsTest,
 	#superclass : #TestCase,
-	#category : #'Stargate-Metrics-Tests'
+	#category : #'Stargate-Metrics-Pharo-Tests'
 }
 
 { #category : #private }

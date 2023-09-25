@@ -4,7 +4,7 @@ I'm a provider of metrics related to the running system
 Class {
 	#name : #RunningSystemMetrics,
 	#superclass : #MetricProvider,
-	#category : #'Stargate-Metrics'
+	#category : #'Stargate-Metrics-Pharo'
 }
 
 { #category : #'instance creation' }
@@ -50,12 +50,14 @@ RunningSystemMetrics >> groupProcessesByStatusAndPriority [
 
 	Smalltalk garbageCollectMost.
 	activeProcess := Processor activeProcess.
-	activeProcessData := Array with: 'ACTIVE' with: activeProcess priority.
+	activeProcessData := { 'ACTIVE'. activeProcess priority }.
 
-	groupedProcesses := [ ( Process allSubInstances copyWithout: activeProcess )
-		groupedBy: [ :process | Array with: ( self statusOf: process ) with: process priority ]
-	] valueUnpreemptively.
-	groupedProcesses at: activeProcessData put: ( Array with: activeProcess ).
+	groupedProcesses := [
+	                    ( Process allSubInstances copyWithout: activeProcess ) groupedBy: [ :process |
+		                    { ( self statusOf: process ). process priority }
+		                    ]
+	                    ] valueUnpreemptively.
+	groupedProcesses at: activeProcessData put: { activeProcess }.
 	^ groupedProcesses
 ]
 
