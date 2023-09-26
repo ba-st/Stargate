@@ -4,7 +4,7 @@ A RunningSystemMetricsTest is a test class for testing the behavior of RunningSy
 Class {
 	#name : #RunningSystemMetricsTest,
 	#superclass : #TestCase,
-	#category : #'Stargate-Metrics-Tests'
+	#category : #'Stargate-Metrics-Pharo-Tests'
 }
 
 { #category : #private }

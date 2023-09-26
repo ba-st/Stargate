@@ -4,7 +4,7 @@ A MemoryMetricsTest is a test class for testing the behavior of MemoryMetrics
 Class {
 	#name : #MemoryMetricsTest,
 	#superclass : #TestCase,
-	#category : #'Stargate-Metrics-Tests'
+	#category : #'Stargate-Metrics-Pharo-Tests'
 }
 
 { #category : #test }

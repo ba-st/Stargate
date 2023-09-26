@@ -45,7 +45,7 @@ TimestampedMetric >> name [
 { #category : #printing }
 TimestampedMetric >> printDetailsOn: stream [
 
-	timestamp printOn: stream.
+	timestamp printRoundedOn: stream.
 	stream space.
 	metric printDetailsOn: stream
 ]

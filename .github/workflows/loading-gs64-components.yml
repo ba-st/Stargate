@@ -12,9 +12,12 @@ jobs:
         load-spec:
           - Application-Configuration
           - Application-Control
+          - Application-Info
           - Core
           - Dependent-SUnit-Extensions
           - Deployment
+          - HealthCheck
+          - Metrics
           - JSON-RPC
     name: GS64 + ${{ matrix.load-spec }}
     steps:
