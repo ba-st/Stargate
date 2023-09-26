@@ -10,7 +10,27 @@ Teapot >> addRouteMatchedBy: aTeaRequestMatcher action: aTeaAction [
 ]
 
 { #category : #'*Stargate-Teapot-Extensions' }
+Teapot >> afterFilters [
+	
+	^ compositeRouter afterFilters
+	
+]
+
+{ #category : #'*Stargate-Teapot-Extensions' }
+Teapot >> beforeFilters [
+	
+	^ compositeRouter beforeFilters
+	
+]
+
+{ #category : #'*Stargate-Teapot-Extensions' }
 Teapot >> removeRoutesMatchedBy: aTeaRequestMatcher [
 
 	dynamicRouter removeRoutesMatchedBy: aTeaRequestMatcher
+]
+
+{ #category : #'*Stargate-Teapot-Extensions' }
+Teapot >> routes [
+	
+	^ dynamicRouter routes
 ]
