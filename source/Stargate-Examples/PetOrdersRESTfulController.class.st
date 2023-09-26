@@ -68,7 +68,7 @@ PetOrdersRESTfulController >> commentIdentifierIn: httpRequest [
 { #category : #private }
 PetOrdersRESTfulController >> commentIdentifierKey [
 
-	^ #commentIdentifier
+	^ #commentIdentifier asString
 ]
 
 { #category : #private }
