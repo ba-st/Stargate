@@ -29,7 +29,7 @@ SingleResourceRESTfulController >> identifierIn: httpRequest [
 { #category : #private }
 SingleResourceRESTfulController >> identifierKey [
 
-	^ #identifier
+	^ #identifier asString
 ]
 
 { #category : #private }
