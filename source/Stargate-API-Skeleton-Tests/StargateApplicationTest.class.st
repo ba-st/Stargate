@@ -112,14 +112,6 @@ StargateApplicationTest >> tearDown [
 	super tearDown
 ]
 
-{ #category : #'tests - application' }
-StargateApplicationTest >> testApplicationBaselineName [
-
-	self
-		assert: PetStoreApplication applicationBaselineName equals: #BaselineOfStargate;
-		assert: SouthAmericanCurrenciesApplication applicationBaselineName equals: #BaselineOfStargate
-]
-
 { #category : #'tests - api' }
 StargateApplicationTest >> testBadRequest [
 
@@ -203,7 +195,7 @@ StargateApplicationTest >> testFileReferenceToDumpStackTrace [
 		assert: segments size equals: 2;
 		assert: segments first equals: 'logs';
 		assert: (segments last beginsWith: PetStoreApplication commandName);
-		assert: (segments last endsWith: '.fuel')
+		assert: (segments last endsWith: '.dump')
 ]
 
 { #category : #'tests - api' }
@@ -302,6 +294,14 @@ ENVIRONMENT
 		PET_STORE__STARGATE__OPERATIONS_SECRET
 			Secret key for checking JWT signatures.
 ' expandMacrosWith: PetStoreApplication version)
+]
+
+{ #category : #'tests - application' }
+StargateApplicationTest >> testProjectName [
+
+	self
+		assert: PetStoreApplication projectName equals: 'Stargate';
+		assert: SouthAmericanCurrenciesApplication projectName equals: 'Stargate'
 ]
 
 { #category : #'tests - api' }
