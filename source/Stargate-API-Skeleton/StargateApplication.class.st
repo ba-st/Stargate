@@ -226,7 +226,7 @@ StargateApplication >> initialize [
 { #category : #'private - activation/deactivation' }
 StargateApplication >> installAndStart: api [
 
-	LaunchpadLogRecord
+	LogRecord
 		emitInfo: 'Installing API' during: [ api install ];
 		emitInfo: 'Starting API' during: [ api start ]
 ]
@@ -237,7 +237,7 @@ StargateApplication >> logAPIVersion [
 	BasicApplicationInformationProvider new applicationNamed: self class commandName
 		describedBy: self class description
 		version: self class version.
-	LaunchpadLogRecord emitInfo: ( 'API Version: <1s>' expandMacrosWith: self class version )
+	LogRecord emitInfo: ( 'API Version: <1s>' expandMacrosWith: self class version )
 ]
 
 { #category : #'private - accessing' }
