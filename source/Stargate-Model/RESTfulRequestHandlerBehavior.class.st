@@ -104,7 +104,7 @@ RESTfulRequestHandlerBehavior >> entityTagOf: resource encodedAs: mediaType with
 { #category : #private }
 RESTfulRequestHandlerBehavior >> entityTagToMatchBasedOn: httpRequest [
 
-	^ (httpRequest headers at: #'If-Match' ifAbsent: [ 
+	^ (httpRequest headers at: 'If-Match' ifAbsent: [ 
 		   HTTPClientError preconditionRequired signal:
 			   'Missing If-Match header.' ]) asEntityTag
 ]
@@ -226,7 +226,7 @@ RESTfulRequestHandlerBehavior >> holdTargetMediaTypeAndLanguageFrom: httpRequest
 RESTfulRequestHandlerBehavior >> ifNoneMatchHeaderPresentIn: httpRequest do: aMonadycBlock [
 
 	httpRequest headers
-		at: #'If-None-Match'
+		at: 'If-None-Match'
 		ifPresent: [ :ifNoneMatchHeader | 
 			aMonadycBlock value: ifNoneMatchHeader asEntityTag ]
 ]
