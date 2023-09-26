@@ -192,10 +192,10 @@ StargateApplicationTest >> testFileReferenceToDumpStackTrace [
 
 	segments := PetStoreApplication fileReferenceToDumpStackTrace asPath segments.
 	self
-		assert: segments size equals: 2;
-		assert: segments first equals: 'logs';
-		assert: (segments last beginsWith: PetStoreApplication commandName);
-		assert: (segments last endsWith: '.dump')
+		assert: segments size >= 2;
+		assert: ( segments at: segments size - 1 ) equals: 'logs';
+		assert: ( segments last beginsWith: PetStoreApplication commandName );
+		assert: ( segments last endsWith: '.dump' )
 ]
 
 { #category : #'tests - api' }
