@@ -19,6 +19,14 @@ StargateApplicationTest class >> defaultTimeLimit [
 ]
 
 { #category : #private }
+StargateApplicationTest >> assert: string isLineEndingInsensitiveEqualsTo: anotherString [
+
+	self
+		assert: ( string withLineEndings: String lf )
+		equals: ( anotherString withLineEndings: String lf )
+]
+
+{ #category : #private }
 StargateApplicationTest >> baseUrl [
 
 	^ baseUrl
@@ -275,7 +283,7 @@ StargateApplicationTest >> testPrintHelpOn [
 
 	help := String streamContents: [ :stream | PetStoreApplication printHelpOn: stream ].
 
-	self assert: help equals: ('NAME
+	self assert: help isLineEndingInsensitiveEqualsTo: ('NAME
 		pet-store [<1s>] - A RESTful API for Pet stores
 SYNOPSYS
 		pet-store --pet-store.stargate.public-url=%<publicURL%> --pet-store.stargate.port=%<port%> --pet-store.stargate.operations-secret=%<operationsSecret%>

@@ -86,7 +86,7 @@ JWTBearerAuthenticationFilterTest >> testInvalidCredentials [
 	filter := self newFilter.
 
 	self
-		assertResponseFor: ( self newHttpRequestWithJWTBearerAuthenticationFor: '' )
+		assertResponseFor: ( self newHttpRequestWithJWTBearerAuthenticationFor: 'notasecret' )
 		isUnauthorizedAfterApplying: filter.
 
 	self
