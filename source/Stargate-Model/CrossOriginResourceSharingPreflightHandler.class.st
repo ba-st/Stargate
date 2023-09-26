@@ -31,14 +31,12 @@ CrossOriginResourceSharingPreflightHandler >> setAllowedHeadersOn: aResponse fro
 
 	aRequest headers
 		at: self headerNames >> #accessControlRequestHeaders
-		ifPresent: [ :requestedHeaders | 
-			requestedHeaders
-				splitOn: $,
-				do: [ :header | 
-					aResponse headers
-						at: self headerNames >> #accessControlAllowHeaders
-						addSeparatedWithComma: header trimBoth
-					].
+		ifPresent: [ :requestedHeaders |
+			$, split: requestedHeaders do: [ :header |
+				aResponse headers
+					at: self headerNames >> #accessControlAllowHeaders
+					addSeparatedWithComma: header trimBoth
+				].
 			aResponse addToVary: self headerNames >> #accessControlAllowHeaders
 			]
 ]
