@@ -17,7 +17,8 @@ RwSimpleProjectLoadComponentV2 {
     'Stargate-JSON-RPC-Tests',
     'Stargate-Loggers-Tests',
     'Stargate-Metrics-Tests',
-    'Stargate-Metrics-HTTP-Tests'
+    'Stargate-Metrics-HTTP-Tests',
+    'Stargate-Model-Tests'
 
   ],
   #conditionalPackageMapSpecs : {
@@ -33,7 +34,8 @@ RwSimpleProjectLoadComponentV2 {
           'Stargate-JSON-RPC-Tests' : { 'symbolDictName' : 'Stargate' },
           'Stargate-Loggers-Tests' : { 'symbolDictName' : 'Stargate' },
           'Stargate-Metrics-Tests' : { 'symbolDictName' : 'Stargate' },
-          'Stargate-Metrics-HTTP-Tests' : { 'symbolDictName' : 'Stargate' }
+          'Stargate-Metrics-HTTP-Tests' : { 'symbolDictName' : 'Stargate' },
+          'Stargate-Model-Tests' : { 'symbolDictName' : 'Stargate' }
         }
       }
     }
