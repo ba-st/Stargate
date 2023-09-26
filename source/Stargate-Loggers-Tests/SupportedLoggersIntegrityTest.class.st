@@ -1,17 +1,18 @@
 Class {
-	#name : #SupportedLoggersIntegrityTest,
-	#superclass : #TestCase,
-	#category : #'Stargate-Loggers-Tests'
+	#name : 'SupportedLoggersIntegrityTest',
+	#superclass : 'TestCase',
+	#category : 'Stargate-Loggers-Tests',
+	#package : 'Stargate-Loggers-Tests'
 }
 
-{ #category : #tests }
+{ #category : 'tests' }
 SupportedLoggersIntegrityTest >> testAvailableLoggersImplementTheRequiredProtocol [
 
 	SignalLogger availableInStargate do: [ :loggerClass | 
 		self assert: ( loggerClass respondsTo: #typeDescription ) ]
 ]
 
-{ #category : #tests }
+{ #category : 'tests' }
 SupportedLoggersIntegrityTest >> testAvailableLoggersNamesDoNotCollide [
 
 	"Each logger name is used in the API to identify it, so it can't be repeated"

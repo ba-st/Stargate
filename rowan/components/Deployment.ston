@@ -6,6 +6,7 @@ RwSimpleProjectLoadComponentV2 {
     'Application-Control',
     'Application-Info',
     'HealthCheck',
+    'Loggers',
     'Metrics'
   ],
   #packageNames : [ ]

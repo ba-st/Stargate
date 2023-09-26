@@ -1,10 +1,11 @@
 Class {
-	#name : #LoggersPluginConfigurationAPITest,
-	#superclass : #OperationalPluginAPITest,
-	#category : #'Stargate-Loggers-Tests'
+	#name : 'LoggersPluginConfigurationAPITest',
+	#superclass : 'OperationalPluginAPITest',
+	#category : 'Stargate-Loggers-Tests',
+	#package : 'Stargate-Loggers-Tests'
 }
 
-{ #category : #running }
+{ #category : 'running' }
 LoggersPluginConfigurationAPITest >> operationsConfiguration [
 
 	^ super operationsConfiguration
@@ -12,13 +13,13 @@ LoggersPluginConfigurationAPITest >> operationsConfiguration [
 		  yourself
 ]
 
-{ #category : #running }
+{ #category : 'running' }
 LoggersPluginConfigurationAPITest >> requiredPermissions [
 
 	^ #('read:loggers')
 ]
 
-{ #category : #tests }
+{ #category : 'tests' }
 LoggersPluginConfigurationAPITest >> testPluginIsDisabled [
 
 	self

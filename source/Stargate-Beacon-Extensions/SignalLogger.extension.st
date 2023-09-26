@@ -1,18 +1,18 @@
-Extension { #name : #SignalLogger }
+Extension { #name : 'SignalLogger' }
 
-{ #category : #'*Stargate-Loggers' }
+{ #category : '*Stargate-Beacon-Extensions' }
 SignalLogger class >> availableInStargate [
 
 	^ self allSubclasses select: [ :class | class isAbstract not and: [ class isSupportedInStargate ] ]
 ]
 
-{ #category : #'*Stargate-Loggers' }
+{ #category : '*Stargate-Beacon-Extensions' }
 SignalLogger class >> isSupportedInStargate [
 
 	^ false
 ]
 
-{ #category : #'*Stargate-Loggers' }
+{ #category : '*Stargate-Beacon-Extensions' }
 SignalLogger >> typeDescription [
 
 	^ self class typeDescription

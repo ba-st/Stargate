@@ -4,15 +4,16 @@ I provide information of the active loggers in the system
 
 "
 Class {
-	#name : #LoggersPlugin,
-	#superclass : #OperationalPlugin,
+	#name : 'LoggersPlugin',
+	#superclass : 'OperationalPlugin',
 	#instVars : [
 		'beacon'
 	],
-	#category : #'Stargate-Loggers'
+	#category : 'Stargate-Loggers',
+	#package : 'Stargate-Loggers'
 }
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 LoggersPlugin class >> configureMediaControlsIn: builder within: requestContext [
 
 	builder
@@ -20,7 +21,7 @@ LoggersPlugin class >> configureMediaControlsIn: builder within: requestContext 
 		relatedTo: 'loggers'
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 LoggersPlugin class >> configuredBy: configuration [
 
 	| selfConfiguration |
@@ -30,39 +31,39 @@ LoggersPlugin class >> configuredBy: configuration [
 	^ self new initializeWith: ( selfConfiguration at: #beacon ifAbsent: [ Beacon instance ] )
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 LoggersPlugin class >> endpoint [
 
 	^ 'loggers'
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 LoggersPlugin class >> pluginName [
 
 	^ 'Loggers'
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 LoggersPlugin >> activeLoggerNamed: aName [
 
 	^ self activeLoggers detect: [ :logger | logger name = aName ]
 		  ifNone: [ ObjectNotFound signal: ( 'There''s no logger named <1s>' expandMacrosWith: aName ) ]
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 LoggersPlugin >> activeLoggers [
 
 	^ beacon loggers
 ]
 
-{ #category : #configuring }
+{ #category : 'configuring' }
 LoggersPlugin >> includeControllersIn: api [
 
 	api addController:
 		( LoggersRESTfulController over: self configuredBy: api operationsConfiguration )
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 LoggersPlugin >> initializeWith: aBeaconInstance [
 
 	beacon := aBeaconInstance 

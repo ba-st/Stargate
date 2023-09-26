@@ -2,22 +2,23 @@
 I'm a controller exposing the API of LoggersPlugin
 "
 Class {
-	#name : #LoggersRESTfulController,
-	#superclass : #OperationsRESTfulController,
+	#name : 'LoggersRESTfulController',
+	#superclass : 'OperationsRESTfulController',
 	#instVars : [
 		'requestHandler',
 		'plugin'
 	],
-	#category : #'Stargate-Loggers'
+	#category : 'Stargate-Loggers',
+	#package : 'Stargate-Loggers'
 }
 
-{ #category : #'instance creation' }
+{ #category : 'instance creation' }
 LoggersRESTfulController class >> over: aLoggersPlugin configuredBy: configuration [
 
 	^ ( self authenticationFilterBasedOn: configuration ) initializeOver: aLoggersPlugin
 ]
 
-{ #category : #routes }
+{ #category : 'routes' }
 LoggersRESTfulController >> declareGetLoggerRoute [
 
 	^ RouteSpecification
@@ -26,7 +27,7 @@ LoggersRESTfulController >> declareGetLoggerRoute [
 		evaluating: [ :httpRequest :requestContext | self getLoggerBasedOn: httpRequest within: requestContext ]
 ]
 
-{ #category : #routes }
+{ #category : 'routes' }
 LoggersRESTfulController >> declareGetLoggersRoute [
 
 	^ RouteSpecification
@@ -35,7 +36,7 @@ LoggersRESTfulController >> declareGetLoggersRoute [
 		evaluating: [ :httpRequest :requestContext | self getLoggersBasedOn: httpRequest within: requestContext ]
 ]
 
-{ #category : #API }
+{ #category : 'API' }
 LoggersRESTfulController >> getLoggerBasedOn: httpRequest within: requestContext [
 
 	self assert: httpRequest isAuthorizedWithin: requestContext.
@@ -44,21 +45,21 @@ LoggersRESTfulController >> getLoggerBasedOn: httpRequest within: requestContext
 		  get: [ :name | plugin activeLoggerNamed: name ]
 ]
 
-{ #category : #API }
+{ #category : 'API' }
 LoggersRESTfulController >> getLoggersBasedOn: httpRequest within: requestContext [
 
 	self assert: httpRequest isAuthorizedWithin: requestContext.
 	^ requestHandler from: httpRequest within: requestContext getCollection: [ plugin activeLoggers ]
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 LoggersRESTfulController >> initializeOver: aLoggersPlugin [
 
 	plugin := aLoggersPlugin.
 	self initializeRequestHandler
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 LoggersRESTfulController >> initializeRequestHandler [
 
 	requestHandler := RESTfulRequestHandlerBuilder new
@@ -86,25 +87,25 @@ LoggersRESTfulController >> initializeRequestHandler [
 		                  build
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 LoggersRESTfulController >> loggerVersion1dor0dot0MediaType [
 	
 	^ self jsonMediaType: 'logger' vendoredBy: 'stargate' version: '1.0.0'
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 LoggersRESTfulController >> pluginEndpoint [
 
 	^ plugin endpoint
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 LoggersRESTfulController >> requestHandler [
 
 	^ requestHandler
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 LoggersRESTfulController >> requiredPermission [
 
 	^ 'read:<1s>' expandMacrosWith: self pluginEndpoint

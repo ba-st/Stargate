@@ -9,11 +9,14 @@ RwSimpleProjectLoadComponentV2 {
   #packageNames : [
     'Stargate-Application-Configuration-Tests',
     'Stargate-Application-Control-Tests',
+    'Stargate-JSON-RPC-Tests',
     'Stargate-Application-Info-Tests',
     'Stargate-HealthCheck-Tests',
     'Stargate-JSON-RPC-Tests',
+    'Stargate-Loggers-Tests',
     'Stargate-Metrics-Tests',
     'Stargate-Metrics-HTTP-Tests'
+
   ],
   #conditionalPackageMapSpecs : {
     'gemstone' : {
@@ -21,9 +24,11 @@ RwSimpleProjectLoadComponentV2 {
         #packageNameToPlatformPropertiesMap : {
           'Stargate-Application-Configuration-Tests' : { 'symbolDictName' : 'Stargate' },
           'Stargate-Application-Control-Tests' : { 'symbolDictName' : 'Stargate' },
+          'Stargate-JSON-RPC-Tests' : { 'symbolDictName' : 'Stargate' },
           'Stargate-Application-Info-Tests' : { 'symbolDictName' : 'Stargate' },
           'Stargate-HealthCheck-Tests' : { 'symbolDictName' : 'Stargate' },
           'Stargate-JSON-RPC-Tests' : { 'symbolDictName' : 'Stargate' },
+          'Stargate-Loggers-Tests' : { 'symbolDictName' : 'Stargate' },
           'Stargate-Metrics-Tests' : { 'symbolDictName' : 'Stargate' },
           'Stargate-Metrics-HTTP-Tests' : { 'symbolDictName' : 'Stargate' }
         }
