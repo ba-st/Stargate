@@ -9,5 +9,16 @@ RwSimpleProjectLoadComponentV2 {
     'Loggers',
     'Metrics'
   ],
-  #packageNames : [ ]
+  #packageNames : [
+    'Stargate-API-Skeleton'
+   ],
+  #conditionalPackageMapSpecs : {
+    'gemstone' : {
+      'allusers' : {
+        #packageNameToPlatformPropertiesMap : {
+          'Stargate-API-Skeleton' : { 'symbolDictName' : 'Stargate' }
+        }
+      }
+    }
+  }
 }

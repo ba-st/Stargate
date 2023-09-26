@@ -16,6 +16,7 @@ jobs:
           - Core
           - Dependent-SUnit-Extensions
           - Deployment
+          - Examples
           - HealthCheck
           - Metrics
           - JSON-RPC

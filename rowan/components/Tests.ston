@@ -4,13 +4,15 @@ RwSimpleProjectLoadComponentV2 {
   #projectNames : [ ],
   #componentNames : [
     'Deployment',
-    'Dependent-SUnit-Extensions'
+    'Dependent-SUnit-Extensions',
+    'Examples'
   ],
   #packageNames : [
+    'Stargate-API-Skeleton-Tests',
     'Stargate-Application-Configuration-Tests',
     'Stargate-Application-Control-Tests',
-    'Stargate-JSON-RPC-Tests',
     'Stargate-Application-Info-Tests',
+    'Stargate-Examples-Tests',
     'Stargate-HealthCheck-Tests',
     'Stargate-JSON-RPC-Tests',
     'Stargate-Loggers-Tests',
@@ -22,10 +24,11 @@ RwSimpleProjectLoadComponentV2 {
     'gemstone' : {
       'allusers' : {
         #packageNameToPlatformPropertiesMap : {
+          'Stargate-API-Skeleton-Tests' : { 'symbolDictName' : 'Stargate' },
           'Stargate-Application-Configuration-Tests' : { 'symbolDictName' : 'Stargate' },
           'Stargate-Application-Control-Tests' : { 'symbolDictName' : 'Stargate' },
-          'Stargate-JSON-RPC-Tests' : { 'symbolDictName' : 'Stargate' },
           'Stargate-Application-Info-Tests' : { 'symbolDictName' : 'Stargate' },
+          'Stargate-Examples-Tests' : { 'symbolDictName' : 'Stargate' },
           'Stargate-HealthCheck-Tests' : { 'symbolDictName' : 'Stargate' },
           'Stargate-JSON-RPC-Tests' : { 'symbolDictName' : 'Stargate' },
           'Stargate-Loggers-Tests' : { 'symbolDictName' : 'Stargate' },
