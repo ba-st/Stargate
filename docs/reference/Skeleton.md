@@ -15,9 +15,9 @@ YourApplication class>>initialize
   <ignoreForCoverage>
   self initializeVersion
 
-YourApplication class>>applicationBaselineName
+YourApplication class>>projectName
 
-  ^#BaselineOfYourApplication
+  ^#YourApplication
 
 YourApplication class>>commandName
 
@@ -52,12 +52,13 @@ String streamContents: [ :s | YourApplication printHelpOn: s].
 ### Stack trace generation
 
 By default, stack traces are written in a `logs` directory relative to
-the image's working directory in a filename whose name is `app-name-YYYY-MM-DD_HH-MM-SS.MS`,
-and in `Fuel` format.
+the image's working directory in a filename whose name is `app-name-YYYY-MM-DD_HH-MM-SS_uuid-as-base36.dump`.
 
 - To change the stack trace location, re-implement the `logsDirectory` class method.
 - To change the stack trace file name, re-implement `fileReferenceToDumpStackTrace`
   class method
+- To change the stack trace file extension, re-implement
+  `stackTraceDumpExtension` class method
 - To change the dump format, re-implement `stackTraceDumper` instance method
 
 ### Additional configuration parameters

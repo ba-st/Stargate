@@ -1,4 +1,6 @@
-# Baseline Groups
+# Baseline Groups & GS 64 Components
+
+## Pharo Baseline Groups
 
 Stargate includes the following groups in its Baseline that can be used as
 loading targets:

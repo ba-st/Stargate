@@ -20,7 +20,7 @@ Dictionary new
 
 To get a list of supported metric providers print the result of `MetricProvider allProviderNames`.
 
-Available metric providers:
+Available metric providers for Pharo:
 
 - `memory` gathers metrics over the allocated memory (total, old space, free
   old space, eden space, young space)
@@ -28,6 +28,13 @@ Available metric providers:
   on garbage collection, invocation count and tenure count)
 - `running system` gathers information over the running system (uptime,
   process count by status and priority, external semaphore table data)
+
+Available metric providers for GS64:
+
+- `running gem` gathers information over the running gem (process count by status and priority)
+
+Available metric providers for Pharo and GS64
+
 - `http` (optional group) gathers information over the incoming HTTP requests
   (request count, request duration, response size by HTTP method, response code,
   URL and URL template). The categories used for the breakdown can be filtered
