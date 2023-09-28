@@ -12,21 +12,23 @@
 - `StargateApplication>>#stackTraceDumper` changed the default
   implementation to create a `StackTraceTextDumper` instead of the
   binary version. If you want to continue using the dumper as before,
-  reimplement it with: 
+  reimplement it with:
+
   ```smalltalk
   stackTraceDumper
 
-	^ StackTraceBinarySerializer on: [ :dumpAction | 
-		  self class fileReferenceToDumpStackTrace binaryWriteStreamDo: dumpAction ]
+  ^ StackTraceBinarySerializer on: [ :dumpAction | 
+    self class fileReferenceToDumpStackTrace binaryWriteStreamDo: dumpAction ]
   ```
+
 - `StargateApplication class >> fileReferenceToDumpStackTrace` changed
-   the file naming convention. Now the produced file includes:
-   - the command name used to start the application
-   - the current timestamp
-   - a UUID encoded in Base-36
-   
-   The new implementation will also check that the file to use doesn't
-   exist before dumping information on it.
+  the file naming convention. Now the produced file includes:
+  - the command name used to start the application
+  - the current timestamp
+  - a UUID encoded in Base-36
+
+  The new implementation will also check that the file to use doesn't
+  exist before dumping information on it.
 - `stackTraceDumpExtension` is introduced in `StargateApplication` so
   users can now specify a different file extension for the trace dumps.
 - This version adds support for GemStone/S 64 bits 3.7.0, keep

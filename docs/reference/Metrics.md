@@ -31,7 +31,8 @@ Available metric providers for Pharo:
 
 Available metric providers for GS64:
 
-- `running gem` gathers information over the running gem (process count by status and priority)
+- `running gem` gathers information over the running gem (process count by
+  status and priority)
 
 Available metric providers for Pharo and GS64
 
