@@ -29,6 +29,7 @@ ApplicationInfoPluginTest >> asPluginConfigurationGathering: infoProviderNames [
 { #category : #private }
 ApplicationInfoPluginTest >> assertGS64InformationOn: info [
 
+	<ignoreForCoverage>
 	info
 		at: 'gs64'
 		ifPresent: [ :gsData |
