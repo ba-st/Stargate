@@ -1,11 +1,10 @@
 Class {
-	#name : 'BaselineOfStargate',
-	#superclass : 'BaselineOf',
-	#category : 'BaselineOfStargate',
-	#package : 'BaselineOfStargate'
+	#name : #BaselineOfStargate,
+	#superclass : #BaselineOf,
+	#category : #BaselineOfStargate
 }
 
-{ #category : 'baselines' }
+{ #category : #baselines }
 BaselineOfStargate >> baseline: spec [
 
 	<baseline>
@@ -22,13 +21,13 @@ BaselineOfStargate >> baseline: spec [
 			]
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 BaselineOfStargate >> projectClass [
 
 	^ MetacelloCypressBaselineProject
 ]
 
-{ #category : 'baselines' }
+{ #category : #baselines }
 BaselineOfStargate >> setUpCorePackages: spec [
 
 	spec
@@ -50,7 +49,7 @@ BaselineOfStargate >> setUpCorePackages: spec [
 			group: 'Deployment' with: extensionPackageName ]
 ]
 
-{ #category : 'baselines' }
+{ #category : #baselines }
 BaselineOfStargate >> setUpDependencies: spec [
 
 	spec
@@ -61,7 +60,7 @@ BaselineOfStargate >> setUpDependencies: spec [
 	spec
 		baseline: 'Hyperspace' with: [ spec repository: 'github://ba-st/Hyperspace:v5' ];
 		project: 'Hyperspace-Deployment' copyFrom: 'Hyperspace' with: [ spec loads: 'Deployment' ];
-    project: 'Hyperspace-Tools' copyFrom: 'Hyperspace' with: [ spec loads: 'Tools' ];
+		project: 'Hyperspace-Tools' copyFrom: 'Hyperspace' with: [ spec loads: 'Tools' ];
 		project: 'Hyperspace-SUnit'
 		copyFrom: 'Hyperspace'
 		with: [ spec loads: 'Dependent-SUnit-Extensions' ].
@@ -72,9 +71,7 @@ BaselineOfStargate >> setUpDependencies: spec [
 
 	spec
 		baseline: 'JSONWebToken' with: [ spec repository: 'github://ba-st-dependencies/JSONWebToken:v1' ];
-		project: 'JSONWebToken-Deployment'
-		copyFrom: 'JSONWebToken'
-		with: [ spec loads: 'SSL' ].
+		project: 'JSONWebToken-Deployment' copyFrom: 'JSONWebToken' with: [ spec loads: 'SSL' ].
 
 	spec
 		baseline: 'JRPC' with: [ spec repository: 'github://ba-st-dependencies/JRPC:v4' ];
@@ -82,14 +79,10 @@ BaselineOfStargate >> setUpDependencies: spec [
 
 	spec
 		baseline: 'Launchpad' with: [ spec repository: 'github://ba-st/Launchpad:v5' ];
-		project: 'Launchpad-Deployment' copyFrom: 'Launchpad' with: [ spec loads: 'Deployment' ].
-
-	spec
-		baseline: 'ZTimestamp' with: [ spec repository: 'github://svenvc/ztimestamp' ];
-		project: 'ZTimestamp-Core' copyFrom: 'ZTimestamp' with: [ spec loads: 'core' ]
+		project: 'Launchpad-Deployment' copyFrom: 'Launchpad' with: [ spec loads: 'Deployment' ]
 ]
 
-{ #category : 'baselines' }
+{ #category : #baselines }
 BaselineOfStargate >> setUpDeploymentPackages: spec [
 
 	self setUpCorePackages: spec.
@@ -154,7 +147,7 @@ BaselineOfStargate >> setUpDeploymentPackages: spec [
 		group: 'Deployment' with: 'Stargate-API-Skeleton'
 ]
 
-{ #category : 'baselines' }
+{ #category : #baselines }
 BaselineOfStargate >> setUpPackages: spec [
 
 	self setUpDeploymentPackages: spec.
@@ -167,7 +160,7 @@ BaselineOfStargate >> setUpPackages: spec [
 	self setUpTestPackages: spec
 ]
 
-{ #category : 'baselines' }
+{ #category : #baselines }
 BaselineOfStargate >> setUpTestPackages: spec [
 
 	spec

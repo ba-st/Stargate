@@ -154,6 +154,8 @@ StargateApplication >> applicationInfoConfiguration [
 
 { #category : #'private - accessing' }
 StargateApplication >> authAlgorithm [
+	"The signing algorithm identifier as defined in https://datatracker.ietf.org/doc/html/rfc7518#section-3.1.
+	Used for securing operational plugins, by default HMAC using SHA-256"
 
 	^ 'HS256'
 ]
