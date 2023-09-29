@@ -103,7 +103,7 @@ BaselineOfStargate >> setUpDeploymentPackages: spec [
 	spec
 		package: 'Stargate-Metrics-HTTP-Zinc-Extensions' with: [ spec requires: 'Stargate-Metrics-HTTP' ];
 		group: 'Metrics-HTTP' with: 'Stargate-Metrics-HTTP-Zinc-Extensions';
-		group: 'Deployment' with: 'Metrics-HTTP'.		
+		group: 'Deployment' with: 'Metrics-HTTP'.
 	spec
 		package: 'Stargate-JSON-RPC' with: [ spec requires: #( 'Core' 'JRPC-Deployment' ) ];
 		group: 'JSON-RPC' with: 'Stargate-JSON-RPC';
@@ -129,20 +129,18 @@ BaselineOfStargate >> setUpDeploymentPackages: spec [
 		group: 'Loggers' with: 'Stargate-Loggers';
 		group: 'Deployment' with: 'Loggers'.
 	spec
-		package: 'Stargate-Beacon-Extensions'
-		with: [ spec requires: #( 'Core' 'Launchpad-Deployment' ) ];
+		package: 'Stargate-Beacon-Extensions' with: [ spec requires: #( 'Core' 'Launchpad-Deployment' ) ];
 		group: 'Loggers' with: 'Stargate-Beacon-Extensions';
 		group: 'Deployment' with: 'Loggers'.
 	spec
-		package: 'Stargate-Bell-Extensions'
-		with: [ spec requires: #( 'Core' 'Launchpad-Deployment' ) ];
+		package: 'Stargate-Bell-Extensions' with: [ spec requires: #( 'Core' 'Launchpad-Deployment' ) ];
 		group: 'Loggers' with: 'Stargate-Bell-Extensions';
 		group: 'Deployment' with: 'Loggers'.
 	spec
 		package: 'Stargate-API-Skeleton' with: [
 			spec requires:
 					#( 'Metrics-HTTP' 'Application-Control' 'Application-Info' 'Application-Configuration'
-					   'Launchpad-Deployment' 'ZTimestamp-Core' )
+					   'Launchpad-Deployment' )
 			];
 		group: 'Deployment' with: 'Stargate-API-Skeleton'
 ]
