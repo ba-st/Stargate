@@ -351,9 +351,7 @@ PetsRESTfulControllerTest >> testGetPetJustCreatedWhenNoAcceptHeaderPresentInReq
 
 	response := resourceController
 		            getPetBasedOn:
-		            ( TeaRequest
-			              fromZnRequest: getRequest
-			              pathParams: { ( #identifier -> 1 ) } asDictionary )
+		            ( TeaRequest fromZnRequest: getRequest pathParams: ( self parametersWith: 1 ) )
 		            within: self newHttpRequestContext.
 
 	self
@@ -366,7 +364,7 @@ PetsRESTfulControllerTest >> testGetPetJustCreatedWhenNoAcceptHeaderPresentInReq
 		equals: '"c051344b8c92c5ed8a2bd0752070c35ed3de3bab"' asEntityTag
 		or: '"1323cdfb8bb0f9011fbd480c5a87c17d05883214"' asEntityTag.
 
-	self withJsonFromContentsIn: response do: [ :json | 
+	self withJsonFromContentsIn: response do: [ :json |
 		self
 			assert: json name equals: 'Firulais';
 			assertUrl: json selfLocation equals: 'https://pets.example.com/pets/1'

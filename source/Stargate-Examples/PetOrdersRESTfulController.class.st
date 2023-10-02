@@ -68,7 +68,7 @@ PetOrdersRESTfulController >> commentIdentifierIn: httpRequest [
 { #category : #private }
 PetOrdersRESTfulController >> commentIdentifierKey [
 
-	^ #commentIdentifier
+	^ #commentIdentifier asString
 ]
 
 { #category : #private }
@@ -112,13 +112,14 @@ PetOrdersRESTfulController >> completeTemplate [
 PetOrdersRESTfulController >> configureOrderDecodingOn: reader [
 
 	^ reader
-		for: PetOrder
-			do: [ :mapping | 
-			mapping
-				mapInstVar: #date;
-				mapProperty: #pet setter: [ :order :url | order instVarNamed: 'pet' put: url asUrl ]
-			];
-		nextAs: PetOrder
+		  for: PetOrder do: [ :mapping |
+			  mapping
+				  mapInstVar: #date;
+				  mapProperty: #pet
+				  setter: [ :order :url |
+					  LanguagePlatform current atInstanceVariableNamed: 'pet' on: order put: url asUrl ]
+			  ];
+		  nextAs: PetOrder
 ]
 
 { #category : #private }

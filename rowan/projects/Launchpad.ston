@@ -1,0 +1,10 @@
+RwLoadSpecificationV2 {
+  #specName: 'Launchpad',
+  #projectName : 'Launchpad',
+  #gitUrl : 'https://github.com/ba-st/Launchpad.git',
+  #revision : 'v5',
+  #projectSpecFile : 'rowan/project.ston',
+  #componentNames : [
+    'Deployment'
+  ]
+}

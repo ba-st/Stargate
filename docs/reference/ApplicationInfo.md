@@ -23,6 +23,7 @@ Dictionary new
 Available information providers:
 
 - `application` Reports the application name, description, and version
+- `gs64` Reports information about the Gem, Shared Page Cache and Stone
 - `pharo` Reports information about the Pharo image and VM
 - `os` Reports information about the underlying operating system
 

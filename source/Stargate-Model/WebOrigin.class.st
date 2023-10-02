@@ -48,6 +48,12 @@ WebOrigin >> = aWebOrigin [
 ]
 
 { #category : #converting }
+WebOrigin >> asString [
+
+	^ self printString
+]
+
+{ #category : #converting }
 WebOrigin >> asUrl [
 
 	^ url copy

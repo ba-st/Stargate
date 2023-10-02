@@ -10,12 +10,6 @@ Class {
 	#category : #'Stargate-API-Skeleton'
 }
 
-{ #category : #private }
-StargateApplication class >> applicationBaselineName [
-
-	^ self subclassResponsibility
-]
-
 { #category : #accessing }
 StargateApplication class >> configurationParameters [
 
@@ -25,15 +19,38 @@ StargateApplication class >> configurationParameters [
 { #category : #private }
 StargateApplication class >> fileReferenceToDumpStackTrace [
 
-	^ self logsDirectory / ( '<1s>-<2s>.fuel' expandMacrosWith: self commandName
-		    with: ( ( ZTimestampFormat fromString: '2001-02-03_16-05-06.07' ) format: ZTimestamp now ) )
+	| logsDirectory stackTraceDumpFile |
+
+	logsDirectory := self logsDirectory.
+
+	[
+	| timestamp random |
+
+	random := UUID new asString36.
+	timestamp := String streamContents: [ :stream |
+		             | now |
+
+		             now := DateAndTime now.
+		             now printYMDOn: stream.
+		             stream nextPut: $_.
+		             now printHMSOn: stream separatedBy: $-
+		             ].
+	stackTraceDumpFile := logsDirectory / ( '<1s>_<2s>_<3s>.<4s>'
+		                        expandMacrosWith: self commandName
+		                        with: timestamp
+		                        with: random
+		                        with: self stackTraceDumpExtension ).
+	stackTraceDumpFile exists
+	] whileTrue.
+
+	^ stackTraceDumpFile
 ]
 
 { #category : #initialization }
 StargateApplication class >> initializeVersion [
 
 	<ignoreForCoverage>
-	Version := VersionFromRepositoryResolver new valueFor: self applicationBaselineName
+	Version := VersionFromRepositoryResolver new valueFor: self projectName
 ]
 
 { #category : #testing }
@@ -49,9 +66,21 @@ StargateApplication class >> logsDirectory [
 ]
 
 { #category : #private }
+StargateApplication class >> projectName [
+
+	^ self subclassResponsibility
+]
+
+{ #category : #private }
 StargateApplication class >> sectionsForStargateConfiguration [
 
 	^ #('Stargate')
+]
+
+{ #category : #private }
+StargateApplication class >> stackTraceDumpExtension [
+
+	^ 'dump'
 ]
 
 { #category : #private }
@@ -125,8 +154,10 @@ StargateApplication >> applicationInfoConfiguration [
 
 { #category : #'private - accessing' }
 StargateApplication >> authAlgorithm [
+	"The signing algorithm identifier as defined in https://datatracker.ietf.org/doc/html/rfc7518#section-3.1.
+	Used for securing operational plugins, by default HMAC using SHA-256"
 
-	^ JWAHMACSHA256 parameterValue
+	^ 'HS256'
 ]
 
 { #category : #'private - activation/deactivation' }
@@ -197,7 +228,7 @@ StargateApplication >> initialize [
 { #category : #'private - activation/deactivation' }
 StargateApplication >> installAndStart: api [
 
-	LaunchpadLogRecord
+	LogRecord
 		emitInfo: 'Installing API' during: [ api install ];
 		emitInfo: 'Starting API' during: [ api start ]
 ]
@@ -208,7 +239,7 @@ StargateApplication >> logAPIVersion [
 	BasicApplicationInformationProvider new applicationNamed: self class commandName
 		describedBy: self class description
 		version: self class version.
-	LaunchpadLogRecord emitInfo: ( 'API Version: <1s>' expandMacrosWith: self class version )
+	LogRecord emitInfo: ( 'API Version: <1s>' expandMacrosWith: self class version )
 ]
 
 { #category : #'private - accessing' }
@@ -249,8 +280,10 @@ StargateApplication >> operationsConfiguration [
 { #category : #'error handling' }
 StargateApplication >> stackTraceDumper [
 
-	^ StackTraceBinarySerializer on: [ :dumpAction | 
-		  self class fileReferenceToDumpStackTrace binaryWriteStreamDo: dumpAction ]
+	^ StackTraceTextDumper on: [ :dumpAction |
+		  self class fileReferenceToDumpStackTrace writeStreamDo: [ :stream |
+			  dumpAction value: ( ZnNewLineWriterStream on: stream ) ]
+		  ]
 ]
 
 { #category : #'private - accessing' }

@@ -4,12 +4,6 @@ Class {
 	#category : #'Stargate-Examples'
 }
 
-{ #category : #private }
-PetStoreApplication class >> applicationBaselineName [
-
-	^ #BaselineOfStargate
-]
-
 { #category : #accessing }
 PetStoreApplication class >> commandName [
 
@@ -27,6 +21,12 @@ PetStoreApplication class >> initialize [
 
 	<ignoreForCoverage>
 	self initializeVersion
+]
+
+{ #category : #private }
+PetStoreApplication class >> projectName [
+
+	^ 'Stargate'
 ]
 
 { #category : #private }

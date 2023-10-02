@@ -14,11 +14,12 @@ Class {
 EntityTagHasher >> calculateHash [
 
 	| message |
+	message := String streamContents: [ :stream |
+		           toHash
+			           do: [ :object | stream nextPutAll: object asString ]
+			           separatedBy: [ stream nextPut: $- ] ].
 
-	message := String
-		streamContents:
-			[ :stream | toHash do: [ :object | stream nextPutAll: object asString ] separatedBy: [ stream nextPut: $- ] ].
-	^ ( SHA1 new hashMessage: message ) hex
+	^ MessageDigestAlgorithm sha1 digestStringAsHexString: message
 ]
 
 { #category : #configuring }

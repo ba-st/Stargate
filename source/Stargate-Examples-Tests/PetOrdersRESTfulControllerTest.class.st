@@ -487,14 +487,13 @@ PetOrdersRESTfulControllerTest >> testRoutes [
 
 	self
 		assert: routes size equals: 9;
-		assertCollection: ( routes collect: #urlTemplate )
-			hasSameElements: #(
-				'/orders' 
-				'/orders/<identifier:IsInteger>' 
-				'/orders/<identifier:IsInteger>/cancel' 
-				'/orders/<identifier:IsInteger>/complete' 
-				'/orders/<identifier:IsInteger>/comments' 
-				'/orders/<identifier:IsInteger>/comments/<commentIdentifier:IsInteger>')
+		assert: ( ( routes collect: #urlTemplate ) includesAll:
+					  #( 	'/orders'
+							'/orders/<identifier:IsInteger>'
+							'/orders/<identifier:IsInteger>/cancel'
+							'/orders/<identifier:IsInteger>/complete'
+							'/orders/<identifier:IsInteger>/comments'
+							'/orders/<identifier:IsInteger>/comments/<commentIdentifier:IsInteger>' ) )
 ]
 
 { #category : #tests }

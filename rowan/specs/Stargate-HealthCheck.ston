@@ -1,0 +1,9 @@
+RwLoadSpecificationV2 {
+  #specName: 'Stargate-HealthCheck',
+  #projectName : 'Stargate',
+  #diskUrl : 'Stargate',
+  #projectSpecFile : 'rowan/project.ston',
+  #componentNames : [
+    'HealthCheck'
+  ]
+}

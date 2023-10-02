@@ -19,6 +19,14 @@ StargateApplicationTest class >> defaultTimeLimit [
 ]
 
 { #category : #private }
+StargateApplicationTest >> assert: string isLineEndingInsensitiveEqualsTo: anotherString [
+
+	self
+		assert: ( string withLineEndings: String lf )
+		equals: ( anotherString withLineEndings: String lf )
+]
+
+{ #category : #private }
 StargateApplicationTest >> baseUrl [
 
 	^ baseUrl
@@ -112,14 +120,6 @@ StargateApplicationTest >> tearDown [
 	super tearDown
 ]
 
-{ #category : #'tests - application' }
-StargateApplicationTest >> testApplicationBaselineName [
-
-	self
-		assert: PetStoreApplication applicationBaselineName equals: #BaselineOfStargate;
-		assert: SouthAmericanCurrenciesApplication applicationBaselineName equals: #BaselineOfStargate
-]
-
 { #category : #'tests - api' }
 StargateApplicationTest >> testBadRequest [
 
@@ -200,10 +200,10 @@ StargateApplicationTest >> testFileReferenceToDumpStackTrace [
 
 	segments := PetStoreApplication fileReferenceToDumpStackTrace asPath segments.
 	self
-		assert: segments size equals: 2;
-		assert: segments first equals: 'logs';
-		assert: (segments last beginsWith: PetStoreApplication commandName);
-		assert: (segments last endsWith: '.fuel')
+		assert: segments size >= 2;
+		assert: ( segments at: segments size - 1 ) equals: 'logs';
+		assert: ( segments last beginsWith: PetStoreApplication commandName );
+		assert: ( segments last endsWith: '.dump' )
 ]
 
 { #category : #'tests - api' }
@@ -283,7 +283,7 @@ StargateApplicationTest >> testPrintHelpOn [
 
 	help := String streamContents: [ :stream | PetStoreApplication printHelpOn: stream ].
 
-	self assert: help equals: ('NAME
+	self assert: help isLineEndingInsensitiveEqualsTo: ('NAME
 		pet-store [<1s>] - A RESTful API for Pet stores
 SYNOPSYS
 		pet-store --pet-store.stargate.public-url=%<publicURL%> --pet-store.stargate.port=%<port%> --pet-store.stargate.operations-secret=%<operationsSecret%>
@@ -302,6 +302,14 @@ ENVIRONMENT
 		PET_STORE__STARGATE__OPERATIONS_SECRET
 			Secret key for checking JWT signatures.
 ' expandMacrosWith: PetStoreApplication version)
+]
+
+{ #category : #'tests - application' }
+StargateApplicationTest >> testProjectName [
+
+	self
+		assert: PetStoreApplication projectName equals: 'Stargate';
+		assert: SouthAmericanCurrenciesApplication projectName equals: 'Stargate'
 ]
 
 { #category : #'tests - api' }

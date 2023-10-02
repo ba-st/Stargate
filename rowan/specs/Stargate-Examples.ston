@@ -1,0 +1,9 @@
+RwLoadSpecificationV2 {
+  #specName: 'Stargate-Examples',
+  #projectName : 'Stargate',
+  #diskUrl : 'Stargate',
+  #projectSpecFile : 'rowan/project.ston',
+  #componentNames : [
+    'Examples'
+  ]
+}

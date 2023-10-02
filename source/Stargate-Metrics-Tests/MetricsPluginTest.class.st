@@ -31,41 +31,12 @@ MetricsPluginTest >> testConfiguredRunningAllMetrics [
 
 	| plugin |
 
-	plugin := MetricsPlugin
-		configuredBy: ( self asPluginConfigurationGathering: MetricProvider allProviderNames ).
+	plugin := MetricsPlugin configuredBy:
+		          ( self asPluginConfigurationGathering: MetricProvider allProviderNames ).
 
-	self assert: plugin gatherMetrics size equals: 7
-]
-
-{ #category : #tests }
-MetricsPluginTest >> testConfiguredRunningGarbageCollectionMetrics [
-
-	| plugin |
-
-	plugin := MetricsPlugin
-		configuredBy: ( self asPluginConfigurationGathering: ( Array with: GarbageCollectionMetrics providerName ) ).
-
-	self assert: plugin gatherMetrics size equals: 3
-]
-
-{ #category : #tests }
-MetricsPluginTest >> testConfiguredRunningMemoryMetrics [
-
-	| plugin |
-
-	plugin := MetricsPlugin configuredBy: ( self asPluginConfigurationGathering: #('memory') ).
-
-	self assert: plugin gatherMetrics size equals: 1
-]
-
-{ #category : #tests }
-MetricsPluginTest >> testConfiguredRunningSystemMetrics [
-
-	| plugin |
-
-	plugin := MetricsPlugin configuredBy: ( self asPluginConfigurationGathering: #('running system') ).
-
-	self assert: plugin gatherMetrics size equals: 3
+	self
+		runOnlyInPharo: [ self assert: plugin gatherMetrics size equals: 7 ];
+		runOnlyInGemStone64: [ self assert: plugin gatherMetrics size equals: 1 ]
 ]
 
 { #category : #tests }

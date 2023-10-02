@@ -1,0 +1,24 @@
+RwSimpleProjectLoadComponentV2 {
+  #name : 'Deployment',
+  #projectNames : [ ],
+  #componentNames : [
+    'Application-Configuration',
+    'Application-Control',
+    'Application-Info',
+    'HealthCheck',
+    'Loggers',
+    'Metrics'
+  ],
+  #packageNames : [
+    'Stargate-API-Skeleton'
+   ],
+  #conditionalPackageMapSpecs : {
+    'gemstone' : {
+      'allusers' : {
+        #packageNameToPlatformPropertiesMap : {
+          'Stargate-API-Skeleton' : { 'symbolDictName' : 'Stargate' }
+        }
+      }
+    }
+  }
+}

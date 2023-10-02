@@ -1,6 +1,8 @@
 name: Baseline groups
-
-on: [push,pull_request,workflow_dispatch]
+on:
+  - push
+  - pull_request
+  - workflow_dispatch
 
 jobs:
    group-loading:
@@ -8,8 +10,25 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        smalltalk: [ Pharo64-11, Pharo64-10, Pharo64-9.0, Pharo64-8.0 ]
-        load-spec: [ deployment, dependent-sunit-extensions, tests, development, tools, examples, core, healthcheck, metrics, metrics-http, json-rpc, app-control, app-info, app-config, loggers ]
+        smalltalk:
+          - Pharo64-10
+          - Pharo64-11
+        load-spec:
+          - app-config
+          - app-control
+          - app-info
+          - core
+          - dependent-sunit-extensions
+          - deployment
+          - development
+          - examples
+          - healthcheck
+          - json-rpc
+          - loggers
+          - metrics
+          - metrics-http
+          - tests
+          - tools
     name: ${{ matrix.smalltalk }} + ${{ matrix.load-spec }}
     steps:
       - uses: actions/checkout@v3

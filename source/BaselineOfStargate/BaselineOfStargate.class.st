@@ -28,102 +28,119 @@ BaselineOfStargate >> projectClass [
 ]
 
 { #category : #baselines }
+BaselineOfStargate >> setUpCorePackages: spec [
+
+	spec
+		package: 'Stargate-Model' with: [
+			spec requires:
+					#( 'Buoy-Deployment' 'Hyperspace-Deployment'
+					   'Teapot-Deployment' 'JSONWebToken-Deployment' ) ];
+		group: 'Core' with: 'Stargate-Model';
+		group: 'Deployment' with: 'Stargate-Model'.
+
+	#( 'Stargate-Zinc-Extensions' 'Stargate-Teapot-Extensions'
+	   'Stargate-NeoJSON-Extensions' 'Stargate-JSONWebToken-Extensions'
+	   'Stargate-Hyperspace-Extensions' 'Stargate-Extensions' ) do: [
+		:extensionPackageName |
+		spec
+			package: extensionPackageName
+			with: [ spec requires: 'Stargate-Model' ];
+			group: 'Core' with: extensionPackageName;
+			group: 'Deployment' with: extensionPackageName ]
+]
+
+{ #category : #baselines }
 BaselineOfStargate >> setUpDependencies: spec [
 
 	spec
-		baseline: 'Buoy' with: [ spec repository: 'github://ba-st/Buoy:v6' ];
+		baseline: 'Buoy' with: [ spec repository: 'github://ba-st/Buoy:v7' ];
 		project: 'Buoy-Deployment' copyFrom: 'Buoy' with: [ spec loads: 'Deployment' ];
 		project: 'Buoy-SUnit' copyFrom: 'Buoy' with: [ spec loads: 'Dependent-SUnit-Extensions' ].
 
 	spec
-		baseline: 'Hyperspace' with: [ spec repository: 'github://ba-st/Hyperspace:v4' ];
+		baseline: 'Hyperspace' with: [ spec repository: 'github://ba-st/Hyperspace:v5' ];
 		project: 'Hyperspace-Deployment' copyFrom: 'Hyperspace' with: [ spec loads: 'Deployment' ];
-    project: 'Hyperspace-Tools' copyFrom: 'Hyperspace' with: [ spec loads: 'Tools' ];
+		project: 'Hyperspace-Tools' copyFrom: 'Hyperspace' with: [ spec loads: 'Tools' ];
 		project: 'Hyperspace-SUnit'
 		copyFrom: 'Hyperspace'
 		with: [ spec loads: 'Dependent-SUnit-Extensions' ].
 
 	spec
-		baseline: 'Teapot' with: [ spec repository: 'github://zeroflag/Teapot:v2.7.0/source' ];
+		baseline: 'Teapot' with: [ spec repository: 'github://ba-st-dependencies/Teapot:v2' ];
 		project: 'Teapot-Deployment' copyFrom: 'Teapot' with: [ spec loads: 'Deployment' ].
 
 	spec
-		baseline: 'JSONWebToken' with: [ spec repository: 'github://noha/JSONWebToken:0.3/source' ];
-		project: 'JSONWebToken-Deployment'
-		copyFrom: 'JSONWebToken'
-		with: [ spec loads: 'JSONWebToken-Core' ].
+		baseline: 'JSONWebToken' with: [ spec repository: 'github://ba-st-dependencies/JSONWebToken:v1' ];
+		project: 'JSONWebToken-Deployment' copyFrom: 'JSONWebToken' with: [ spec loads: 'SSL' ].
 
 	spec
-		baseline: 'JRPC' with: [ spec repository: 'github://juliendelplanque/JRPC:v3.x.x/src' ];
+		baseline: 'JRPC' with: [ spec repository: 'github://ba-st-dependencies/JRPC:v4' ];
 		project: 'JRPC-Deployment' copyFrom: 'JRPC' with: [ spec loads: 'Server-Deployment' ].
 
 	spec
-		baseline: 'Launchpad' with: [ spec repository: 'github://ba-st/Launchpad:v4' ];
-		project: 'Launchpad-Deployment' copyFrom: 'Launchpad' with: [ spec loads: 'Deployment' ].
-
-	spec
-		baseline: 'ZTimestamp' with: [ spec repository: 'github://svenvc/ztimestamp' ];
-		project: 'ZTimestamp-Core' copyFrom: 'ZTimestamp' with: [ spec loads: 'core' ]
+		baseline: 'Launchpad' with: [ spec repository: 'github://ba-st/Launchpad:v5' ];
+		project: 'Launchpad-Deployment' copyFrom: 'Launchpad' with: [ spec loads: 'Deployment' ]
 ]
 
 { #category : #baselines }
 BaselineOfStargate >> setUpDeploymentPackages: spec [
 
+	self setUpCorePackages: spec.
 	spec
-		package: 'Stargate-Model' with: [ 
-			spec requires:
-					#( 'Buoy-Deployment' 'Hyperspace-Deployment' 'Teapot-Deployment' 'JSONWebToken-Deployment' )
-			];
-		group: 'Core' with: 'Stargate-Model';
-		group: 'Deployment' with: 'Stargate-Model'.
-
-	spec
-		package: 'Stargate-HealthCheck' with: [ spec requires: 'Stargate-Model' ];
+		package: 'Stargate-HealthCheck' with: [ spec requires: 'Core' ];
 		group: 'HealthCheck' with: 'Stargate-HealthCheck';
 		group: 'Deployment' with: 'HealthCheck'.
-
 	spec
-		package: 'Stargate-Metrics' with: [ spec requires: 'Stargate-Model' ];
-		group: 'Metrics' with: 'Stargate-Metrics';
+		package: 'Stargate-Metrics' with: [ spec requires: 'Core' ];
+		group: 'Metrics' with: 'Stargate-Metrics'.
+	spec
+		package: 'Stargate-Metrics-Pharo' with: [ spec requires: 'Stargate-Metrics' ];
+		group: 'Metrics' with: 'Stargate-Metrics-Pharo';
 		group: 'Deployment' with: 'Metrics'.
-
 	spec
 		package: 'Stargate-Metrics-HTTP' with: [ spec requires: 'Stargate-Metrics' ];
-		group: 'Metrics-HTTP' with: 'Stargate-Metrics-HTTP';
-		group: 'Deployment' with: 'Metrics-HTTP'.
-
+		group: 'Metrics-HTTP' with: 'Stargate-Metrics-HTTP'.
 	spec
-		package: 'Stargate-JSON-RPC' with: [ spec requires: #( 'Stargate-Model' 'JRPC-Deployment' ) ];
+		package: 'Stargate-Metrics-HTTP-Zinc-Extensions' with: [ spec requires: 'Stargate-Metrics-HTTP' ];
+		group: 'Metrics-HTTP' with: 'Stargate-Metrics-HTTP-Zinc-Extensions';
+		group: 'Deployment' with: 'Metrics-HTTP'.
+	spec
+		package: 'Stargate-JSON-RPC' with: [ spec requires: #( 'Core' 'JRPC-Deployment' ) ];
 		group: 'JSON-RPC' with: 'Stargate-JSON-RPC';
 		group: 'Deployment' with: 'JSON-RPC'.
-
 	spec
-		package: 'Stargate-Application-Control' with: [ spec requires: #( 'Stargate-Model'
-				   'JSON-RPC' ) ];
+		package: 'Stargate-Application-Control' with: [ spec requires: #( 'Core' 'JSON-RPC' ) ];
 		group: 'Application-Control' with: 'Stargate-Application-Control';
 		group: 'Deployment' with: 'Application-Control'.
-
 	spec
-		package: 'Stargate-Application-Info' with: [ spec requires: 'Stargate-Model' ];
-		group: 'Application-Info' with: 'Stargate-Application-Info';
+		package: 'Stargate-Application-Info' with: [ spec requires: 'Core' ];
+		group: 'Application-Info' with: 'Stargate-Application-Info'.
+	spec
+		package: 'Stargate-Application-Info-Pharo' with: [ spec requires: 'Stargate-Application-Info' ];
+		group: 'Application-Info' with: 'Stargate-Application-Info-Pharo';
 		group: 'Deployment' with: 'Application-Info'.
-
 	spec
 		package: 'Stargate-Application-Configuration'
-		with: [ spec requires: #( 'Stargate-Model' 'Launchpad-Deployment' ) ];
+		with: [ spec requires: #( 'Core' 'Launchpad-Deployment' ) ];
 		group: 'Application-Configuration' with: 'Stargate-Application-Configuration';
 		group: 'Deployment' with: 'Application-Configuration'.
-
 	spec
-		package: 'Stargate-Loggers' with: [ spec requires: #( 'Stargate-Model' 'Launchpad-Deployment' ) ];
+		package: 'Stargate-Loggers' with: [ spec requires: #( 'Core' 'Launchpad-Deployment' ) ];
 		group: 'Loggers' with: 'Stargate-Loggers';
 		group: 'Deployment' with: 'Loggers'.
-
 	spec
-		package: 'Stargate-API-Skeleton' with: [ 
+		package: 'Stargate-Beacon-Extensions' with: [ spec requires: #( 'Core' 'Launchpad-Deployment' ) ];
+		group: 'Loggers' with: 'Stargate-Beacon-Extensions';
+		group: 'Deployment' with: 'Loggers'.
+	spec
+		package: 'Stargate-Bell-Extensions' with: [ spec requires: #( 'Core' 'Launchpad-Deployment' ) ];
+		group: 'Loggers' with: 'Stargate-Bell-Extensions';
+		group: 'Deployment' with: 'Loggers'.
+	spec
+		package: 'Stargate-API-Skeleton' with: [
 			spec requires:
 					#( 'Metrics-HTTP' 'Application-Control' 'Application-Info' 'Application-Configuration'
-					   'Launchpad-Deployment' 'ZTimestamp-Core' )
+					   'Launchpad-Deployment' )
 			];
 		group: 'Deployment' with: 'Stargate-API-Skeleton'
 ]
@@ -157,6 +174,10 @@ BaselineOfStargate >> setUpTestPackages: spec [
 		package: 'Stargate-Metrics-Tests'
 		with: [ spec requires: #( 'Stargate-Metrics' 'Stargate-Model-Tests' ) ];
 		group: 'Tests' with: 'Stargate-Metrics-Tests'.
+	spec
+		package: 'Stargate-Metrics-Pharo-Tests'
+		with: [ spec requires: #( 'Stargate-Metrics-Pharo' 'Stargate-Model-Tests' ) ];
+		group: 'Tests' with: 'Stargate-Metrics-Pharo-Tests'.
 	spec
 		package: 'Stargate-Metrics-HTTP-Tests'
 		with: [ spec requires: #( 'Stargate-Metrics-HTTP' 'Stargate-Model-Tests' ) ];

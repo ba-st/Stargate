@@ -1,0 +1,16 @@
+name: 'GS64 Unit Tests'
+on:
+  - push
+  - pull_request
+  - workflow_dispatch
+jobs:
+  unit-tests:
+    runs-on: ubuntu-latest
+    name: GS64 Unit Tests
+    steps:
+      - uses: actions/checkout@v3
+      - name: Load Image and Run Tests
+        uses: ba-st-actions/gs64-ci@v2
+        with:
+          project_name: 'Stargate'
+          run_tests: 'true'

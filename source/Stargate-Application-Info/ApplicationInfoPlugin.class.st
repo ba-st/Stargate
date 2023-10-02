@@ -31,12 +31,6 @@ ApplicationInfoPlugin class >> configuredBy: configuration [
 ]
 
 { #category : #accessing }
-ApplicationInfoPlugin class >> defaultProviderNames [
-
-	^ #('os' 'pharo')
-]
-
-{ #category : #accessing }
 ApplicationInfoPlugin class >> endpoint [
 
 	^ 'application-info'

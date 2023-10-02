@@ -20,7 +20,7 @@ HTTPBasedRESTfulAPITest class >> isAbstract [
 { #category : #running }
 HTTPBasedRESTfulAPITest >> algorithmName [
 
-	^ JWAHMACSHA256 parameterValue
+	^ 'HS256'
 ]
 
 { #category : #private }
@@ -64,7 +64,7 @@ HTTPBasedRESTfulAPITest >> newJWTAuthorizedClientClaiming: aClaimSet [
 	jws := JsonWebSignature new.
 	jws algorithmName: self algorithmName.
 	jws payload: aClaimSet.
-	jws key: self secret.
+	jws symmetricKey: self secret.
 
 	client := self newClient.
 	client request setAuthorization: ( 'Bearer <1s>' expandMacrosWith: jws compactSerialized ).

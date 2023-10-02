@@ -52,19 +52,27 @@ PrometheusMetricsEncoderTest >> testGaugeEncoding [
 PrometheusMetricsEncoderTest >> testLabeledAndTimestampedMetricEncodingForCounters [
 
 	self
-		assertEncodingOf:
-			( CompositeMetricBuilder forCounter
-				named: 'API HTTP request count';
-				describedBy: 'The total number of HTTP requests.';
-				addValue: 1027
-					labeledBy: { #method -> 'post' . #code -> 200 }
-					at: self timestamp ;
-				addValue: 3
-					labeledBy: { #method -> 'post' . #code -> 400 } 
-					at: (DateAndTime year: 1970 month: 1 day: 2 offset: 0 asDuration);
-				build )
+		assertEncodingOf: ( CompositeMetricBuilder forCounter
+				  named: 'API HTTP request count';
+				  describedBy: 'The total number of HTTP requests.';
+				  addValue: 1027 labeledBy: {
+						  ( #method -> 'post' ).
+						  ( #code -> 200 ) }
+				  at: self timestamp;
+				  addValue: 3 labeledBy: {
+						  ( #method -> 'post' ).
+						  ( #code -> 400 ) }
+				  at: ( DateAndTime
+						    year: 1970
+						    month: 1
+						    day: 2
+						    hour: 0
+						    minute: 0
+						    second: 0
+						    offset: 0 asDuration );
+				  build )
 		equals:
-			'# HELP api_http_request_count The total number of HTTP requests.<1s># TYPE api_http_request_count counter<1s>api_http_request_count{method="post",code="200"} 1027 0<1s>api_http_request_count{method="post",code="400"} 3 86400000<1s>'
+		'# HELP api_http_request_count The total number of HTTP requests.<1s># TYPE api_http_request_count counter<1s>api_http_request_count{method="post",code="200"} 1027 0<1s>api_http_request_count{method="post",code="400"} 3 86400000<1s>'
 ]
 
 { #category : #tests }

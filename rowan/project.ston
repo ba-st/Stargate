@@ -1,0 +1,11 @@
+RwProjectSpecificationV2 {
+  #specName : 'project',
+  #projectSpecPath : 'rowan',
+  #componentsPath : 'rowan/components',
+  #packagesPath : 'source',
+  #projectsPath : 'rowan/projects',
+  #specsPath : 'rowan/specs',
+  #packageFormat : 'tonel',
+  #packageConvention : 'Rowan',
+  #comment : 'Stargate project specification'
+}

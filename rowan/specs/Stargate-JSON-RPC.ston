@@ -1,0 +1,9 @@
+RwLoadSpecificationV2 {
+  #specName: 'Stargate-JSON-RPC',
+  #projectName : 'Stargate',
+  #diskUrl : 'Stargate',
+  #projectSpecFile : 'rowan/project.ston',
+  #componentNames : [
+    'JSON-RPC'
+  ]
+}

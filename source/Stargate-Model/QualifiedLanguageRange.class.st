@@ -15,17 +15,22 @@ Class {
 QualifiedLanguageRange class >> fromString: aString [
 
 	^ ( aString substrings: ';' )
-		ifEmpty: [ InstanceCreationFailed signal: 'Cannot create a qualified language range with an empty string' ]
-		ifNotEmpty: [ :tokens | 
-			| quality languageRange |
+		  ifEmpty: [
+		  InstanceCreationFailed signal: 'Cannot create a qualified language range with an empty string' ]
+		  ifNotEmpty: [ :tokens |
+			  | quality languageRange |
 
-			languageRange := LanguageRange fromString: tokens first trimBoth.
-			quality := tokens withoutFirst
-				detect: [ :parameter | parameter beginsWith: 'q=' ]
-				ifFound: [ :qParameter | ( qParameter withoutFirst: 2 ) asNumber ]
-				ifNone: [ 1.0 ].
-			self qualifying: languageRange with: quality
-			]
+			  languageRange := LanguageRange fromString: tokens first trimBoth.
+			  quality := tokens withoutFirst
+				             detect: [ :parameter | parameter beginsWith: 'q=' ]
+				             ifFound: [ :qParameter |
+					             ( qParameter withoutFirst: 2 )
+						             ifEmpty: [ InstanceCreationFailed signal: 'Invalid quality parameter value' ]
+						             ifNotEmpty: [ :qValue | qValue asNumber ]
+					             ]
+				             ifNone: [ 1.0 ].
+			  self qualifying: languageRange with: quality
+			  ]
 ]
 
 { #category : #'instance creation' }

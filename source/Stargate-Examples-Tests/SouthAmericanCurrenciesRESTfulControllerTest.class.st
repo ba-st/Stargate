@@ -367,7 +367,7 @@ SouthAmericanCurrenciesRESTfulControllerTest >> testGetBrazilianRealInSpanish [
 		do: [ :tag | self assert: tag equals: self argentineSpanish ];
 		assert: response varyHeaderNames includes: 'Accept-Language';
 		assert: response varyHeaderNames includes: 'Accept';
-		assert: response entityTag equals: '"f74a6f30f3c09515114aa5aa2a47253dfcd59d49"' asEntityTag.
+		assert: response entityTag equals: '"7172cf7dcf693f57fc6b54b31df90a85b1927901"' asEntityTag.
 
 	self withJsonFromContentsIn: response do: [ :json | 
 		self

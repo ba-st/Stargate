@@ -4,12 +4,6 @@ Class {
 	#category : #'Stargate-Examples'
 }
 
-{ #category : #private }
-SouthAmericanCurrenciesApplication class >> applicationBaselineName [
-
-	^ #BaselineOfStargate
-]
-
 { #category : #accessing }
 SouthAmericanCurrenciesApplication class >> commandName [
 
@@ -27,6 +21,12 @@ SouthAmericanCurrenciesApplication class >> initialize [
 
 	<ignoreForCoverage>
 	self initializeVersion
+]
+
+{ #category : #private }
+SouthAmericanCurrenciesApplication class >> projectName [
+
+	^ 'Stargate'
 ]
 
 { #category : #'private - accessing' }

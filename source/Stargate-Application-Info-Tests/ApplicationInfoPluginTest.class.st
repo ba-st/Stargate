@@ -27,6 +27,26 @@ ApplicationInfoPluginTest >> asPluginConfigurationGathering: infoProviderNames [
 ]
 
 { #category : #private }
+ApplicationInfoPluginTest >> assertGS64InformationOn: info [
+
+	<ignoreForCoverage>
+	info
+		at: 'gs64'
+		ifPresent: [ :gsData |
+			gsData
+				at: 'gem'
+				ifPresent: [ :gemData | self assert: ( gemData includesKey: 'gsVersion' ) ]
+				ifAbsent: [ self fail ].
+			self assert: ( gsData includesKey: 'sharedPageCache' ).
+			gsData
+				at: 'stone'
+				ifPresent: [ :stoneData | self assert: ( stoneData includesKey: 'gsVersion' ) ]
+				ifAbsent: [ self fail ]
+			]
+		ifAbsent: [ self fail ]
+]
+
+{ #category : #private }
 ApplicationInfoPluginTest >> assertOperatingSystemInformationOn: info [
 
 	info
@@ -79,23 +99,24 @@ ApplicationInfoPluginTest >> assertPharoInformationOn: info [
 		ifAbsent: [ self fail ]
 ]
 
-{ #category : #test }
+{ #category : #tests }
 ApplicationInfoPluginTest >> testConfiguredUsingDefaults [
 
 	| plugin info |
 
-	plugin := ApplicationInfoPlugin
-		configuredBy: ( self asPluginConfiguration: {( #enabled -> true )} asDictionary ).
+	plugin := ApplicationInfoPlugin configuredBy:
+		          ( self asPluginConfiguration: { ( #enabled -> true ) } asDictionary ).
 
 	info := plugin gatherInformation.
 
 	self
 		assert: info size equals: 2;
-		assertPharoInformationOn: info;
+		runOnlyInPharo: [ self assertPharoInformationOn: info ];
+		runOnlyInGemStone64: [ self assertGS64InformationOn: info ];
 		assertOperatingSystemInformationOn: info
 ]
 
-{ #category : #test }
+{ #category : #tests }
 ApplicationInfoPluginTest >> testConfiguredWithAllProviders [
 
 	| plugin |
@@ -106,7 +127,7 @@ ApplicationInfoPluginTest >> testConfiguredWithAllProviders [
 	self assert: plugin gatherInformation size equals: 3
 ]
 
-{ #category : #test }
+{ #category : #tests }
 ApplicationInfoPluginTest >> testConfiguredWithoutProviders [
 
 	| plugin |
@@ -116,31 +137,35 @@ ApplicationInfoPluginTest >> testConfiguredWithoutProviders [
 	self assert: plugin gatherInformation isEmpty
 ]
 
-{ #category : #test }
+{ #category : #tests }
 ApplicationInfoPluginTest >> testDefaultProviders [
 
-	self assert: ApplicationInfoPlugin defaultProviderNames equals: #('os' 'pharo')
+	self
+		runOnlyInPharo: [
+			self assert: ApplicationInfoPlugin defaultProviderNames equals: #( 'os' 'pharo' ) ];
+		runOnlyInGemStone64: [
+			self assert: ApplicationInfoPlugin defaultProviderNames equals: #( 'os' 'gs64' ) ]
 ]
 
-{ #category : #test }
+{ #category : #tests }
 ApplicationInfoPluginTest >> testEnabledByDefault [
 
 	self deny: ApplicationInfoPlugin enabledByDefault
 ]
 
-{ #category : #test }
+{ #category : #tests }
 ApplicationInfoPluginTest >> testEndpoint [
 
 	self assert: ApplicationInfoPlugin endpoint equals: 'application-info'
 ]
 
-{ #category : #test }
+{ #category : #tests }
 ApplicationInfoPluginTest >> testPluginName [
 
 	self assert: ApplicationInfoPlugin pluginName equals: 'Application Information'
 ]
 
-{ #category : #test }
+{ #category : #tests }
 ApplicationInfoPluginTest >> testPrintOn [
 
 	self assert: ApplicationInfoPlugin new printString equals: 'Application Information'

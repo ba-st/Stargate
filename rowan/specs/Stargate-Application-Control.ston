@@ -1,0 +1,9 @@
+RwLoadSpecificationV2 {
+  #specName: 'Stargate-Application-Control',
+  #projectName : 'Stargate',
+  #diskUrl : 'Stargate',
+  #projectSpecFile : 'rowan/project.ston',
+  #componentNames : [
+    'Application-Control'
+  ]
+}
