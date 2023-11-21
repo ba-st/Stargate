@@ -2,12 +2,13 @@
 An ApplicationConfigurationRESTfulControllerTest is a test class for testing the behavior of ApplicationConfigurationRESTfulController
 "
 Class {
-	#name : #ApplicationConfigurationRESTfulControllerTest,
-	#superclass : #OperationalPluginRESTfulControllerTest,
-	#category : #'Stargate-Application-Configuration-Tests'
+	#name : 'ApplicationConfigurationRESTfulControllerTest',
+	#superclass : 'OperationalPluginRESTfulControllerTest',
+	#category : 'Stargate-Application-Configuration-Tests',
+	#package : 'Stargate-Application-Configuration-Tests'
 }
 
-{ #category : #'private - support' }
+{ #category : 'private - support' }
 ApplicationConfigurationRESTfulControllerTest >> configurationParameters [
 
 	^ Array
@@ -25,7 +26,7 @@ ApplicationConfigurationRESTfulControllerTest >> configurationParameters [
 				  asSensitive
 ]
 
-{ #category : #'private - support' }
+{ #category : 'private - support' }
 ApplicationConfigurationRESTfulControllerTest >> configurationProvider [
 
 	^ [ 
@@ -36,7 +37,7 @@ ApplicationConfigurationRESTfulControllerTest >> configurationProvider [
 	  ]
 ]
 
-{ #category : #'private - support' }
+{ #category : 'private - support' }
 ApplicationConfigurationRESTfulControllerTest >> operationsConfiguration [
 
 	^ super operationsConfiguration
@@ -49,7 +50,7 @@ ApplicationConfigurationRESTfulControllerTest >> operationsConfiguration [
 		yourself
 ]
 
-{ #category : #'private - support' }
+{ #category : 'private - support' }
 ApplicationConfigurationRESTfulControllerTest >> setUpResourceController [
 
 	resourceController := ApplicationConfigurationRESTfulController
@@ -57,7 +58,7 @@ ApplicationConfigurationRESTfulControllerTest >> setUpResourceController [
 		configuredBy: self operationsConfiguration
 ]
 
-{ #category : #'private - support' }
+{ #category : 'private - support' }
 ApplicationConfigurationRESTfulControllerTest >> testGetConfigurationInJson [
 
 	| response |
@@ -112,13 +113,13 @@ ApplicationConfigurationRESTfulControllerTest >> testGetConfigurationInJson [
 					assert: config attributeName equals: 'secret';
 					assert: config commandLineArgumentName equals: 'vault.secret';
 					assert: config environmentVariableName equals: 'VAULT__SECRET';
-					assert: config sections equals: #( 'Vault' );
+					assert: config sections hasTheSameElementsInTheSameOrderThat: #( 'Vault' );
 					assert: ( config at: #'current-value' ) equals: '**********'
 				]
 			]
 ]
 
-{ #category : #'private - support' }
+{ #category : 'private - support' }
 ApplicationConfigurationRESTfulControllerTest >> testGetConfigurationInPlainText [
 
 	| response |
@@ -137,7 +138,7 @@ ApplicationConfigurationRESTfulControllerTest >> testGetConfigurationInPlainText
 				with: String lf )
 ]
 
-{ #category : #'private - support' }
+{ #category : 'private - support' }
 ApplicationConfigurationRESTfulControllerTest >> withConfigurationNamed: aName in: configurations do: aBlock [
 
 	configurations detect: [ :config | config name = aName ] ifFound: aBlock ifNone: [ self fail ]

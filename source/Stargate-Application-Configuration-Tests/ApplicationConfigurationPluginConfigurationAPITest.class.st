@@ -2,12 +2,13 @@
 I'm a test for API configuration options
 "
 Class {
-	#name : #ApplicationConfigurationPluginConfigurationAPITest,
-	#superclass : #OperationalPluginAPITest,
-	#category : #'Stargate-Application-Configuration-Tests'
+	#name : 'ApplicationConfigurationPluginConfigurationAPITest',
+	#superclass : 'OperationalPluginAPITest',
+	#category : 'Stargate-Application-Configuration-Tests',
+	#package : 'Stargate-Application-Configuration-Tests'
 }
 
-{ #category : #running }
+{ #category : 'running' }
 ApplicationConfigurationPluginConfigurationAPITest >> operationsConfiguration [
 
 	^ super operationsConfiguration
@@ -15,13 +16,13 @@ ApplicationConfigurationPluginConfigurationAPITest >> operationsConfiguration [
 		yourself
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 ApplicationConfigurationPluginConfigurationAPITest >> requiredPermissions [
 
 	^ #('read:application-configuration')
 ]
 
-{ #category : #tests }
+{ #category : 'tests' }
 ApplicationConfigurationPluginConfigurationAPITest >> testPluginIsDisabled [
 
 	self

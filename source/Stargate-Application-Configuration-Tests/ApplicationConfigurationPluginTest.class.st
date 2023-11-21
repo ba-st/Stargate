@@ -2,12 +2,13 @@
 An ApplicationConfigurationPluginTest is a test class for testing the behavior of ApplicationConfigurationPlugin
 "
 Class {
-	#name : #ApplicationConfigurationPluginTest,
-	#superclass : #TestCase,
-	#category : #'Stargate-Application-Configuration-Tests'
+	#name : 'ApplicationConfigurationPluginTest',
+	#superclass : 'TestCase',
+	#category : 'Stargate-Application-Configuration-Tests',
+	#package : 'Stargate-Application-Configuration-Tests'
 }
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 ApplicationConfigurationPluginTest >> configuration [
 
 	^ Dictionary new
@@ -20,7 +21,7 @@ ApplicationConfigurationPluginTest >> configuration [
 		yourself
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 ApplicationConfigurationPluginTest >> configurationParameters [
 
 	^ Array
@@ -35,7 +36,7 @@ ApplicationConfigurationPluginTest >> configurationParameters [
 				    convertingWith: [ :value | value = 'true' ] )
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 ApplicationConfigurationPluginTest >> configurationProvider [
 
 	^ [ 
@@ -46,7 +47,7 @@ ApplicationConfigurationPluginTest >> configurationProvider [
 	  ]
 ]
 
-{ #category : #tests }
+{ #category : 'tests' }
 ApplicationConfigurationPluginTest >> testConfigurationAccessing [
 
 	| plugin parameter |
@@ -74,19 +75,19 @@ ApplicationConfigurationPluginTest >> testConfigurationAccessing [
 		assert: ( plugin currentValueFor: parameter )
 ]
 
-{ #category : #tests }
+{ #category : 'tests' }
 ApplicationConfigurationPluginTest >> testEnabledByDefault [
 
 	self deny: ApplicationConfigurationPlugin enabledByDefault
 ]
 
-{ #category : #tests }
+{ #category : 'tests' }
 ApplicationConfigurationPluginTest >> testEndpoint [
 
 	self assert: ApplicationConfigurationPlugin endpoint equals: 'application-configuration'
 ]
 
-{ #category : #tests }
+{ #category : 'tests' }
 ApplicationConfigurationPluginTest >> testPluginName [
 
 	self assert: ApplicationConfigurationPlugin pluginName equals: 'Application Configuration'

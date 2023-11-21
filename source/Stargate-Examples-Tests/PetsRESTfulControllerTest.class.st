@@ -2,27 +2,29 @@
 I'm a user stoty test testing the service providing the Pet resource, in the classic Pet Store example
 "
 Class {
-	#name : #PetsRESTfulControllerTest,
-	#superclass : #SingleResourceRESTfulControllerTest,
+	#name : 'PetsRESTfulControllerTest',
+	#superclass : 'SingleResourceRESTfulControllerTest',
 	#instVars : [
 		'petRepository'
 	],
-	#category : #'Stargate-Examples-Tests-PetStore'
+	#category : 'Stargate-Examples-Tests-PetStore',
+	#package : 'Stargate-Examples-Tests',
+	#tag : 'PetStore'
 }
 
-{ #category : #'private - support' }
+{ #category : 'private - support' }
 PetsRESTfulControllerTest >> assert: anObject equals: aSecondObject or: aThirdObject [
 
 	self assert: ( anObject = aSecondObject or: [ anObject = aThirdObject ] )
 ]
 
-{ #category : #'private - support' }
+{ #category : 'private - support' }
 PetsRESTfulControllerTest >> baseUrl [
 
 	^ 'https://pets.example.com' asUrl 
 ]
 
-{ #category : #'private - support' }
+{ #category : 'private - support' }
 PetsRESTfulControllerTest >> createPet [
 
 	self
@@ -32,7 +34,7 @@ PetsRESTfulControllerTest >> createPet [
 				within: self newHttpRequestContext) isSuccess
 ]
 
-{ #category : #'private - support' }
+{ #category : 'private - support' }
 PetsRESTfulControllerTest >> createSixPets [
 
 	resourceController
@@ -46,13 +48,13 @@ PetsRESTfulControllerTest >> createSixPets [
 	self assert: petRepository count equals: 6
 ]
 
-{ #category : #'private - support' }
+{ #category : 'private - support' }
 PetsRESTfulControllerTest >> defaultPetMediaType [
 
 	^ resourceController petVersion1dot0dot0MediaType
 ]
 
-{ #category : #'private - support' }
+{ #category : 'private - support' }
 PetsRESTfulControllerTest >> entityTagOfPetIdentifiedBy: anIdentifier [
 
 	| getResponse |
@@ -64,7 +66,7 @@ PetsRESTfulControllerTest >> entityTagOfPetIdentifiedBy: anIdentifier [
 	^ getResponse entityTag
 ]
 
-{ #category : #'private - support' }
+{ #category : 'private - support' }
 PetsRESTfulControllerTest >> requestMissingIfMatchHeaderToUpdatePetIdentifiedBy: anIdentifier nameTo: aName [
 
 	^ TeaRequest
@@ -76,25 +78,25 @@ PetsRESTfulControllerTest >> requestMissingIfMatchHeaderToUpdatePetIdentifiedBy:
 		pathParams: ( self parametersWith: anIdentifier )
 ]
 
-{ #category : #'private - support' }
+{ #category : 'private - support' }
 PetsRESTfulControllerTest >> requestToCreatePetFrom: json [
 
 	^ self requestToPOST: json as: self defaultPetMediaType
 ]
 
-{ #category : #'private - support' }
+{ #category : 'private - support' }
 PetsRESTfulControllerTest >> requestToGetPetsAccepting: anAcceptHeader [
 
 	^ self requestToGET: self resourceUrl accepting: anAcceptHeader
 ]
 
-{ #category : #'private - support' }
+{ #category : 'private - support' }
 PetsRESTfulControllerTest >> requestToUpdatePetIdentifiedBy: anIdentifier nameTo: aName [
 
 	^ self requestToUpdatePetIdentifiedBy: anIdentifier nameTo: aName using: (self entityTagOfPetIdentifiedBy: anIdentifier)
 ]
 
-{ #category : #'private - support' }
+{ #category : 'private - support' }
 PetsRESTfulControllerTest >> requestToUpdatePetIdentifiedBy: anIdentifier nameTo: aName using: anETag [
 
 	^ self
@@ -104,7 +106,7 @@ PetsRESTfulControllerTest >> requestToUpdatePetIdentifiedBy: anIdentifier nameTo
 		conditionalTo: anETag
 ]
 
-{ #category : #'private - support' }
+{ #category : 'private - support' }
 PetsRESTfulControllerTest >> requestToUpdatePetIdentifiedBy: anIdentifier statusTo: aStatus [
 
 	^ self
@@ -114,7 +116,7 @@ PetsRESTfulControllerTest >> requestToUpdatePetIdentifiedBy: anIdentifier status
 		conditionalTo: ( self entityTagOfPetIdentifiedBy: anIdentifier )
 ]
 
-{ #category : #running }
+{ #category : 'running' }
 PetsRESTfulControllerTest >> setUp [
 
 	petRepository := InMemoryPetRepository new.
@@ -122,13 +124,13 @@ PetsRESTfulControllerTest >> setUp [
 	self assert: petRepository findAll isEmpty
 ]
 
-{ #category : #running }
+{ #category : 'running' }
 PetsRESTfulControllerTest >> setUpResourceController [
 
 	resourceController := PetsRESTfulController persistingTo: petRepository
 ]
 
-{ #category : #'tests - delete' }
+{ #category : 'tests - delete' }
 PetsRESTfulControllerTest >> testCantDeleteInvalidPet [
 
 	self
@@ -137,7 +139,7 @@ PetsRESTfulControllerTest >> testCantDeleteInvalidPet [
 		withExceptionDo: [ :signal | self assert: signal code equals: 404 ]
 ]
 
-{ #category : #'tests - get individual' }
+{ #category : 'tests - get individual' }
 PetsRESTfulControllerTest >> testCantGetPetSpecifyingLanguageRange [
 
 	self
@@ -165,7 +167,7 @@ PetsRESTfulControllerTest >> testCantGetPetSpecifyingLanguageRange [
 			]
 ]
 
-{ #category : #'tests - update' }
+{ #category : 'tests - update' }
 PetsRESTfulControllerTest >> testCantUpdatePetIfMissingETag [
 
 	self
@@ -175,7 +177,7 @@ PetsRESTfulControllerTest >> testCantUpdatePetIfMissingETag [
 			withExceptionDo: [ :error | self assert: error code equals: 428 ]
 ]
 
-{ #category : #'tests - update' }
+{ #category : 'tests - update' }
 PetsRESTfulControllerTest >> testCantUpdatePetNameWhenEmpty [
 
 	self
@@ -191,7 +193,7 @@ PetsRESTfulControllerTest >> testCantUpdatePetNameWhenEmpty [
 		raise: HTTPClientError unprocessableEntity
 ]
 
-{ #category : #'tests - update' }
+{ #category : 'tests - update' }
 PetsRESTfulControllerTest >> testCantUpdatePetWhenETagDoesNotMatch [
 
 	self
@@ -201,7 +203,7 @@ PetsRESTfulControllerTest >> testCantUpdatePetWhenETagDoesNotMatch [
 			withExceptionDo: [ :error | self assert: error code equals: 412 ]
 ]
 
-{ #category : #'tests - get collection' }
+{ #category : 'tests - get collection' }
 PetsRESTfulControllerTest >> testComplexPagination [
 
 	| response |
@@ -259,7 +261,7 @@ PetsRESTfulControllerTest >> testComplexPagination [
 		]
 ]
 
-{ #category : #'tests - delete' }
+{ #category : 'tests - delete' }
 PetsRESTfulControllerTest >> testDeletePet [
 
 	| response |
@@ -274,7 +276,7 @@ PetsRESTfulControllerTest >> testDeletePet [
 		deny: response hasEntity
 ]
 
-{ #category : #'tests - get individual' }
+{ #category : 'tests - get individual' }
 PetsRESTfulControllerTest >> testGetNotModifiedWhenValidETag [
 
 	| response |
@@ -302,7 +304,7 @@ PetsRESTfulControllerTest >> testGetNotModifiedWhenValidETag [
 		assert: response entityTag equals: '"c051344b8c92c5ed8a2bd0752070c35ed3de3bab"' asEntityTag
 ]
 
-{ #category : #'tests - get individual' }
+{ #category : 'tests - get individual' }
 PetsRESTfulControllerTest >> testGetPetJustCreated [
 
 	| response |
@@ -335,7 +337,7 @@ PetsRESTfulControllerTest >> testGetPetJustCreated [
 		]
 ]
 
-{ #category : #'tests - get individual' }
+{ #category : 'tests - get individual' }
 PetsRESTfulControllerTest >> testGetPetJustCreatedWhenNoAcceptHeaderPresentInRequest [
 
 	| getRequest response |
@@ -371,7 +373,7 @@ PetsRESTfulControllerTest >> testGetPetJustCreatedWhenNoAcceptHeaderPresentInReq
 		]
 ]
 
-{ #category : #'tests - get individual' }
+{ #category : 'tests - get individual' }
 PetsRESTfulControllerTest >> testGetPetNotFoundShouldFail [
 
 	self
@@ -383,7 +385,7 @@ PetsRESTfulControllerTest >> testGetPetNotFoundShouldFail [
 		withExceptionDo: [ :error | self assert: error code equals: 404 ]
 ]
 
-{ #category : #'tests - get individual' }
+{ #category : 'tests - get individual' }
 PetsRESTfulControllerTest >> testGetPetSummaryJustCreated [
 
 	| response |
@@ -418,7 +420,7 @@ PetsRESTfulControllerTest >> testGetPetSummaryJustCreated [
 		]
 ]
 
-{ #category : #'tests - get collection' }
+{ #category : 'tests - get collection' }
 PetsRESTfulControllerTest >> testGetPets [
 
 	| response |
@@ -444,7 +446,7 @@ PetsRESTfulControllerTest >> testGetPets [
 			]
 ]
 
-{ #category : #'tests - get collection' }
+{ #category : 'tests - get collection' }
 PetsRESTfulControllerTest >> testGetPetsNotEmpty [
 
 	| response |
@@ -483,7 +485,7 @@ PetsRESTfulControllerTest >> testGetPetsNotEmpty [
 			]
 ]
 
-{ #category : #'tests - get collection' }
+{ #category : 'tests - get collection' }
 PetsRESTfulControllerTest >> testGetPetsNotEmptyAcceptingCompleteMediaType [
 
 	| response |
@@ -522,7 +524,7 @@ PetsRESTfulControllerTest >> testGetPetsNotEmptyAcceptingCompleteMediaType [
 			]
 ]
 
-{ #category : #'tests - get collection' }
+{ #category : 'tests - get collection' }
 PetsRESTfulControllerTest >> testGetPetsWithPagination [
 
 	| response |
@@ -579,7 +581,7 @@ PetsRESTfulControllerTest >> testGetPetsWithPagination [
 		]
 ]
 
-{ #category : #'tests - creation' }
+{ #category : 'tests - creation' }
 PetsRESTfulControllerTest >> testPetCreation [
 
 	| response request |
@@ -599,7 +601,7 @@ PetsRESTfulControllerTest >> testPetCreation [
 		assert: petRepository findAll first name equals: 'Firulais'
 ]
 
-{ #category : #'tests - creation' }
+{ #category : 'tests - creation' }
 PetsRESTfulControllerTest >> testPetCreationWhenNoAcceptHeaderPresentInRequest [
 
 	| request response |
@@ -624,13 +626,13 @@ PetsRESTfulControllerTest >> testPetCreationWhenNoAcceptHeaderPresentInRequest [
 		assert: petRepository findAll first name equals: 'Firulais'
 ]
 
-{ #category : #tests }
+{ #category : 'tests' }
 PetsRESTfulControllerTest >> testTemplate [
 
 	self assert: resourceController identifierTemplate equals: '/pets/<identifier:IsInteger>'
 ]
 
-{ #category : #'tests - update' }
+{ #category : 'tests - update' }
 PetsRESTfulControllerTest >> testUpdatePetName [
 
 	| response |
@@ -657,7 +659,7 @@ PetsRESTfulControllerTest >> testUpdatePetName [
 				assertUrl: json selfLocation equals: 'https://pets.example.com/pets/1' ]
 ]
 
-{ #category : #'tests - update' }
+{ #category : 'tests - update' }
 PetsRESTfulControllerTest >> testUpdatePetStatus [
 
 	| response |
