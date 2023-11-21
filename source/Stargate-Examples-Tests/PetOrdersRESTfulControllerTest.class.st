@@ -2,21 +2,23 @@
 I'm a user stoty test testing the service providing the Pet Order resource, in the classic Pet Store example
 "
 Class {
-	#name : #PetOrdersRESTfulControllerTest,
-	#superclass : #SingleResourceRESTfulControllerTest,
+	#name : 'PetOrdersRESTfulControllerTest',
+	#superclass : 'SingleResourceRESTfulControllerTest',
 	#instVars : [
 		'orderRepository'
 	],
-	#category : #'Stargate-Examples-Tests-PetStore'
+	#category : 'Stargate-Examples-Tests-PetStore',
+	#package : 'Stargate-Examples-Tests',
+	#tag : 'PetStore'
 }
 
-{ #category : #'private - support' }
+{ #category : 'private - support' }
 PetOrdersRESTfulControllerTest >> baseUrl [
 
 	^ 'https://petstore.example.com' asUrl
 ]
 
-{ #category : #'private - support' }
+{ #category : 'private - support' }
 PetOrdersRESTfulControllerTest >> commentsRelatedTo: order [
 
 	^ resourceController
@@ -25,7 +27,7 @@ PetOrdersRESTfulControllerTest >> commentsRelatedTo: order [
 		within: self newHttpRequestContext
 ]
 
-{ #category : #'private - support' }
+{ #category : 'private - support' }
 PetOrdersRESTfulControllerTest >> createCommentFor: order identifiedBy: anId withContent: aComment [
 
 	| request |
@@ -36,7 +38,7 @@ PetOrdersRESTfulControllerTest >> createCommentFor: order identifiedBy: anId wit
 	^ resourceController createCommentBasedOn: request within: self newHttpRequestContext
 ]
 
-{ #category : #'private - support' }
+{ #category : 'private - support' }
 PetOrdersRESTfulControllerTest >> createOrder [
 
 	^ resourceController
@@ -46,7 +48,7 @@ PetOrdersRESTfulControllerTest >> createOrder [
 		within: self newHttpRequestContext
 ]
 
-{ #category : #'private - support' }
+{ #category : 'private - support' }
 PetOrdersRESTfulControllerTest >> getFirstOrderAndWithJsonDo: aBlock [
 
 	| response |
@@ -68,7 +70,7 @@ PetOrdersRESTfulControllerTest >> getFirstOrderAndWithJsonDo: aBlock [
 	self withJsonFromContentsIn: response do: aBlock
 ]
 
-{ #category : #'private - support' }
+{ #category : 'private - support' }
 PetOrdersRESTfulControllerTest >> parametersWith: anOrderId and: aCommentIndex [
 
 	^ ( self parametersWith: anOrderId )
@@ -76,13 +78,13 @@ PetOrdersRESTfulControllerTest >> parametersWith: anOrderId and: aCommentIndex [
 		yourself
 ]
 
-{ #category : #'private - support' }
+{ #category : 'private - support' }
 PetOrdersRESTfulControllerTest >> petUrl [
 
 	^ self baseUrl / 'pets/1' asUrl
 ]
 
-{ #category : #'private - HTTP requests' }
+{ #category : 'private - HTTP requests' }
 PetOrdersRESTfulControllerTest >> requestToDELETEComment: aSubresourceUrl at: aCommentIndex forOrder: anOrderId [
 
 	^ TeaRequest
@@ -90,7 +92,7 @@ PetOrdersRESTfulControllerTest >> requestToDELETEComment: aSubresourceUrl at: aC
 		pathParams: ( self parametersWith: anOrderId and: aCommentIndex )
 ]
 
-{ #category : #'private - HTTP requests' }
+{ #category : 'private - HTTP requests' }
 PetOrdersRESTfulControllerTest >> requestToGETComment: aSubresourceUrl at: aCommentIndex forOrder: anOrderId [
 
 	^ TeaRequest
@@ -101,7 +103,7 @@ PetOrdersRESTfulControllerTest >> requestToGETComment: aSubresourceUrl at: aComm
 		pathParams: ( self parametersWith: anOrderId and: aCommentIndex )
 ]
 
-{ #category : #'private - HTTP requests' }
+{ #category : 'private - HTTP requests' }
 PetOrdersRESTfulControllerTest >> requestToPOST: url identifiedBy: anIdentifier [
 
 	^ TeaRequest
@@ -109,13 +111,13 @@ PetOrdersRESTfulControllerTest >> requestToPOST: url identifiedBy: anIdentifier 
 		pathParams: ( self parametersWith: anIdentifier )
 ]
 
-{ #category : #'private - HTTP requests' }
+{ #category : 'private - HTTP requests' }
 PetOrdersRESTfulControllerTest >> requestToPOSTAsOrder: json [
 
 	^ self requestToPOST: json as: resourceController orderVersion1dot0dot0MediaType
 ]
 
-{ #category : #'private - HTTP requests' }
+{ #category : 'private - HTTP requests' }
 PetOrdersRESTfulControllerTest >> requestToPUTComment: aComment on: aSubresourceUrl at: aCommentIndex forOrder: anOrderId conditionalTo: anETag [
 
 	^ TeaRequest
@@ -127,7 +129,7 @@ PetOrdersRESTfulControllerTest >> requestToPUTComment: aComment on: aSubresource
 		pathParams: ( self parametersWith: anOrderId and: aCommentIndex )
 ]
 
-{ #category : #running }
+{ #category : 'running' }
 PetOrdersRESTfulControllerTest >> setUp [
 
 	orderRepository := InMemoryPetOrderRepository new.
@@ -135,13 +137,13 @@ PetOrdersRESTfulControllerTest >> setUp [
 	self assert: orderRepository findAll isEmpty
 ]
 
-{ #category : #running }
+{ #category : 'running' }
 PetOrdersRESTfulControllerTest >> setUpResourceController [
 
 	resourceController := PetOrdersRESTfulController persistingTo: orderRepository 
 ]
 
-{ #category : #'tests - comments' }
+{ #category : 'tests - comments' }
 PetOrdersRESTfulControllerTest >> testCannnotDeleteComment [
 
 	self
@@ -156,7 +158,7 @@ PetOrdersRESTfulControllerTest >> testCannnotDeleteComment [
 			]
 ]
 
-{ #category : #'tests - comments' }
+{ #category : 'tests - comments' }
 PetOrdersRESTfulControllerTest >> testCannotGetComment [
 
 	self
@@ -175,7 +177,7 @@ PetOrdersRESTfulControllerTest >> testCannotGetComment [
 			]
 ]
 
-{ #category : #'tests - comments' }
+{ #category : 'tests - comments' }
 PetOrdersRESTfulControllerTest >> testCannotUpdateComment [
 
 	self
@@ -208,7 +210,7 @@ PetOrdersRESTfulControllerTest >> testCannotUpdateComment [
 			]
 ]
 
-{ #category : #'tests - comments' }
+{ #category : 'tests - comments' }
 PetOrdersRESTfulControllerTest >> testCannotUpdateCommentWhenETagDoesNotMatch [
 
 	self withJsonFromContentsIn: self createOrder do: [ :order | 
@@ -240,7 +242,7 @@ PetOrdersRESTfulControllerTest >> testCannotUpdateCommentWhenETagDoesNotMatch [
 		]
 ]
 
-{ #category : #'tests - comments' }
+{ #category : 'tests - comments' }
 PetOrdersRESTfulControllerTest >> testCommentCreation [
 
 	self
@@ -268,7 +270,7 @@ PetOrdersRESTfulControllerTest >> testCommentCreation [
 			]
 ]
 
-{ #category : #'tests - comments' }
+{ #category : 'tests - comments' }
 PetOrdersRESTfulControllerTest >> testDeleteComment [
 
 	self
@@ -300,7 +302,7 @@ PetOrdersRESTfulControllerTest >> testDeleteComment [
 			]
 ]
 
-{ #category : #'tests - orders' }
+{ #category : 'tests - orders' }
 PetOrdersRESTfulControllerTest >> testGetCanceledOrder [
 
 	self
@@ -320,7 +322,7 @@ PetOrdersRESTfulControllerTest >> testGetCanceledOrder [
 				assertUrl: json selfLocation equals: 'https://petstore.example.com/orders/1' ]
 ]
 
-{ #category : #'tests - comments' }
+{ #category : 'tests - comments' }
 PetOrdersRESTfulControllerTest >> testGetComment [
 
 	self
@@ -343,7 +345,7 @@ PetOrdersRESTfulControllerTest >> testGetComment [
 			]
 ]
 
-{ #category : #'tests - comments' }
+{ #category : 'tests - comments' }
 PetOrdersRESTfulControllerTest >> testGetComments [
 
 	self
@@ -365,7 +367,7 @@ PetOrdersRESTfulControllerTest >> testGetComments [
 			]
 ]
 
-{ #category : #'tests - comments' }
+{ #category : 'tests - comments' }
 PetOrdersRESTfulControllerTest >> testGetCommentsForJustCreatedOrder [
 
 	self
@@ -385,7 +387,7 @@ PetOrdersRESTfulControllerTest >> testGetCommentsForJustCreatedOrder [
 			]
 ]
 
-{ #category : #'tests - orders' }
+{ #category : 'tests - orders' }
 PetOrdersRESTfulControllerTest >> testGetOrderJustCreated [
 
 	self
@@ -399,7 +401,7 @@ PetOrdersRESTfulControllerTest >> testGetOrderJustCreated [
 				assertUrl: json links complete equals: 'https://petstore.example.com/orders/1/complete' ]
 ]
 
-{ #category : #'tests - orders' }
+{ #category : 'tests - orders' }
 PetOrdersRESTfulControllerTest >> testHATEOAS [
 
 	"This case will transition an order from registered to completed to canceled, using the hypermedia controls provided
@@ -441,7 +443,7 @@ PetOrdersRESTfulControllerTest >> testHATEOAS [
 			]
 ]
 
-{ #category : #'tests - orders' }
+{ #category : 'tests - orders' }
 PetOrdersRESTfulControllerTest >> testInvalidStateTransition [
 
 	| completeOrderLink |
@@ -462,7 +464,7 @@ PetOrdersRESTfulControllerTest >> testInvalidStateTransition [
 			withExceptionDo: [ :error | self assert: error code equals: 409 ]
 ]
 
-{ #category : #'tests - orders' }
+{ #category : 'tests - orders' }
 PetOrdersRESTfulControllerTest >> testOrderCreation [
 
 	| response |
@@ -478,7 +480,7 @@ PetOrdersRESTfulControllerTest >> testOrderCreation [
 		assert: orderRepository findAll first pet equals: self petUrl
 ]
 
-{ #category : #tests }
+{ #category : 'tests' }
 PetOrdersRESTfulControllerTest >> testRoutes [
 
 	| routes |
@@ -496,7 +498,7 @@ PetOrdersRESTfulControllerTest >> testRoutes [
 							'/orders/<identifier:IsInteger>/comments/<commentIdentifier:IsInteger>' ) )
 ]
 
-{ #category : #tests }
+{ #category : 'tests' }
 PetOrdersRESTfulControllerTest >> testTemplate [
 
 	| controller |
@@ -512,7 +514,7 @@ PetOrdersRESTfulControllerTest >> testTemplate [
 			equals: '/orders/<identifier:IsInteger>/comments/<commentIdentifier:IsInteger>'
 ]
 
-{ #category : #'tests - comments' }
+{ #category : 'tests - comments' }
 PetOrdersRESTfulControllerTest >> testUpdateComment [
 
 	self
@@ -550,7 +552,7 @@ PetOrdersRESTfulControllerTest >> testUpdateComment [
 			]
 ]
 
-{ #category : #'tests - comments' }
+{ #category : 'tests - comments' }
 PetOrdersRESTfulControllerTest >> testUpdateCommentAcceptingADifferentMediaType [
 
 	"Test for https://github.com/ba-st/Stargate/issues/164"

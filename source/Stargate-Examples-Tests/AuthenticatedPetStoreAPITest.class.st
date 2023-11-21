@@ -1,14 +1,16 @@
 Class {
-	#name : #AuthenticatedPetStoreAPITest,
-	#superclass : #HTTPBasedRESTfulAPITest,
+	#name : 'AuthenticatedPetStoreAPITest',
+	#superclass : 'HTTPBasedRESTfulAPITest',
 	#instVars : [
 		'petsController',
 		'ordersController'
 	],
-	#category : #'Stargate-Examples-Tests-PetStore'
+	#category : 'Stargate-Examples-Tests-PetStore',
+	#package : 'Stargate-Examples-Tests',
+	#tag : 'PetStore'
 }
 
-{ #category : #'tests - support' }
+{ #category : 'tests - support' }
 AuthenticatedPetStoreAPITest >> assert: aResponse canBeSharedWithRequestsFrom: anOriginLocation [
 
 	self
@@ -16,14 +18,14 @@ AuthenticatedPetStoreAPITest >> assert: aResponse canBeSharedWithRequestsFrom: a
 		equals: anOriginLocation asWebOrigin asString
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 AuthenticatedPetStoreAPITest >> controllersToInstall [
 
 	^ {petsController.
 	ordersController}
 ]
 
-{ #category : #running }
+{ #category : 'running' }
 AuthenticatedPetStoreAPITest >> setUpAPI [
 
 	petsController := PetsRESTfulController new.
@@ -33,7 +35,7 @@ AuthenticatedPetStoreAPITest >> setUpAPI [
 		( JWTBearerAuthenticationFilter with: self secret forAlgorithmNamed: self algorithmName )
 ]
 
-{ #category : #'tests - client errors' }
+{ #category : 'tests - client errors' }
 AuthenticatedPetStoreAPITest >> testBadRequest [
 
 	self
@@ -48,7 +50,7 @@ AuthenticatedPetStoreAPITest >> testBadRequest [
 		withExceptionDo: [ :error | self assert: error response isBadRequest ]
 ]
 
-{ #category : #'tests - CORS' }
+{ #category : 'tests - CORS' }
 AuthenticatedPetStoreAPITest >> testCORSAllowingAnyOrigin [
 
 	| response |
@@ -80,7 +82,7 @@ AuthenticatedPetStoreAPITest >> testCORSAllowingAnyOrigin [
 		assert: ( response headers at: 'Access-Control-Allow-Origin' ) equals: '*'
 ]
 
-{ #category : #'tests - CORS' }
+{ #category : 'tests - CORS' }
 AuthenticatedPetStoreAPITest >> testCORSAllowingExactlyOneOrigin [
 
 	| response |
@@ -114,7 +116,7 @@ AuthenticatedPetStoreAPITest >> testCORSAllowingExactlyOneOrigin [
 		assert: response canBeSharedWithRequestsFrom: self baseUrl
 ]
 
-{ #category : #'tests - CORS' }
+{ #category : 'tests - CORS' }
 AuthenticatedPetStoreAPITest >> testCORSAllowingMoreThanOneOrigin [
 
 	| response |
@@ -154,7 +156,7 @@ AuthenticatedPetStoreAPITest >> testCORSAllowingMoreThanOneOrigin [
 		assert: response canBeSharedWithRequestsFrom:  self baseUrl
 ]
 
-{ #category : #'tests - CORS' }
+{ #category : 'tests - CORS' }
 AuthenticatedPetStoreAPITest >> testCORSOptionalHeaders [
 
 	| response |
@@ -203,7 +205,7 @@ AuthenticatedPetStoreAPITest >> testCORSOptionalHeaders [
 		deny: response varyHeaderNames includes: 'Access-Control-Allow-Headers'
 ]
 
-{ #category : #'tests - CORS' }
+{ #category : 'tests - CORS' }
 AuthenticatedPetStoreAPITest >> testCORSRespondWithEmptyHeadersIfOriginNotAllowed [
 
 	| response |
@@ -234,7 +236,7 @@ AuthenticatedPetStoreAPITest >> testCORSRespondWithEmptyHeadersIfOriginNotAllowe
 		should: [ response headers at: 'Access-Control-Allow-Origin' ] raise: KeyNotFound
 ]
 
-{ #category : #'tests - client errors' }
+{ #category : 'tests - client errors' }
 AuthenticatedPetStoreAPITest >> testConflict [
 
 	self newJWTAuthorizedClient
@@ -262,7 +264,7 @@ AuthenticatedPetStoreAPITest >> testConflict [
 			]
 ]
 
-{ #category : #tests }
+{ #category : 'tests' }
 AuthenticatedPetStoreAPITest >> testCreatePet [
 
 	| response json |
@@ -290,7 +292,7 @@ AuthenticatedPetStoreAPITest >> testCreatePet [
 		assert: json selfLocation equals: response location
 ]
 
-{ #category : #'tests - authentication' }
+{ #category : 'tests - authentication' }
 AuthenticatedPetStoreAPITest >> testCreatePetUnauthorized [
 
 	self
@@ -306,7 +308,7 @@ AuthenticatedPetStoreAPITest >> testCreatePetUnauthorized [
 		withExceptionDo: [ :error | self assert: error response code equals: 401 ]
 ]
 
-{ #category : #'tests - authentication' }
+{ #category : 'tests - authentication' }
 AuthenticatedPetStoreAPITest >> testGetOrdersUnauthorized [
 
 	self should: [ self newClient get: self baseUrl / 'orders' asUrl ]
@@ -314,7 +316,7 @@ AuthenticatedPetStoreAPITest >> testGetOrdersUnauthorized [
 		withExceptionDo: [ :error | self assert: error response code equals: 401 ]
 ]
 
-{ #category : #tests }
+{ #category : 'tests' }
 AuthenticatedPetStoreAPITest >> testGetPets [
 
 	| json |
@@ -326,7 +328,7 @@ AuthenticatedPetStoreAPITest >> testGetPets [
 		assert: json links size equals: 1
 ]
 
-{ #category : #'tests - authentication' }
+{ #category : 'tests - authentication' }
 AuthenticatedPetStoreAPITest >> testGetPetsUnauthorized [
 
 	self should: [ self newClient get: self baseUrl / 'pets' asUrl ]
@@ -334,7 +336,7 @@ AuthenticatedPetStoreAPITest >> testGetPetsUnauthorized [
 		withExceptionDo: [ :error | self assert: error response code equals: 401 ]
 ]
 
-{ #category : #'tests - client errors' }
+{ #category : 'tests - client errors' }
 AuthenticatedPetStoreAPITest >> testMethodNotAllowed [
 
 	self newJWTAuthorizedClient
@@ -355,7 +357,7 @@ AuthenticatedPetStoreAPITest >> testMethodNotAllowed [
 			]
 ]
 
-{ #category : #'tests - client errors' }
+{ #category : 'tests - client errors' }
 AuthenticatedPetStoreAPITest >> testNotAcceptable [
 
 	self
@@ -369,7 +371,7 @@ AuthenticatedPetStoreAPITest >> testNotAcceptable [
 				assert: error response hasEntity ]
 ]
 
-{ #category : #'tests - client errors' }
+{ #category : 'tests - client errors' }
 AuthenticatedPetStoreAPITest >> testNotFound [
 
 	self 
@@ -378,7 +380,7 @@ AuthenticatedPetStoreAPITest >> testNotFound [
 		withExceptionDo: [ :error | self assert: error response isNotFound ]
 ]
 
-{ #category : #'tests - authentication' }
+{ #category : 'tests - authentication' }
 AuthenticatedPetStoreAPITest >> testNotFoundEndpointUnauthorized [
 
 	self should: [ self newClient get: self baseUrl / 'inexistent' asUrl ]
@@ -386,7 +388,7 @@ AuthenticatedPetStoreAPITest >> testNotFoundEndpointUnauthorized [
 		withExceptionDo: [ :error | self assert: error response code equals: 401 ]
 ]
 
-{ #category : #'tests - authentication' }
+{ #category : 'tests - authentication' }
 AuthenticatedPetStoreAPITest >> testNotPreflightOptionsUnauthorized [
 
 	self
@@ -400,7 +402,7 @@ AuthenticatedPetStoreAPITest >> testNotPreflightOptionsUnauthorized [
 		withExceptionDo: [ :error | self assert: error response code equals: 401 ]
 ]
 
-{ #category : #'tests - client errors' }
+{ #category : 'tests - client errors' }
 AuthenticatedPetStoreAPITest >> testUnsupportedMediaType [
 
 	self

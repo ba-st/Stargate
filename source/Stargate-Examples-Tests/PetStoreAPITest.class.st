@@ -2,16 +2,18 @@
 Test
 "
 Class {
-	#name : #PetStoreAPITest,
-	#superclass : #HTTPBasedRESTfulAPITest,
+	#name : 'PetStoreAPITest',
+	#superclass : 'HTTPBasedRESTfulAPITest',
 	#instVars : [
 		'petsController',
 		'ordersController'
 	],
-	#category : #'Stargate-Examples-Tests-PetStore'
+	#category : 'Stargate-Examples-Tests-PetStore',
+	#package : 'Stargate-Examples-Tests',
+	#tag : 'PetStore'
 }
 
-{ #category : #'tests - support' }
+{ #category : 'tests - support' }
 PetStoreAPITest >> assert: aResponse canBeSharedWithRequestsFrom: anOriginLocation [
 
 	self
@@ -19,20 +21,20 @@ PetStoreAPITest >> assert: aResponse canBeSharedWithRequestsFrom: anOriginLocati
 		equals: anOriginLocation asWebOrigin asString
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 PetStoreAPITest >> controllersToInstall [
 
 	^ {petsController.
 	ordersController}
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 PetStoreAPITest >> port [
 
 	^ 65535
 ]
 
-{ #category : #running }
+{ #category : 'running' }
 PetStoreAPITest >> setUpAPI [
 
 	petsController := PetsRESTfulController new.
@@ -40,7 +42,7 @@ PetStoreAPITest >> setUpAPI [
 	super setUpAPI
 ]
 
-{ #category : #'tests - client errors' }
+{ #category : 'tests - client errors' }
 PetStoreAPITest >> testBadRequest [
 
 	self
@@ -54,7 +56,7 @@ PetStoreAPITest >> testBadRequest [
 		withExceptionDo: [ :error | self assert: error response isBadRequest ]
 ]
 
-{ #category : #'tests - CORS' }
+{ #category : 'tests - CORS' }
 PetStoreAPITest >> testCORSAllowingAnyOrigin [
 
 	| response |
@@ -86,7 +88,7 @@ PetStoreAPITest >> testCORSAllowingAnyOrigin [
 		assert: ( response headers at: 'Access-Control-Allow-Origin' ) equals: '*'
 ]
 
-{ #category : #'tests - CORS' }
+{ #category : 'tests - CORS' }
 PetStoreAPITest >> testCORSAllowingExactlyOneOrigin [
 
 	| response |
@@ -120,7 +122,7 @@ PetStoreAPITest >> testCORSAllowingExactlyOneOrigin [
 		assert: response canBeSharedWithRequestsFrom: self baseUrl
 ]
 
-{ #category : #'tests - CORS' }
+{ #category : 'tests - CORS' }
 PetStoreAPITest >> testCORSAllowingMoreThanOneOrigin [
 
 	| response |
@@ -160,7 +162,7 @@ PetStoreAPITest >> testCORSAllowingMoreThanOneOrigin [
 		assert: response canBeSharedWithRequestsFrom:  self baseUrl
 ]
 
-{ #category : #'tests - CORS' }
+{ #category : 'tests - CORS' }
 PetStoreAPITest >> testCORSOptionalHeaders [
 
 	| response |
@@ -209,7 +211,7 @@ PetStoreAPITest >> testCORSOptionalHeaders [
 		deny: response varyHeaderNames includes: 'Access-Control-Allow-Headers'
 ]
 
-{ #category : #'tests - CORS' }
+{ #category : 'tests - CORS' }
 PetStoreAPITest >> testCORSRespondWithEmptyHeadersIfOriginNotAllowed [
 
 	| response |
@@ -240,7 +242,7 @@ PetStoreAPITest >> testCORSRespondWithEmptyHeadersIfOriginNotAllowed [
 		should: [ response headers at: 'Access-Control-Allow-Origin' ] raise: KeyNotFound
 ]
 
-{ #category : #'tests - client errors' }
+{ #category : 'tests - client errors' }
 PetStoreAPITest >> testConflict [
 
 	self newClient
@@ -268,7 +270,7 @@ PetStoreAPITest >> testConflict [
 			]
 ]
 
-{ #category : #tests }
+{ #category : 'tests' }
 PetStoreAPITest >> testCreatePet [
 
 	| response json |
@@ -296,7 +298,7 @@ PetStoreAPITest >> testCreatePet [
 		assert: json selfLocation equals: response location
 ]
 
-{ #category : #tests }
+{ #category : 'tests' }
 PetStoreAPITest >> testGetPets [
 
 	| json |
@@ -308,7 +310,7 @@ PetStoreAPITest >> testGetPets [
 		assert: json links size equals: 1
 ]
 
-{ #category : #'tests - client errors' }
+{ #category : 'tests - client errors' }
 PetStoreAPITest >> testMethodNotAllowed [
 
 	self newClient
@@ -329,7 +331,7 @@ PetStoreAPITest >> testMethodNotAllowed [
 			]
 ]
 
-{ #category : #'tests - client errors' }
+{ #category : 'tests - client errors' }
 PetStoreAPITest >> testNotAcceptable [
 
 	self
@@ -343,7 +345,7 @@ PetStoreAPITest >> testNotAcceptable [
 				assert: error response hasEntity ]
 ]
 
-{ #category : #'tests - client errors' }
+{ #category : 'tests - client errors' }
 PetStoreAPITest >> testNotFound [
 
 	self 
@@ -352,7 +354,7 @@ PetStoreAPITest >> testNotFound [
 		withExceptionDo: [ :error | self assert: error response isNotFound ]
 ]
 
-{ #category : #'tests - client errors' }
+{ #category : 'tests - client errors' }
 PetStoreAPITest >> testUnsupportedMediaType [
 
 	self

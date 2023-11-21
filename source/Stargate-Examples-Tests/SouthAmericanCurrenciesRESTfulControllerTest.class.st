@@ -2,60 +2,62 @@
 A SouthAmericanCurrenciesRESTfulControllerTest is a test class for testing the behavior of SouthAmericanCurrenciesRESTfulController
 "
 Class {
-	#name : #SouthAmericanCurrenciesRESTfulControllerTest,
-	#superclass : #SingleResourceRESTfulControllerTest,
-	#category : #'Stargate-Examples-Tests-Currencies'
+	#name : 'SouthAmericanCurrenciesRESTfulControllerTest',
+	#superclass : 'SingleResourceRESTfulControllerTest',
+	#category : 'Stargate-Examples-Tests-Currencies',
+	#package : 'Stargate-Examples-Tests',
+	#tag : 'Currencies'
 }
 
-{ #category : #'private - language ranges' }
+{ #category : 'private - language ranges' }
 SouthAmericanCurrenciesRESTfulControllerTest >> argentineSpanish [
 
 	^ 'es-AR' asLanguageTag 
 ]
 
-{ #category : #'private - support' }
+{ #category : 'private - support' }
 SouthAmericanCurrenciesRESTfulControllerTest >> assertThereAreNoLinksIn: json [
 
 	self assert: json links isNil
 ]
 
-{ #category : #'private - support' }
+{ #category : 'private - support' }
 SouthAmericanCurrenciesRESTfulControllerTest >> baseUrl [
 
 	^ 'https://currencies.example.com' asUrl
 ]
 
-{ #category : #'private - language ranges' }
+{ #category : 'private - language ranges' }
 SouthAmericanCurrenciesRESTfulControllerTest >> english [
 
 	^ 'en' asLanguageTag 
 ]
 
-{ #category : #'private - language ranges' }
+{ #category : 'private - language ranges' }
 SouthAmericanCurrenciesRESTfulControllerTest >> languageRange [
 
 	^ 'de,en;q=0.5,es;q=0.6'
 ]
 
-{ #category : #running }
+{ #category : 'running' }
 SouthAmericanCurrenciesRESTfulControllerTest >> setUpResourceController [
 
 	resourceController := SouthAmericanCurrenciesRESTfulController new
 ]
 
-{ #category : #'private - language ranges' }
+{ #category : 'private - language ranges' }
 SouthAmericanCurrenciesRESTfulControllerTest >> spanish [
 
 	^ 'es' asLanguageTag 
 ]
 
-{ #category : #'private - language ranges' }
+{ #category : 'private - language ranges' }
 SouthAmericanCurrenciesRESTfulControllerTest >> supportedLanguages [
 
 	^ Array with: self argentineSpanish with: self unitedStatesEnglish
 ]
 
-{ #category : #tests }
+{ #category : 'tests' }
 SouthAmericanCurrenciesRESTfulControllerTest >> testCantGetArgentinePesoAskingForAnEmptyLanguage [
 
 	| request |
@@ -77,7 +79,7 @@ SouthAmericanCurrenciesRESTfulControllerTest >> testCantGetArgentinePesoAskingFo
 			]
 ]
 
-{ #category : #tests }
+{ #category : 'tests' }
 SouthAmericanCurrenciesRESTfulControllerTest >> testCantGetArgentinePesoAskingForUnsupportedLanguage [
 
 	| request |
@@ -99,7 +101,7 @@ SouthAmericanCurrenciesRESTfulControllerTest >> testCantGetArgentinePesoAskingFo
 			]
 ]
 
-{ #category : #tests }
+{ #category : 'tests' }
 SouthAmericanCurrenciesRESTfulControllerTest >> testGetArgentinePeso [
 
 	| response |
@@ -130,7 +132,7 @@ SouthAmericanCurrenciesRESTfulControllerTest >> testGetArgentinePeso [
 		]
 ]
 
-{ #category : #tests }
+{ #category : 'tests' }
 SouthAmericanCurrenciesRESTfulControllerTest >> testGetArgentinePesoBanknotes [
 
 	| response |
@@ -155,7 +157,7 @@ SouthAmericanCurrenciesRESTfulControllerTest >> testGetArgentinePesoBanknotes [
 		self assertCollection: banknotes hasSameElements: #( 5 10 20 50 100 200 500 1000 ) ]
 ]
 
-{ #category : #tests }
+{ #category : 'tests' }
 SouthAmericanCurrenciesRESTfulControllerTest >> testGetArgentinePesoInEnglish [
 
 	| response request |
@@ -187,7 +189,7 @@ SouthAmericanCurrenciesRESTfulControllerTest >> testGetArgentinePesoInEnglish [
 		]
 ]
 
-{ #category : #tests }
+{ #category : 'tests' }
 SouthAmericanCurrenciesRESTfulControllerTest >> testGetArgentinePesoInEnglishBasedOnAnyLanguageWildcard [
 
 	| response request |
@@ -219,7 +221,7 @@ SouthAmericanCurrenciesRESTfulControllerTest >> testGetArgentinePesoInEnglishBas
 		]
 ]
 
-{ #category : #tests }
+{ #category : 'tests' }
 SouthAmericanCurrenciesRESTfulControllerTest >> testGetArgentinePesoInSpanish [
 
 	| response request |
@@ -251,7 +253,7 @@ SouthAmericanCurrenciesRESTfulControllerTest >> testGetArgentinePesoInSpanish [
 		]
 ]
 
-{ #category : #tests }
+{ #category : 'tests' }
 SouthAmericanCurrenciesRESTfulControllerTest >> testGetArgentinePesoInSpanishBasedOnLanguagePriorityList [
 
 	| response request |
@@ -283,7 +285,7 @@ SouthAmericanCurrenciesRESTfulControllerTest >> testGetArgentinePesoInSpanishBas
 		]
 ]
 
-{ #category : #tests }
+{ #category : 'tests' }
 SouthAmericanCurrenciesRESTfulControllerTest >> testGetBrazilianReal [
 
 	| response |
@@ -313,7 +315,7 @@ SouthAmericanCurrenciesRESTfulControllerTest >> testGetBrazilianReal [
 		]
 ]
 
-{ #category : #tests }
+{ #category : 'tests' }
 SouthAmericanCurrenciesRESTfulControllerTest >> testGetBrazilianRealInEnglish [
 
 	| response request |
@@ -346,7 +348,7 @@ SouthAmericanCurrenciesRESTfulControllerTest >> testGetBrazilianRealInEnglish [
 		]
 ]
 
-{ #category : #tests }
+{ #category : 'tests' }
 SouthAmericanCurrenciesRESTfulControllerTest >> testGetBrazilianRealInSpanish [
 
 	| response request |
@@ -378,7 +380,7 @@ SouthAmericanCurrenciesRESTfulControllerTest >> testGetBrazilianRealInSpanish [
 		]
 ]
 
-{ #category : #tests }
+{ #category : 'tests' }
 SouthAmericanCurrenciesRESTfulControllerTest >> testGetCurrencies [
 
 	| response |
@@ -407,7 +409,7 @@ SouthAmericanCurrenciesRESTfulControllerTest >> testGetCurrencies [
 		]
 ]
 
-{ #category : #tests }
+{ #category : 'tests' }
 SouthAmericanCurrenciesRESTfulControllerTest >> testGetCurrenciesInSpanish [
 
 	| response request |
@@ -440,7 +442,7 @@ SouthAmericanCurrenciesRESTfulControllerTest >> testGetCurrenciesInSpanish [
 		]
 ]
 
-{ #category : #tests }
+{ #category : 'tests' }
 SouthAmericanCurrenciesRESTfulControllerTest >> testGetCurrencyNotFoundShouldFail [
 
 	self
@@ -453,7 +455,7 @@ SouthAmericanCurrenciesRESTfulControllerTest >> testGetCurrencyNotFoundShouldFai
 		withExceptionDo: [ :error | self assert: error code equals: 404 ]
 ]
 
-{ #category : #tests }
+{ #category : 'tests' }
 SouthAmericanCurrenciesRESTfulControllerTest >> testGetNotModifiedWhenValidETag [
 
 	| response |
@@ -466,7 +468,10 @@ SouthAmericanCurrenciesRESTfulControllerTest >> testGetNotModifiedWhenValidETag 
 
 	self
 		assert: response isSuccess;
-		assert: response entityTag equals: '"5dd07a40a75ea23fa44e641a92a6dd1ec7999a36"' asEntityTag.
+		assert: response entityTag equals: '"5dd07a40a75ea23fa44e641a92a6dd1ec7999a36"' asEntityTag;
+		assert: response cachingDirectives size equals: 2;
+		assert: response cachingDirectives includes: 'immutable';
+		assert: response cachingDirectives includes: 'public'.
 
 	response := resourceController
 		            currencyBasedOn: ( self
@@ -478,10 +483,13 @@ SouthAmericanCurrenciesRESTfulControllerTest >> testGetNotModifiedWhenValidETag 
 	self
 		assert: response code equals: 304;
 		assert: response entityTag equals: '"5dd07a40a75ea23fa44e641a92a6dd1ec7999a36"' asEntityTag;
-		assert: response varyHeaderNames includes: 'Accept'
+		assert: response varyHeaderNames includes: 'Accept';
+		assert: response cachingDirectives size equals: 2;
+		assert: response cachingDirectives includes: 'immutable';
+		assert: response cachingDirectives includes: 'public'
 ]
 
-{ #category : #tests }
+{ #category : 'tests' }
 SouthAmericanCurrenciesRESTfulControllerTest >> testTemplates [
 
 	| routes |
@@ -496,13 +504,13 @@ SouthAmericanCurrenciesRESTfulControllerTest >> testTemplates [
 	routes do: [ :route | self assert: route httpMethod equals: #GET ]
 ]
 
-{ #category : #'private - language ranges' }
+{ #category : 'private - language ranges' }
 SouthAmericanCurrenciesRESTfulControllerTest >> unitedStatesEnglish [
 
 	^ 'en-US' asLanguageTag 
 ]
 
-{ #category : #'private - language ranges' }
+{ #category : 'private - language ranges' }
 SouthAmericanCurrenciesRESTfulControllerTest >> unsupportedLanguage [
 
 	^ 'de' asLanguageTag
