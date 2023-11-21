@@ -593,5 +593,5 @@ PetOrdersRESTfulControllerTest >> testUpdateCommentAcceptingADifferentMediaType 
 			assert: response isSuccess;
 			assert: response contentType equals: ZnMimeType applicationJson;
 			withJsonFromContentsIn: response
-			do: [ :json | self assert: json equals: #( 'Hola!' 'Mr. DJ' ) ] ]
+			do: [ :json | self assert: json hasTheSameElementsInTheSameOrderThat: #( 'Hola!' 'Mr. DJ' ) ] ]
 ]

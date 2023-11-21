@@ -401,11 +401,12 @@ SouthAmericanCurrenciesRESTfulControllerTest >> testGetCurrencies [
 		assert: response varyHeaderNames includes: 'Accept'.
 	self assertCachingDirectivesFor: response with: #( 'immutable' 'Max-Age=86400' ).
 
-	self withJsonFromContentsIn: response do: [ :currencies | 
+	self withJsonFromContentsIn: response do: [ :currencies |
 		self
 			assert: currencies size equals: 11;
 			assert: ( currencies collect: #isoCode )
-			equals: #( 'ARS' 'BOB' 'BRL' 'CLP' 'COP' 'GYD' 'PYG' 'PEN' 'SRD' 'UYU' 'VES' )
+			hasTheSameElementsInTheSameOrderThat:
+				#( 'ARS' 'BOB' 'BRL' 'CLP' 'COP' 'GYD' 'PYG' 'PEN' 'SRD' 'UYU' 'VES' )
 		]
 ]
 
@@ -414,7 +415,7 @@ SouthAmericanCurrenciesRESTfulControllerTest >> testGetCurrenciesInSpanish [
 
 	| response request |
 
-	request := self requestToGET: self resourceUrl applying: [ :requestConfig | 
+	request := self requestToGET: self resourceUrl applying: [ :requestConfig |
 		           requestConfig
 			           setAccept: resourceController currencyVersion1dot0dot0MediaType;
 			           setAcceptLanguage: self spanish
@@ -433,11 +434,12 @@ SouthAmericanCurrenciesRESTfulControllerTest >> testGetCurrenciesInSpanish [
 		assert: response varyHeaderNames includes: 'Accept'.
 	self assertCachingDirectivesFor: response with: #( 'immutable' 'Max-Age=86400' ).
 
-	self withJsonFromContentsIn: response do: [ :currencies | 
+	self withJsonFromContentsIn: response do: [ :currencies |
 		self
 			assert: currencies size equals: 11;
 			assert: ( currencies collect: #isoCode )
-			equals: #( 'ARS' 'BOB' 'BRL' 'CLP' 'COP' 'GYD' 'PYG' 'PEN' 'SRD' 'UYU' 'VES' );
+			hasTheSameElementsInTheSameOrderThat:
+				#( 'ARS' 'BOB' 'BRL' 'CLP' 'COP' 'GYD' 'PYG' 'PEN' 'SRD' 'UYU' 'VES' );
 			assert: ( currencies anySatisfy: [ :currency | currency name = 'Real brasileño' ] )
 		]
 ]

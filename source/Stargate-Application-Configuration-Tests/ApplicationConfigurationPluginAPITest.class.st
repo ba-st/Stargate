@@ -2,18 +2,19 @@
 I'm the test case for the Application Configuration API
 "
 Class {
-	#name : #ApplicationConfigurationPluginAPITest,
-	#superclass : #OperationalPluginAPITest,
-	#category : #'Stargate-Application-Configuration-Tests'
+	#name : 'ApplicationConfigurationPluginAPITest',
+	#superclass : 'OperationalPluginAPITest',
+	#category : 'Stargate-Application-Configuration-Tests',
+	#package : 'Stargate-Application-Configuration-Tests'
 }
 
-{ #category : #private }
+{ #category : 'private' }
 ApplicationConfigurationPluginAPITest >> configurationParameters [
 
 	^ Array with: ( MandatoryConfigurationParameter named: 'Public URL' describedBy: 'Public URL' )
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 ApplicationConfigurationPluginAPITest >> configurationProvider [
 
 	^ [ 
@@ -23,7 +24,7 @@ ApplicationConfigurationPluginAPITest >> configurationProvider [
 	  ]
 ]
 
-{ #category : #running }
+{ #category : 'running' }
 ApplicationConfigurationPluginAPITest >> operationsConfiguration [
 
 	^ super operationsConfiguration
@@ -36,13 +37,13 @@ ApplicationConfigurationPluginAPITest >> operationsConfiguration [
 		yourself
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 ApplicationConfigurationPluginAPITest >> requiredPermissions [
 
 	^ #('read:application-configuration')
 ]
 
-{ #category : #tests }
+{ #category : 'tests' }
 ApplicationConfigurationPluginAPITest >> testDisablePlugin [
 
 	self assertIsEnabled: ApplicationConfigurationPlugin.
@@ -62,7 +63,7 @@ ApplicationConfigurationPluginAPITest >> testDisablePlugin [
 		withExceptionDo: [ :error | self assert: error response isNotFound ]
 ]
 
-{ #category : #tests }
+{ #category : 'tests' }
 ApplicationConfigurationPluginAPITest >> testEnablePreviouslyDisabledPlugin [
 
 	self assertIsEnabled: ApplicationConfigurationPlugin.
@@ -76,7 +77,7 @@ ApplicationConfigurationPluginAPITest >> testEnablePreviouslyDisabledPlugin [
 	self testGetConfigurationWithPermissions
 ]
 
-{ #category : #tests }
+{ #category : 'tests' }
 ApplicationConfigurationPluginAPITest >> testGetConfigurationWithPermissions [
 
 	| response |
