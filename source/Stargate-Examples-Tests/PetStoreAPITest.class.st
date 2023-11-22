@@ -64,11 +64,11 @@ PetStoreAPITest >> testCORSAllowingAnyOrigin [
 	api allowCrossOriginSharingApplying: [ :cors | cors allowAnyOrigin ].
 
 	response := self newClient
-		url: self baseUrl / 'pets' asUrl;
-		headerAt: 'Origin' put: self baseUrl printString;
-		headerAt: 'Access-Control-Request-Headers' put: 'Content-Type';
-		options;
-		response.
+		            url: self baseUrl / 'pets' asUrl;
+		            headerAt: 'Origin' put: self baseUrl printString;
+		            headerAt: 'Access-Control-Request-Headers' put: 'Content-Type';
+		            options;
+		            response.
 
 	self
 		assert: response isNoContent;
@@ -78,12 +78,24 @@ PetStoreAPITest >> testCORSAllowingAnyOrigin [
 		assert: ( response headers at: 'Access-Control-Allow-Methods' ) equals: 'POST, GET'.
 
 	response := self newClient
-		url: self baseUrl / 'pets' asUrl;
-		headerAt: 'Origin' put: self baseUrl printString;
-		get;
-		response.
+		            url: self baseUrl / 'pets' asUrl;
+		            headerAt: 'Origin' put: self baseUrl printString;
+		            get;
+		            response.
 
 	self
+		deny: response varyHeaderNames includes: 'Access-Control-Allow-Headers';
+		assert: ( response headers at: 'Access-Control-Allow-Origin' ) equals: '*'.
+
+	response := self newClient
+		            url: self baseUrl / 'pets' / '404' asUrl;
+		            headerAt: 'Origin' put: self baseUrl printString;
+		            enforceHttpSuccess: false;
+		            get;
+		            response.
+
+	self
+		assert: response isNotFound;
 		deny: response varyHeaderNames includes: 'Access-Control-Allow-Headers';
 		assert: ( response headers at: 'Access-Control-Allow-Origin' ) equals: '*'
 ]
@@ -93,14 +105,14 @@ PetStoreAPITest >> testCORSAllowingExactlyOneOrigin [
 
 	| response |
 
-	api allowCrossOriginSharingApplying: [ :cors | cors allowOnlyFrom: {self baseUrl} ].
+	api allowCrossOriginSharingApplying: [ :cors | cors allowOnlyFrom: { self baseUrl } ].
 
 	response := self newClient
-		url: self baseUrl / 'pets' asUrl;
-		headerAt: 'Origin' put: self baseUrl printString;
-		headerAt: 'Access-Control-Request-Headers' put: 'Content-Type';
-		options;
-		response.
+		            url: self baseUrl / 'pets' asUrl;
+		            headerAt: 'Origin' put: self baseUrl printString;
+		            headerAt: 'Access-Control-Request-Headers' put: 'Content-Type';
+		            options;
+		            response.
 
 	self
 		assert: response isNoContent;
@@ -111,12 +123,25 @@ PetStoreAPITest >> testCORSAllowingExactlyOneOrigin [
 		assert: ( response headers at: 'Access-Control-Allow-Methods' ) equals: 'POST, GET'.
 
 	response := self newClient
-		url: self baseUrl / 'pets' asUrl;
-		headerAt: 'Origin' put: self baseUrl printString;
-		get;
-		response.
+		            url: self baseUrl / 'pets' asUrl;
+		            headerAt: 'Origin' put: self baseUrl printString;
+		            get;
+		            response.
 
 	self
+		deny: response varyHeaderNames includes: 'Access-Control-Allow-Headers';
+		deny: response varyHeaderNames includes: 'Access-Control-Allow-Origin';
+		assert: response canBeSharedWithRequestsFrom: self baseUrl.
+
+	response := self newClient
+		            url: self baseUrl / 'pets' / '404' asUrl;
+		            headerAt: 'Origin' put: self baseUrl printString;
+		            enforceHttpSuccess: false;
+		            get;
+		            response.
+
+	self
+		assert: response isNotFound;
 		deny: response varyHeaderNames includes: 'Access-Control-Allow-Headers';
 		deny: response varyHeaderNames includes: 'Access-Control-Allow-Origin';
 		assert: response canBeSharedWithRequestsFrom: self baseUrl
@@ -127,20 +152,18 @@ PetStoreAPITest >> testCORSAllowingMoreThanOneOrigin [
 
 	| response |
 
-	api
-		allowCrossOriginSharingApplying: [ :cors | 
-			cors
-				allowOnlyFrom:
-					{self baseUrl.
-					'http://google.com/' asUrl}
-			].
+	api allowCrossOriginSharingApplying: [ :cors |
+		cors allowOnlyFrom: {
+				self baseUrl.
+				'http://google.com/' asUrl }
+		].
 
 	response := self newClient
-		url: self baseUrl / 'pets' asUrl;
-		headerAt: 'Origin' put: self baseUrl printString;
-		headerAt: 'Access-Control-Request-Headers' put: 'Content-Type';
-		options;
-		response.
+		            url: self baseUrl / 'pets' asUrl;
+		            headerAt: 'Origin' put: self baseUrl printString;
+		            headerAt: 'Access-Control-Request-Headers' put: 'Content-Type';
+		            options;
+		            response.
 
 	self
 		assert: response isNoContent;
@@ -151,15 +174,28 @@ PetStoreAPITest >> testCORSAllowingMoreThanOneOrigin [
 		assert: ( response headers at: 'Access-Control-Allow-Methods' ) equals: 'POST, GET'.
 
 	response := self newClient
-		url: self baseUrl / 'pets' asUrl;
-		headerAt: 'Origin' put: self baseUrl printString;
-		get;
-		response.
+		            url: self baseUrl / 'pets' asUrl;
+		            headerAt: 'Origin' put: self baseUrl printString;
+		            get;
+		            response.
 
 	self
 		assert: response varyHeaderNames includes: 'Origin';
 		deny: response varyHeaderNames includes: 'Access-Control-Allow-Headers';
-		assert: response canBeSharedWithRequestsFrom:  self baseUrl
+		assert: response canBeSharedWithRequestsFrom: self baseUrl.
+
+	response := self newClient
+		            url: self baseUrl / 'pets' / '404' asUrl;
+		            headerAt: 'Origin' put: self baseUrl printString;
+		            enforceHttpSuccess: false;
+		            get;
+		            response.
+
+	self
+		assert: response isNotFound;
+		assert: response varyHeaderNames includes: 'Origin';
+		deny: response varyHeaderNames includes: 'Access-Control-Allow-Headers';
+		assert: response canBeSharedWithRequestsFrom: self baseUrl
 ]
 
 { #category : 'tests - CORS' }
@@ -167,21 +203,20 @@ PetStoreAPITest >> testCORSOptionalHeaders [
 
 	| response |
 
-	api
-		allowCrossOriginSharingApplying: [ :cors | 
-			cors
-				allowAnyOrigin;
-				allowCredentials;
-				expireIn: 600 seconds;
-				expose: #('Authorization' 'X-Custom')
-			].
+	api allowCrossOriginSharingApplying: [ :cors |
+		cors
+			allowAnyOrigin;
+			allowCredentials;
+			expireIn: 600 seconds;
+			expose: #( 'Authorization' 'X-Custom' )
+		].
 
 	response := self newClient
-		url: self baseUrl / 'pets' asUrl;
-		headerAt: 'Origin' put: self baseUrl printString;
-		headerAt: 'Access-Control-Request-Headers' put: 'Content-Type';
-		options;
-		response.
+		            url: self baseUrl / 'pets' asUrl;
+		            headerAt: 'Origin' put: self baseUrl printString;
+		            headerAt: 'Access-Control-Request-Headers' put: 'Content-Type';
+		            options;
+		            response.
 
 	self
 		assert: response isNoContent;
@@ -189,23 +224,41 @@ PetStoreAPITest >> testCORSOptionalHeaders [
 		assert: ( response headers at: 'Access-Control-Allow-Headers' ) equals: 'Content-Type';
 		assert: ( response headers at: 'Access-Control-Allow-Methods' ) equals: 'POST, GET';
 		assert: ( response headers at: 'Access-Control-Expose-Headers' )
-			equals: 'Authorization, X-Custom';
+		equals: 'Authorization, X-Custom';
 		assert: ( response headers at: 'Access-Control-Allow-Credentials' ) equals: 'true';
 		assert: ( response headers at: 'Access-Control-Max-Age' ) equals: '600';
 		assert: response varyHeaderNames includes: 'Access-Control-Allow-Headers'.
 
 	response := self newClient
-		url: self baseUrl / 'pets' asUrl;
-		headerAt: 'Origin' put: self baseUrl printString;
-		get;
-		response.
+		            url: self baseUrl / 'pets' asUrl;
+		            headerAt: 'Origin' put: self baseUrl printString;
+		            get;
+		            response.
 
 	self
 		assert: ( response headers at: 'Access-Control-Allow-Origin' ) equals: '*';
 		should: [ response headers at: 'Access-Control-Allow-Headers' ] raise: KeyNotFound;
 		should: [ response headers at: 'Access-Control-Allow-Methods' ] raise: KeyNotFound;
 		assert: ( response headers at: 'Access-Control-Expose-Headers' )
-			equals: 'Authorization, X-Custom';
+		equals: 'Authorization, X-Custom';
+		assert: ( response headers at: 'Access-Control-Allow-Credentials' ) equals: 'true';
+		should: [ response headers at: 'Access-Control-Max-Age' ] raise: KeyNotFound;
+		deny: response varyHeaderNames includes: 'Access-Control-Allow-Headers'.
+
+	response := self newClient
+		            url: self baseUrl / 'pets' / '404' asUrl;
+		            headerAt: 'Origin' put: self baseUrl printString;
+		            enforceHttpSuccess: false;
+		            get;
+		            response.
+
+	self
+		assert: response isNotFound;
+		assert: ( response headers at: 'Access-Control-Allow-Origin' ) equals: '*';
+		should: [ response headers at: 'Access-Control-Allow-Headers' ] raise: KeyNotFound;
+		should: [ response headers at: 'Access-Control-Allow-Methods' ] raise: KeyNotFound;
+		assert: ( response headers at: 'Access-Control-Expose-Headers' )
+		equals: 'Authorization, X-Custom';
 		assert: ( response headers at: 'Access-Control-Allow-Credentials' ) equals: 'true';
 		should: [ response headers at: 'Access-Control-Max-Age' ] raise: KeyNotFound;
 		deny: response varyHeaderNames includes: 'Access-Control-Allow-Headers'

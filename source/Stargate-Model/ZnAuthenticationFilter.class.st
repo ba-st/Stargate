@@ -2,15 +2,17 @@
 I'm an authentication filter supporting the already provided ZnAuthenticators: ZnBasicAuthenticator or ZnDigestAuthenticator
 "
 Class {
-	#name : #ZnAuthenticationFilter,
-	#superclass : #AuthenticationFilter,
+	#name : 'ZnAuthenticationFilter',
+	#superclass : 'AuthenticationFilter',
 	#instVars : [
 		'authenticator'
 	],
-	#category : #'Stargate-Model-Auth'
+	#category : 'Stargate-Model-Auth',
+	#package : 'Stargate-Model',
+	#tag : 'Auth'
 }
 
-{ #category : #private }
+{ #category : 'private' }
 ZnAuthenticationFilter class >> canHandle: configuration [
 
 	| schema |
@@ -19,7 +21,7 @@ ZnAuthenticationFilter class >> canHandle: configuration [
 	^ schema = 'basic'
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 ZnAuthenticationFilter class >> configuredBy: configuration [
 
 	^ self
@@ -27,32 +29,32 @@ ZnAuthenticationFilter class >> configuredBy: configuration [
 		password: ( configuration at: #authPassword ifAbsent: [ AssertionFailed signal: 'Missing password' ] )
 ]
 
-{ #category : #'instance creation' }
+{ #category : 'instance creation' }
 ZnAuthenticationFilter class >> username: username password: password [
 
 	^ self using: ( ZnBasicAuthenticator username: username password: password )
 ]
 
-{ #category : #'instance creation' }
+{ #category : 'instance creation' }
 ZnAuthenticationFilter class >> using: aZnAuthenticator [
 
 	^ self new initializeUsing: aZnAuthenticator
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 ZnAuthenticationFilter >> authChallenge [
 
 	^ authenticator authHeader
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 ZnAuthenticationFilter >> checkCredentials: authorization for: httpRequest within: requestContext ifInvalid: aBlock [
 
 	( authenticator isRequestAuthenticated: httpRequest )
 		ifFalse: aBlock
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 ZnAuthenticationFilter >> initializeUsing: anAuthenticator [
 
 	authenticator := anAuthenticator 

@@ -2,21 +2,23 @@
 I'm a filter used to add CORS support to a HTTPBasedRESTfulAPI instance
 "
 Class {
-	#name : #CrossOriginResourceSharingFilter,
-	#superclass : #Object,
+	#name : 'CrossOriginResourceSharingFilter',
+	#superclass : 'Object',
 	#instVars : [
 		'filter'
 	],
-	#category : #'Stargate-Model-CORS'
+	#category : 'Stargate-Model-CORS',
+	#package : 'Stargate-Model',
+	#tag : 'CORS'
 }
 
-{ #category : #'private - instance creation' }
+{ #category : 'private - instance creation' }
 CrossOriginResourceSharingFilter class >> applying: aFilter [
 
 	^ self new initializeApplying: aFilter 
 ]
 
-{ #category : #'instance creation' }
+{ #category : 'instance creation' }
 CrossOriginResourceSharingFilter class >> handleActualRequestByEvaluating: aHandler [
 
 	^ self
@@ -27,7 +29,7 @@ CrossOriginResourceSharingFilter class >> handleActualRequestByEvaluating: aHand
 			]
 ]
 
-{ #category : #'instance creation' }
+{ #category : 'instance creation' }
 CrossOriginResourceSharingFilter class >> handlePreflightByEvaluating: aHandler [
 
 	^ self applying: [ :teapotServer | 
@@ -37,19 +39,19 @@ CrossOriginResourceSharingFilter class >> handlePreflightByEvaluating: aHandler 
 		  ]
 ]
 
-{ #category : #testing }
+{ #category : 'testing' }
 CrossOriginResourceSharingFilter class >> isForPreflight: request [
 
 	^ ( request headers includesKey: 'Origin' ) and: [ request method = #OPTIONS ]
 ]
 
-{ #category : #applying }
+{ #category : 'applying' }
 CrossOriginResourceSharingFilter >> applyOn: aTeapot [
 
 	filter value: aTeapot 
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 CrossOriginResourceSharingFilter >> initializeApplying: aBlock [
 
 	filter := aBlock 

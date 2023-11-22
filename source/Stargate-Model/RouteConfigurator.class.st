@@ -4,29 +4,31 @@ I'm a web service route configurator.
 I'm being used to configure a route on a Teapot server. I also know how to configure a route supporting cross-origin resource sharing.
 "
 Class {
-	#name : #RouteConfigurator,
-	#superclass : #Object,
+	#name : 'RouteConfigurator',
+	#superclass : 'Object',
 	#instVars : [
 		'teapot',
 		'resourceController'
 	],
-	#category : #'Stargate-Model-Routing'
+	#category : 'Stargate-Model-Routing',
+	#package : 'Stargate-Model',
+	#tag : 'Routing'
 }
 
-{ #category : #'instance creation' }
+{ #category : 'instance creation' }
 RouteConfigurator class >> configuring: aTeapot withRoutesDefinedOn: aResourceRESTfulController [
 
 	^ self new initializeConfiguring: aTeapot withRoutesDefinedOn: aResourceRESTfulController
 ]
 
-{ #category : #configuring }
+{ #category : 'configuring' }
 RouteConfigurator >> configure [
 	
 	resourceController routes
 		do: [ :routeSpecification | routeSpecification configureUsing: self ]
 ]
 
-{ #category : #'private - configuring' }
+{ #category : 'private - configuring' }
 RouteConfigurator >> configureRouteFrom: aRouteSpecification [
 
 	teapot addRouteMatchedBy: aRouteSpecification asRequestMatcher action: [ :request | 
@@ -35,7 +37,7 @@ RouteConfigurator >> configureRouteFrom: aRouteSpecification [
 		]
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 RouteConfigurator >> initializeConfiguring: aTeapot withRoutesDefinedOn: aResourceRESTfulController [
 
 	teapot := aTeapot.
@@ -43,7 +45,7 @@ RouteConfigurator >> initializeConfiguring: aTeapot withRoutesDefinedOn: aResour
 	self withServerUrlDo: [ :url | resourceController serverUrl: url ].
 ]
 
-{ #category : #'private - configuring' }
+{ #category : 'private - configuring' }
 RouteConfigurator >> withServerUrlDo: aBlock [
 
 	teapot server serverUrl ifNotNil: aBlock

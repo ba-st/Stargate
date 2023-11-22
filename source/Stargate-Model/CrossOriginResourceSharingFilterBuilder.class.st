@@ -2,22 +2,31 @@
 I'm a filter builder. I aim to provide a clean interface to configure CORS support during the configuration of a HTTPBasedRESTfulAPI instance.
 "
 Class {
-	#name : #CrossOriginResourceSharingFilterBuilder,
-	#superclass : #Object,
+	#name : 'CrossOriginResourceSharingFilterBuilder',
+	#superclass : 'Object',
 	#instVars : [
 		'actualRequestHandlerBuilder',
-		'preflightHandlerBuilder'
+		'preflightHandlerBuilder',
+		'actualRequestHandlerBinding'
 	],
-	#category : #'Stargate-Model-CORS'
+	#category : 'Stargate-Model-CORS',
+	#package : 'Stargate-Model',
+	#tag : 'CORS'
 }
 
-{ #category : #'instance creation' }
+{ #category : 'instance creation' }
 CrossOriginResourceSharingFilterBuilder class >> using: aControllerCollection [
 
 	^ self new initializeUsing: aControllerCollection
 ]
 
-{ #category : #configuring }
+{ #category : 'accessing' }
+CrossOriginResourceSharingFilterBuilder >> actualRequestHandler [
+
+	^ actualRequestHandlerBinding content
+]
+
+{ #category : 'configuring' }
 CrossOriginResourceSharingFilterBuilder >> allowAnyOrigin [
 	
 	preflightHandlerBuilder allowAnyOrigin.
@@ -25,21 +34,21 @@ CrossOriginResourceSharingFilterBuilder >> allowAnyOrigin [
 	
 ]
 
-{ #category : #configuring }
+{ #category : 'configuring' }
 CrossOriginResourceSharingFilterBuilder >> allowCredentials [
 
 	actualRequestHandlerBuilder allowCredentials.
 	preflightHandlerBuilder allowCredentials
 ]
 
-{ #category : #configuring }
+{ #category : 'configuring' }
 CrossOriginResourceSharingFilterBuilder >> allowOnlyFrom: origins [ 
 	
 	preflightHandlerBuilder allowOnlyFrom: origins.
 	actualRequestHandlerBuilder allowOnlyFrom: origins
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 CrossOriginResourceSharingFilterBuilder >> allowedMethodsFrom: aControllerCollection [
 
 	| routes allowedMethods |
@@ -61,42 +70,44 @@ CrossOriginResourceSharingFilterBuilder >> allowedMethodsFrom: aControllerCollec
 	preflightHandlerBuilder allowMethods: allowedMethods
 ]
 
-{ #category : #building }
+{ #category : 'building' }
 CrossOriginResourceSharingFilterBuilder >> buildActualRequestFilter [
 
-	^ CrossOriginResourceSharingFilter handleActualRequestByEvaluating: actualRequestHandlerBuilder build
+	actualRequestHandlerBinding := Binding to: actualRequestHandlerBuilder build.
+	^ CrossOriginResourceSharingFilter handleActualRequestByEvaluating: self actualRequestHandler
 ]
 
-{ #category : #building }
+{ #category : 'building' }
 CrossOriginResourceSharingFilterBuilder >> buildPreflightFilter [
 
 	^ CrossOriginResourceSharingFilter handlePreflightByEvaluating: preflightHandlerBuilder build
 ]
 
-{ #category : #configuring }
+{ #category : 'configuring' }
 CrossOriginResourceSharingFilterBuilder >> doNotCache [
 	
 	preflightHandlerBuilder doNotCache 
 ]
 
-{ #category : #configuring }
+{ #category : 'configuring' }
 CrossOriginResourceSharingFilterBuilder >> expireIn: aDuration [ 
 	
 	preflightHandlerBuilder expireIn: aDuration
 	
 ]
 
-{ #category : #configuring }
+{ #category : 'configuring' }
 CrossOriginResourceSharingFilterBuilder >> expose: headers [ 
 	
 	preflightHandlerBuilder expose: headers.
 	actualRequestHandlerBuilder expose: headers
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 CrossOriginResourceSharingFilterBuilder >> initializeUsing: aControllerCollection [
 
 	preflightHandlerBuilder := CrossOriginResourceSharingPreflightHandlerBuilder new.
 	actualRequestHandlerBuilder := CrossOriginResourceSharingActualRequestHandlerBuilder new.
+	actualRequestHandlerBinding := Binding undefinedExplainedBy: 'Actual request handler not built yet'.
 	self allowedMethodsFrom: aControllerCollection
 ]

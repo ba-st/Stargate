@@ -1,6 +1,6 @@
 Class {
-	#name : #InMemoryPetOrderRepository,
-	#superclass : #Object,
+	#name : 'InMemoryPetOrderRepository',
+	#superclass : 'Object',
 	#instVars : [
 		'orders',
 		'nextId',
@@ -8,34 +8,36 @@ Class {
 		'orderStatus',
 		'updateTimestamps'
 	],
-	#category : #'Stargate-Examples-PetStore'
+	#category : 'Stargate-Examples-PetStore',
+	#package : 'Stargate-Examples',
+	#tag : 'PetStore'
 }
 
-{ #category : #querying }
+{ #category : 'querying' }
 InMemoryPetOrderRepository >> count [
 
 	^ orders size
 ]
 
-{ #category : #querying }
+{ #category : 'querying' }
 InMemoryPetOrderRepository >> findAll [
 
 	^ orders
 ]
 
-{ #category : #querying }
+{ #category : 'querying' }
 InMemoryPetOrderRepository >> findIdentifiedBy: anId [
 
 	^ orderById at: anId ifAbsent: [ ObjectNotFound signal ]
 ]
 
-{ #category : #querying }
+{ #category : 'querying' }
 InMemoryPetOrderRepository >> identifierOf: aPetOrder [
 
 	^ orderById keyAtValue: aPetOrder
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 InMemoryPetOrderRepository >> initialize [
 
 	super initialize.
@@ -46,13 +48,13 @@ InMemoryPetOrderRepository >> initialize [
 	nextId := 1
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 InMemoryPetOrderRepository >> lastModificationOf: aPetOrder [
 
 	^ updateTimestamps at: (self identifierOf: aPetOrder)
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 InMemoryPetOrderRepository >> recordIdAndUpdateTimestampFor: order [
 
 	orderById at: nextId put: order.
@@ -62,13 +64,13 @@ InMemoryPetOrderRepository >> recordIdAndUpdateTimestampFor: order [
 	updateTimestamps at: nextId put: 1
 ]
 
-{ #category : #querying }
+{ #category : 'querying' }
 InMemoryPetOrderRepository >> statusOf: anOrder [
 
 	^ orderStatus at: ( self identifierOf: anOrder ) ifAbsent: [ ObjectNotFound signal ]
 ]
 
-{ #category : #management }
+{ #category : 'management' }
 InMemoryPetOrderRepository >> store: aPetOrder [
 
 	orders add: aPetOrder.
@@ -77,7 +79,7 @@ InMemoryPetOrderRepository >> store: aPetOrder [
 	^ aPetOrder
 ]
 
-{ #category : #management }
+{ #category : 'management' }
 InMemoryPetOrderRepository >> updateStatusOf: order to: aTargetStatus [
 
 	| id |

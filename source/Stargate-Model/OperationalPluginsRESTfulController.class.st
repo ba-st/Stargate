@@ -2,23 +2,25 @@
 I'm a RESTful controller providing access to the list of available operational plugins and its endpoints
 "
 Class {
-	#name : #OperationalPluginsRESTfulController,
-	#superclass : #OperationsRESTfulController,
+	#name : 'OperationalPluginsRESTfulController',
+	#superclass : 'OperationsRESTfulController',
 	#instVars : [
 		'requestHandler',
 		'api'
 	],
-	#category : #'Stargate-Model-Operations'
+	#category : 'Stargate-Model-Operations',
+	#package : 'Stargate-Model',
+	#tag : 'Operations'
 }
 
-{ #category : #'instance creation' }
+{ #category : 'instance creation' }
 OperationalPluginsRESTfulController class >> on: anHTTPBasedRESTfulAPI [
 
 	^ ( self authenticationFilterBasedOn: anHTTPBasedRESTfulAPI operationsConfiguration )
 		initializeOn: anHTTPBasedRESTfulAPI
 ]
 
-{ #category : #API }
+{ #category : 'API' }
 OperationalPluginsRESTfulController >> changeOperationalPluginStatusBasedOn: httpRequest within: requestContext [
 
 	self assert: httpRequest isAuthorizedTo: self updatePermission within: requestContext.
@@ -38,7 +40,7 @@ OperationalPluginsRESTfulController >> changeOperationalPluginStatusBasedOn: htt
 			  ]
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 OperationalPluginsRESTfulController >> configureOperationalPluginEncodingOn: writer within: requestContext [
 
 	OperationalPlugin availablePlugins
@@ -54,7 +56,7 @@ OperationalPluginsRESTfulController >> configureOperationalPluginEncodingOn: wri
 			]
 ]
 
-{ #category : #routes }
+{ #category : 'routes' }
 OperationalPluginsRESTfulController >> declareGetOperationalPluginRoute [
 
 	^ RouteSpecification
@@ -63,7 +65,7 @@ OperationalPluginsRESTfulController >> declareGetOperationalPluginRoute [
 		evaluating: [ :httpRequest :requestContext | self operationalPluginBasedOn: httpRequest within: requestContext ]
 ]
 
-{ #category : #routes }
+{ #category : 'routes' }
 OperationalPluginsRESTfulController >> declareGetOperationalPluginsRoute [
 
 	^ RouteSpecification
@@ -73,7 +75,7 @@ OperationalPluginsRESTfulController >> declareGetOperationalPluginsRoute [
 			[ :httpRequest :requestContext | self operationalPluginsBasedOn: httpRequest within: requestContext ]
 ]
 
-{ #category : #routes }
+{ #category : 'routes' }
 OperationalPluginsRESTfulController >> declareUpdateOperationalPluginRoute [
 
 	^ RouteSpecification handling: #PATCH
@@ -82,14 +84,14 @@ OperationalPluginsRESTfulController >> declareUpdateOperationalPluginRoute [
 			  self changeOperationalPluginStatusBasedOn: httpRequest within: requestContext ]
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 OperationalPluginsRESTfulController >> initializeOn: anHTTPBasedRESTfulAPI [
 
 	api := anHTTPBasedRESTfulAPI.
 	self initializeRequestHandler
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 OperationalPluginsRESTfulController >> initializeRequestHandler [
 
 	requestHandler := RESTfulRequestHandlerBuilder new
@@ -112,7 +114,7 @@ OperationalPluginsRESTfulController >> initializeRequestHandler [
 		                  build
 ]
 
-{ #category : #API }
+{ #category : 'API' }
 OperationalPluginsRESTfulController >> operationalPluginBasedOn: httpRequest within: requestContext [
 
 	self assert: httpRequest isAuthorizedWithin: requestContext.
@@ -123,13 +125,13 @@ OperationalPluginsRESTfulController >> operationalPluginBasedOn: httpRequest wit
 		get: [ :endpoint | OperationalPlugin pluginAt: endpoint ]
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 OperationalPluginsRESTfulController >> operationalPluginVersion1dot0dot0MediaType [
 
 	^ self jsonMediaType: 'operational-plugin' vendoredBy: 'stargate' version: '1.0.0'
 ]
 
-{ #category : #API }
+{ #category : 'API' }
 OperationalPluginsRESTfulController >> operationalPluginsBasedOn: httpRequest within: requestContext [
 
 	self assert: httpRequest isAuthorizedWithin: requestContext.
@@ -140,25 +142,25 @@ OperationalPluginsRESTfulController >> operationalPluginsBasedOn: httpRequest wi
 		getCollection: [ OperationalPlugin availablePlugins ]
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 OperationalPluginsRESTfulController >> requestHandler [
 
 	^ requestHandler
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 OperationalPluginsRESTfulController >> requiredPermission [
 
 	^ 'read:operations'
 ]
 
-{ #category : #querying }
+{ #category : 'querying' }
 OperationalPluginsRESTfulController >> statusOf: aPluginType [
 
 	^ ( api isEnabled: aPluginType ) then: [ 'ENABLED' ] otherwise: [ 'DISABLED' ]
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 OperationalPluginsRESTfulController >> updatePermission [
 
 	^ 'update:operations'

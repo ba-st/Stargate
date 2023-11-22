@@ -1,22 +1,23 @@
 Class {
-	#name : #StargateApplication,
-	#superclass : #LaunchpadApplication,
+	#name : 'StargateApplication',
+	#superclass : 'LaunchpadApplication',
 	#instVars : [
 		'apiOptional'
 	],
 	#classInstVars : [
 		'Version'
 	],
-	#category : #'Stargate-API-Skeleton'
+	#category : 'Stargate-API-Skeleton',
+	#package : 'Stargate-API-Skeleton'
 }
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 StargateApplication class >> configurationParameters [
 
 	^ self stargateConfigurationParameters
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 StargateApplication class >> fileReferenceToDumpStackTrace [
 
 	| logsDirectory stackTraceDumpFile |
@@ -46,44 +47,44 @@ StargateApplication class >> fileReferenceToDumpStackTrace [
 	^ stackTraceDumpFile
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 StargateApplication class >> initializeVersion [
 
 	<ignoreForCoverage>
 	Version := VersionFromRepositoryResolver new valueFor: self projectName
 ]
 
-{ #category : #testing }
+{ #category : 'testing' }
 StargateApplication class >> isAbstract [
 
 	^ self = StargateApplication
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 StargateApplication class >> logsDirectory [
 
 	^ ( FileLocator workingDirectory / 'logs' ) ensureCreateDirectory
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 StargateApplication class >> projectName [
 
 	^ self subclassResponsibility
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 StargateApplication class >> sectionsForStargateConfiguration [
 
 	^ #('Stargate')
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 StargateApplication class >> stackTraceDumpExtension [
 
 	^ 'dump'
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 StargateApplication class >> stargateConfigurationParameters [
 
 	^ Array
@@ -101,13 +102,13 @@ StargateApplication class >> stargateConfigurationParameters [
 				    convertingWith: #asByteArray ) asSensitive
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 StargateApplication class >> version [
 
 	^ Version
 ]
 
-{ #category : #'private - accessing' }
+{ #category : 'private - accessing' }
 StargateApplication >> apiConfiguration [
 
 	^ Array with: #serverUrl -> self stargateConfiguration publicURL
@@ -116,7 +117,7 @@ StargateApplication >> apiConfiguration [
 		  with: #operations -> self operationsConfiguration
 ]
 
-{ #category : #'private - accessing' }
+{ #category : 'private - accessing' }
 StargateApplication >> applicationConfigurationConfiguration [
 
 	^ Dictionary new
@@ -126,7 +127,7 @@ StargateApplication >> applicationConfigurationConfiguration [
 		  yourself
 ]
 
-{ #category : #'private - accessing' }
+{ #category : 'private - accessing' }
 StargateApplication >> applicationControlCommandsToEnable [
 
 	"This method must return an array of application control command names to be enabled"
@@ -134,7 +135,7 @@ StargateApplication >> applicationControlCommandsToEnable [
 	^ #(  )
 ]
 
-{ #category : #'private - accessing' }
+{ #category : 'private - accessing' }
 StargateApplication >> applicationControlConfiguration [
 
 	^ Dictionary new
@@ -143,7 +144,7 @@ StargateApplication >> applicationControlConfiguration [
 		  yourself
 ]
 
-{ #category : #'private - accessing' }
+{ #category : 'private - accessing' }
 StargateApplication >> applicationInfoConfiguration [
 
 	^ Dictionary new
@@ -152,7 +153,7 @@ StargateApplication >> applicationInfoConfiguration [
 		yourself
 ]
 
-{ #category : #'private - accessing' }
+{ #category : 'private - accessing' }
 StargateApplication >> authAlgorithm [
 	"The signing algorithm identifier as defined in https://datatracker.ietf.org/doc/html/rfc7518#section-3.1.
 	Used for securing operational plugins, by default HMAC using SHA-256"
@@ -160,7 +161,7 @@ StargateApplication >> authAlgorithm [
 	^ 'HS256'
 ]
 
-{ #category : #'private - activation/deactivation' }
+{ #category : 'private - activation/deactivation' }
 StargateApplication >> basicStartWithin: context [
 
 	| api |
@@ -173,41 +174,43 @@ StargateApplication >> basicStartWithin: context [
 	apiOptional := Optional containing: api
 ]
 
-{ #category : #'private - activation/deactivation' }
+{ #category : 'private - activation/deactivation' }
 StargateApplication >> basicStop [
 
 	apiOptional withContentDo: [ :api | api stop ].
 	super basicStop
 ]
 
-{ #category : #'private - activation/deactivation' }
+{ #category : 'private - activation/deactivation' }
 StargateApplication >> configureGlobalErrorHandlerIn: api [
-	 
+
 	[
 	LogRecord emitInfo: 'Configuring error handlers' during: [
 		api
-			on: Error addErrorHandler: [ :error |
+			on: Error addErrorHandler: [ :error :request |
+				| response |
+
 				LogRecord emitError: ( 'Unexpected error: "<1s>"' expandMacrosWith: error messageText ).
 				self stackTraceDumper dumpStackTraceFor: error.
-				TeaResponse serverError
-					body: error messageText;
-					yourself
+				response := ZnResponse serverError: error messageText.
+				api applyCrossSharingResourceConfigurationTo: response accordingTo: request.
+				response
 				];
 			on: Exit addErrorHandler: [ :exit |
-			exit isSuccess then: [ self stop ].
-			exit pass
-			]
+				exit isSuccess then: [ self stop ].
+				exit pass
+				]
 		]
 	] unless: self isDebugModeEnabled
 ]
 
-{ #category : #'private - accessing' }
+{ #category : 'private - accessing' }
 StargateApplication >> controllersToInstall [
 
 	^ self subclassResponsibility
 ]
 
-{ #category : #'private - activation/deactivation' }
+{ #category : 'private - activation/deactivation' }
 StargateApplication >> createAPI [
 
 	| api |
@@ -218,14 +221,14 @@ StargateApplication >> createAPI [
 	^ api
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 StargateApplication >> initialize [
 
 	super initialize.
 	apiOptional := Optional unused
 ]
 
-{ #category : #'private - activation/deactivation' }
+{ #category : 'private - activation/deactivation' }
 StargateApplication >> installAndStart: api [
 
 	LogRecord
@@ -233,7 +236,7 @@ StargateApplication >> installAndStart: api [
 		emitInfo: 'Starting API' during: [ api start ]
 ]
 
-{ #category : #'private - activation/deactivation' }
+{ #category : 'private - activation/deactivation' }
 StargateApplication >> logAPIVersion [
 
 	BasicApplicationInformationProvider new applicationNamed: self class commandName
@@ -242,7 +245,7 @@ StargateApplication >> logAPIVersion [
 	LogRecord emitInfo: ( 'API Version: <1s>' expandMacrosWith: self class version )
 ]
 
-{ #category : #'private - accessing' }
+{ #category : 'private - accessing' }
 StargateApplication >> loggersConfiguration [
 
 	^ Dictionary new
@@ -250,7 +253,7 @@ StargateApplication >> loggersConfiguration [
 		  yourself
 ]
 
-{ #category : #'private - accessing' }
+{ #category : 'private - accessing' }
 StargateApplication >> metricsConfiguration [
 
 	^ Dictionary new
@@ -262,7 +265,7 @@ StargateApplication >> metricsConfiguration [
 		  yourself
 ]
 
-{ #category : #'private - accessing' }
+{ #category : 'private - accessing' }
 StargateApplication >> operationsConfiguration [
 
 	^ Dictionary new
@@ -277,7 +280,7 @@ StargateApplication >> operationsConfiguration [
 		  yourself
 ]
 
-{ #category : #'error handling' }
+{ #category : 'error handling' }
 StargateApplication >> stackTraceDumper [
 
 	^ StackTraceTextDumper on: [ :dumpAction |
@@ -286,7 +289,7 @@ StargateApplication >> stackTraceDumper [
 		  ]
 ]
 
-{ #category : #'private - accessing' }
+{ #category : 'private - accessing' }
 StargateApplication >> stargateConfiguration [
 
 	^ self configuration stargate

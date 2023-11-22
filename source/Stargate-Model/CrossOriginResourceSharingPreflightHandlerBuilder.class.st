@@ -2,43 +2,45 @@
 I'm a builder for CrossOriginResourceSharingPreflightHandlerBuilder instances.
 "
 Class {
-	#name : #CrossOriginResourceSharingPreflightHandlerBuilder,
-	#superclass : #CrossOriginResourceSharingRequestHandlerBuilder,
+	#name : 'CrossOriginResourceSharingPreflightHandlerBuilder',
+	#superclass : 'CrossOriginResourceSharingRequestHandlerBuilder',
 	#instVars : [
 		'allowedMethodsBinding',
 		'allowOriginPolicyBinding',
 		'addHeaderCommands'
 	],
-	#category : #'Stargate-Model-CORS'
+	#category : 'Stargate-Model-CORS',
+	#package : 'Stargate-Model',
+	#tag : 'CORS'
 }
 
-{ #category : #configuring }
+{ #category : 'configuring' }
 CrossOriginResourceSharingPreflightHandlerBuilder >> allowAnyOrigin [
 
 	allowOriginPolicyBinding := Binding to: AllowAnyOriginPolicy new.
 	
 ]
 
-{ #category : #configuring }
+{ #category : 'configuring' }
 CrossOriginResourceSharingPreflightHandlerBuilder >> allowCredentials [
 
 	addHeaderCommands
 		add: [ :headers :headerNames | headers at: headerNames >> #accessControlAllowCredentials put: true asString ]
 ]
 
-{ #category : #configuring }
+{ #category : 'configuring' }
 CrossOriginResourceSharingPreflightHandlerBuilder >> allowMethods: methods [
 
 	allowedMethodsBinding := Binding to: methods
 ]
 
-{ #category : #configuring }
+{ #category : 'configuring' }
 CrossOriginResourceSharingPreflightHandlerBuilder >> allowOnlyFrom: origins [
 
 	allowOriginPolicyBinding := Binding to: ( AllowSpecifiedOriginsPolicy onlyFrom: origins )
 ]
 
-{ #category : #building }
+{ #category : 'building' }
 CrossOriginResourceSharingPreflightHandlerBuilder >> build [
 
 	^ CrossOriginResourceSharingPreflightHandler
@@ -47,14 +49,14 @@ CrossOriginResourceSharingPreflightHandlerBuilder >> build [
 		applying: addHeaderCommands
 ]
 
-{ #category : #configuring }
+{ #category : 'configuring' }
 CrossOriginResourceSharingPreflightHandlerBuilder >> doNotCache [
 
 	addHeaderCommands
 		add: [ :headers :headerNames | headers at: headerNames >> #accessControlMaxAge put: -1 asString ]
 ]
 
-{ #category : #configuring }
+{ #category : 'configuring' }
 CrossOriginResourceSharingPreflightHandlerBuilder >> expireIn: aDuration [
 
 	addHeaderCommands
@@ -62,7 +64,7 @@ CrossOriginResourceSharingPreflightHandlerBuilder >> expireIn: aDuration [
 			[ :headers :headerNames | headers at: headerNames >> #accessControlMaxAge put: aDuration asSeconds asString ]
 ]
 
-{ #category : #configuring }
+{ #category : 'configuring' }
 CrossOriginResourceSharingPreflightHandlerBuilder >> expose: exposedHeaders [
 
 	addHeaderCommands
@@ -73,7 +75,7 @@ CrossOriginResourceSharingPreflightHandlerBuilder >> expose: exposedHeaders [
 			]
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 CrossOriginResourceSharingPreflightHandlerBuilder >> initialize [
 
 	super initialize.

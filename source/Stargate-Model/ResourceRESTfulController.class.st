@@ -5,26 +5,28 @@ My subclasses must create one or more RESTfulRequestHandler (usually with the av
 and delegate to them the needed methods.
 "
 Class {
-	#name : #ResourceRESTfulController,
-	#superclass : #Object,
-	#category : #'Stargate-Model-Controllers'
+	#name : 'ResourceRESTfulController',
+	#superclass : 'Object',
+	#category : 'Stargate-Model-Controllers',
+	#package : 'Stargate-Model',
+	#tag : 'Controllers'
 }
 
-{ #category : #testing }
+{ #category : 'testing' }
 ResourceRESTfulController class >> isAbstract [
 
 	<ignoreForCoverage>
 	^ self = ResourceRESTfulController
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 ResourceRESTfulController >> jsonMediaType: aSubType vendoredBy: aVendorName version: aVersion [
 
 	^ ( 'application/vnd.<1s>.<2s>+json' expandMacrosWith: aVendorName with: aSubType ) asMediaType
 		version: aVersion
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 ResourceRESTfulController >> routes [
 
 	^ ( UnaryMessageSendingCollector
@@ -33,7 +35,7 @@ ResourceRESTfulController >> routes [
 		to: self ) value
 ]
 
-{ #category : #configuring }
+{ #category : 'configuring' }
 ResourceRESTfulController >> serverUrl: aServerUrl [
 
 	self subclassResponsibility

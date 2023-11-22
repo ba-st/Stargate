@@ -2,16 +2,18 @@
 I'm a pagination specification, used to know the start index and the expected page size
 "
 Class {
-	#name : #PaginationSpecification,
-	#superclass : #Object,
+	#name : 'PaginationSpecification',
+	#superclass : 'Object',
 	#instVars : [
 		'start',
 		'limit'
 	],
-	#category : #'Stargate-Model-Pagination'
+	#category : 'Stargate-Model-Pagination',
+	#package : 'Stargate-Model',
+	#tag : 'Pagination'
 }
 
-{ #category : #'Instance creation' }
+{ #category : 'Instance creation' }
 PaginationSpecification class >> startingAt: aNumber limitedTo: aLimit [
 
 	AssertionChecker
@@ -21,26 +23,26 @@ PaginationSpecification class >> startingAt: aNumber limitedTo: aLimit [
 	^ self new initializeStartingAt: ( aNumber max: 1 ) limitedTo: aLimit
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 PaginationSpecification >> end [
 
 	^ start + limit - 1 
 ]
 
-{ #category : #'initialize - release' }
+{ #category : 'initialize - release' }
 PaginationSpecification >> initializeStartingAt: anStartIndex limitedTo: aLimitCount [
 
 	start := anStartIndex.
 	limit := aLimitCount
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 PaginationSpecification >> limit [
 
 	^ limit
 ]
 
-{ #category : #printing }
+{ #category : 'printing' }
 PaginationSpecification >> printOn: aStream [
 
 	aStream
@@ -51,7 +53,7 @@ PaginationSpecification >> printOn: aStream [
 		print: limit
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 PaginationSpecification >> start [
 
 	^ start

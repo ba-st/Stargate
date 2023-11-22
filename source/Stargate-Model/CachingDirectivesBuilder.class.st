@@ -2,16 +2,18 @@
 I'm a builder of caching headers, translating a Smalltalk expression inside a block into a command that adds a cache-control header (and the expires header) to the response before being sent.
 "
 Class {
-	#name : #CachingDirectivesBuilder,
-	#superclass : #Object,
+	#name : 'CachingDirectivesBuilder',
+	#superclass : 'Object',
 	#instVars : [
 		'directives',
 		'currentCondition'
 	],
-	#category : #'Stargate-Model-Caching'
+	#category : 'Stargate-Model-Caching',
+	#package : 'Stargate-Model',
+	#tag : 'Caching'
 }
 
-{ #category : #private }
+{ #category : 'private' }
 CachingDirectivesBuilder >> addCacheControlNamed: aName [
 
 	| condition |
@@ -22,25 +24,25 @@ CachingDirectivesBuilder >> addCacheControlNamed: aName [
 			[ :response :context :resource | ( condition cull: response cull: resource ) then: [ response addCachingDirective: aName ] ]
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 CachingDirectivesBuilder >> addCacheControlNamed: aName withString: aString [
 
 	self addCacheControlNamed: ( '<1s>="<2s>"' expandMacrosWith: aName with: aString )
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 CachingDirectivesBuilder >> addCacheControlNamed: aName withToken: aValue [
 
 	self addCacheControlNamed: ( '<1s>=<2p>' expandMacrosWith: aName with: aValue )
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 CachingDirectivesBuilder >> alwaysApplyDirectives [
 
 	currentCondition := [ :response | true ]
 ]
 
-{ #category : #configuring }
+{ #category : 'configuring' }
 CachingDirectivesBuilder >> beAvailableFor: aDuration [
 
 	^ self
@@ -49,19 +51,19 @@ CachingDirectivesBuilder >> beAvailableFor: aDuration [
 		expireIn: aDuration
 ]
 
-{ #category : #configuring }
+{ #category : 'configuring' }
 CachingDirectivesBuilder >> beImmutable [
 
 	self addCacheControlNamed: 'immutable'
 ]
 
-{ #category : #configuring }
+{ #category : 'configuring' }
 CachingDirectivesBuilder >> bePrivate [
 
 	self addCacheControlNamed: 'private'
 ]
 
-{ #category : #configuring }
+{ #category : 'configuring' }
 CachingDirectivesBuilder >> bePrivateRestrictedTo: aFieldNameCollection [
 
 	| fieldsString |
@@ -70,37 +72,37 @@ CachingDirectivesBuilder >> bePrivateRestrictedTo: aFieldNameCollection [
 	self addCacheControlNamed: 'private' withString: fieldsString
 ]
 
-{ #category : #configuring }
+{ #category : 'configuring' }
 CachingDirectivesBuilder >> bePublic [
 
 	self addCacheControlNamed: 'public'
 ]
 
-{ #category : #configuring }
+{ #category : 'configuring' }
 CachingDirectivesBuilder >> beStaleAfter: aDuration [
 
 	self addCacheControlNamed: 'Max-Age' withToken: aDuration asSeconds
 ]
 
-{ #category : #building }
+{ #category : 'building' }
 CachingDirectivesBuilder >> build [
 
 	^ directives
 ]
 
-{ #category : #configuring }
+{ #category : 'configuring' }
 CachingDirectivesBuilder >> configureUsing: aBlock [
 
 	aBlock cull: self
 ]
 
-{ #category : #configuring }
+{ #category : 'configuring' }
 CachingDirectivesBuilder >> doNotCache [
 
 	self addCacheControlNamed: 'no-cache'
 ]
 
-{ #category : #configuring }
+{ #category : 'configuring' }
 CachingDirectivesBuilder >> doNotCacheRestrictedTo: aFieldNameCollection [
 
 	| fieldsString |
@@ -109,7 +111,7 @@ CachingDirectivesBuilder >> doNotCacheRestrictedTo: aFieldNameCollection [
 	self addCacheControlNamed: 'no-cache' withString: fieldsString
 ]
 
-{ #category : #configuring }
+{ #category : 'configuring' }
 CachingDirectivesBuilder >> doNotExpire [
 
 	^ self
@@ -117,19 +119,19 @@ CachingDirectivesBuilder >> doNotExpire [
 		beAvailableFor: 365000000 seconds
 ]
 
-{ #category : #configuring }
+{ #category : 'configuring' }
 CachingDirectivesBuilder >> doNotStore [
 
 	self addCacheControlNamed: 'no-store'
 ]
 
-{ #category : #configuring }
+{ #category : 'configuring' }
 CachingDirectivesBuilder >> doNotTransform [
 
 	self addCacheControlNamed: 'no-transform'
 ]
 
-{ #category : #configuring }
+{ #category : 'configuring' }
 CachingDirectivesBuilder >> expireIn: aDuration [
 
 	| condition |
@@ -142,7 +144,7 @@ CachingDirectivesBuilder >> expireIn: aDuration [
 			]
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 CachingDirectivesBuilder >> fieldStringFor: aFieldNameCollection [
 
 	^ String
@@ -156,7 +158,7 @@ CachingDirectivesBuilder >> fieldStringFor: aFieldNameCollection [
 			]
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 CachingDirectivesBuilder >> initialize [
 
 	super initialize.
@@ -164,13 +166,13 @@ CachingDirectivesBuilder >> initialize [
 	self alwaysApplyDirectives
 ]
 
-{ #category : #configuring }
+{ #category : 'configuring' }
 CachingDirectivesBuilder >> mustRevalidate [
 
 	self addCacheControlNamed: 'must-revalidate'
 ]
 
-{ #category : #configuring }
+{ #category : 'configuring' }
 CachingDirectivesBuilder >> requireRevalidation [
 
 	self
@@ -178,7 +180,7 @@ CachingDirectivesBuilder >> requireRevalidation [
 		beStaleAfter: 0 seconds
 ]
 
-{ #category : #configuring }
+{ #category : 'configuring' }
 CachingDirectivesBuilder >> when: aResponseCondition apply: aDirectiveConfiguration [
 
 	[ currentCondition := aResponseCondition.
@@ -187,13 +189,13 @@ CachingDirectivesBuilder >> when: aResponseCondition apply: aDirectiveConfigurat
 		ensure: [ self alwaysApplyDirectives ]
 ]
 
-{ #category : #configuring }
+{ #category : 'configuring' }
 CachingDirectivesBuilder >> whenSharedBeStaleAfter: aDuration [
 
 	self addCacheControlNamed: 'S-MaxAge' withToken: aDuration asSeconds
 ]
 
-{ #category : #configuring }
+{ #category : 'configuring' }
 CachingDirectivesBuilder >> whenSharedMustRevalidate [
 
 	self addCacheControlNamed: 'proxy-revalidate'

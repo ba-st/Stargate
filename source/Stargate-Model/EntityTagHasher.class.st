@@ -2,15 +2,17 @@
 I'm responsible for generating a valid ETag hashing the objects included
 "
 Class {
-	#name : #EntityTagHasher,
-	#superclass : #Object,
+	#name : 'EntityTagHasher',
+	#superclass : 'Object',
 	#instVars : [
 		'toHash'
 	],
-	#category : #'Stargate-Model-Controllers'
+	#category : 'Stargate-Model-Controllers',
+	#package : 'Stargate-Model',
+	#tag : 'Controllers'
 }
 
-{ #category : #calculating }
+{ #category : 'calculating' }
 EntityTagHasher >> calculateHash [
 
 	| message |
@@ -22,13 +24,13 @@ EntityTagHasher >> calculateHash [
 	^ MessageDigestAlgorithm sha1 digestStringAsHexString: message
 ]
 
-{ #category : #configuring }
+{ #category : 'configuring' }
 EntityTagHasher >> include: anObjectToHash [
 
 	toHash add: anObjectToHash
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 EntityTagHasher >> initialize [
 
 	super initialize.

@@ -2,16 +2,18 @@
 I'm a language range including a quality parameter as used in Accept-Language headers
 "
 Class {
-	#name : #QualifiedLanguageRange,
-	#superclass : #Object,
+	#name : 'QualifiedLanguageRange',
+	#superclass : 'Object',
 	#instVars : [
 		'languangeRange',
 		'quality'
 	],
-	#category : #'Stargate-Model-Controllers'
+	#category : 'Stargate-Model-Controllers',
+	#package : 'Stargate-Model',
+	#tag : 'Controllers'
 }
 
-{ #category : #'instance creation' }
+{ #category : 'instance creation' }
 QualifiedLanguageRange class >> fromString: aString [
 
 	^ ( aString substrings: ';' )
@@ -33,26 +35,26 @@ QualifiedLanguageRange class >> fromString: aString [
 			  ]
 ]
 
-{ #category : #'instance creation' }
+{ #category : 'instance creation' }
 QualifiedLanguageRange class >> qualifying: aLanguageRange with: aQualityFactor [
 
 	^ self new initializeQualifying: aLanguageRange with: aQualityFactor
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 QualifiedLanguageRange >> initializeQualifying: aLanguageRange with: aQualityFactor [
 
 	languangeRange := aLanguageRange.
 	quality := aQualityFactor
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 QualifiedLanguageRange >> quality [
 
 	^ quality
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 QualifiedLanguageRange >> range [
 
 	^ languangeRange

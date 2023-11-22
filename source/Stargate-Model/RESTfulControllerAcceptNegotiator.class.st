@@ -2,28 +2,30 @@
 I will provide the best representation (media type) to use for processing an HTTP Request given an available media type list
 "
 Class {
-	#name : #RESTfulControllerAcceptNegotiator,
-	#superclass : #Object,
+	#name : 'RESTfulControllerAcceptNegotiator',
+	#superclass : 'Object',
 	#instVars : [
 		'availableMediaTypes',
 		'availableLanguageTags'
 	],
-	#category : #'Stargate-Model-Controllers'
+	#category : 'Stargate-Model-Controllers',
+	#package : 'Stargate-Model',
+	#tag : 'Controllers'
 }
 
-{ #category : #'instance creation' }
+{ #category : 'instance creation' }
 RESTfulControllerAcceptNegotiator class >> accepting: aMediaTypeCollection [
 
 	^ self accepting: aMediaTypeCollection inAnyOf: #()
 ]
 
-{ #category : #'instance creation' }
+{ #category : 'instance creation' }
 RESTfulControllerAcceptNegotiator class >> accepting: aMediaTypeCollection inAnyOf: aLanguageTagCollection [
 
 	^ self new initializeAccepting: aMediaTypeCollection inAnyOf: aLanguageTagCollection
 ]
 
-{ #category : #'private - accessing' }
+{ #category : 'private - accessing' }
 RESTfulControllerAcceptNegotiator >> acceptableMediaTypesIn: anHttpRequest [
 
 	| acceptHeaderContent |
@@ -38,7 +40,7 @@ RESTfulControllerAcceptNegotiator >> acceptableMediaTypesIn: anHttpRequest [
 		otherwise: [ self splitMediaTypesIn: acceptHeaderContent ]
 ]
 
-{ #category : #'private - accessing' }
+{ #category : 'private - accessing' }
 RESTfulControllerAcceptNegotiator >> acceptableQualifiedLanguageRangesIn: anHttpRequest [
 
 	| acceptHeaderContent |
@@ -55,7 +57,7 @@ RESTfulControllerAcceptNegotiator >> acceptableQualifiedLanguageRangesIn: anHttp
 		otherwise: [ self splitQualifiedLanguageRangesIn: acceptHeaderContent ]
 ]
 
-{ #category : #querying }
+{ #category : 'querying' }
 RESTfulControllerAcceptNegotiator >> bestLanguageFor: anHttpRequest [
 
 	"This method returns the best suited language tag for the given request"
@@ -73,7 +75,7 @@ RESTfulControllerAcceptNegotiator >> bestLanguageFor: anHttpRequest [
 		inAnyOf: availableLanguageTags
 ]
 
-{ #category : #querying }
+{ #category : 'querying' }
 RESTfulControllerAcceptNegotiator >> bestRepresentationFor: anHttpRequest [
 
 	"This method returns the best suited representation for the given request"
@@ -82,14 +84,14 @@ RESTfulControllerAcceptNegotiator >> bestRepresentationFor: anHttpRequest [
 	HTTPNotAcceptable signal: 'Cannot generate a response entity with acceptable characteristics.' accepting: availableMediaTypes
 ]
 
-{ #category : #'initialize - release' }
+{ #category : 'initialize - release' }
 RESTfulControllerAcceptNegotiator >> initializeAccepting: aMediaTypeCollection inAnyOf: aLanguageTagCollection [
 
 	availableMediaTypes := aMediaTypeCollection.
 	availableLanguageTags := aLanguageTagCollection
 ]
 
-{ #category : #'private - accessing' }
+{ #category : 'private - accessing' }
 RESTfulControllerAcceptNegotiator >> mediaTypesAvailableFor: aMediaType [
 
 	^ availableMediaTypes
@@ -98,7 +100,7 @@ RESTfulControllerAcceptNegotiator >> mediaTypesAvailableFor: aMediaType [
 				and: [ self versionIn: aMediaType canBeHandledBy: available ] ]
 ]
 
-{ #category : #'private - accessing' }
+{ #category : 'private - accessing' }
 RESTfulControllerAcceptNegotiator >> precedenceFor: aMediaType [
 
 	| precedence version versionParts |
@@ -119,19 +121,19 @@ RESTfulControllerAcceptNegotiator >> precedenceFor: aMediaType [
 	^ precedence
 ]
 
-{ #category : #'private - accessing' }
+{ #category : 'private - accessing' }
 RESTfulControllerAcceptNegotiator >> sortByPrecedence: mediaTypes [
 
 	^ mediaTypes sorted: [ :mediaType | self precedenceFor: mediaType ] descending
 ]
 
-{ #category : #'private - accessing' }
+{ #category : 'private - accessing' }
 RESTfulControllerAcceptNegotiator >> splitMediaTypesIn: acceptList [
 
 	^ ( ',' split: acceptList ) collect: [ :type | type asMediaType ]
 ]
 
-{ #category : #'private - accessing' }
+{ #category : 'private - accessing' }
 RESTfulControllerAcceptNegotiator >> splitQualifiedLanguageRangesIn: acceptLanguageList [
 
 	^ ( ',' split: acceptLanguageList )
@@ -146,7 +148,7 @@ RESTfulControllerAcceptNegotiator >> splitQualifiedLanguageRangesIn: acceptLangu
 			]
 ]
 
-{ #category : #'private - accessing' }
+{ #category : 'private - accessing' }
 RESTfulControllerAcceptNegotiator >> versionIn: acceptable canBeHandledBy: available [
 
 	| acceptVersion availableVersion acceptVersionParts availableVersionParts |
@@ -164,7 +166,7 @@ RESTfulControllerAcceptNegotiator >> versionIn: acceptable canBeHandledBy: avail
 	^ true
 ]
 
-{ #category : #'private - accessing' }
+{ #category : 'private - accessing' }
 RESTfulControllerAcceptNegotiator >> withAcceptableLanguageRangesIn: anHttpRequest do: aBlock [
 
 	| acceptable grouped |
@@ -178,7 +180,7 @@ RESTfulControllerAcceptNegotiator >> withAcceptableLanguageRangesIn: anHttpReque
 		do: [ :quality | ( grouped at: quality ) do: [ :qualifiedRange | aBlock value: qualifiedRange range ] ]
 ]
 
-{ #category : #'private - accessing' }
+{ #category : 'private - accessing' }
 RESTfulControllerAcceptNegotiator >> withAcceptableMediaTypesIn: anHttpRequest do: aBlock [
 
 	| acceptable grouped |

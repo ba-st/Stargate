@@ -2,8 +2,8 @@
 I'm a builder of RESTful handlers
 "
 Class {
-	#name : #RESTfulRequestHandlerBuilder,
-	#superclass : #Object,
+	#name : 'RESTfulRequestHandlerBuilder',
+	#superclass : 'Object',
 	#instVars : [
 		'decodingRules',
 		'encodingRules',
@@ -15,22 +15,24 @@ Class {
 		'cachingDirectives',
 		'allowedLanguageTags'
 	],
-	#category : #'Stargate-Model-Controllers'
+	#category : 'Stargate-Model-Controllers',
+	#package : 'Stargate-Model',
+	#tag : 'Controllers'
 }
 
-{ #category : #configuring }
+{ #category : 'configuring' }
 RESTfulRequestHandlerBuilder >> addAsSupportedLanguage: aLanguageTag [
 
 	allowedLanguageTags add: aLanguageTag asLanguageTag
 ]
 
-{ #category : #configuring }
+{ #category : 'configuring' }
 RESTfulRequestHandlerBuilder >> beHypermediaDriven [
 
 	self beHypermediaDrivenBy: [  ]
 ]
 
-{ #category : #configuring }
+{ #category : 'configuring' }
 RESTfulRequestHandlerBuilder >> beHypermediaDrivenBy: aMediaControlsFactoryBlock [
 
 	AssertionChecker
@@ -57,13 +59,13 @@ RESTfulRequestHandlerBuilder >> beHypermediaDrivenBy: aMediaControlsFactoryBlock
 	]
 ]
 
-{ #category : #building }
+{ #category : 'building' }
 RESTfulRequestHandlerBuilder >> build [
 
 	^  handlerFactory value
 ]
 
-{ #category : #configuring }
+{ #category : 'configuring' }
 RESTfulRequestHandlerBuilder >> createEntityTagHashing: aBlockClosure [
 
 	self
@@ -77,7 +79,7 @@ RESTfulRequestHandlerBuilder >> createEntityTagHashing: aBlockClosure [
 			]
 ]
 
-{ #category : #configuring }
+{ #category : 'configuring' }
 RESTfulRequestHandlerBuilder >> createEntityTagHashingEncodedResource [
 
 	self
@@ -88,19 +90,19 @@ RESTfulRequestHandlerBuilder >> createEntityTagHashingEncodedResource [
 			]
 ]
 
-{ #category : #configuring }
+{ #category : 'configuring' }
 RESTfulRequestHandlerBuilder >> createEntityTagWith: aBlock [
 
 	entityTagFactoryBinding := Binding to: aBlock
 ]
 
-{ #category : #decoding }
+{ #category : 'decoding' }
 RESTfulRequestHandlerBuilder >> decodeToNeoJSONObjectWhenAccepting: aMediaType [
 
 	self whenAccepting: aMediaType decodeApplying: [ :json | NeoJSONObject fromString: json ]
 ]
 
-{ #category : #configuring }
+{ #category : 'configuring' }
 RESTfulRequestHandlerBuilder >> directCachingWith: aBlock [
 
 	cachingDirectives := CachingDirectivesBuilder new
@@ -108,25 +110,25 @@ RESTfulRequestHandlerBuilder >> directCachingWith: aBlock [
 		build
 ]
 
-{ #category : #configuring }
+{ #category : 'configuring' }
 RESTfulRequestHandlerBuilder >> handleExceptionsApplying: aBlock [
 
 	aBlock value: exceptionHandler
 ]
 
-{ #category : #configuring }
+{ #category : 'configuring' }
 RESTfulRequestHandlerBuilder >> handling: anEndpoint [
 
 	resourceLocator := ResourceLocator handling: anEndpoint
 ]
 
-{ #category : #configuring }
+{ #category : 'configuring' }
 RESTfulRequestHandlerBuilder >> handling: anEndpoint extractingIdentifierWith: aBlock [
 
 	resourceLocator := ResourceLocator handling: anEndpoint extractingIdentifierWith: aBlock
 ]
 
-{ #category : #configuring }
+{ #category : 'configuring' }
 RESTfulRequestHandlerBuilder >> handling: anEndpoint extractingIdentifierWith: aBlock locatingParentResourceWith: aResourceLocator [
 
 	resourceLocator := SubresourceLocator
@@ -135,7 +137,7 @@ RESTfulRequestHandlerBuilder >> handling: anEndpoint extractingIdentifierWith: a
 		locatingParentResourceWith: aResourceLocator
 ]
 
-{ #category : #configuring }
+{ #category : 'configuring' }
 RESTfulRequestHandlerBuilder >> handling: anEndpoint locatingResourcesWith: aLocationBlock extractingIdentifierWith: aBlock [
 
 	resourceLocator := ResourceLocator
@@ -144,7 +146,7 @@ RESTfulRequestHandlerBuilder >> handling: anEndpoint locatingResourcesWith: aLoc
 		andIdentifierBy: aBlock
 ]
 
-{ #category : #configuring }
+{ #category : 'configuring' }
 RESTfulRequestHandlerBuilder >> handling: anEndpoint locatingSubresourcesWith: aLocationBlock extractingIdentifierWith: aBlock locatingParentResourceWith: aResourceLocator [
 
 	resourceLocator := SubresourceLocator
@@ -154,7 +156,7 @@ RESTfulRequestHandlerBuilder >> handling: anEndpoint locatingSubresourcesWith: a
 		locatingParentResourceWith: aResourceLocator
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 RESTfulRequestHandlerBuilder >> initialize [
 
 	super initialize.
@@ -177,7 +179,7 @@ RESTfulRequestHandlerBuilder >> initialize [
 	]
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 RESTfulRequestHandlerBuilder >> jsonFor: resource within: requestContext applying: aBlock writingResourceWith: aResourceWritingBlock [
 
 	^ String streamContents: [ :stream | 
@@ -188,13 +190,13 @@ RESTfulRequestHandlerBuilder >> jsonFor: resource within: requestContext applyin
 		  ]
 ]
 
-{ #category : #configuring }
+{ #category : 'configuring' }
 RESTfulRequestHandlerBuilder >> paginateCollectionsWithDefaultLimit: anInteger [
 
 	paginationPolicyFactory := [ :processor | RESTfulControllerPaginateCollectionsPolicy for: processor with: anInteger ]
 ]
 
-{ #category : #decoding }
+{ #category : 'decoding' }
 RESTfulRequestHandlerBuilder >> whenAccepting: aMediaType decodeApplying: aDecodingBlock [
 
 	"aDecodingBlock will be evaluated with the request contents and optionally the request context"
@@ -205,7 +207,7 @@ RESTfulRequestHandlerBuilder >> whenAccepting: aMediaType decodeApplying: aDecod
 		ifAbsentPut: [ aDecodingBlock ]
 ]
 
-{ #category : #decoding }
+{ #category : 'decoding' }
 RESTfulRequestHandlerBuilder >> whenAccepting: aMediaType decodeFromJsonApplying: aBlock [
 
 	self
@@ -213,7 +215,7 @@ RESTfulRequestHandlerBuilder >> whenAccepting: aMediaType decodeFromJsonApplying
 		decodeApplying: [ :json | aBlock value: json value: ( NeoJSONReader on: json readStream ) ]
 ]
 
-{ #category : #encoding }
+{ #category : 'encoding' }
 RESTfulRequestHandlerBuilder >> whenResponding: aMediaType encodeApplying: anEncodingBlock [
 
 	encodingRules
@@ -222,7 +224,7 @@ RESTfulRequestHandlerBuilder >> whenResponding: aMediaType encodeApplying: anEnc
 		ifAbsentPut: [ ResourceEncodingRule encoding: aMediaType using: anEncodingBlock ]
 ]
 
-{ #category : #encoding }
+{ #category : 'encoding' }
 RESTfulRequestHandlerBuilder >> whenResponding: aMediaType encodeToJsonApplying: aBlock [
 
 	self whenResponding: aMediaType encodeApplying: [ :resource :requestContext | 
@@ -242,7 +244,7 @@ RESTfulRequestHandlerBuilder >> whenResponding: aMediaType encodeToJsonApplying:
 		]
 ]
 
-{ #category : #encoding }
+{ #category : 'encoding' }
 RESTfulRequestHandlerBuilder >> whenResponding: aMediaType encodeToJsonApplying: aBlock as: schema [
 
 	self whenResponding: aMediaType encodeApplying: [ :resource :requestContext | 

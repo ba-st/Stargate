@@ -2,44 +2,45 @@
 I'm a provider of metrics related to HTTP requests
 "
 Class {
-	#name : #HTTPMetrics,
-	#superclass : #MetricProvider,
+	#name : 'HTTPMetrics',
+	#superclass : 'MetricProvider',
 	#instVars : [
 		'groupedRequestCount',
 		'groupedResponseSize',
 		'groupedRequestResponseDuration',
 		'categoriesFilter'
 	],
-	#category : #'Stargate-Metrics-HTTP'
+	#category : 'Stargate-Metrics-HTTP',
+	#package : 'Stargate-Metrics-HTTP'
 }
 
-{ #category : #'instance creation' }
+{ #category : 'instance creation' }
 HTTPMetrics class >> configuredBy: pluginConfiguration [
 
 	^ self basicNew
 		initializeConfiguredBy: ( pluginConfiguration at: self providerName ifAbsent: [ Dictionary new ] )
 ]
 
-{ #category : #'instance creation' }
+{ #category : 'instance creation' }
 HTTPMetrics class >> new [
 
 	^ self configuredBy: Dictionary new
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 HTTPMetrics class >> providerName [
 
 	^ 'http'
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 HTTPMetrics >> finalize [
 
 	super finalize.
 	self uninstall
 ]
 
-{ #category : #calculating }
+{ #category : 'calculating' }
 HTTPMetrics >> gatherMetrics [
 
 	^ groupedRequestCount
@@ -51,7 +52,7 @@ HTTPMetrics >> gatherMetrics [
 			]
 ]
 
-{ #category : #'event handling' }
+{ #category : 'event handling' }
 HTTPMetrics >> handleEvent: aZnServerTransactionEvent [
 
 	| labels |
@@ -65,7 +66,7 @@ HTTPMetrics >> handleEvent: aZnServerTransactionEvent [
 		increaseRequestResponseDurationAt: labels with: aZnServerTransactionEvent duration
 ]
 
-{ #category : #'event handling' }
+{ #category : 'event handling' }
 HTTPMetrics >> handleSimplifiedEvent: aZnSimplifiedServerTransactionEvent [
 
 	| labels |
@@ -78,7 +79,7 @@ HTTPMetrics >> handleSimplifiedEvent: aZnSimplifiedServerTransactionEvent [
 		increaseRequestResponseDurationAt: labels with: aZnSimplifiedServerTransactionEvent duration
 ]
 
-{ #category : #'private - accumulating' }
+{ #category : 'private - accumulating' }
 HTTPMetrics >> increaseRequestCountAt: labels [
 
 	| previousCount |
@@ -88,7 +89,7 @@ HTTPMetrics >> increaseRequestCountAt: labels [
 	groupedRequestCount at: labels put: previousCount + 1
 ]
 
-{ #category : #'private - accumulating' }
+{ #category : 'private - accumulating' }
 HTTPMetrics >> increaseRequestResponseDurationAt: labels with: aMillisecondsCount [
 
 	| previousDuration |
@@ -97,7 +98,7 @@ HTTPMetrics >> increaseRequestResponseDurationAt: labels with: aMillisecondsCoun
 	groupedRequestResponseDuration at: labels put: previousDuration + aMillisecondsCount
 ]
 
-{ #category : #'private - accumulating' }
+{ #category : 'private - accumulating' }
 HTTPMetrics >> increaseResponseSizeAt: labels with: aByteCount [
 
 	| previousSize |
@@ -106,7 +107,7 @@ HTTPMetrics >> increaseResponseSizeAt: labels with: aByteCount [
 	groupedResponseSize at: labels put: previousSize + aByteCount
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 HTTPMetrics >> initializeConfiguredBy: providerConfiguration [
 
 	categoriesFilter := providerConfiguration at: #breakdownCategories
@@ -116,17 +117,21 @@ HTTPMetrics >> initializeConfiguredBy: providerConfiguration [
 	self resetCounters
 ]
 
-{ #category : #actions }
+{ #category : 'actions' }
 HTTPMetrics >> installOn: teapotServer [
 
 	ZnLogEvent announcer
-		when: ZnSimplifiedServerTransactionEvent do: [ :event | self handleSimplifiedEvent: event ];
-		when: ZnServerTransactionEvent do: [ :event | self handleEvent: event ].
+		when: ZnSimplifiedServerTransactionEvent
+		do: [ :event | self handleSimplifiedEvent: event ]
+		for: self;
+		when: ZnServerTransactionEvent
+		do: [ :event | self handleEvent: event ]
+		for: self.
 
 	teapotServer server setLogLevelAtLeastTo: 2
 ]
 
-{ #category : #'private - metrics' }
+{ #category : 'private - metrics' }
 HTTPMetrics >> labelsFor: aServerTransactionEvent [
 
 	^ categoriesFilter
@@ -138,7 +143,7 @@ HTTPMetrics >> labelsFor: aServerTransactionEvent [
 				with: #url_template -> aServerTransactionEvent urlTemplate )
 ]
 
-{ #category : #'private - metrics' }
+{ #category : 'private - metrics' }
 HTTPMetrics >> requestCountMetric [
 
 	| builder |
@@ -153,7 +158,7 @@ HTTPMetrics >> requestCountMetric [
 	^ builder build
 ]
 
-{ #category : #'private - metrics' }
+{ #category : 'private - metrics' }
 HTTPMetrics >> requestResponseDurationMetric [
 
 	| builder |
@@ -168,7 +173,7 @@ HTTPMetrics >> requestResponseDurationMetric [
 	^ builder build
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 HTTPMetrics >> resetCounters [
 
 	groupedRequestCount := Dictionary new.
@@ -176,7 +181,7 @@ HTTPMetrics >> resetCounters [
 	groupedRequestResponseDuration := Dictionary new
 ]
 
-{ #category : #'private - metrics' }
+{ #category : 'private - metrics' }
 HTTPMetrics >> responseSizeMetric [
 
 	| builder |
@@ -191,7 +196,7 @@ HTTPMetrics >> responseSizeMetric [
 	^ builder build
 ]
 
-{ #category : #actions }
+{ #category : 'actions' }
 HTTPMetrics >> uninstall [
 
 	ZnLogEvent announcer unsubscribe: self.

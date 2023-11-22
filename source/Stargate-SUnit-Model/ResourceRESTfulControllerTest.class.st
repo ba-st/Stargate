@@ -2,27 +2,28 @@
 I'm an abstract Test Case providing facililties to test RESTfulControllers
 "
 Class {
-	#name : #ResourceRESTfulControllerTest,
-	#superclass : #TestCase,
+	#name : 'ResourceRESTfulControllerTest',
+	#superclass : 'TestCase',
 	#instVars : [
 		'resourceController'
 	],
-	#category : #'Stargate-SUnit-Model'
+	#category : 'Stargate-SUnit-Model',
+	#package : 'Stargate-SUnit-Model'
 }
 
-{ #category : #testing }
+{ #category : 'testing' }
 ResourceRESTfulControllerTest class >> isAbstract [
 
 	^ self name = #ResourceRESTfulControllerTest
 ]
 
-{ #category : #'private - asserting' }
+{ #category : 'private - asserting' }
 ResourceRESTfulControllerTest >> assertCachingDirectivesFor: response with: aString [
 
 	self assert: response cachingDirectives equals: aString
 ]
 
-{ #category : #'private - asserting' }
+{ #category : 'private - asserting' }
 ResourceRESTfulControllerTest >> assertExpiresHeaderFor: response with: aDuration [
 
 	| oneMinuteBeforeFourHours fourHoursInTheFuture expiresString |
@@ -37,19 +38,19 @@ ResourceRESTfulControllerTest >> assertExpiresHeaderFor: response with: aDuratio
 		assert: ( expiresString = oneMinuteBeforeFourHours or: [ expiresString = fourHoursInTheFuture ] )
 ]
 
-{ #category : #'private - support' }
+{ #category : 'private - support' }
 ResourceRESTfulControllerTest >> baseUrl [
 
 	^ self subclassResponsibility
 ]
 
-{ #category : #'private - support' }
+{ #category : 'private - support' }
 ResourceRESTfulControllerTest >> newHttpRequestContext [
 
 	^ HttpRequestContext new
 ]
 
-{ #category : #running }
+{ #category : 'running' }
 ResourceRESTfulControllerTest >> setUp [
 
 	super setUp.
@@ -57,19 +58,19 @@ ResourceRESTfulControllerTest >> setUp [
 	resourceController serverUrl: self baseUrl asZnUrl
 ]
 
-{ #category : #running }
+{ #category : 'running' }
 ResourceRESTfulControllerTest >> setUpResourceController [
 
 	self subclassResponsibility
 ]
 
-{ #category : #'private - support' }
+{ #category : 'private - support' }
 ResourceRESTfulControllerTest >> withJsonFromContentsIn: httpResponse do: aBlock [
 
 	aBlock value: (NeoJSONObject fromString: httpResponse contents)
 ]
 
-{ #category : #'private - support' }
+{ #category : 'private - support' }
 ResourceRESTfulControllerTest >> withJsonFromItemsIn: httpResponse do: aBlock [
 
 	self withJsonFromContentsIn: httpResponse do: [:json | aBlock value: json items]

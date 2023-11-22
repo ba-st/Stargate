@@ -1,22 +1,23 @@
 Class {
-	#name : #OperationalPluginRESTfulControllerTest,
-	#superclass : #SingleResourceRESTfulControllerTest,
-	#category : #'Stargate-SUnit-Model'
+	#name : 'OperationalPluginRESTfulControllerTest',
+	#superclass : 'SingleResourceRESTfulControllerTest',
+	#category : 'Stargate-SUnit-Model',
+	#package : 'Stargate-SUnit-Model'
 }
 
-{ #category : #testing }
+{ #category : 'testing' }
 OperationalPluginRESTfulControllerTest class >> isAbstract [
 
 	^ self name = #OperationalPluginRESTfulControllerTest
 ]
 
-{ #category : #'private - support' }
+{ #category : 'private - support' }
 OperationalPluginRESTfulControllerTest >> baseUrl [
 
 	^ 'https://api.example.com' asUrl
 ]
 
-{ #category : #'private - support' }
+{ #category : 'private - support' }
 OperationalPluginRESTfulControllerTest >> newHttpRequestContext [
 
 	^ super newHttpRequestContext
@@ -24,7 +25,7 @@ OperationalPluginRESTfulControllerTest >> newHttpRequestContext [
 		yourself
 ]
 
-{ #category : #'private - support' }
+{ #category : 'private - support' }
 OperationalPluginRESTfulControllerTest >> operationsConfiguration [
 
 	^ Dictionary new

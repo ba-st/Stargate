@@ -2,37 +2,39 @@
 I'm a RESTful controllers handling only one resource, so I can make some assumptions and provide some ready to use behavior.
 "
 Class {
-	#name : #SingleResourceRESTfulController,
-	#superclass : #ResourceRESTfulController,
-	#category : #'Stargate-Model-Controllers'
+	#name : 'SingleResourceRESTfulController',
+	#superclass : 'ResourceRESTfulController',
+	#category : 'Stargate-Model-Controllers',
+	#package : 'Stargate-Model',
+	#tag : 'Controllers'
 }
 
-{ #category : #testing }
+{ #category : 'testing' }
 SingleResourceRESTfulController class >> isAbstract [
 
 	<ignoreForCoverage>
 	^ self = SingleResourceRESTfulController
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 SingleResourceRESTfulController >> endpoint [
 
 	^ self requestHandler endpoint
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 SingleResourceRESTfulController >> identifierIn: httpRequest [
 
 	^ httpRequest at: self identifierKey
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 SingleResourceRESTfulController >> identifierKey [
 
 	^ #identifier asString
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 SingleResourceRESTfulController >> identifierTemplate [
 
 	^ '<1s>/%<<2s>:<3s>>'
@@ -41,19 +43,19 @@ SingleResourceRESTfulController >> identifierTemplate [
 		with: self typeIdConstraint asString
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 SingleResourceRESTfulController >> requestHandler [
 
 	^ self subclassResponsibility
 ]
 
-{ #category : #configuring }
+{ #category : 'configuring' }
 SingleResourceRESTfulController >> serverUrl: aServerUrl [
 
 	self requestHandler serverUrl: aServerUrl
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 SingleResourceRESTfulController >> typeIdConstraint [
 
 	^ self subclassResponsibility

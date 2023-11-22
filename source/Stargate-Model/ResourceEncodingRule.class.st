@@ -3,28 +3,30 @@ I'm an encoding rule.
 I'm responsible of generating an Entity with the provided media type encoding a resource into it's representation.
 "
 Class {
-	#name : #ResourceEncodingRule,
-	#superclass : #Object,
+	#name : 'ResourceEncodingRule',
+	#superclass : 'Object',
 	#instVars : [
 		'mediaType',
 		'encodingBlock'
 	],
-	#category : #'Stargate-Model-Controllers'
+	#category : 'Stargate-Model-Controllers',
+	#package : 'Stargate-Model',
+	#tag : 'Controllers'
 }
 
-{ #category : #'instance creation' }
+{ #category : 'instance creation' }
 ResourceEncodingRule class >> encoding: aMediaType using: aWriter [
 
 	^ self new initializeMapping: aMediaType using: aWriter
 ]
 
-{ #category : #encoding }
+{ #category : 'encoding' }
 ResourceEncodingRule >> encode: resource within: requestContext [
 
 	^ ZnEntity with: ( encodingBlock cull: resource cull: requestContext ) ofType: mediaType
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 ResourceEncodingRule >> initializeMapping: aMediaType using: anEncodingBlock [
 
 	encodingBlock := anEncodingBlock.

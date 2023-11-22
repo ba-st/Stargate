@@ -2,24 +2,25 @@
 I'm an abstract Test Case providing facililties to test RESTfulControllers for single resources
 "
 Class {
-	#name : #SingleResourceRESTfulControllerTest,
-	#superclass : #ResourceRESTfulControllerTest,
-	#category : #'Stargate-SUnit-Model'
+	#name : 'SingleResourceRESTfulControllerTest',
+	#superclass : 'ResourceRESTfulControllerTest',
+	#category : 'Stargate-SUnit-Model',
+	#package : 'Stargate-SUnit-Model'
 }
 
-{ #category : #testing }
+{ #category : 'testing' }
 SingleResourceRESTfulControllerTest class >> isAbstract [
 
 	^ self name = #SingleResourceRESTfulControllerTest
 ]
 
-{ #category : #'private - support' }
+{ #category : 'private - support' }
 SingleResourceRESTfulControllerTest >> endpoint [
 
 	^ resourceController endpoint
 ]
 
-{ #category : #'private - support' }
+{ #category : 'private - support' }
 SingleResourceRESTfulControllerTest >> parametersWith: anIdentifier [
 
 	^ SmallDictionary new
@@ -27,7 +28,7 @@ SingleResourceRESTfulControllerTest >> parametersWith: anIdentifier [
 		yourself
 ]
 
-{ #category : #'private - HTTP requests' }
+{ #category : 'private - HTTP requests' }
 SingleResourceRESTfulControllerTest >> requestToDELETEResourceIdentifiedBy: anIdentifier [
 
 	^ TeaRequest
@@ -35,7 +36,7 @@ SingleResourceRESTfulControllerTest >> requestToDELETEResourceIdentifiedBy: anId
 		pathParams: ( self parametersWith: anIdentifier )
 ]
 
-{ #category : #'private - HTTP requests' }
+{ #category : 'private - HTTP requests' }
 SingleResourceRESTfulControllerTest >> requestToGET: aUrl accepting: aMediaRange [
 
 	^ self
@@ -43,7 +44,7 @@ SingleResourceRESTfulControllerTest >> requestToGET: aUrl accepting: aMediaRange
 		  applying: [ :request | request setAccept: aMediaRange ]
 ]
 
-{ #category : #'private - HTTP requests' }
+{ #category : 'private - HTTP requests' }
 SingleResourceRESTfulControllerTest >> requestToGET: aUrl applying: aConfiguration [
 
 	^ self
@@ -52,7 +53,7 @@ SingleResourceRESTfulControllerTest >> requestToGET: aUrl applying: aConfigurati
 		  applying: aConfiguration
 ]
 
-{ #category : #'private - HTTP requests' }
+{ #category : 'private - HTTP requests' }
 SingleResourceRESTfulControllerTest >> requestToGET: aUrl withPathParams: aDictionary applying: aConfiguration [
 	
 	| request | 
@@ -66,7 +67,7 @@ SingleResourceRESTfulControllerTest >> requestToGET: aUrl withPathParams: aDicti
 		pathParams: aDictionary.
 ]
 
-{ #category : #'private - HTTP requests' }
+{ #category : 'private - HTTP requests' }
 SingleResourceRESTfulControllerTest >> requestToGETResourceFrom: aLocation identifiedBy: anIdentifier applying: aConfiguration [
 
 	^ self
@@ -75,7 +76,7 @@ SingleResourceRESTfulControllerTest >> requestToGETResourceFrom: aLocation ident
 		  applying: aConfiguration
 ]
 
-{ #category : #'private - HTTP requests' }
+{ #category : 'private - HTTP requests' }
 SingleResourceRESTfulControllerTest >> requestToGETResourceIdentifiedBy: anIdentifier accepting: aMediaRange [
 
 	^ self
@@ -83,7 +84,7 @@ SingleResourceRESTfulControllerTest >> requestToGETResourceIdentifiedBy: anIdent
 		  applying: [ :request | request setAccept: aMediaRange ]
 ]
 
-{ #category : #'private - HTTP requests' }
+{ #category : 'private - HTTP requests' }
 SingleResourceRESTfulControllerTest >> requestToGETResourceIdentifiedBy: anIdentifier accepting: aMediaRange conditionalTo: anETag [
 
 	^ self
@@ -94,7 +95,7 @@ SingleResourceRESTfulControllerTest >> requestToGETResourceIdentifiedBy: anIdent
 				  setIfNoneMatchTo: anETag ]
 ]
 
-{ #category : #'private - HTTP requests' }
+{ #category : 'private - HTTP requests' }
 SingleResourceRESTfulControllerTest >> requestToGETResourceIdentifiedBy: anIdentifier acceptingContentMatching: aMediaRange inAnyOf: aLanguageRange [
 
 	^ self
@@ -105,7 +106,7 @@ SingleResourceRESTfulControllerTest >> requestToGETResourceIdentifiedBy: anIdent
 				  setAcceptLanguage: aLanguageRange ]
 ]
 
-{ #category : #'private - HTTP requests' }
+{ #category : 'private - HTTP requests' }
 SingleResourceRESTfulControllerTest >> requestToGETResourceIdentifiedBy: anIdentifier applying: aConfiguration [
 
 	^ self
@@ -115,7 +116,7 @@ SingleResourceRESTfulControllerTest >> requestToGETResourceIdentifiedBy: anIdent
 		  applying: aConfiguration
 ]
 
-{ #category : #'private - HTTP requests' }
+{ #category : 'private - HTTP requests' }
 SingleResourceRESTfulControllerTest >> requestToGETSubresource: aSubresourceUrl identifiedBy: anIdentifier accepting: aMediaRange [
 
 	^ self
@@ -124,7 +125,7 @@ SingleResourceRESTfulControllerTest >> requestToGETSubresource: aSubresourceUrl 
 		  applying: [ :request | request setAccept: aMediaRange ]
 ]
 
-{ #category : #'private - HTTP requests' }
+{ #category : 'private - HTTP requests' }
 SingleResourceRESTfulControllerTest >> requestToPATCHResourceIdentifiedBy: anIdentifier with: aRequestBody accepting: aMediaRange conditionalTo: anETag [
 
 	^ TeaRequest
@@ -137,7 +138,7 @@ SingleResourceRESTfulControllerTest >> requestToPATCHResourceIdentifiedBy: anIde
 		pathParams: ( self parametersWith: anIdentifier )
 ]
 
-{ #category : #'private - HTTP requests' }
+{ #category : 'private - HTTP requests' }
 SingleResourceRESTfulControllerTest >> requestToPOST: content as: aMediaType [
 
 	^ TeaRequest
@@ -147,13 +148,13 @@ SingleResourceRESTfulControllerTest >> requestToPOST: content as: aMediaType [
 				yourself)
 ]
 
-{ #category : #'private - support' }
+{ #category : 'private - support' }
 SingleResourceRESTfulControllerTest >> resourceUrl [
 
 	^ self baseUrl / self endpoint
 ]
 
-{ #category : #'private - support' }
+{ #category : 'private - support' }
 SingleResourceRESTfulControllerTest >> urlForResourceIdentifiedBy: anIdentifier [
 
 	^ self resourceUrl / anIdentifier asString asUrl

@@ -2,30 +2,31 @@
 I'm an abstract test class providing facilities to test the API of Operational Plugins
 "
 Class {
-	#name : #OperationalPluginAPITest,
-	#superclass : #HTTPBasedRESTfulAPITest,
-	#category : #'Stargate-SUnit-Model'
+	#name : 'OperationalPluginAPITest',
+	#superclass : 'HTTPBasedRESTfulAPITest',
+	#category : 'Stargate-SUnit-Model',
+	#package : 'Stargate-SUnit-Model'
 }
 
-{ #category : #testing }
+{ #category : 'testing' }
 OperationalPluginAPITest class >> isAbstract [
 
 	^ self name = #OperationalPluginAPITest
 ]
 
-{ #category : #asserting }
+{ #category : 'asserting' }
 OperationalPluginAPITest >> assertIsDisabled: anOperationPluginType [
 
 	self deny: ( api isEnabled: anOperationPluginType )
 ]
 
-{ #category : #asserting }
+{ #category : 'asserting' }
 OperationalPluginAPITest >> assertIsEnabled: anOperationPluginType [
 
 	self assert: ( api isEnabled: anOperationPluginType )
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 OperationalPluginAPITest >> claimSet [
 
 	^ super claimSet
@@ -33,42 +34,42 @@ OperationalPluginAPITest >> claimSet [
 		yourself
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 OperationalPluginAPITest >> controllersToInstall [
 
 	^ Array with: self 
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 OperationalPluginAPITest >> newJWTAuthorizedClientLackingPermissions [
 
 	^ self newJWTAuthorizedClientClaiming: super claimSet
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 OperationalPluginAPITest >> operationsPluginsUrl [
 
 	^ self operationsUrl / 'plugins'
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 OperationalPluginAPITest >> operationsUrl [
 
 	^ self baseUrl / 'operations' asUrl
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 OperationalPluginAPITest >> requiredPermissions [
 
 	self subclassResponsibility
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 OperationalPluginAPITest >> routes [
 
 	^ #()
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 OperationalPluginAPITest >> serverUrl: aUrl [ 
 ]

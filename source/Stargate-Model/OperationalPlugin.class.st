@@ -13,42 +13,44 @@ An operational plugin must have the following characteristics:
 
 "
 Class {
-	#name : #OperationalPlugin,
-	#superclass : #Object,
-	#category : #'Stargate-Model-Operations'
+	#name : 'OperationalPlugin',
+	#superclass : 'Object',
+	#category : 'Stargate-Model-Operations',
+	#package : 'Stargate-Model',
+	#tag : 'Operations'
 }
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 OperationalPlugin class >> availablePlugins [
 
 	^ self allLeafSubclasses
 ]
 
-{ #category : #configuring }
+{ #category : 'configuring' }
 OperationalPlugin class >> configureMediaControlsIn: builder within: requestContext [
 
 	self subclassResponsibility
 ]
 
-{ #category : #'instance creation' }
+{ #category : 'instance creation' }
 OperationalPlugin class >> configuredBy: configuration [
 
 	^ self subclassResponsibility
 ]
 
-{ #category : #testing }
+{ #category : 'testing' }
 OperationalPlugin class >> enabledByDefault [
 
 	^ false
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 OperationalPlugin class >> endpoint [
 
 	^ self subclassResponsibility
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 OperationalPlugin class >> pluginAt: endpoint [
 
 	^ self availablePlugins
@@ -56,7 +58,7 @@ OperationalPlugin class >> pluginAt: endpoint [
 		ifNone: [ ObjectNotFound signal: ( 'Plugin <1s> not available' expandMacrosWith: endpoint ) ]
 ]
 
-{ #category : #'instance creation' }
+{ #category : 'instance creation' }
 OperationalPlugin class >> pluginConfigurationOn: configuration [
 
 	| selfConfiguration |
@@ -70,37 +72,37 @@ OperationalPlugin class >> pluginConfigurationOn: configuration [
 	^ selfConfiguration
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 OperationalPlugin class >> pluginName [
 
 	^ self subclassResponsibility
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 OperationalPlugin >> endpoint [
 
 	^ self class endpoint
 ]
 
-{ #category : #configuring }
+{ #category : 'configuring' }
 OperationalPlugin >> includeControllersIn: api [
 
 	self subclassResponsibility
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 OperationalPlugin >> name [
 
 	^ self class pluginName
 ]
 
-{ #category : #printing }
+{ #category : 'printing' }
 OperationalPlugin >> printOn: stream [
 
 	stream nextPutAll: self name
 ]
 
-{ #category : #controlling }
+{ #category : 'controlling' }
 OperationalPlugin >> startOn: teapotServer [
 
 	"This method is called when the server is started, giving
@@ -109,7 +111,7 @@ OperationalPlugin >> startOn: teapotServer [
 	
 ]
 
-{ #category : #controlling }
+{ #category : 'controlling' }
 OperationalPlugin >> stop [
 
 	"This method is called when the server is stopped, giving

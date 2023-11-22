@@ -2,8 +2,8 @@
 I'm responsible for locating specific subresource instances and generating location urls from them
 "
 Class {
-	#name : #SubresourceLocator,
-	#superclass : #ResourceLocatorBehavior,
+	#name : 'SubresourceLocator',
+	#superclass : 'ResourceLocatorBehavior',
 	#instVars : [
 		'endpoint',
 		'identifierLookupAction',
@@ -11,10 +11,12 @@ Class {
 		'resourceLocator',
 		'exceptionHandler'
 	],
-	#category : #'Stargate-Model-Controllers'
+	#category : 'Stargate-Model-Controllers',
+	#package : 'Stargate-Model',
+	#tag : 'Controllers'
 }
 
-{ #category : #'instance creation' }
+{ #category : 'instance creation' }
 SubresourceLocator class >> handling: aStringOrSymbol
 	calculatingLocationWith: aLocationResolver
 	andIdentifierBy: aBlock
@@ -27,7 +29,7 @@ SubresourceLocator class >> handling: aStringOrSymbol
 		locatingParentResourceWith: aResourceLocator
 ]
 
-{ #category : #'instance creation' }
+{ #category : 'instance creation' }
 SubresourceLocator class >> handling: aStringOrSymbol extractingIdentifierWith: aBlock locatingParentResourceWith: aResourceLocator [
 
 	^ self
@@ -37,7 +39,7 @@ SubresourceLocator class >> handling: aStringOrSymbol extractingIdentifierWith: 
 		locatingParentResourceWith: aResourceLocator
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 SubresourceLocator class >> handling: aStringOrSymbol
 	resolvingLocationWith: aLocationResolverBinding
 	andIdentifierBy: aBlock
@@ -50,49 +52,49 @@ SubresourceLocator class >> handling: aStringOrSymbol
 		locatingParentResourceWith: aResourceLocator
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 SubresourceLocator >> baseUrl [
 
 	^ resourceLocator baseUrl
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 SubresourceLocator >> baseUrl: aServerUrl [
 
 	resourceLocator baseUrl: aServerUrl
 ]
 
-{ #category : #testing }
+{ #category : 'testing' }
 SubresourceLocator >> canLookupResources [
 
 	^ locationResolverBinding isDefined
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 SubresourceLocator >> endpoint [
 
 	^ endpoint
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 SubresourceLocator >> exceptionHandler [
 
 	^ exceptionHandler
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 SubresourceLocator >> handleExceptionsWith: anExceptionHandler [
 
 	exceptionHandler := anExceptionHandler
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 SubresourceLocator >> identifierLookupAction [
 
 	^ identifierLookupAction
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 SubresourceLocator >> initializeHandling: aStringOrSymbol
 	resolvingLocationWith: aLocationResolverBinding
 	andIdentifierBy: aBlock
@@ -105,7 +107,7 @@ SubresourceLocator >> initializeHandling: aStringOrSymbol
 	exceptionHandler := RESTfulRequestExceptionHandler new
 ]
 
-{ #category : #querying }
+{ #category : 'querying' }
 SubresourceLocator >> locationOf: resource within: requestContext [
 
 	^ ( resourceLocator locationOf: requestContext parentResource within: requestContext )

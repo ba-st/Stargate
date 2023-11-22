@@ -1,47 +1,49 @@
 Class {
-	#name : #PetStoreApplication,
-	#superclass : #StargateApplication,
-	#category : #'Stargate-Examples'
+	#name : 'PetStoreApplication',
+	#superclass : 'StargateApplication',
+	#category : 'Stargate-Examples-PetStore',
+	#package : 'Stargate-Examples',
+	#tag : 'PetStore'
 }
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 PetStoreApplication class >> commandName [
 
 	^ 'pet-store'
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 PetStoreApplication class >> description [
 
 	^'A RESTful API for Pet stores'
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 PetStoreApplication class >> initialize [
 
 	<ignoreForCoverage>
 	self initializeVersion
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 PetStoreApplication class >> projectName [
 
 	^ 'Stargate'
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 PetStoreApplication class >> sectionsForStargateConfiguration [
 
 	^ #( 'Pet Store' ) , super sectionsForStargateConfiguration
 ]
 
-{ #category : #'private - accessing' }
+{ #category : 'private - accessing' }
 PetStoreApplication >> controllersToInstall [
 
 	^ Array with: PetsRESTfulController new with: PetOrdersRESTfulController new
 ]
 
-{ #category : #'private - accessing' }
+{ #category : 'private - accessing' }
 PetStoreApplication >> stargateConfiguration [
 
 	^self configuration petStore stargate

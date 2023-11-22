@@ -1,58 +1,60 @@
 Class {
-	#name : #ResourceLocatorBehavior,
-	#superclass : #Object,
-	#category : #'Stargate-Model-Controllers'
+	#name : 'ResourceLocatorBehavior',
+	#superclass : 'Object',
+	#category : 'Stargate-Model-Controllers',
+	#package : 'Stargate-Model',
+	#tag : 'Controllers'
 }
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 ResourceLocatorBehavior >> baseUrl [
 
 	^ self subclassResponsibility
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 ResourceLocatorBehavior >> baseUrl: aServerUrl [
 
 	self subclassResponsibility
 ]
 
-{ #category : #testing }
+{ #category : 'testing' }
 ResourceLocatorBehavior >> canLookupResources [
 
 	self subclassResponsibility
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 ResourceLocatorBehavior >> endpoint [
 
 	^ self subclassResponsibility
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 ResourceLocatorBehavior >> exceptionHandler [
 
 	^ self subclassResponsibility
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 ResourceLocatorBehavior >> handleExceptionsWith: anExceptionHandler [
 
 	self subclassResponsibility
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 ResourceLocatorBehavior >> identifierLookupAction [
 
 	^ self subclassResponsibility
 ]
 
-{ #category : #querying }
+{ #category : 'querying' }
 ResourceLocatorBehavior >> locationOf: resource within: requestContext [
 
 	self subclassResponsibility
 ]
 
-{ #category : #querying }
+{ #category : 'querying' }
 ResourceLocatorBehavior >> lookupResourceIdentifiedBy: httpRequest evaluating: aQueryBlock [
 
 	^ self exceptionHandler
