@@ -50,7 +50,7 @@ ErroneousAPITest >> testCORSAllowingAnyOrigin [
 	api allowCrossOriginSharingApplying: [ :cors | cors allowAnyOrigin ].
 
 	response := self newClient
-		            url: self baseUrl / 'errors' asUrl;
+		            url: self baseUrl / 'errors' / '1' asUrl;
 		            headerAt: 'Origin' put: self baseUrl printString;
 		            headerAt: 'Access-Control-Request-Headers' put: 'Content-Type';
 		            options;
@@ -64,7 +64,7 @@ ErroneousAPITest >> testCORSAllowingAnyOrigin [
 
 
 	response := self newClient
-		            url: self baseUrl / 'errors' asUrl;
+		            url: self baseUrl / 'errors' / '1' asUrl;
 		            headerAt: 'Origin' put: self baseUrl printString;
 		            enforceHttpSuccess: false;
 		            get;
@@ -84,7 +84,7 @@ ErroneousAPITest >> testCORSAllowingExactlyOneOrigin [
 	api allowCrossOriginSharingApplying: [ :cors | cors allowOnlyFrom: { self baseUrl } ].
 
 	response := self newClient
-		            url: self baseUrl / 'errors' asUrl;
+		            url: self baseUrl / 'errors' / '1' asUrl;
 		            headerAt: 'Origin' put: self baseUrl printString;
 		            headerAt: 'Access-Control-Request-Headers' put: 'Content-Type';
 		            options;
@@ -99,7 +99,7 @@ ErroneousAPITest >> testCORSAllowingExactlyOneOrigin [
 		assert: ( response headers at: 'Access-Control-Allow-Methods' ) equals: 'GET'.
 
 	response := self newClient
-		            url: self baseUrl / 'errors' asUrl;
+		            url: self baseUrl / 'errors' / '1' asUrl;
 		            headerAt: 'Origin' put: self baseUrl printString;
 		            enforceHttpSuccess: false;
 		            get;
@@ -124,7 +124,7 @@ ErroneousAPITest >> testCORSAllowingMoreThanOneOrigin [
 		].
 
 	response := self newClient
-		            url: self baseUrl / 'errors' asUrl;
+		            url: self baseUrl / 'errors' / '1' asUrl;
 		            headerAt: 'Origin' put: self baseUrl printString;
 		            headerAt: 'Access-Control-Request-Headers' put: 'Content-Type';
 		            options;
@@ -139,7 +139,7 @@ ErroneousAPITest >> testCORSAllowingMoreThanOneOrigin [
 		assert: ( response headers at: 'Access-Control-Allow-Methods' ) equals: 'GET'.
 
 	response := self newClient
-		            url: self baseUrl / 'errors' asUrl;
+		            url: self baseUrl / 'errors' / '1' asUrl;
 		            headerAt: 'Origin' put: self baseUrl printString;
 		            enforceHttpSuccess: false;
 		            get;
@@ -166,7 +166,7 @@ ErroneousAPITest >> testCORSOptionalHeaders [
 		].
 
 	response := self newClient
-		            url: self baseUrl / 'errors' asUrl;
+		            url: self baseUrl / 'errors' / '1' asUrl;
 		            headerAt: 'Origin' put: self baseUrl printString;
 		            headerAt: 'Access-Control-Request-Headers' put: 'Content-Type';
 		            options;
@@ -184,7 +184,7 @@ ErroneousAPITest >> testCORSOptionalHeaders [
 		assert: response varyHeaderNames includes: 'Access-Control-Allow-Headers'.
 
 	response := self newClient
-		            url: self baseUrl / 'errors' asUrl;
+		            url: self baseUrl / 'errors' / '1' asUrl;
 		            headerAt: 'Origin' put: self baseUrl printString;
 		            enforceHttpSuccess: false;
 		            get;
@@ -210,7 +210,7 @@ ErroneousAPITest >> testCORSRespondWithEmptyHeadersIfOriginNotAllowed [
 	api allowCrossOriginSharingApplying: [ :cors | cors allowOnlyFrom: { 'https://google.com' asUrl } ].
 
 	response := self newClient
-		            url: self baseUrl / 'errors' asUrl;
+		            url: self baseUrl / 'errors' / '1' asUrl;
 		            headerAt: 'Origin' put: self baseUrl printString;
 		            headerAt: 'Access-Control-Request-Headers' put: 'Content-Type';
 		            options;
@@ -223,7 +223,7 @@ ErroneousAPITest >> testCORSRespondWithEmptyHeadersIfOriginNotAllowed [
 		should: [ response headers at: 'Access-Control-Allow-Methods' ] raise: KeyNotFound.
 
 	response := self newClient
-		            url: self baseUrl / 'errors' asUrl;
+		            url: self baseUrl / 'errors' / '1' asUrl;
 		            headerAt: 'Origin' put: self baseUrl printString;
 		            enforceHttpSuccess: false;
 		            get;

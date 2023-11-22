@@ -13,9 +13,9 @@ Class {
 ErroneousRESTfulController >> declareGetErroneousRoute [
 
 	^ RouteSpecification
-		handling: #GET
-		at: self endpoint
-		evaluating: [ :httpRequest :requestContext | Error signal: 'Server error' ]
+		  handling: #GET
+		  at: self identifierTemplate
+		  evaluating: [ :httpRequest :requestContext | Error signal: 'Server error' ]
 ]
 
 { #category : 'initialization' }
