@@ -2,23 +2,25 @@
 I'm a toy abstraction used just as an example
 "
 Class {
-	#name : #Pet,
-	#superclass : #Object,
+	#name : 'Pet',
+	#superclass : 'Object',
 	#instVars : [
 		'name',
 		'type',
 		'status'
 	],
-	#category : #'Stargate-Examples-PetStore'
+	#category : 'Stargate-Examples-PetStore',
+	#package : 'Stargate-Examples',
+	#tag : 'PetStore'
 }
 
-{ #category : #'instance creation' }
+{ #category : 'instance creation' }
 Pet class >> named: aName ofType: aPetType [
 
 	^ self named: aName ofType: aPetType withStatus: 'new'
 ]
 
-{ #category : #'instance creation' }
+{ #category : 'instance creation' }
 Pet class >> named: aName ofType: aPetType withStatus: status [
 
 	AssertionChecker
@@ -29,7 +31,7 @@ Pet class >> named: aName ofType: aPetType withStatus: status [
 	^ self new initializeNamed: aName ofType: aPetType withStatus: status
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 Pet >> initializeNamed: aName ofType: aPetType withStatus: aStatus [
 
 	name := aName.
@@ -37,17 +39,17 @@ Pet >> initializeNamed: aName ofType: aPetType withStatus: aStatus [
 	status := aStatus
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 Pet >> name [
 	^ name
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 Pet >> status [
 	^ status
 ]
 
-{ #category : #updating }
+{ #category : 'updating' }
 Pet >> synchronizeWith: aPet [
 
 	name := aPet name.
@@ -55,7 +57,7 @@ Pet >> synchronizeWith: aPet [
 	status := aPet status
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 Pet >> type [
 	^ type
 ]

@@ -1,13 +1,15 @@
 Class {
-	#name : #CrossOriginResourceSharingHandler,
-	#superclass : #Object,
+	#name : 'CrossOriginResourceSharingHandler',
+	#superclass : 'Object',
 	#classVars : [
 		'Headers'
 	],
-	#category : #'Stargate-Model-CORS'
+	#category : 'Stargate-Model-CORS',
+	#package : 'Stargate-Model',
+	#tag : 'CORS'
 }
 
-{ #category : #'class initialization' }
+{ #category : 'class initialization' }
 CrossOriginResourceSharingHandler class >> initialize [
 
 	<ignoreForCoverage>
@@ -28,19 +30,19 @@ CrossOriginResourceSharingHandler class >> initialize [
 		to: 'Access-Control-Expose-Headers'
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 CrossOriginResourceSharingHandler >> headerNames [
 
 	^ Headers
 ]
 
-{ #category : #'private - evaluating' }
+{ #category : 'private - evaluating' }
 CrossOriginResourceSharingHandler >> set: anOrigin asAllowOriginOn: aResponse [
 	
 	aResponse headers at: self headerNames >> #accessControlAllowOrigin put: anOrigin asString
 ]
 
-{ #category : #'private - evaluating' }
+{ #category : 'private - evaluating' }
 CrossOriginResourceSharingHandler >> setAnyOriginAllowedOn: aResponse [
 	
 	aResponse headers at: self headerNames >> #accessControlAllowOrigin put: '*'

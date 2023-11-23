@@ -2,23 +2,25 @@
 I'm a before filter handler for the preflight request.
 "
 Class {
-	#name : #CrossOriginResourceSharingPreflightHandler,
-	#superclass : #CrossOriginResourceSharingHandler,
+	#name : 'CrossOriginResourceSharingPreflightHandler',
+	#superclass : 'CrossOriginResourceSharingHandler',
 	#instVars : [
 		'allowOriginPolicy',
 		'allowedMethodsByRoute',
 		'optionalHeaderCommands'
 	],
-	#category : #'Stargate-Model-CORS'
+	#category : 'Stargate-Model-CORS',
+	#package : 'Stargate-Model',
+	#tag : 'CORS'
 }
 
-{ #category : #'instance creation' }
+{ #category : 'instance creation' }
 CrossOriginResourceSharingPreflightHandler class >> allowing: anAllowOriginPolicy accessTo: allowMethods applying: headersCommands [
 
 	^ self new initializeAllowing: anAllowOriginPolicy accessTo: allowMethods applying: headersCommands
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 CrossOriginResourceSharingPreflightHandler >> initializeAllowing: anAllowOriginPolicy accessTo: methods applying: aCommandCollection [ 
 
 	allowOriginPolicy := anAllowOriginPolicy.
@@ -26,7 +28,7 @@ CrossOriginResourceSharingPreflightHandler >> initializeAllowing: anAllowOriginP
 	optionalHeaderCommands := aCommandCollection.
 ]
 
-{ #category : #'private - evaluating' }
+{ #category : 'private - evaluating' }
 CrossOriginResourceSharingPreflightHandler >> setAllowedHeadersOn: aResponse from: aRequest [
 
 	aRequest headers
@@ -41,7 +43,7 @@ CrossOriginResourceSharingPreflightHandler >> setAllowedHeadersOn: aResponse fro
 			]
 ]
 
-{ #category : #'private - evaluating' }
+{ #category : 'private - evaluating' }
 CrossOriginResourceSharingPreflightHandler >> setAllowedMethodsOn: aResponse from: allowedMethods [
 
 	allowedMethods
@@ -49,19 +51,19 @@ CrossOriginResourceSharingPreflightHandler >> setAllowedMethodsOn: aResponse fro
 			[ :method | aResponse headers at: self headerNames >> #accessControlAllowMethods addSeparatedWithComma: method ]
 ]
 
-{ #category : #'private - evaluating' }
+{ #category : 'private - evaluating' }
 CrossOriginResourceSharingPreflightHandler >> setAllowedOriginOn: aResponse from: aRequest [ 
 	
 	allowOriginPolicy applyOn: aResponse for: aRequest using: self
 ]
 
-{ #category : #'private - evaluating' }
+{ #category : 'private - evaluating' }
 CrossOriginResourceSharingPreflightHandler >> setOptionalHeadersOn: aResponse [
 
 	optionalHeaderCommands do: [ :command | command value: aResponse headers value: self headerNames ]
 ]
 
-{ #category : #evaluating }
+{ #category : 'evaluating' }
 CrossOriginResourceSharingPreflightHandler >> teaEvalActionOnRequest: aRequest [
 
 	| response |
@@ -78,7 +80,7 @@ CrossOriginResourceSharingPreflightHandler >> teaEvalActionOnRequest: aRequest [
 			]
 ]
 
-{ #category : #evaluating }
+{ #category : 'evaluating' }
 CrossOriginResourceSharingPreflightHandler >> withAllowedMethodsFor: aUrl do: aBlock [
 
 	allowedMethodsByRoute keys

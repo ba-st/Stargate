@@ -1,40 +1,42 @@
 Class {
-	#name : #InMemoryPetRepository,
-	#superclass : #Object,
+	#name : 'InMemoryPetRepository',
+	#superclass : 'Object',
 	#instVars : [
 		'pets',
 		'petById',
 		'updateTimestamps',
 		'nextId'
 	],
-	#category : #'Stargate-Examples-PetStore'
+	#category : 'Stargate-Examples-PetStore',
+	#package : 'Stargate-Examples',
+	#tag : 'PetStore'
 }
 
-{ #category : #querying }
+{ #category : 'querying' }
 InMemoryPetRepository >> count [
 
 	^ pets size
 ]
 
-{ #category : #querying }
+{ #category : 'querying' }
 InMemoryPetRepository >> findAll [
 
 	^ pets
 ]
 
-{ #category : #querying }
+{ #category : 'querying' }
 InMemoryPetRepository >> findIdentifiedBy: anId [
 
 	^ petById at: anId ifAbsent: [ ObjectNotFound signal ]
 ]
 
-{ #category : #'private - repository' }
+{ #category : 'private - repository' }
 InMemoryPetRepository >> identifierOf: aPet [
 
 	^ petById keyAtValue: aPet
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 InMemoryPetRepository >> initialize [
 
 	super initialize.
@@ -44,19 +46,19 @@ InMemoryPetRepository >> initialize [
 	nextId := 1
 ]
 
-{ #category : #'private - repository' }
+{ #category : 'private - repository' }
 InMemoryPetRepository >> lastModificationOf: aPet [
 
 	^ updateTimestamps at: (self identifierOf: aPet)
 ]
 
-{ #category : #management }
+{ #category : 'management' }
 InMemoryPetRepository >> purge: aPet [
 
 	pets remove: aPet
 ]
 
-{ #category : #'private - repository' }
+{ #category : 'private - repository' }
 InMemoryPetRepository >> recordIdAndUpdateTimestampFor: newPet [
 
 	petById at: nextId put: newPet.
@@ -65,7 +67,7 @@ InMemoryPetRepository >> recordIdAndUpdateTimestampFor: newPet [
 	updateTimestamps at: nextId put: 1
 ]
 
-{ #category : #management }
+{ #category : 'management' }
 InMemoryPetRepository >> store: aPet [
 
 	pets add: aPet.
@@ -74,7 +76,7 @@ InMemoryPetRepository >> store: aPet [
 	^ aPet
 ]
 
-{ #category : #management }
+{ #category : 'management' }
 InMemoryPetRepository >> update: pet with: updatedPet [
 
 	pet synchronizeWith: updatedPet.

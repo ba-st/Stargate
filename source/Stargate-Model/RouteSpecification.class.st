@@ -3,30 +3,32 @@ I'm an spec for a route.
 I provide a URL template, an HTTP method and a handler to invoke for this route.
 "
 Class {
-	#name : #RouteSpecification,
-	#superclass : #Object,
+	#name : 'RouteSpecification',
+	#superclass : 'Object',
 	#instVars : [
 		'httpMethod',
 		'handler',
 		'urlTemplate'
 	],
-	#category : #'Stargate-Model-Routing'
+	#category : 'Stargate-Model-Routing',
+	#package : 'Stargate-Model',
+	#tag : 'Routing'
 }
 
-{ #category : #'instance creation' }
+{ #category : 'instance creation' }
 RouteSpecification class >> handling: anHttpMethod at: anUrlTemplate evaluating: aBlock [
 
 	^ self new initializeHandling: anHttpMethod at: anUrlTemplate evaluating: aBlock
 ]
 
-{ #category : #converting }
+{ #category : 'converting' }
 RouteSpecification >> asRequestMatcher [
 
 	^ TeaRequestMatcher method: ( TeaMethodMatcher exactly: httpMethod asSymbol )
 		  url: urlTemplate asTeaUrlPattern
 ]
 
-{ #category : #configuring }
+{ #category : 'configuring' }
 RouteSpecification >> authenticatedBy: anAuthorizationFilter [
 
 	^ self class
@@ -38,25 +40,25 @@ RouteSpecification >> authenticatedBy: anAuthorizationFilter [
 			]
 ]
 
-{ #category : #configuring }
+{ #category : 'configuring' }
 RouteSpecification >> configureUsing: aRouteConfigurator [ 
 
 	aRouteConfigurator configureRouteFrom: self  
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 RouteSpecification >> handler [
 
 	^ handler
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 RouteSpecification >> httpMethod [
 
 	^ httpMethod
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 RouteSpecification >> initializeHandling: anHttpMethod at: anURLTemplate evaluating: aBlock [
 
 	httpMethod := anHttpMethod.
@@ -67,7 +69,7 @@ RouteSpecification >> initializeHandling: anHttpMethod at: anURLTemplate evaluat
 	]
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 RouteSpecification >> urlTemplate [
 
 	^ urlTemplate

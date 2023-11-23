@@ -2,15 +2,17 @@
 I represent a RESTful handler supporting hypermedia driven controllers.
 "
 Class {
-	#name : #HypermediaDrivenRESTfulRequestHandler,
-	#superclass : #RESTfulRequestHandlerBehavior,
+	#name : 'HypermediaDrivenRESTfulRequestHandler',
+	#superclass : 'RESTfulRequestHandlerBehavior',
 	#instVars : [
 		'mediaControlsFactory'
 	],
-	#category : #'Stargate-Model-HATEOAS'
+	#category : 'Stargate-Model-HATEOAS',
+	#package : 'Stargate-Model',
+	#tag : 'HATEOAS'
 }
 
-{ #category : #'instance creation' }
+{ #category : 'instance creation' }
 HypermediaDrivenRESTfulRequestHandler class >> resourceLocator: aResouceLocator paginationPolicy: aPaginationPolicy decodingRules: theDecodingRules encodingRules: theEncodingRules calculateEntityTagsWith: entityTagCalculator cachingDirectives: theCachingDirectives allowedLanguageTags: allowedLanguageTags drivenBy: aMediaControlsFactory handleErrorsWith: anExceptionHandler [
 
 	^ self new
@@ -25,14 +27,14 @@ HypermediaDrivenRESTfulRequestHandler class >> resourceLocator: aResouceLocator 
 		handleErrorsWith: anExceptionHandler
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 HypermediaDrivenRESTfulRequestHandler >> encodeResource: resource as: mediaType within: requestContext [
 
 	self holdResource: resource controlsWithin: requestContext.
 	^ super encodeResource: resource as: mediaType within: requestContext
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 HypermediaDrivenRESTfulRequestHandler >> encodeResourceCollection: resourceCollection basedOn: httpRequest within: requestContext [
 
 	requestContext
@@ -48,7 +50,7 @@ HypermediaDrivenRESTfulRequestHandler >> encodeResourceCollection: resourceColle
 		within: requestContext
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 HypermediaDrivenRESTfulRequestHandler >> holdResource: resource controlsWithin: requestContext [
 
 	requestContext
@@ -56,7 +58,7 @@ HypermediaDrivenRESTfulRequestHandler >> holdResource: resource controlsWithin: 
 		for: resource
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 HypermediaDrivenRESTfulRequestHandler >> initializeResourceLocator: aResouceLocator
 	paginationPolicy: aPaginationPolicy
 	decodingRules: theDecodingRules
@@ -81,7 +83,7 @@ HypermediaDrivenRESTfulRequestHandler >> initializeResourceLocator: aResouceLoca
 	mediaControlsFactory := aMediaControlsFactory
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 HypermediaDrivenRESTfulRequestHandler >> mediaControlsFor: resource within: requestContext [
 
 	^ mediaControlsFactory

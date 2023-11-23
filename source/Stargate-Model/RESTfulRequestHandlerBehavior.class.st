@@ -3,8 +3,8 @@ I represent a RESTful handler, and provide the base support to easily create spe
 I provide the standard machinery to handle REST requests, and I'm supposed to be used from a controller.
 "
 Class {
-	#name : #RESTfulRequestHandlerBehavior,
-	#superclass : #Object,
+	#name : 'RESTfulRequestHandlerBehavior',
+	#superclass : 'Object',
 	#instVars : [
 		'paginationPolicy',
 		'decodingRules',
@@ -14,24 +14,26 @@ Class {
 		'acceptNegotiator',
 		'cachingDirectives'
 	],
-	#category : #'Stargate-Model-Controllers'
+	#category : 'Stargate-Model-Controllers',
+	#package : 'Stargate-Model',
+	#tag : 'Controllers'
 }
 
-{ #category : #private }
+{ #category : 'private' }
 RESTfulRequestHandlerBehavior >> applyCachingDirectivesFor: aResource to: response within: requestContext [
 
 	cachingDirectives
 		do: [ :directive | directive cull: response cull: requestContext cull: aResource ]
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 RESTfulRequestHandlerBehavior >> assert: etag matchesEntityTagOf: entity encodedAs: mediaType within: requestContext [
 
 	etag = ( self entityTagOf: entity encodedAs: mediaType within: requestContext )
 		ifFalse: [ HTTPClientError preconditionFailed signal ]
 ]
 
-{ #category : #'decoding/encoding' }
+{ #category : 'decoding/encoding' }
 RESTfulRequestHandlerBehavior >> decode: httpRequest within: requestContext [
 
 	| decodingRule |
@@ -44,7 +46,7 @@ RESTfulRequestHandlerBehavior >> decode: httpRequest within: requestContext [
 		handleDecodingFailedDuring: [ decodingRule cull: httpRequest contents cull: requestContext ]
 ]
 
-{ #category : #'decoding/encoding' }
+{ #category : 'decoding/encoding' }
 RESTfulRequestHandlerBehavior >> encode: resource as: targetMediaType within: requestContext [
 
 	| encodingRule |
@@ -55,7 +57,7 @@ RESTfulRequestHandlerBehavior >> encode: resource as: targetMediaType within: re
 	^ encodingRule encode: resource within: requestContext
 ]
 
-{ #category : #'decoding/encoding' }
+{ #category : 'decoding/encoding' }
 RESTfulRequestHandlerBehavior >> encode: resource within: requestContext [
 
 	^ self
@@ -64,13 +66,13 @@ RESTfulRequestHandlerBehavior >> encode: resource within: requestContext [
 		  within: requestContext
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 RESTfulRequestHandlerBehavior >> encodeResource: resource as: mediaType within: requestContext [
 
 	^ self encode: resource as: mediaType within: requestContext
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 RESTfulRequestHandlerBehavior >> encodeResource: resource within: requestContext [
 
 	^ self
@@ -79,19 +81,19 @@ RESTfulRequestHandlerBehavior >> encodeResource: resource within: requestContext
 		  within: requestContext
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 RESTfulRequestHandlerBehavior >> encodeResourceCollection: resourceCollection basedOn: httpRequest within: requestContext [
 
 	^ self encode: resourceCollection within: requestContext
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 RESTfulRequestHandlerBehavior >> endpoint [
 
 	^ resourceLocator endpoint
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 RESTfulRequestHandlerBehavior >> entityTagOf: resource encodedAs: mediaType within: requestContext [
 
 	^ EntityTag with: (entityTagCalculator
@@ -101,7 +103,7 @@ RESTfulRequestHandlerBehavior >> entityTagOf: resource encodedAs: mediaType with
 			   value: self)
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 RESTfulRequestHandlerBehavior >> entityTagToMatchBasedOn: httpRequest [
 
 	^ (httpRequest headers at: 'If-Match' ifAbsent: [ 
@@ -109,19 +111,19 @@ RESTfulRequestHandlerBehavior >> entityTagToMatchBasedOn: httpRequest [
 			   'Missing If-Match header.' ]) asEntityTag
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 RESTfulRequestHandlerBehavior >> evaluateCollectionQuery: aQueryEvaluationBlock [
 
 	^ self exceptionHandler handleMissingQueryParametersDuring: aQueryEvaluationBlock
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 RESTfulRequestHandlerBehavior >> exceptionHandler [
 
 	^ resourceLocator exceptionHandler
 ]
 
-{ #category : #API }
+{ #category : 'API' }
 RESTfulRequestHandlerBehavior >> from: httpRequest within: requestContext get: aQueryEvaluationBlock [
 
 	| resource response |
@@ -153,7 +155,7 @@ RESTfulRequestHandlerBehavior >> from: httpRequest within: requestContext get: a
 	^ response
 ]
 
-{ #category : #API }
+{ #category : 'API' }
 RESTfulRequestHandlerBehavior >> from: httpRequest within: requestContext get: aQueryEvaluationBlock thenDo: actionBlock [
 
 	| resource |
@@ -165,7 +167,7 @@ RESTfulRequestHandlerBehavior >> from: httpRequest within: requestContext get: a
 	^ ZnResponse noContent
 ]
 
-{ #category : #API }
+{ #category : 'API' }
 RESTfulRequestHandlerBehavior >> from: httpRequest within: requestContext get: findBlock thenUpdateWith: updateBlock [
 
 	| etag |
@@ -193,7 +195,7 @@ RESTfulRequestHandlerBehavior >> from: httpRequest within: requestContext get: f
 		  ]
 ]
 
-{ #category : #API }
+{ #category : 'API' }
 RESTfulRequestHandlerBehavior >> from: httpRequest within: requestContext getCollection: aQueryEvaluationBlock [
 
 	| resourceCollection encodedResourceCollection response |
@@ -213,7 +215,7 @@ RESTfulRequestHandlerBehavior >> from: httpRequest within: requestContext getCol
 	^ response
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 RESTfulRequestHandlerBehavior >> holdTargetMediaTypeAndLanguageFrom: httpRequest within: requestContext [
 
 	httpRequest hasLanguageProrityList
@@ -222,7 +224,7 @@ RESTfulRequestHandlerBehavior >> holdTargetMediaTypeAndLanguageFrom: httpRequest
 	^ requestContext targetMediaType: ( acceptNegotiator bestRepresentationFor: httpRequest )
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 RESTfulRequestHandlerBehavior >> ifNoneMatchHeaderPresentIn: httpRequest do: aMonadycBlock [
 
 	httpRequest headers
@@ -231,7 +233,7 @@ RESTfulRequestHandlerBehavior >> ifNoneMatchHeaderPresentIn: httpRequest do: aMo
 			aMonadycBlock value: ifNoneMatchHeader asEntityTag ]
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 RESTfulRequestHandlerBehavior >> initializeResourceLocator: aResouceLocator
 	paginationPolicy: aPaginationPolicy
 	decodingRules: theDecodingRules
@@ -251,19 +253,19 @@ RESTfulRequestHandlerBehavior >> initializeResourceLocator: aResouceLocator
 	cachingDirectives := theCachingDirectives
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 RESTfulRequestHandlerBehavior >> locationOf: resource within: requestContext [
 
 	^ resourceLocator locationOf: resource within: requestContext
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 RESTfulRequestHandlerBehavior >> paginationPolicy [
 
 	^ paginationPolicy
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 RESTfulRequestHandlerBehavior >> putEntityTagOf: resource in: response within: requestContext [
 
 	response
@@ -271,7 +273,7 @@ RESTfulRequestHandlerBehavior >> putEntityTagOf: resource in: response within: r
 		addToVary: 'Accept'
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 RESTfulRequestHandlerBehavior >> putLanguageContentTagIn: response within: requestContext [
 
 	requestContext
@@ -282,7 +284,7 @@ RESTfulRequestHandlerBehavior >> putLanguageContentTagIn: response within: reque
 			]
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 RESTfulRequestHandlerBehavior >> resourceCreationPolicyBasedOn: httpRequest within: requestContext [
 
 	^ httpRequest
@@ -293,19 +295,19 @@ RESTfulRequestHandlerBehavior >> resourceCreationPolicyBasedOn: httpRequest with
 		  ifAbsent: [ RESTfulControllerDoNotRespondCreatedEntityPolicy for: self ]
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 RESTfulRequestHandlerBehavior >> resourceLocator [
 
 	^ resourceLocator
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 RESTfulRequestHandlerBehavior >> serverUrl: aServerUrl [
 
 	resourceLocator baseUrl: aServerUrl
 ]
 
-{ #category : #API }
+{ #category : 'API' }
 RESTfulRequestHandlerBehavior >> withRepresentationIn: httpRequest within: requestContext createResourceWith: aCreationBlock thenDo: aBlock [
 
 	^ self
@@ -317,7 +319,7 @@ RESTfulRequestHandlerBehavior >> withRepresentationIn: httpRequest within: reque
 			]
 ]
 
-{ #category : #API }
+{ #category : 'API' }
 RESTfulRequestHandlerBehavior >> withResourceCreatedFrom: httpRequest within: requestContext do: aBlock [
 
 	| creationPolicy decodedRepresentation newResource |

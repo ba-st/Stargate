@@ -2,28 +2,30 @@
 I'm the policy indicating a RESTful controller to support pagination of collections related to the controlled resource.
 "
 Class {
-	#name : #RESTfulControllerPaginateCollectionsPolicy,
-	#superclass : #RESTfulControllerPaginationPolicy,
+	#name : 'RESTfulControllerPaginateCollectionsPolicy',
+	#superclass : 'RESTfulControllerPaginationPolicy',
 	#instVars : [
 		'defaultLimit',
 		'requestHandler'
 	],
-	#category : #'Stargate-Model-Pagination'
+	#category : 'Stargate-Model-Pagination',
+	#package : 'Stargate-Model',
+	#tag : 'Pagination'
 }
 
-{ #category : #'instance creation' }
+{ #category : 'instance creation' }
 RESTfulControllerPaginateCollectionsPolicy class >> for: aRequestHandler with: aPaginationLimit [
 
 	^ self new initializeFor: aRequestHandler with: aPaginationLimit
 ]
 
-{ #category : #applying }
+{ #category : 'applying' }
 RESTfulControllerPaginateCollectionsPolicy >> addPaginationControlsTo: mediaControls within: requestContext [
 
 	^ mediaControls , requestContext paginationControls
 ]
 
-{ #category : #applying }
+{ #category : 'applying' }
 RESTfulControllerPaginateCollectionsPolicy >> affect: response within: requestContext [
 
 	requestContext paginationControls do: [ :assoc | 
@@ -33,7 +35,7 @@ RESTfulControllerPaginateCollectionsPolicy >> affect: response within: requestCo
 		]
 ]
 
-{ #category : #applying }
+{ #category : 'applying' }
 RESTfulControllerPaginateCollectionsPolicy >> evaluateQuery: aQueryEvaluationBlock basedOn: httpRequest [
 
 	| pagination |
@@ -44,14 +46,14 @@ RESTfulControllerPaginateCollectionsPolicy >> evaluateQuery: aQueryEvaluationBlo
 	^ requestHandler evaluateCollectionQuery: [ aQueryEvaluationBlock cull: pagination ]
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 RESTfulControllerPaginateCollectionsPolicy >> initializeFor: aRequestHandler with: aPaginationLimit [
 
 	requestHandler := aRequestHandler.
 	defaultLimit := aPaginationLimit
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 RESTfulControllerPaginateCollectionsPolicy >> paginationFrom: httpRequest [
 
 	^ PaginationSpecification

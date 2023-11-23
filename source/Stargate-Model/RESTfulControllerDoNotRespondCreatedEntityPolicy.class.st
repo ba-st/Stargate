@@ -2,27 +2,29 @@
 I'm a policy configuring a controller in such a way that responses for creation requests will not respond immediately with a representation of the created resource.
 "
 Class {
-	#name : #RESTfulControllerDoNotRespondCreatedEntityPolicy,
-	#superclass : #RESTfulControllerResourceCreationPolicy,
+	#name : 'RESTfulControllerDoNotRespondCreatedEntityPolicy',
+	#superclass : 'RESTfulControllerResourceCreationPolicy',
 	#instVars : [
 		'requestHandler'
 	],
-	#category : #'Stargate-Model-Controllers'
+	#category : 'Stargate-Model-Controllers',
+	#package : 'Stargate-Model',
+	#tag : 'Controllers'
 }
 
-{ #category : #'instance creation' }
+{ #category : 'instance creation' }
 RESTfulControllerDoNotRespondCreatedEntityPolicy class >> for: aRequestHandler [
 
 	^ self new initializeFor: aRequestHandler
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 RESTfulControllerDoNotRespondCreatedEntityPolicy >> initializeFor: aRequestHandler [
 
 	requestHandler := aRequestHandler
 ]
 
-{ #category : #processing }
+{ #category : 'processing' }
 RESTfulControllerDoNotRespondCreatedEntityPolicy >> responseFor: resource basedOn: httpRequest within: requestContext [
 
 	^ ZnResponse created: ( requestHandler locationOf: resource within: requestContext )

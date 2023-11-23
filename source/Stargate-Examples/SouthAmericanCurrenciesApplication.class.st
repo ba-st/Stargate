@@ -1,35 +1,37 @@
 Class {
-	#name : #SouthAmericanCurrenciesApplication,
-	#superclass : #StargateApplication,
-	#category : #'Stargate-Examples'
+	#name : 'SouthAmericanCurrenciesApplication',
+	#superclass : 'StargateApplication',
+	#category : 'Stargate-Examples-Currencies',
+	#package : 'Stargate-Examples',
+	#tag : 'Currencies'
 }
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 SouthAmericanCurrenciesApplication class >> commandName [
 
 	^ 'currencies'
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 SouthAmericanCurrenciesApplication class >> description [
 
 	^'API for South american currencies'
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 SouthAmericanCurrenciesApplication class >> initialize [
 
 	<ignoreForCoverage>
 	self initializeVersion
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 SouthAmericanCurrenciesApplication class >> projectName [
 
 	^ 'Stargate'
 ]
 
-{ #category : #'private - accessing' }
+{ #category : 'private - accessing' }
 SouthAmericanCurrenciesApplication >> controllersToInstall [
 
 	^ Array with: SouthAmericanCurrenciesRESTfulController new

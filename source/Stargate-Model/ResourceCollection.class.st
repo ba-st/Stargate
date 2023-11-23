@@ -5,27 +5,29 @@ I'm used internally in Hypermedia driven controllers to ease the media control c
 I'm not intended to be used externally.
 "
 Class {
-	#name : #ResourceCollection,
-	#superclass : #Object,
+	#name : 'ResourceCollection',
+	#superclass : 'Object',
 	#instVars : [
 		'items'
 	],
-	#category : #'Stargate-Model-HATEOAS'
+	#category : 'Stargate-Model-HATEOAS',
+	#package : 'Stargate-Model',
+	#tag : 'HATEOAS'
 }
 
-{ #category : #'instance creation' }
+{ #category : 'instance creation' }
 ResourceCollection class >> wrapping: aCollection [ 
 
 	^self new initializeWrapping: aCollection
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 ResourceCollection >> initializeWrapping: aCollection [ 
 
 	items := aCollection
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 ResourceCollection >> items [
 
 	^ items

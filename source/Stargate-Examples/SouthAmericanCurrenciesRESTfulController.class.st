@@ -5,24 +5,26 @@ I'm a example of a RESTful controller:
 - don't using hypermedia
 "
 Class {
-	#name : #SouthAmericanCurrenciesRESTfulController,
-	#superclass : #SingleResourceRESTfulController,
+	#name : 'SouthAmericanCurrenciesRESTfulController',
+	#superclass : 'SingleResourceRESTfulController',
 	#instVars : [
 		'banknotesByCurrency',
 		'banknotesRequestHandler',
 		'currenciesRequestHandler',
 		'currenciesByLanguage'
 	],
-	#category : #'Stargate-Examples-Currencies'
+	#category : 'Stargate-Examples-Currencies',
+	#package : 'Stargate-Examples',
+	#tag : 'Currencies'
 }
 
-{ #category : #private }
+{ #category : 'private' }
 SouthAmericanCurrenciesRESTfulController >> banknotesTemplate [
 
 	^ '<1s><2s>' expandMacrosWith: self identifierTemplate with: banknotesRequestHandler endpoint
 ]
 
-{ #category : #API }
+{ #category : 'API' }
 SouthAmericanCurrenciesRESTfulController >> currenciesBasedOn: httpRequest within: requestContext [
 
 	^ currenciesRequestHandler
@@ -31,7 +33,7 @@ SouthAmericanCurrenciesRESTfulController >> currenciesBasedOn: httpRequest withi
 		getCollection: [ self currenciesInLanguageAt: requestContext ]
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 SouthAmericanCurrenciesRESTfulController >> currenciesInLanguageAt: requestContext [
 
 	| targetLanguage |
@@ -42,7 +44,7 @@ SouthAmericanCurrenciesRESTfulController >> currenciesInLanguageAt: requestConte
 	^ currenciesByLanguage at: targetLanguage
 ]
 
-{ #category : #API }
+{ #category : 'API' }
 SouthAmericanCurrenciesRESTfulController >> currencyBanknotesBasedOn: httpRequest within: requestContext [
 
 	^ banknotesRequestHandler
@@ -51,7 +53,7 @@ SouthAmericanCurrenciesRESTfulController >> currencyBanknotesBasedOn: httpReques
 		getCollection: [ banknotesByCurrency at: ( self identifierIn: httpRequest ) ]
 ]
 
-{ #category : #API }
+{ #category : 'API' }
 SouthAmericanCurrenciesRESTfulController >> currencyBasedOn: httpRequest within: requestContext [
 
 	^ currenciesRequestHandler
@@ -64,19 +66,19 @@ SouthAmericanCurrenciesRESTfulController >> currencyBasedOn: httpRequest within:
 			]
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 SouthAmericanCurrenciesRESTfulController >> currencyNamed: aName symbol: aSymbol isoCode: anIsoCode [
 
 	^ StargateCurrency named: aName symbol: aSymbol isoCode: anIsoCode
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 SouthAmericanCurrenciesRESTfulController >> currencyVersion1dot0dot0MediaType [
 
 	^ self jsonMediaType: 'currency' vendoredBy: 'stargate' version: '1.0.0'
 ]
 
-{ #category : #routes }
+{ #category : 'routes' }
 SouthAmericanCurrenciesRESTfulController >> declareGetCurrenciesRoute [
 
 	^ RouteSpecification
@@ -85,7 +87,7 @@ SouthAmericanCurrenciesRESTfulController >> declareGetCurrenciesRoute [
 		evaluating: [ :httpRequest :requestContext | self currenciesBasedOn: httpRequest within: requestContext ]
 ]
 
-{ #category : #routes }
+{ #category : 'routes' }
 SouthAmericanCurrenciesRESTfulController >> declareGetCurrencyBanknotesRoute [
 
 	^ RouteSpecification
@@ -94,7 +96,7 @@ SouthAmericanCurrenciesRESTfulController >> declareGetCurrencyBanknotesRoute [
 		evaluating: [ :httpRequest :requestContext | self currencyBanknotesBasedOn: httpRequest within: requestContext ]
 ]
 
-{ #category : #routes }
+{ #category : 'routes' }
 SouthAmericanCurrenciesRESTfulController >> declareGetCurrencyRoute [
 
 	^ RouteSpecification
@@ -103,7 +105,7 @@ SouthAmericanCurrenciesRESTfulController >> declareGetCurrencyRoute [
 		evaluating: [ :httpRequest :requestContext | self currencyBasedOn: httpRequest within: requestContext ]
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 SouthAmericanCurrenciesRESTfulController >> initialize [
 
 	super initialize.
@@ -114,7 +116,7 @@ SouthAmericanCurrenciesRESTfulController >> initialize [
 		initializeBanknotesRequestHandler
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 SouthAmericanCurrenciesRESTfulController >> initializeBanknotesByCurrency [
 
 	banknotesByCurrency := Dictionary new
@@ -132,7 +134,7 @@ SouthAmericanCurrenciesRESTfulController >> initializeBanknotesByCurrency [
 		yourself
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 SouthAmericanCurrenciesRESTfulController >> initializeBanknotesRequestHandler [
 
 	banknotesRequestHandler := RESTfulRequestHandlerBuilder new
@@ -146,7 +148,7 @@ SouthAmericanCurrenciesRESTfulController >> initializeBanknotesRequestHandler [
 		build
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 SouthAmericanCurrenciesRESTfulController >> initializeCurrencies [
 
 	currenciesByLanguage := Dictionary new
@@ -183,7 +185,7 @@ SouthAmericanCurrenciesRESTfulController >> initializeCurrencies [
 		yourself
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 SouthAmericanCurrenciesRESTfulController >> initializeCurrenciesRequestHandler [
 
 	currenciesRequestHandler := RESTfulRequestHandlerBuilder new
@@ -211,13 +213,13 @@ SouthAmericanCurrenciesRESTfulController >> initializeCurrenciesRequestHandler [
 		build
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 SouthAmericanCurrenciesRESTfulController >> requestHandler [
 
 	^ currenciesRequestHandler 
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 SouthAmericanCurrenciesRESTfulController >> typeIdConstraint [
 
 	^ IsObject

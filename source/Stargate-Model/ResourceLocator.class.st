@@ -2,8 +2,8 @@
 I'm responsible for locating specific resource instances and generating location urls from them
 "
 Class {
-	#name : #ResourceLocator,
-	#superclass : #ResourceLocatorBehavior,
+	#name : 'ResourceLocator',
+	#superclass : 'ResourceLocatorBehavior',
 	#instVars : [
 		'baseUrl',
 		'endpoint',
@@ -11,16 +11,18 @@ Class {
 		'locationResolverBinding',
 		'exceptionHandler'
 	],
-	#category : #'Stargate-Model-Controllers'
+	#category : 'Stargate-Model-Controllers',
+	#package : 'Stargate-Model',
+	#tag : 'Controllers'
 }
 
-{ #category : #'instance creation' }
+{ #category : 'instance creation' }
 ResourceLocator class >> handling: aStringOrSymbol [
 
 	^ self handling: aStringOrSymbol extractingIdentifierWith: [ :httpRequest | '' ]
 ]
 
-{ #category : #'instance creation' }
+{ #category : 'instance creation' }
 ResourceLocator class >> handling: aStringOrSymbol calculatingLocationWith: aLocationResolver andIdentifierBy: aBlock [
 
 	^ self
@@ -29,7 +31,7 @@ ResourceLocator class >> handling: aStringOrSymbol calculatingLocationWith: aLoc
 		andIdentifierBy: aBlock
 ]
 
-{ #category : #'instance creation' }
+{ #category : 'instance creation' }
 ResourceLocator class >> handling: aStringOrSymbol extractingIdentifierWith: aBlock [
 
 	^ self
@@ -38,7 +40,7 @@ ResourceLocator class >> handling: aStringOrSymbol extractingIdentifierWith: aBl
 		andIdentifierBy: aBlock
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 ResourceLocator class >> handling: aStringOrSymbol resolvingLocationWith: aLocationResolverBinding andIdentifierBy: aBlock [
 
 	^ self new
@@ -47,49 +49,49 @@ ResourceLocator class >> handling: aStringOrSymbol resolvingLocationWith: aLocat
 		andIdentifierBy: aBlock
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 ResourceLocator >> baseUrl [
 
 	^ baseUrl
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 ResourceLocator >> baseUrl: aServerUrl [
 
 	baseUrl := aServerUrl asUrl
 ]
 
-{ #category : #testing }
+{ #category : 'testing' }
 ResourceLocator >> canLookupResources [
 
 	^ locationResolverBinding isDefined
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 ResourceLocator >> endpoint [
 
 	^ endpoint
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 ResourceLocator >> exceptionHandler [
 
 	^ exceptionHandler
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 ResourceLocator >> handleExceptionsWith: anExceptionHandler [
 
 	exceptionHandler := anExceptionHandler
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 ResourceLocator >> identifierLookupAction [
 
 	^ identifierLookupAction
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 ResourceLocator >> initializeHandling: aStringOrSymbol resolvingLocationWith: aLocationResolverBinding andIdentifierBy: aBlock [
 
 	baseUrl := '' asUrl.
@@ -99,7 +101,7 @@ ResourceLocator >> initializeHandling: aStringOrSymbol resolvingLocationWith: aL
 	exceptionHandler := RESTfulRequestExceptionHandler new
 ]
 
-{ #category : #querying }
+{ #category : 'querying' }
 ResourceLocator >> locationOf: resource within: requestContext [
 
 	^ self baseUrl / endpoint asUrl

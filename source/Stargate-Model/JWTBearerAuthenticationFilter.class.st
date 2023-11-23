@@ -2,16 +2,18 @@
 I'm an authentication filter using Bearer tokens in JWT format
 "
 Class {
-	#name : #JWTBearerAuthenticationFilter,
-	#superclass : #AuthenticationFilter,
+	#name : 'JWTBearerAuthenticationFilter',
+	#superclass : 'AuthenticationFilter',
 	#instVars : [
 		'key',
 		'algorithm'
 	],
-	#category : #'Stargate-Model-Auth'
+	#category : 'Stargate-Model-Auth',
+	#package : 'Stargate-Model',
+	#tag : 'Auth'
 }
 
-{ #category : #private }
+{ #category : 'private' }
 JWTBearerAuthenticationFilter class >> canHandle: configuration [
 
 	| schema algorithm |
@@ -22,7 +24,7 @@ JWTBearerAuthenticationFilter class >> canHandle: configuration [
 			  JsonWebAlgorithm supportsAlgorithmNamed: algorithm ] ]
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 JWTBearerAuthenticationFilter class >> configuredBy: configuration [
 
 	^ self
@@ -30,19 +32,19 @@ JWTBearerAuthenticationFilter class >> configuredBy: configuration [
 		forAlgorithmNamed: ( configuration at: #authAlgorithm )
 ]
 
-{ #category : #'instance creation' }
+{ #category : 'instance creation' }
 JWTBearerAuthenticationFilter class >> with: aKey forAlgorithmNamed: anAlgorithmName [
 
 	^ self new initializeWith: aKey forAlgorithm: ( JsonWebAlgorithm named: anAlgorithmName )
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 JWTBearerAuthenticationFilter >> authChallenge [
 
 	^ 'Bearer'
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 JWTBearerAuthenticationFilter >> checkCredentials: authorization for: httpRequest within: requestContext ifInvalid: aBlock [
 
 	| tokenString |
@@ -61,7 +63,7 @@ JWTBearerAuthenticationFilter >> checkCredentials: authorization for: httpReques
 		do: [ :error | error return: aBlock value ]
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 JWTBearerAuthenticationFilter >> initializeWith: aKey forAlgorithm: anAlgorithm [
 
 	key := aKey .

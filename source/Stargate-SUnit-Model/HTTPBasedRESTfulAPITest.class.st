@@ -2,46 +2,53 @@
 A HTTPBasedRESTfulAPITest is a test class for testing the behavior of HTTPBasedRESTfulAPI
 "
 Class {
-	#name : #HTTPBasedRESTfulAPITest,
-	#superclass : #TestCase,
+	#name : 'HTTPBasedRESTfulAPITest',
+	#superclass : 'TestCase',
 	#instVars : [
 		'api',
 		'port'
 	],
-	#category : #'Stargate-SUnit-Model'
+	#category : 'Stargate-SUnit-Model',
+	#package : 'Stargate-SUnit-Model'
 }
 
-{ #category : #testing }
+{ #category : 'testing' }
 HTTPBasedRESTfulAPITest class >> isAbstract [
 
 	^ self name = #HTTPBasedRESTfulAPITest
 ]
 
-{ #category : #running }
+{ #category : 'running' }
 HTTPBasedRESTfulAPITest >> algorithmName [
 
 	^ 'HS256'
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 HTTPBasedRESTfulAPITest >> baseUrl [
 
 	^ 'http://localhost' asUrl port: self port
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 HTTPBasedRESTfulAPITest >> claimSet [
 
 	^ JWTClaimsSet new
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 HTTPBasedRESTfulAPITest >> controllersToInstall [
 
 	^ self subclassResponsibility
 ]
 
-{ #category : #private }
+{ #category : 'running' }
+HTTPBasedRESTfulAPITest >> globalErrorHandler [
+
+	^ [ :error :request | self fail ]
+]
+
+{ #category : 'private' }
 HTTPBasedRESTfulAPITest >> newClient [
 
 	^ ZnClient new
@@ -50,13 +57,13 @@ HTTPBasedRESTfulAPITest >> newClient [
 		yourself
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 HTTPBasedRESTfulAPITest >> newJWTAuthorizedClient [
 
 	^ self newJWTAuthorizedClientClaiming: self claimSet
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 HTTPBasedRESTfulAPITest >> newJWTAuthorizedClientClaiming: aClaimSet [
 
 	| client jws |
@@ -71,7 +78,7 @@ HTTPBasedRESTfulAPITest >> newJWTAuthorizedClientClaiming: aClaimSet [
 	^ client
 ]
 
-{ #category : #running }
+{ #category : 'running' }
 HTTPBasedRESTfulAPITest >> operationsConfiguration [
 
 	^ Dictionary new
@@ -81,19 +88,19 @@ HTTPBasedRESTfulAPITest >> operationsConfiguration [
 		yourself
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 HTTPBasedRESTfulAPITest >> port [
 
 	^ port
 ]
 
-{ #category : #running }
+{ #category : 'running' }
 HTTPBasedRESTfulAPITest >> secret [
 
 	^ 'secret'
 ]
 
-{ #category : #running }
+{ #category : 'running' }
 HTTPBasedRESTfulAPITest >> setUp [
 
 	super setUp.
@@ -104,20 +111,20 @@ HTTPBasedRESTfulAPITest >> setUp [
 		start
 ]
 
-{ #category : #running }
+{ #category : 'running' }
 HTTPBasedRESTfulAPITest >> setUpAPI [
 
 	api := HTTPBasedRESTfulAPI
-		       configuredBy: { 
+		       configuredBy: {
 				       ( #port -> self port ).
 				       ( #serverUrl -> self baseUrl ).
 				       ( #operations -> self operationsConfiguration ) }
 		       installing: self controllersToInstall.
 
-	api on: Error addErrorHandler: [ :error :request | self fail ]
+	api on: Error addErrorHandler: self globalErrorHandler
 ]
 
-{ #category : #running }
+{ #category : 'running' }
 HTTPBasedRESTfulAPITest >> tearDown [
 
 	api ifNotNil: [ api stop ].
@@ -125,7 +132,7 @@ HTTPBasedRESTfulAPITest >> tearDown [
 	super tearDown
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 HTTPBasedRESTfulAPITest >> withJsonFromContentsIn: httpResponse do: aBlock [
 
 	aBlock value: (NeoJSONObject fromString: httpResponse contents)

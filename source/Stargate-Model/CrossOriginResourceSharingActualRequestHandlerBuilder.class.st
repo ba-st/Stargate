@@ -2,42 +2,44 @@
 I'm a builder for CrossOriginResourceSharingActualRequestHandler instances.
 "
 Class {
-	#name : #CrossOriginResourceSharingActualRequestHandlerBuilder,
-	#superclass : #CrossOriginResourceSharingRequestHandlerBuilder,
+	#name : 'CrossOriginResourceSharingActualRequestHandlerBuilder',
+	#superclass : 'CrossOriginResourceSharingRequestHandlerBuilder',
 	#instVars : [
 		'allowOriginPolicyBinding',
 		'addHeaderCommands'
 	],
-	#category : #'Stargate-Model-CORS'
+	#category : 'Stargate-Model-CORS',
+	#package : 'Stargate-Model',
+	#tag : 'CORS'
 }
 
-{ #category : #configuring }
+{ #category : 'configuring' }
 CrossOriginResourceSharingActualRequestHandlerBuilder >> allowAnyOrigin [
 	
 	allowOriginPolicyBinding := Binding to: AllowAnyOriginPolicy new.
 	
 ]
 
-{ #category : #configuring }
+{ #category : 'configuring' }
 CrossOriginResourceSharingActualRequestHandlerBuilder >> allowCredentials [
 
 	addHeaderCommands
 		add: [ :headers :headerNames | headers at: headerNames >> #accessControlAllowCredentials put: true asString ]
 ]
 
-{ #category : #configuring }
+{ #category : 'configuring' }
 CrossOriginResourceSharingActualRequestHandlerBuilder >> allowOnlyFrom: origins [
 
 	allowOriginPolicyBinding := Binding to: ( AllowSpecifiedOriginsPolicy onlyFrom: origins )
 ]
 
-{ #category : #building }
+{ #category : 'building' }
 CrossOriginResourceSharingActualRequestHandlerBuilder >> build [
 
 	^ CrossOriginResourceSharingActualRequestHandler allowing: allowOriginPolicyBinding content applying: addHeaderCommands
 ]
 
-{ #category : #configuring }
+{ #category : 'configuring' }
 CrossOriginResourceSharingActualRequestHandlerBuilder >> expose: exposedHeaders [
 
 	addHeaderCommands
@@ -48,7 +50,7 @@ CrossOriginResourceSharingActualRequestHandlerBuilder >> expose: exposedHeaders 
 			]
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 CrossOriginResourceSharingActualRequestHandlerBuilder >> initialize [
 
 	super initialize.

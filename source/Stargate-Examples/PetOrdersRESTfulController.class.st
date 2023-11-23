@@ -2,30 +2,32 @@
 I'm an example RESTful Controller implementing Pet Order resource management
 "
 Class {
-	#name : #PetOrdersRESTfulController,
-	#superclass : #SingleResourceRESTfulController,
+	#name : 'PetOrdersRESTfulController',
+	#superclass : 'SingleResourceRESTfulController',
 	#instVars : [
 		'ordersRepository',
 		'commentsRequestHandler',
 		'commentsByOrderId',
 		'ordersRequestHandler'
 	],
-	#category : #'Stargate-Examples-PetStore'
+	#category : 'Stargate-Examples-PetStore',
+	#package : 'Stargate-Examples',
+	#tag : 'PetStore'
 }
 
-{ #category : #'instance creation' }
+{ #category : 'instance creation' }
 PetOrdersRESTfulController class >> new [
 
 	^ self persistingTo: InMemoryPetOrderRepository  new
 ]
 
-{ #category : #'instance creation' }
+{ #category : 'instance creation' }
 PetOrdersRESTfulController class >> persistingTo: aRepository [
 
 	^ self basicNew initializePersistingTo: aRepository
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 PetOrdersRESTfulController >> affect: builder withMediaControlsFor: order locatedAt: location [
 
 	| status |
@@ -43,7 +45,7 @@ PetOrdersRESTfulController >> affect: builder withMediaControlsFor: order locate
 	builder addLink: location / 'comments' asUrl relatedTo: 'comments'
 ]
 
-{ #category : #'API - orders' }
+{ #category : 'API - orders' }
 PetOrdersRESTfulController >> cancelOrderBasedOn: httpRequest within: requestContext [
 
 	^ ordersRequestHandler
@@ -53,25 +55,25 @@ PetOrdersRESTfulController >> cancelOrderBasedOn: httpRequest within: requestCon
 		thenDo: [ :order | ordersRepository updateStatusOf: order to: 'canceled' ]
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 PetOrdersRESTfulController >> cancelTemplate [
 
 	^ '<1s>/cancel' expandMacrosWith: self identifierTemplate
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 PetOrdersRESTfulController >> commentIdentifierIn: httpRequest [
 
 	^ httpRequest at: self commentIdentifierKey
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 PetOrdersRESTfulController >> commentIdentifierKey [
 
 	^ #commentIdentifier asString
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 PetOrdersRESTfulController >> commentIdentifierTemplate [
 
 	^ '<1s>/%<<2s>:<3s>>'
@@ -80,19 +82,19 @@ PetOrdersRESTfulController >> commentIdentifierTemplate [
 		with: self typeIdConstraint asString
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 PetOrdersRESTfulController >> commentsForOrderIn: httpRequest [
 
 	^ commentsByOrderId at: ( self identifierIn: httpRequest ) ifAbsent: [ #() ]
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 PetOrdersRESTfulController >> commentsTemplate [
 
 	^ '<1s><2s>' expandMacrosWith: self identifierTemplate with: commentsRequestHandler endpoint
 ]
 
-{ #category : #'API - orders' }
+{ #category : 'API - orders' }
 PetOrdersRESTfulController >> completeOrderBasedOn: httpRequest within: requestContext [
 
 	^ ordersRequestHandler
@@ -102,13 +104,13 @@ PetOrdersRESTfulController >> completeOrderBasedOn: httpRequest within: requestC
 		thenDo: [ :order | ordersRepository updateStatusOf: order to: 'completed' ]
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 PetOrdersRESTfulController >> completeTemplate [
 
 	^ '<1s>/complete' expandMacrosWith: self identifierTemplate
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 PetOrdersRESTfulController >> configureOrderDecodingOn: reader [
 
 	^ reader
@@ -122,7 +124,7 @@ PetOrdersRESTfulController >> configureOrderDecodingOn: reader [
 		  nextAs: PetOrder
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 PetOrdersRESTfulController >> configureOrderEncodingOn: writer within: requestContext [
 
 	writer
@@ -137,7 +139,7 @@ PetOrdersRESTfulController >> configureOrderEncodingOn: writer within: requestCo
 			]
 ]
 
-{ #category : #'API - comments' }
+{ #category : 'API - comments' }
 PetOrdersRESTfulController >> createCommentBasedOn: httpRequest within: requestContext [
 
 	^ commentsRequestHandler
@@ -154,7 +156,7 @@ PetOrdersRESTfulController >> createCommentBasedOn: httpRequest within: requestC
 			]
 ]
 
-{ #category : #'API - orders' }
+{ #category : 'API - orders' }
 PetOrdersRESTfulController >> createOrderBasedOn: httpRequest within: requestContext [
 
 	^ ordersRequestHandler
@@ -167,7 +169,7 @@ PetOrdersRESTfulController >> createOrderBasedOn: httpRequest within: requestCon
 			]
 ]
 
-{ #category : #routes }
+{ #category : 'routes' }
 PetOrdersRESTfulController >> declareCancelOrderRoute [
 
 	^ RouteSpecification
@@ -176,7 +178,7 @@ PetOrdersRESTfulController >> declareCancelOrderRoute [
 		evaluating: [ :httpRequest :requestContext | self cancelOrderBasedOn: httpRequest within: requestContext ]
 ]
 
-{ #category : #routes }
+{ #category : 'routes' }
 PetOrdersRESTfulController >> declareCompleteOrderRoute [
 
 	^ RouteSpecification
@@ -185,7 +187,7 @@ PetOrdersRESTfulController >> declareCompleteOrderRoute [
 		evaluating: [ :httpRequest :requestContext | self completeOrderBasedOn: httpRequest within: requestContext ]
 ]
 
-{ #category : #routes }
+{ #category : 'routes' }
 PetOrdersRESTfulController >> declareCreateOrderCommentRoute [
 
 	^ RouteSpecification
@@ -194,7 +196,7 @@ PetOrdersRESTfulController >> declareCreateOrderCommentRoute [
 		evaluating: [ :httpRequest :requestContext | self createCommentBasedOn: httpRequest within: requestContext ]
 ]
 
-{ #category : #routes }
+{ #category : 'routes' }
 PetOrdersRESTfulController >> declareCreateOrderRoute [
 
 	^ RouteSpecification
@@ -203,7 +205,7 @@ PetOrdersRESTfulController >> declareCreateOrderRoute [
 		evaluating: [ :httpRequest :requestContext | self createOrderBasedOn: httpRequest within: requestContext ]
 ]
 
-{ #category : #routes }
+{ #category : 'routes' }
 PetOrdersRESTfulController >> declareDeleteOrderCommentRoute [
 
 	^ RouteSpecification
@@ -213,7 +215,7 @@ PetOrdersRESTfulController >> declareDeleteOrderCommentRoute [
 			[ :httpRequest :requestContext | self deleteOrderCommentBasedOn: httpRequest within: requestContext ]
 ]
 
-{ #category : #routes }
+{ #category : 'routes' }
 PetOrdersRESTfulController >> declareGetOrderCommentRoute [
 
 	^ RouteSpecification
@@ -222,7 +224,7 @@ PetOrdersRESTfulController >> declareGetOrderCommentRoute [
 		evaluating: [ :httpRequest :requestContext | self orderCommentBasedOn: httpRequest within: requestContext ]
 ]
 
-{ #category : #routes }
+{ #category : 'routes' }
 PetOrdersRESTfulController >> declareGetOrderCommentsRoute [
 
 	^ RouteSpecification
@@ -231,7 +233,7 @@ PetOrdersRESTfulController >> declareGetOrderCommentsRoute [
 		evaluating: [ :httpRequest :requestContext | self orderCommentsBasedOn: httpRequest within: requestContext ]
 ]
 
-{ #category : #routes }
+{ #category : 'routes' }
 PetOrdersRESTfulController >> declareGetOrderRoute [
 
 	^ RouteSpecification
@@ -240,7 +242,7 @@ PetOrdersRESTfulController >> declareGetOrderRoute [
 		evaluating: [ :httpRequest :requestContext | self getOrderBasedOn: httpRequest within: requestContext ]
 ]
 
-{ #category : #routes }
+{ #category : 'routes' }
 PetOrdersRESTfulController >> declareUpdateOrderCommentRoute [
 
 	^ RouteSpecification
@@ -250,7 +252,7 @@ PetOrdersRESTfulController >> declareUpdateOrderCommentRoute [
 			[ :httpRequest :requestContext | self updateOrderCommentBasedOn: httpRequest within: requestContext ]
 ]
 
-{ #category : #'API - comments' }
+{ #category : 'API - comments' }
 PetOrdersRESTfulController >> deleteOrderCommentBasedOn: httpRequest within: requestContext [
 
 	^ commentsRequestHandler
@@ -260,7 +262,7 @@ PetOrdersRESTfulController >> deleteOrderCommentBasedOn: httpRequest within: req
 		thenDo: [ :comment | ( self commentsForOrderIn: httpRequest ) remove: comment ]
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 PetOrdersRESTfulController >> encodeComments: resource [
 
 	^ resource isArray
@@ -271,7 +273,7 @@ PetOrdersRESTfulController >> encodeComments: resource [
 		ifFalse: [ resource asString ]
 ]
 
-{ #category : #'API - orders' }
+{ #category : 'API - orders' }
 PetOrdersRESTfulController >> getOrderBasedOn: httpRequest within: requestContext [
 
 	^ ordersRequestHandler
@@ -285,7 +287,7 @@ PetOrdersRESTfulController >> getOrderBasedOn: httpRequest within: requestContex
 			]
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 PetOrdersRESTfulController >> initializeCommentsRequestHandler [
 
 	commentsRequestHandler := RESTfulRequestHandlerBuilder new
@@ -310,7 +312,7 @@ PetOrdersRESTfulController >> initializeCommentsRequestHandler [
 		build
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 PetOrdersRESTfulController >> initializeOrdersRequestHandler [
 
 	ordersRequestHandler := RESTfulRequestHandlerBuilder new
@@ -333,7 +335,7 @@ PetOrdersRESTfulController >> initializeOrdersRequestHandler [
 		build
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 PetOrdersRESTfulController >> initializePersistingTo: aPetRepository [
 
 	ordersRepository := aPetRepository.
@@ -343,7 +345,7 @@ PetOrdersRESTfulController >> initializePersistingTo: aPetRepository [
 		initializeCommentsRequestHandler
 ]
 
-{ #category : #'API - comments' }
+{ #category : 'API - comments' }
 PetOrdersRESTfulController >> orderCommentBasedOn: httpRequest within: requestContext [
 
 	^ commentsRequestHandler
@@ -353,7 +355,7 @@ PetOrdersRESTfulController >> orderCommentBasedOn: httpRequest within: requestCo
 			[ :commentIndex | ( self commentsForOrderIn: httpRequest ) at: commentIndex ifAbsent: [ ObjectNotFound signal ] ]
 ]
 
-{ #category : #'API - comments' }
+{ #category : 'API - comments' }
 PetOrdersRESTfulController >> orderCommentsBasedOn: httpRequest within: requestContext [
 
 	^ commentsRequestHandler
@@ -362,32 +364,32 @@ PetOrdersRESTfulController >> orderCommentsBasedOn: httpRequest within: requestC
 		getCollection: [ ( self commentsForOrderIn: httpRequest ) asArray ]
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 PetOrdersRESTfulController >> orderVersion1dot0dot0MediaType [
 
 	^ self jsonMediaType: 'order' vendoredBy: 'stargate' version: '1.0.0'
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 PetOrdersRESTfulController >> requestHandler [
 
 	^ ordersRequestHandler
 ]
 
-{ #category : #configuring }
+{ #category : 'configuring' }
 PetOrdersRESTfulController >> serverUrl: aServerUrl [
 
 	super serverUrl: aServerUrl.
 	commentsRequestHandler serverUrl: aServerUrl
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 PetOrdersRESTfulController >> typeIdConstraint [
 
 	^ IsInteger
 ]
 
-{ #category : #'API - comments' }
+{ #category : 'API - comments' }
 PetOrdersRESTfulController >> updateOrderCommentBasedOn: httpRequest within: requestContext [
 
 	^ commentsRequestHandler

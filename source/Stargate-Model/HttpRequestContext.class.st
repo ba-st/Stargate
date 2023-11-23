@@ -3,15 +3,17 @@ I'm a context that gets created each time an Http Request is proceesed. I can ca
 I also provide some facilities to manage Hypermedia Controls.
 "
 Class {
-	#name : #HttpRequestContext,
-	#superclass : #Object,
+	#name : 'HttpRequestContext',
+	#superclass : 'Object',
 	#instVars : [
 		'knownObjects'
 	],
-	#category : #'Stargate-Model-Routing'
+	#category : 'Stargate-Model-Routing',
+	#package : 'Stargate-Model',
+	#tag : 'Routing'
 }
 
-{ #category : #pagination }
+{ #category : 'pagination' }
 HttpRequestContext >> addPaginationLink: aUrl relatedTo: aRelationType [
 
 	| controls |
@@ -26,14 +28,14 @@ HttpRequestContext >> addPaginationLink: aUrl relatedTo: aRelationType [
 				build )
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 HttpRequestContext >> hold: anObject under: aConcept [
 
 	knownObjects at: aConcept put: anObject.
 	^ anObject
 ]
 
-{ #category : #hypermedia }
+{ #category : 'hypermedia' }
 HttpRequestContext >> holdAsHypermediaControls: aControlCollection for: resource [
 
 	| resourcesHypermediaControls |
@@ -44,7 +46,7 @@ HttpRequestContext >> holdAsHypermediaControls: aControlCollection for: resource
 	resourcesHypermediaControls at: resource put: aControlCollection
 ]
 
-{ #category : #hypermedia }
+{ #category : 'hypermedia' }
 HttpRequestContext >> hypermediaControlsFor: resource [
 
 	| hypermediaControls |
@@ -53,20 +55,20 @@ HttpRequestContext >> hypermediaControlsFor: resource [
 	^ hypermediaControls at: resource ifAbsent: [ #() ]
 ]
 
-{ #category : #authorization }
+{ #category : 'authorization' }
 HttpRequestContext >> includesPermission: aPermission [
 
 	^ ( self objectUnder: #permissions ifNone: [ #() ] ) includes: aPermission
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 HttpRequestContext >> initialize [
 
 	super initialize.
 	knownObjects := IdentityDictionary new
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 HttpRequestContext >> objectUnder: aConcept [
 
 	^ self
@@ -74,61 +76,61 @@ HttpRequestContext >> objectUnder: aConcept [
 		ifNone: [ NotFound signal: ( 'Missing <1s> in the request context' expandMacrosWith: aConcept asString ) ]
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 HttpRequestContext >> objectUnder: aConcept ifNone: aBlock [
 
 	^ knownObjects at: aConcept ifAbsent: aBlock
 ]
 
-{ #category : #pagination }
+{ #category : 'pagination' }
 HttpRequestContext >> paginationControls [
 
 	^ (self objectUnder: #paginationLinks ifNone: [ #() ]) asArray
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 HttpRequestContext >> parentResource [
 
 	^ self objectUnder: #parentResource
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 HttpRequestContext >> parentResource: anIdentifier [
 
 	self hold: anIdentifier under: #parentResource
 ]
 
-{ #category : #authorization }
+{ #category : 'authorization' }
 HttpRequestContext >> permissions: aPermissionCollection [
 
 	self hold: aPermissionCollection under: #permissions
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 HttpRequestContext >> targetLanguageTag [
 
 	^ self objectUnder: #targetLanguageTag
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 HttpRequestContext >> targetLanguageTag: aLanguageTag [
 
 	^ self hold: aLanguageTag under: #targetLanguageTag
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 HttpRequestContext >> targetMediaType [
 
 	^ self objectUnder: #targetMediaType
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 HttpRequestContext >> targetMediaType: aMediaType [
 
 	^ self hold: aMediaType under: #targetMediaType
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 HttpRequestContext >> withTargetLanguageTagDo: aBlock [
 
 	knownObjects at: #targetLanguageTag ifPresent: aBlock

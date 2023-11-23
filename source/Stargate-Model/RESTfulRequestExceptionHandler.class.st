@@ -2,21 +2,23 @@
 I'm an exception handler to be used while handling a RESTful HTTP request
 "
 Class {
-	#name : #RESTfulRequestExceptionHandler,
-	#superclass : #Object,
+	#name : 'RESTfulRequestExceptionHandler',
+	#superclass : 'Object',
 	#instVars : [
 		'exceptionsToHandle'
 	],
-	#category : #'Stargate-Model-Controllers'
+	#category : 'Stargate-Model-Controllers',
+	#package : 'Stargate-Model',
+	#tag : 'Controllers'
 }
 
-{ #category : #configuring }
+{ #category : 'configuring' }
 RESTfulRequestExceptionHandler >> addAsConflictError: anExceptionSelector [
 
 	exceptionsToHandle at: #conflict put: ( exceptionsToHandle at: #conflict ) , anExceptionSelector
 ]
 
-{ #category : #configuring }
+{ #category : 'configuring' }
 RESTfulRequestExceptionHandler >> addAsDecodingError: anExceptionSelector [
 
 	exceptionsToHandle
@@ -24,7 +26,7 @@ RESTfulRequestExceptionHandler >> addAsDecodingError: anExceptionSelector [
 		put: ( exceptionsToHandle at: #decodingFailed ) , anExceptionSelector
 ]
 
-{ #category : #configuring }
+{ #category : 'configuring' }
 RESTfulRequestExceptionHandler >> addAsMissingQueryParameterError: anExceptionSelector [
 
 	exceptionsToHandle
@@ -32,19 +34,19 @@ RESTfulRequestExceptionHandler >> addAsMissingQueryParameterError: anExceptionSe
 		put: ( exceptionsToHandle at: #missingQueryParameters ) , anExceptionSelector
 ]
 
-{ #category : #configuring }
+{ #category : 'configuring' }
 RESTfulRequestExceptionHandler >> addAsNotFoundError: anExceptionSelector [
 
 	exceptionsToHandle at: #notFound put: ( exceptionsToHandle at: #notFound ) , anExceptionSelector
 ]
 
-{ #category : #configuring }
+{ #category : 'configuring' }
 RESTfulRequestExceptionHandler >> addAsUnprocessableEntityError: anExceptionSelector [
 
 	exceptionsToHandle at: #unprocessableEntity put: ( exceptionsToHandle at: #unprocessableEntity ) , anExceptionSelector
 ]
 
-{ #category : #handling }
+{ #category : 'handling' }
 RESTfulRequestExceptionHandler >> handleConflictsDuring: aBlock [
 
 	^ aBlock
@@ -52,7 +54,7 @@ RESTfulRequestExceptionHandler >> handleConflictsDuring: aBlock [
 		do: [ :signal | HTTPClientError conflict signal: signal messageText ]
 ]
 
-{ #category : #handling }
+{ #category : 'handling' }
 RESTfulRequestExceptionHandler >> handleDecodingFailedDuring: aBlock [
 
 	^ [ 
@@ -64,7 +66,7 @@ RESTfulRequestExceptionHandler >> handleDecodingFailedDuring: aBlock [
 		  do: [ :signal | HTTPClientError unprocessableEntity signal: signal messageText ]
 ]
 
-{ #category : #handling }
+{ #category : 'handling' }
 RESTfulRequestExceptionHandler >> handleMissingQueryParametersDuring: aBlock [
 
 	^ aBlock
@@ -72,13 +74,13 @@ RESTfulRequestExceptionHandler >> handleMissingQueryParametersDuring: aBlock [
 		do: [ :signal | HTTPClientError badRequest signal: signal messageText ]
 ]
 
-{ #category : #handling }
+{ #category : 'handling' }
 RESTfulRequestExceptionHandler >> handleNotFoundAndMissingParametersDuring: aBlock [
 
 	^ self handleNotFoundDuring: [ self handleMissingQueryParametersDuring: aBlock ]
 ]
 
-{ #category : #handling }
+{ #category : 'handling' }
 RESTfulRequestExceptionHandler >> handleNotFoundDuring: aBlock [
 
 	^ aBlock
@@ -86,7 +88,7 @@ RESTfulRequestExceptionHandler >> handleNotFoundDuring: aBlock [
 		do: [ :signal | HTTPClientError notFound signal: signal messageText ]
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 RESTfulRequestExceptionHandler >> initialize [
 
 	super initialize.

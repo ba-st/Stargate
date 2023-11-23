@@ -2,27 +2,29 @@
 I'm a policy configuring a controller in such a way that responses for creation requests will respond immediately with a representation of the created resource.
 "
 Class {
-	#name : #RESTfulControllerRespondCreatedEntityPolicy,
-	#superclass : #RESTfulControllerResourceCreationPolicy,
+	#name : 'RESTfulControllerRespondCreatedEntityPolicy',
+	#superclass : 'RESTfulControllerResourceCreationPolicy',
 	#instVars : [
 		'requestHandler'
 	],
-	#category : #'Stargate-Model-Controllers'
+	#category : 'Stargate-Model-Controllers',
+	#package : 'Stargate-Model',
+	#tag : 'Controllers'
 }
 
-{ #category : #'instance creation' }
+{ #category : 'instance creation' }
 RESTfulControllerRespondCreatedEntityPolicy class >> for: aRequestHandler [
 
 	^ self new initializeFor: aRequestHandler
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 RESTfulControllerRespondCreatedEntityPolicy >> initializeFor: aRequestHandler [
 
 	requestHandler := aRequestHandler
 ]
 
-{ #category : #processing }
+{ #category : 'processing' }
 RESTfulControllerRespondCreatedEntityPolicy >> responseFor: resource basedOn: httpRequest within: requestContext [
 
 	| response |

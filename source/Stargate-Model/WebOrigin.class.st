@@ -12,15 +12,17 @@ References
 	https://tools.ietf.org/html/rfc3986
 "
 Class {
-	#name : #WebOrigin,
-	#superclass : #Object,
+	#name : 'WebOrigin',
+	#superclass : 'Object',
 	#instVars : [
 		'url'
 	],
-	#category : #'Stargate-Model-CORS'
+	#category : 'Stargate-Model-CORS',
+	#package : 'Stargate-Model',
+	#tag : 'CORS'
 }
 
-{ #category : #'instance creation' }
+{ #category : 'instance creation' }
 WebOrigin class >> basedOn: aUrl [
 
 	AssertionChecker
@@ -31,7 +33,7 @@ WebOrigin class >> basedOn: aUrl [
 	^ self new initializeBasedOn: aUrl
 ]
 
-{ #category : #preconditions }
+{ #category : 'preconditions' }
 WebOrigin class >> hasValidOrigin: aUrl [
 
 	| validOriginSchemes |
@@ -41,43 +43,43 @@ WebOrigin class >> hasValidOrigin: aUrl [
 	^ aUrl hasScheme and: [ ( validOriginSchemes includes: aUrl scheme ) and: [ aUrl hasHost ] ]
 ]
 
-{ #category : #comparing }
+{ #category : 'comparing' }
 WebOrigin >> = aWebOrigin [
 
 	^ self asString = aWebOrigin asString
 ]
 
-{ #category : #converting }
+{ #category : 'converting' }
 WebOrigin >> asString [
 
 	^ self printString
 ]
 
-{ #category : #converting }
+{ #category : 'converting' }
 WebOrigin >> asUrl [
 
 	^ url copy
 ]
 
-{ #category : #converting }
+{ #category : 'converting' }
 WebOrigin >> asWebOrigin [
 
 	^ self
 ]
 
-{ #category : #comparing }
+{ #category : 'comparing' }
 WebOrigin >> hash [
 
 	^ self asString hash
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 WebOrigin >> initializeBasedOn: aUrl [ 
 	
 	url := aUrl
 ]
 
-{ #category : #printing }
+{ #category : 'printing' }
 WebOrigin >> printOn: stream [
 
 	stream
