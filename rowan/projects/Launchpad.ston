@@ -5,6 +5,7 @@ RwLoadSpecificationV2 {
   #revision : 'v5',
   #projectSpecFile : 'rowan/project.ston',
   #componentNames : [
-    'Deployment'
+    'Deployment',
+    'Dependent-SUnit-Extensions'
   ]
 }
