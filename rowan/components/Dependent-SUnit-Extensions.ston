@@ -3,7 +3,7 @@ RwSimpleProjectLoadComponentV2 {
   #condition : 'sunit',
   #projectNames : [ ],
   #componentNames : [
-    'Core'
+    'Deployment'
   ],
   #packageNames : [
     'Stargate-SUnit-Model'
