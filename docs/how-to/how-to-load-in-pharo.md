@@ -27,7 +27,7 @@
 6. Click *Ok*
 7. Select the repository in the main Iceberg window
 8. Open the contextual menu and select
-  *Metacello -> Install baseline of Stargate ...*
+  *Metacello → Install baseline of Stargate ...*
 9. Type `Development` and click *Ok*
 
 > After Iceberg cloned a repository, it will be checked-out at the default

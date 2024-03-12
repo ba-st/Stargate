@@ -31,7 +31,7 @@ jobs:
           - tools
     name: ${{ matrix.smalltalk }} + ${{ matrix.load-spec }}
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - uses: hpi-swa/setup-smalltalkCI@v1
         with:
           smalltalk-image: ${{ matrix.smalltalk }}
