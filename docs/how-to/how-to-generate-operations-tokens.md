@@ -27,8 +27,8 @@ For testing, you can generate the tokens manually:
               'execute:application-control'
               'read:application-configuration');
           yourself ).
-    jws key: 'SECRET'.
+    jws symmetricKey: 'SECRET'.
     jws compactSerialized
     ```
 
-    replacing `SECRET` by the actual secret key and tunning the permissions if required
+    replacing `SECRET` by the actual secret key and tuning the permissions if required
