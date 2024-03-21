@@ -2,23 +2,24 @@
 A StargateAPISkeletonTest is a test class for testing the behavior of StargateAPISkeleton
 "
 Class {
-	#name : #StargateApplicationTest,
-	#superclass : #TestCase,
+	#name : 'StargateApplicationTest',
+	#superclass : 'TestCase',
 	#instVars : [
 		'application',
 		'port',
 		'baseUrl'
 	],
-	#category : #'Stargate-API-Skeleton-Tests'
+	#category : 'Stargate-API-Skeleton-Tests',
+	#package : 'Stargate-API-Skeleton-Tests'
 }
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 StargateApplicationTest class >> defaultTimeLimit [
 
 	^5 minute
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 StargateApplicationTest >> assert: string isLineEndingInsensitiveEqualsTo: anotherString [
 
 	self
@@ -26,13 +27,13 @@ StargateApplicationTest >> assert: string isLineEndingInsensitiveEqualsTo: anoth
 		equals: ( anotherString withLineEndings: String lf )
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 StargateApplicationTest >> baseUrl [
 
 	^ baseUrl
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 StargateApplicationTest >> newClient [
 
 	^ ZnClient new
@@ -41,31 +42,53 @@ StargateApplicationTest >> newClient [
 		  yourself
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 StargateApplicationTest >> orderVersion1dot0dot0MediaType [
 
 	^ 'application/vnd.stargate.order+json;version=1.0.0' asMediaType
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 StargateApplicationTest >> petVersion1dot0dot0MediaType [
 
 	^ 'application/vnd.stargate.pet+json;version=1.0.0' asMediaType
 ]
 
-{ #category : #running }
+{ #category : 'private' }
+StargateApplicationTest >> run: count concurrentInstancesOf: block [
+
+	| results semaphore |
+
+	semaphore := Semaphore new.
+
+	results := OrderedCollection new.
+
+	count timesRepeat: [
+		LanguagePlatform current
+			fork: [
+				results add: block value.
+				semaphore signal
+				]
+			named: 'Concurrently running'
+			at: Processor activePriority
+		].
+	count timesRepeat: [ semaphore wait ].
+	^ results
+]
+
+{ #category : 'running' }
 StargateApplicationTest >> runCase [
 
 	self shouldnt: [ super runCase ] raise: Exit
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 StargateApplicationTest >> secret [
 
 	^ 'secret'
 ]
 
-{ #category : #running }
+{ #category : 'running' }
 StargateApplicationTest >> setUp [
 
 	super setUp.
@@ -73,7 +96,7 @@ StargateApplicationTest >> setUp [
 	StargateApplication logsDirectory ensureCreateDirectory
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 StargateApplicationTest >> start: aLaunchpadApplication withAll: arguments [
 
 	String streamContents: [ :stream | 
@@ -93,7 +116,18 @@ StargateApplicationTest >> start: aLaunchpadApplication withAll: arguments [
 		]
 ]
 
-{ #category : #private }
+{ #category : 'private' }
+StargateApplicationTest >> startConcurrentConnectionsApp [
+
+	self start: ConcurrentConnectionsTestApplication withAll: { 
+			'--stargate.public-url=http://localhost:<1p>' expandMacrosWith: port.
+			'--stargate.port=<1p>' expandMacrosWith: port.
+			'--stargate.operations-secret=<1s>' expandMacrosWith: self secret.
+			'--stargate.concurrent-connections-threshold=1' }.
+	baseUrl := application configuration stargate publicURL
+]
+
+{ #category : 'private' }
 StargateApplicationTest >> startPetStore [
 
 	self start: PetStoreApplication withAll: { 
@@ -103,7 +137,7 @@ StargateApplicationTest >> startPetStore [
 	baseUrl := application configuration petStore stargate publicURL
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 StargateApplicationTest >> startSouthAmericanCurrencies [
 
 	self start: SouthAmericanCurrenciesApplication withAll: { 
@@ -113,14 +147,15 @@ StargateApplicationTest >> startSouthAmericanCurrencies [
 	baseUrl := application configuration stargate publicURL
 ]
 
-{ #category : #running }
+{ #category : 'running' }
 StargateApplicationTest >> tearDown [
 
 	application ifNotNil: [ :theApplication | theApplication stop ].
+	ZnOptions resetGlobalDefault.
 	super tearDown
 ]
 
-{ #category : #'tests - api' }
+{ #category : 'tests - api' }
 StargateApplicationTest >> testBadRequest [
 
 	self startPetStore.
@@ -136,7 +171,34 @@ StargateApplicationTest >> testBadRequest [
 		withExceptionDo: [ :error | self assert: error response isBadRequest ]
 ]
 
-{ #category : #'tests - api' }
+{ #category : 'tests - options' }
+StargateApplicationTest >> testConcurrentConnectionsThreshold [
+
+	| responses |
+
+	self startConcurrentConnectionsApp.
+
+	responses := self run: 2 concurrentInstancesOf: [
+		             self newClient
+			             enforceHttpSuccess: false;
+			             url: self baseUrl / 'wait' asUrl;
+			             get;
+			             response
+		             ].
+
+	self assert: responses size equals: 2.
+	responses
+		detect: [ :response | response isSuccess ]
+		ifFound: [ :response | self assert: response contents equals: 'OK' ]
+		ifNone: [ self fail ].
+	responses
+		detect: [ :response | response code = 503 ]
+		ifFound: [ :response |
+		self assert: response contents trimBoth equals: 'Too many concurrent connections' ]
+		ifNone: [ self fail ]
+]
+
+{ #category : 'tests - api' }
 StargateApplicationTest >> testConflict [
 
 	self startPetStore.
@@ -165,7 +227,7 @@ StargateApplicationTest >> testConflict [
 			]
 ]
 
-{ #category : #'tests - api' }
+{ #category : 'tests - api' }
 StargateApplicationTest >> testCreatePet [
 
 	| response json |
@@ -193,7 +255,7 @@ StargateApplicationTest >> testCreatePet [
 		assert: json selfLocation equals: response location
 ]
 
-{ #category : #'tests - application' }
+{ #category : 'tests - application' }
 StargateApplicationTest >> testFileReferenceToDumpStackTrace [
 
 	| segments |
@@ -206,7 +268,7 @@ StargateApplicationTest >> testFileReferenceToDumpStackTrace [
 		assert: ( segments last endsWith: '.dump' )
 ]
 
-{ #category : #'tests - api' }
+{ #category : 'tests - api' }
 StargateApplicationTest >> testGetCurrencies [
 
 	| currencies |
@@ -217,7 +279,7 @@ StargateApplicationTest >> testGetCurrencies [
 	self assert: currencies size equals: 11
 ]
 
-{ #category : #'tests - api' }
+{ #category : 'tests - api' }
 StargateApplicationTest >> testGetPets [
 
 	| json |
@@ -230,7 +292,7 @@ StargateApplicationTest >> testGetPets [
 		assert: json links size equals: 1
 ]
 
-{ #category : #'tests - api' }
+{ #category : 'tests - api' }
 StargateApplicationTest >> testMethodNotAllowed [
 
 	self startPetStore.
@@ -249,7 +311,7 @@ StargateApplicationTest >> testMethodNotAllowed [
 			]
 ]
 
-{ #category : #'tests - api' }
+{ #category : 'tests - api' }
 StargateApplicationTest >> testNotAcceptable [
 
 	self startPetStore.
@@ -267,7 +329,7 @@ StargateApplicationTest >> testNotAcceptable [
 			]
 ]
 
-{ #category : #'tests - api' }
+{ #category : 'tests - api' }
 StargateApplicationTest >> testNotFound [
 
 	self startPetStore.
@@ -276,7 +338,7 @@ StargateApplicationTest >> testNotFound [
 		withExceptionDo: [ :error | self assert: error response isNotFound ]
 ]
 
-{ #category : #'tests - application' }
+{ #category : 'tests - application' }
 StargateApplicationTest >> testPrintHelpOn [
 
 	| help |
@@ -286,7 +348,7 @@ StargateApplicationTest >> testPrintHelpOn [
 	self assert: help isLineEndingInsensitiveEqualsTo: ('NAME
 		pet-store [<1s>] - A RESTful API for Pet stores
 SYNOPSYS
-		pet-store --pet-store.stargate.public-url=%<publicURL%> --pet-store.stargate.port=%<port%> --pet-store.stargate.operations-secret=%<operationsSecret%>
+		pet-store --pet-store.stargate.public-url=%<publicURL%> --pet-store.stargate.port=%<port%> --pet-store.stargate.operations-secret=%<operationsSecret%> [--pet-store.stargate.concurrent-connections-threshold=%<concurrentConnectionsThreshold%>]
 PARAMETERS
 		--pet-store.stargate.public-url=%<publicURL%>
 			Public URL where the API is deployed. Used to create hypermedia links.
@@ -294,6 +356,8 @@ PARAMETERS
 			Listening port.
 		--pet-store.stargate.operations-secret=%<operationsSecret%>
 			Secret key for checking JWT signatures.
+		--pet-store.stargate.concurrent-connections-threshold=%<concurrentConnectionsThreshold%>
+			Set the maximum number of concurrent connections that I will accept. When this threshold is reached, a 503 Service Unavailable response will be sent and the connection will be closed. Defaults to 32.
 ENVIRONMENT
 		PET_STORE__STARGATE__PUBLIC_URL
 			Public URL where the API is deployed. Used to create hypermedia links.
@@ -301,10 +365,12 @@ ENVIRONMENT
 			Listening port.
 		PET_STORE__STARGATE__OPERATIONS_SECRET
 			Secret key for checking JWT signatures.
+		PET_STORE__STARGATE__CONCURRENT_CONNECTIONS_THRESHOLD
+			Set the maximum number of concurrent connections that I will accept. When this threshold is reached, a 503 Service Unavailable response will be sent and the connection will be closed. Defaults to 32.
 ' expandMacrosWith: PetStoreApplication version)
 ]
 
-{ #category : #'tests - application' }
+{ #category : 'tests - application' }
 StargateApplicationTest >> testProjectName [
 
 	self
@@ -312,7 +378,7 @@ StargateApplicationTest >> testProjectName [
 		assert: SouthAmericanCurrenciesApplication projectName equals: 'Stargate'
 ]
 
-{ #category : #'tests - api' }
+{ #category : 'tests - api' }
 StargateApplicationTest >> testUnsupportedMediaType [
 
 	self startPetStore.

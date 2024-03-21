@@ -88,18 +88,28 @@ StargateApplication class >> stackTraceDumpExtension [
 StargateApplication class >> stargateConfigurationParameters [
 
 	^ Array
-		  with: ( MandatoryConfigurationParameter named: 'Public URL'
+		  with: ( MandatoryConfigurationParameter
+				    named: 'Public URL'
 				    describedBy: 'Public URL where the API is deployed. Used to create hypermedia links'
 				    inside: self sectionsForStargateConfiguration
 				    convertingWith: #asUrl )
-		  with: ( MandatoryConfigurationParameter named: 'Port'
+		  with: ( MandatoryConfigurationParameter
+				    named: 'Port'
 				    describedBy: 'Listening port'
 				    inside: self sectionsForStargateConfiguration
 				    convertingWith: #asNumber )
-		  with: ( MandatoryConfigurationParameter named: 'Operations Secret'
+		  with: ( MandatoryConfigurationParameter
+				    named: 'Operations Secret'
 				    describedBy: 'Secret key for checking JWT signatures'
 				    inside: self sectionsForStargateConfiguration
 				    convertingWith: #asByteArray ) asSensitive
+		  with: ( OptionalConfigurationParameter
+				    named: 'Concurrent Connections Threshold'
+				    describedBy:
+				    'Set the maximum number of concurrent connections that I will accept. When this threshold is reached, a 503 Service Unavailable response will be sent and the connection will be closed'
+				    inside: self sectionsForStargateConfiguration
+				    defaultingTo: 32
+				    convertingWith: #asNumber )
 ]
 
 { #category : 'accessing' }
@@ -111,10 +121,12 @@ StargateApplication class >> version [
 { #category : 'private - accessing' }
 StargateApplication >> apiConfiguration [
 
-	^ Array with: #serverUrl -> self stargateConfiguration publicURL
-		  with: #port -> self stargateConfiguration port
-		  with: #debugMode -> self isDebugModeEnabled
-		  with: #operations -> self operationsConfiguration
+	^ {
+		  #serverUrl -> self stargateConfiguration publicURL.
+		  #port -> self stargateConfiguration port.
+		  #maximumNumberOfConcurrentConnections -> self stargateConfiguration concurrentConnectionsThreshold.
+		  #debugMode -> self isDebugModeEnabled.
+		  #operations -> self operationsConfiguration }
 ]
 
 { #category : 'private - accessing' }
@@ -182,6 +194,14 @@ StargateApplication >> basicStop [
 ]
 
 { #category : 'private - activation/deactivation' }
+StargateApplication >> configureConcurrentConnectionsThreshold [
+
+	ZnOptions globalDefault
+		at: #maximumNumberOfConcurrentConnections
+		put: self stargateConfiguration concurrentConnectionsThreshold
+]
+
+{ #category : 'private - activation/deactivation' }
 StargateApplication >> configureGlobalErrorHandlerIn: api [
 
 	[
@@ -233,7 +253,10 @@ StargateApplication >> installAndStart: api [
 
 	LogRecord
 		emitInfo: 'Installing API' during: [ api install ];
-		emitInfo: 'Starting API' during: [ api start ]
+		emitInfo: 'Starting API' during: [
+			self configureConcurrentConnectionsThreshold.
+			api start
+			]
 ]
 
 { #category : 'private - activation/deactivation' }
