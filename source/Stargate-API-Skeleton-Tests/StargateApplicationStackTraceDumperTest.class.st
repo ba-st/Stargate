@@ -1,23 +1,24 @@
 Class {
-	#name : #StargateApplicationStackTraceDumperTest,
-	#superclass : #TestCase,
-	#category : #'Stargate-API-Skeleton-Tests'
+	#name : 'StargateApplicationStackTraceDumperTest',
+	#superclass : 'TestCase',
+	#category : 'Stargate-API-Skeleton-Tests',
+	#package : 'Stargate-API-Skeleton-Tests'
 }
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 StargateApplicationStackTraceDumperTest class >> defaultTimeLimit [
 
 	^5 minute
 ]
 
-{ #category : #running }
+{ #category : 'running' }
 StargateApplicationStackTraceDumperTest >> setUp [
 
 	super setUp.
 	StargateApplication logsDirectory ensureCreateDirectory
 ]
 
-{ #category : #'tests - application' }
+{ #category : 'tests - application' }
 StargateApplicationStackTraceDumperTest >> testStackTraceDumper [
 
 	| dumper result |
