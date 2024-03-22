@@ -2,7 +2,7 @@
 I'm a example of a RESTful controller:
 - only implementing GET operations
 - not paginating collections
-- don't using hypermedia
+- not using hypermedia
 "
 Class {
 	#name : 'DelayedRESTfulController',
