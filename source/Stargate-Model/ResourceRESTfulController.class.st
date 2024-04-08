@@ -9,7 +9,10 @@ Class {
 	#superclass : 'Object',
 	#category : 'Stargate-Model-Controllers',
 	#package : 'Stargate-Model',
-	#tag : 'Controllers'
+	#tag : 'Controllers',
+	#'gs_options' : [
+		'dbTransient'
+	]
 }
 
 { #category : 'testing' }
@@ -29,10 +32,10 @@ ResourceRESTfulController >> jsonMediaType: aSubType vendoredBy: aVendorName ver
 { #category : 'accessing' }
 ResourceRESTfulController >> routes [
 
-	^ ( UnaryMessageSendingCollector
-		sendingAllMessagesBeginningWith: 'declare'
-		andEndingWith: 'Route'
-		to: self ) value
+	^ (UnaryMessageSendingCollector
+		   sendingAllMessagesBeginningWith: 'declare'
+		   andEndingWith: 'Route'
+		   to: self) value
 ]
 
 { #category : 'configuring' }
