@@ -1,33 +1,39 @@
 Class {
-	#name : #BaselineOfStargate,
-	#superclass : #BaselineOf,
-	#category : #BaselineOfStargate
+	#name : 'BaselineOfStargate',
+	#superclass : 'BaselineOf',
+	#category : 'BaselineOfStargate',
+	#package : 'BaselineOfStargate'
 }
 
-{ #category : #baselines }
+{ #category : 'baselines' }
 BaselineOfStargate >> baseline: spec [
 
 	<baseline>
-	spec
-		for: #pharo
-		do: [ self
-				setUpDependencies: spec;
-				setUpPackages: spec.
-			spec
-				group: 'CI' with: 'Tests';
-				group: 'Examples' with: #('Deployment' 'Stargate-Examples');
-				group: 'Tools' with: #('Hyperspace-Tools');
-				group: 'Development' with: #('Tests' 'Tools')
-			]
+	spec for: #pharo do: [
+		spec postLoadDoIt: #configureResourceRESTfulControllerInstancesAsTransient.
+		self
+			setUpDependencies: spec;
+			setUpPackages: spec.
+		spec
+			group: 'CI' with: 'Tests';
+			group: 'Examples' with: #( 'Deployment' 'Stargate-Examples' );
+			group: 'Tools' with: #( 'Hyperspace-Tools' );
+			group: 'Development' with: #( 'Tests' 'Tools' ) ]
 ]
 
-{ #category : #accessing }
+{ #category : 'baselines' }
+BaselineOfStargate >> configureResourceRESTfulControllerInstancesAsTransient [
+
+	ResourceRESTfulController makeInstancesDbTransient
+]
+
+{ #category : 'accessing' }
 BaselineOfStargate >> projectClass [
 
 	^ MetacelloCypressBaselineProject
 ]
 
-{ #category : #baselines }
+{ #category : 'baselines' }
 BaselineOfStargate >> setUpCorePackages: spec [
 
 	spec
@@ -49,7 +55,7 @@ BaselineOfStargate >> setUpCorePackages: spec [
 			group: 'Deployment' with: extensionPackageName ]
 ]
 
-{ #category : #baselines }
+{ #category : 'baselines' }
 BaselineOfStargate >> setUpDependencies: spec [
 
 	spec
@@ -82,7 +88,7 @@ BaselineOfStargate >> setUpDependencies: spec [
 		project: 'Launchpad-Deployment' copyFrom: 'Launchpad' with: [ spec loads: 'Deployment' ]
 ]
 
-{ #category : #baselines }
+{ #category : 'baselines' }
 BaselineOfStargate >> setUpDeploymentPackages: spec [
 
 	self setUpCorePackages: spec.
@@ -145,7 +151,7 @@ BaselineOfStargate >> setUpDeploymentPackages: spec [
 		group: 'Deployment' with: 'Stargate-API-Skeleton'
 ]
 
-{ #category : #baselines }
+{ #category : 'baselines' }
 BaselineOfStargate >> setUpPackages: spec [
 
 	self setUpDeploymentPackages: spec.
@@ -158,7 +164,7 @@ BaselineOfStargate >> setUpPackages: spec [
 	self setUpTestPackages: spec
 ]
 
-{ #category : #baselines }
+{ #category : 'baselines' }
 BaselineOfStargate >> setUpTestPackages: spec [
 
 	spec
