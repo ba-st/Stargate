@@ -10,14 +10,15 @@ BaselineOfStargate >> baseline: spec [
 
 	<baseline>
 	spec for: #pharo do: [
-		spec postLoadDoIt: #configureResourceRESTfulControllerInstancesAsTransient.
+		spec postLoadDoIt:
+			#configureResourceRESTfulControllerInstancesAsTransient.
 		self
 			setUpDependencies: spec;
 			setUpPackages: spec.
 		spec
 			group: 'CI' with: 'Tests';
 			group: 'Examples' with: #( 'Deployment' 'Stargate-Examples' );
-			group: 'Tools' with: #( 'Hyperspace-Tools' );
+			group: 'Tools' with: #( 'Deployment' 'Hyperspace-Tools' );
 			group: 'Development' with: #( 'Tests' 'Tools' ) ]
 ]
 
