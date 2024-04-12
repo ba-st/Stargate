@@ -2,53 +2,54 @@
 I represent a JSON RPC request handler. I'm capable of processing RPC calls.
 "
 Class {
-	#name : #JsonRPCRequestHandler,
-	#superclass : #Object,
+	#name : 'JsonRPCRequestHandler',
+	#superclass : 'Object',
 	#instVars : [
 		'messageProcessor',
 		'acceptNegotiator',
 		'resourceLocator'
 	],
-	#category : #'Stargate-JSON-RPC'
+	#category : 'Stargate-JSON-RPC',
+	#package : 'Stargate-JSON-RPC'
 }
 
-{ #category : #'instance creation' }
+{ #category : 'instance creation' }
 JsonRPCRequestHandler class >> handling: anEndpoint [
 
 	^ self new initializeResolvingLocationWith: ( ResourceLocator handling: anEndpoint )
 ]
 
-{ #category : #configuring }
+{ #category : 'configuring' }
 JsonRPCRequestHandler >> addErrorHandler: anErrorHandler [
 
 	messageProcessor addErrorHandler: anErrorHandler
 ]
 
-{ #category : #configuring }
+{ #category : 'configuring' }
 JsonRPCRequestHandler >> addHandlerNamed: aString evaluating: aBlock [
 
 	messageProcessor addHandlerNamed: aString block: aBlock
 ]
 
-{ #category : #configuring }
+{ #category : 'configuring' }
 JsonRPCRequestHandler >> addHandlerNamed: aString withArgumentNames: argumentNames evaluating: aBlock [
 
 	messageProcessor addHandlerNamed: aString withArgumentsNamed: argumentNames evaluating: aBlock
 ]
 
-{ #category : #configuring }
+{ #category : 'configuring' }
 JsonRPCRequestHandler >> debugMode: aBoolean [
 
 	messageProcessor debugMode: aBoolean
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 JsonRPCRequestHandler >> endpoint [
 
 	^ resourceLocator endpoint
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 JsonRPCRequestHandler >> initialize [
 
 	super initialize.
@@ -57,13 +58,13 @@ JsonRPCRequestHandler >> initialize [
 		accepting: ( Array with: ZnMimeType applicationJson )
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 JsonRPCRequestHandler >> initializeResolvingLocationWith: aResourceLocator [
 
 	resourceLocator := aResourceLocator
 ]
 
-{ #category : #API }
+{ #category : 'API' }
 JsonRPCRequestHandler >> process: httpRequest within: requestContext [
 
 	AssertionChecker
@@ -77,7 +78,7 @@ JsonRPCRequestHandler >> process: httpRequest within: requestContext [
 		ifNotEmpty: [ :rpcResponse | ZnResponse ok: ( ZnEntity json: rpcResponse ) ]
 ]
 
-{ #category : #configuring }
+{ #category : 'configuring' }
 JsonRPCRequestHandler >> serverUrl: aServerUrl [
 
 	resourceLocator baseUrl: aServerUrl

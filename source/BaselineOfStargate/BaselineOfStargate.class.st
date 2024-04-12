@@ -11,7 +11,7 @@ BaselineOfStargate >> baseline: spec [
 	<baseline>
 	spec for: #pharo do: [
 		spec postLoadDoIt:
-			#configureResourceRESTfulControllerInstancesAsTransient.
+			#configureControllerInstancesAsTransient.
 		self
 			setUpDependencies: spec;
 			setUpPackages: spec.
@@ -23,9 +23,11 @@ BaselineOfStargate >> baseline: spec [
 ]
 
 { #category : 'baselines' }
-BaselineOfStargate >> configureResourceRESTfulControllerInstancesAsTransient [
+BaselineOfStargate >> configureControllerInstancesAsTransient [
 
-	ResourceRESTfulController makeInstancesDbTransient
+	{
+		ResourceRESTfulController.
+		JsonRPCController } do: #makeInstancesDbTransient
 ]
 
 { #category : 'accessing' }
