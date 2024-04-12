@@ -25,9 +25,9 @@ BaselineOfStargate >> baseline: spec [
 { #category : 'baselines' }
 BaselineOfStargate >> configureControllerInstancesAsTransient [
 
-	{
-		ResourceRESTfulController.
-		JsonRPCController } do: #makeInstancesDbTransient
+	#( ResourceRESTfulController JsonRPCController ) do: [ :className |
+		(LanguagePlatform current globalNamed: className ifAbsent: [ nil ])
+			ifNotNil: #makeInstancesDbTransient ]
 ]
 
 { #category : 'accessing' }
