@@ -27,7 +27,7 @@ BaselineOfStargate >> configureAsTransientInstancesOfAll: aClassCollection [
 ]
 
 { #category : 'post-load actions' }
-BaselineOfStargate >> configureJsonRPCControllerInstancesAsTransient [
+BaselineOfStargate >> configureInstancesOfStargateJSONRPCClassesAsTransient [
 
 	self configureAsTransientInstancesOfAll: {
 			JsonRPCController.
@@ -35,10 +35,12 @@ BaselineOfStargate >> configureJsonRPCControllerInstancesAsTransient [
 ]
 
 { #category : 'post-load actions' }
-BaselineOfStargate >> configureResourceRESTfulControllerInstancesAsTransient [
+BaselineOfStargate >> configureInstancesOfStargateModelClassesAsTransient [
 
-	self configureAsTransientInstancesOfAll:
-		{ ResourceRESTfulController }
+	self configureAsTransientInstancesOfAll: {
+			HTTPBasedRESTfulAPI.
+			HttpRequestContext.
+			ResourceRESTfulController }
 ]
 
 { #category : 'accessing' }
@@ -52,7 +54,7 @@ BaselineOfStargate >> setUpCorePackages: spec [
 
 	spec
 		package: 'Stargate-Model' with: [
-			spec postLoadDoIt: #configureResourceRESTfulControllerInstancesAsTransient.
+			spec postLoadDoIt: #configureInstancesOfStargateModelClassesAsTransient.
 			spec requires:
 					#( 'Buoy-Deployment' 'Hyperspace-Deployment'
 					   'Teapot-Deployment' 'JSONWebToken-Deployment' ) ];
@@ -127,7 +129,7 @@ BaselineOfStargate >> setUpDeploymentPackages: spec [
 		group: 'Deployment' with: 'Metrics-HTTP'.
 	spec
 		package: 'Stargate-JSON-RPC' with: [ 
-			spec postLoadDoIt: #configureJsonRPCControllerInstancesAsTransient.
+			spec postLoadDoIt: #configureInstancesOfStargateJSONRPCClassesAsTransient.
 			spec requires: #( 'Core' 'JRPC-Deployment' ) ];
 		group: 'JSON-RPC' with: 'Stargate-JSON-RPC';
 		group: 'Deployment' with: 'JSON-RPC'.
