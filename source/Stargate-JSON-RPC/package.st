@@ -1,1 +1,1 @@
-Package { #name : #'Stargate-JSON-RPC' }
+Package { #name : 'Stargate-JSON-RPC' }

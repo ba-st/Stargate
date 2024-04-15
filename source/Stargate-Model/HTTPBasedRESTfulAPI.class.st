@@ -15,7 +15,10 @@ Class {
 	],
 	#category : 'Stargate-Model-Controllers',
 	#package : 'Stargate-Model',
-	#tag : 'Controllers'
+	#tag : 'Controllers',
+	#'gs_options' : [
+		'dbTransient'
+	]
 }
 
 { #category : 'instance creation' }
@@ -138,8 +141,10 @@ HTTPBasedRESTfulAPI >> enable: anOperationalPluginEndpoint configuredBy: configu
 HTTPBasedRESTfulAPI >> initializeConfiguredBy: configuration installing: aRESTfulControllerCollection [
 
 	optionalCORSHandler := Optional unusedBecause: 'CORS not configured'.
-	teapotServer := Teapot
-		configure: configuration , {( #notFoundHandlerClass -> Tea405AwareNotFoundHandler )}.
+	teapotServer := Teapot configure: configuration
+		                ,
+		                { (#notFoundHandlerClass
+		                 -> Tea405AwareNotFoundHandler) }.
 	operationsConfiguration := configuration asDictionary at: #operations.
 	self
 		initializeControllersWithAll: aRESTfulControllerCollection;
@@ -150,7 +155,8 @@ HTTPBasedRESTfulAPI >> initializeConfiguredBy: configuration installing: aRESTfu
 { #category : 'initialization' }
 HTTPBasedRESTfulAPI >> initializeControllersWithAll: aRESTfulControllerCollection [
 
-	controllers := OrderedCollection with: ( OperationalPluginsRESTfulController on: self ).
+	controllers := OrderedCollection with:
+		               (OperationalPluginsRESTfulController on: self).
 	controllers addAll: aRESTfulControllerCollection
 ]
 

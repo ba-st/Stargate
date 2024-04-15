@@ -1,13 +1,14 @@
 Class {
-	#name : #JRPCSelfContainedBlockHandler,
-	#superclass : #JRPCMessageSendHandler,
+	#name : 'JRPCSelfContainedBlockHandler',
+	#superclass : 'JRPCMessageSendHandler',
 	#instVars : [
 		'argumentNames'
 	],
-	#category : #'Stargate-JSON-RPC'
+	#category : 'Stargate-JSON-RPC',
+	#package : 'Stargate-JSON-RPC'
 }
 
-{ #category : #'instance creation' }
+{ #category : 'instance creation' }
 JRPCSelfContainedBlockHandler class >> forProcedureNamed: aString withArgumentNames: argumentNames evaluating: aBlock [
 
 	AssertionChecker enforce: [ aBlock argumentCount = argumentNames size ]
@@ -17,7 +18,7 @@ JRPCSelfContainedBlockHandler class >> forProcedureNamed: aString withArgumentNa
 	^ self new initializeForProcedureNamed: aString withArgumentNames: argumentNames evaluating: aBlock
 ]
 
-{ #category : #evaluation }
+{ #category : 'evaluation' }
 JRPCSelfContainedBlockHandler >> executeWithArguments: anArrayOrDictionary [
 
 	| arguments |
@@ -31,7 +32,7 @@ JRPCSelfContainedBlockHandler >> executeWithArguments: anArrayOrDictionary [
 	^ self send: self messageSelector to: self receiver with: arguments
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 JRPCSelfContainedBlockHandler >> initializeForProcedureNamed: aString withArgumentNames: theArgumentNames evaluating: aBlock [
 
 	self
@@ -40,19 +41,19 @@ JRPCSelfContainedBlockHandler >> initializeForProcedureNamed: aString withArgume
 	argumentNames := theArgumentNames collect: #asString
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 JRPCSelfContainedBlockHandler >> messageSelector [
 
 	^ #valueWithArguments:
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 JRPCSelfContainedBlockHandler >> parametersNames [
 
 	^ argumentNames
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 JRPCSelfContainedBlockHandler >> send: aSelector to: aBlock with: arguments [
 
 	^ super send: aSelector to: aBlock with: ( Array with: arguments )

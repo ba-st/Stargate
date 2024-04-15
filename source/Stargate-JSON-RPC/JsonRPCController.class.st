@@ -1,14 +1,18 @@
 Class {
-	#name : #JsonRPCController,
-	#superclass : #Object,
+	#name : 'JsonRPCController',
+	#superclass : 'Object',
 	#instVars : [
 		'requestHandler',
 		'procedureDefinitions'
 	],
-	#category : #'Stargate-JSON-RPC'
+	#category : 'Stargate-JSON-RPC',
+	#package : 'Stargate-JSON-RPC',
+	#'gs_options' : [
+		'dbTransient'
+	]
 }
 
-{ #category : #'instance creation' }
+{ #category : 'instance creation' }
 JsonRPCController class >> configuredBy: configurationAction [
 
 	| options |
@@ -18,42 +22,45 @@ JsonRPCController class >> configuredBy: configurationAction [
 	^ self with: options
 ]
 
-{ #category : #'instance creation' }
+{ #category : 'instance creation' }
 JsonRPCController class >> with: options [
 
 	^self new initializeWith: options
 ]
 
-{ #category : #configuring }
+{ #category : 'configuring' }
 JsonRPCController >> configureAvailableProcedures [
 
 	procedureDefinitions do: [ :definition | definition value: requestHandler ]
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 JsonRPCController >> endpoint [
 
 	^ self requestHandler endpoint
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 JsonRPCController >> initializeWith: options [
 
 	procedureDefinitions := options at: #procedureDefinitions.
-	requestHandler := JsonRPCRequestHandler handling: ( options at: #endpoint ).
-	options at: #debugMode ifPresent: [ :boolean | requestHandler debugMode: boolean ].
-	options at: #errorHandlers
-		ifPresent: [ :handlers | 
-		handlers do: [ :errorHandler | requestHandler addErrorHandler: errorHandler ] ]
+	requestHandler := JsonRPCRequestHandler handling:
+		                  (options at: #endpoint).
+	options
+		at: #debugMode
+		ifPresent: [ :boolean | requestHandler debugMode: boolean ].
+	options at: #errorHandlers ifPresent: [ :handlers |
+		handlers do: [ :errorHandler |
+			requestHandler addErrorHandler: errorHandler ] ]
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 JsonRPCController >> requestHandler [
 
 	^ requestHandler
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 JsonRPCController >> routes [
 
 	^ Array with: ( RouteSpecification handling: #POST
@@ -62,7 +69,7 @@ JsonRPCController >> routes [
 			    requestHandler process: httpRequest within: requestContext ] )
 ]
 
-{ #category : #configuring }
+{ #category : 'configuring' }
 JsonRPCController >> serverUrl: aServerUrl [
 
 	requestHandler serverUrl: aServerUrl.
