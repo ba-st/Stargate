@@ -138,8 +138,10 @@ HTTPBasedRESTfulAPI >> enable: anOperationalPluginEndpoint configuredBy: configu
 HTTPBasedRESTfulAPI >> initializeConfiguredBy: configuration installing: aRESTfulControllerCollection [
 
 	optionalCORSHandler := Optional unusedBecause: 'CORS not configured'.
-	teapotServer := Teapot
-		configure: configuration , {( #notFoundHandlerClass -> Tea405AwareNotFoundHandler )}.
+	teapotServer := Teapot configure: configuration
+		                ,
+		                { (#notFoundHandlerClass
+		                 -> Tea405AwareNotFoundHandler) }.
 	operationsConfiguration := configuration asDictionary at: #operations.
 	self
 		initializeControllersWithAll: aRESTfulControllerCollection;

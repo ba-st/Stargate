@@ -73,9 +73,10 @@ JsonRPCRequestHandler >> process: httpRequest within: requestContext [
 		raising: HTTPClientError unsupportedMediaType.
 	acceptNegotiator bestRepresentationFor: httpRequest.
 
-	^ ( messageProcessor handleJSON: httpRequest contents )
-		ifEmpty: [ ZnResponse accepted ]
-		ifNotEmpty: [ :rpcResponse | ZnResponse ok: ( ZnEntity json: rpcResponse ) ]
+	^ (messageProcessor handleJSON: httpRequest contents)
+		  ifEmpty: [ ZnResponse accepted ]
+		  ifNotEmpty: [ :rpcResponse |
+		  ZnResponse ok: (ZnEntity json: rpcResponse) ]
 ]
 
 { #category : 'configuring' }
