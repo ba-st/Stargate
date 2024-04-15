@@ -10,8 +10,6 @@ BaselineOfStargate >> baseline: spec [
 
 	<baseline>
 	spec for: #pharo do: [
-		spec postLoadDoIt:
-			#configureControllerInstancesAsTransient.
 		self
 			setUpDependencies: spec;
 			setUpPackages: spec.
@@ -22,12 +20,10 @@ BaselineOfStargate >> baseline: spec [
 			group: 'Development' with: #( 'Tests' 'Tools' ) ]
 ]
 
-{ #category : 'baselines' }
-BaselineOfStargate >> configureControllerInstancesAsTransient [
+{ #category : 'post-load actions' }
+BaselineOfStargate >> configureResourceRESTfulControllerInstancesAsTransient [
 
-	#( ResourceRESTfulController JsonRPCController ) do: [ :className |
-		(LanguagePlatform current globalNamed: className ifAbsent: [ nil ])
-			ifNotNil: #makeInstancesDbTransient ]
+	ResourceRESTfulController makeInstancesDbTransient
 ]
 
 { #category : 'accessing' }
@@ -41,6 +37,7 @@ BaselineOfStargate >> setUpCorePackages: spec [
 
 	spec
 		package: 'Stargate-Model' with: [
+			spec postLoadDoIt: #configureResourceRESTfulControllerInstancesAsTransient.
 			spec requires:
 					#( 'Buoy-Deployment' 'Hyperspace-Deployment'
 					   'Teapot-Deployment' 'JSONWebToken-Deployment' ) ];
