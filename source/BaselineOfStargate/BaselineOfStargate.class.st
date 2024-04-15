@@ -21,15 +21,24 @@ BaselineOfStargate >> baseline: spec [
 ]
 
 { #category : 'post-load actions' }
+BaselineOfStargate >> configureAsTransientInstancesOfAll: aClassCollection [
+
+	aClassCollection do: #makeInstancesDbTransient
+]
+
+{ #category : 'post-load actions' }
 BaselineOfStargate >> configureJsonRPCControllerInstancesAsTransient [
 
-	JsonRPCController makeInstancesDbTransient
+	self configureAsTransientInstancesOfAll: {
+			JsonRPCController.
+			JsonRPCRequestHandler }
 ]
 
 { #category : 'post-load actions' }
 BaselineOfStargate >> configureResourceRESTfulControllerInstancesAsTransient [
 
-	ResourceRESTfulController makeInstancesDbTransient
+	self configureAsTransientInstancesOfAll:
+		{ ResourceRESTfulController }
 ]
 
 { #category : 'accessing' }
