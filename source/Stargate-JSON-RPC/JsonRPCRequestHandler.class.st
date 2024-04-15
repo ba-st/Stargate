@@ -10,7 +10,10 @@ Class {
 		'resourceLocator'
 	],
 	#category : 'Stargate-JSON-RPC',
-	#package : 'Stargate-JSON-RPC'
+	#package : 'Stargate-JSON-RPC',
+	#'gs_options' : [
+		'dbTransient'
+	]
 }
 
 { #category : 'instance creation' }
@@ -54,8 +57,8 @@ JsonRPCRequestHandler >> initialize [
 
 	super initialize.
 	messageProcessor := JRPCMessageProcessor new.
-	acceptNegotiator := RESTfulControllerAcceptNegotiator
-		accepting: ( Array with: ZnMimeType applicationJson )
+	acceptNegotiator := RESTfulControllerAcceptNegotiator accepting:
+		                    (Array with: ZnMimeType applicationJson)
 ]
 
 { #category : 'initialization' }

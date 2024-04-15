@@ -15,7 +15,10 @@ Class {
 	],
 	#category : 'Stargate-Model-Controllers',
 	#package : 'Stargate-Model',
-	#tag : 'Controllers'
+	#tag : 'Controllers',
+	#'gs_options' : [
+		'dbTransient'
+	]
 }
 
 { #category : 'instance creation' }
@@ -152,7 +155,8 @@ HTTPBasedRESTfulAPI >> initializeConfiguredBy: configuration installing: aRESTfu
 { #category : 'initialization' }
 HTTPBasedRESTfulAPI >> initializeControllersWithAll: aRESTfulControllerCollection [
 
-	controllers := OrderedCollection with: ( OperationalPluginsRESTfulController on: self ).
+	controllers := OrderedCollection with:
+		               (OperationalPluginsRESTfulController on: self).
 	controllers addAll: aRESTfulControllerCollection
 ]
 
