@@ -4,7 +4,7 @@ on:
   - pull_request
   - workflow_dispatch
 jobs:
-   component-loading:
+   component-loading-3_7_0:
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
@@ -20,11 +20,35 @@ jobs:
           - HealthCheck
           - Metrics
           - JSON-RPC
-    name: GS64 + ${{ matrix.load-spec }}
+    name: GS64 v3.7.0 + ${{ matrix.load-spec }}
     steps:
       - uses: actions/checkout@v4
       - name: Load component in image
         uses: ba-st-actions/gs64-ci@v2
+        with:
+          project_name: 'Stargate'
+          load_spec: 'Stargate-${{ matrix.load-spec }}'
+   component-loading-3_7_1:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        load-spec:
+          - Application-Configuration
+          - Application-Control
+          - Application-Info
+          - Core
+          - Dependent-SUnit-Extensions
+          - Deployment
+          - Examples
+          - HealthCheck
+          - Metrics
+          - JSON-RPC
+    name: GS64 v3.7.1 + ${{ matrix.load-spec }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Load component in image
+        uses: ba-st-actions/gs64-ci@v3
         with:
           project_name: 'Stargate'
           load_spec: 'Stargate-${{ matrix.load-spec }}'

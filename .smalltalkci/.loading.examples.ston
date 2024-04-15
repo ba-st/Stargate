@@ -4,7 +4,8 @@ SmalltalkCISpec {
       #baseline : 'Stargate',
       #directory : '../source',
       #load : [ 'Examples' ],
-      #platforms : [  #pharo ]
+      #platforms : [  #pharo ],
+      #failOn : [ #Warning ]
     }
   ],
   #testing : {
