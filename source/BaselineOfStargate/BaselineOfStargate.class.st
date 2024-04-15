@@ -21,6 +21,12 @@ BaselineOfStargate >> baseline: spec [
 ]
 
 { #category : 'post-load actions' }
+BaselineOfStargate >> configureJsonRPCControllerInstancesAsTransient [
+
+	JsonRPCController makeInstancesDbTransient
+]
+
+{ #category : 'post-load actions' }
 BaselineOfStargate >> configureResourceRESTfulControllerInstancesAsTransient [
 
 	ResourceRESTfulController makeInstancesDbTransient
@@ -111,7 +117,9 @@ BaselineOfStargate >> setUpDeploymentPackages: spec [
 		group: 'Metrics-HTTP' with: 'Stargate-Metrics-HTTP-Zinc-Extensions';
 		group: 'Deployment' with: 'Metrics-HTTP'.
 	spec
-		package: 'Stargate-JSON-RPC' with: [ spec requires: #( 'Core' 'JRPC-Deployment' ) ];
+		package: 'Stargate-JSON-RPC' with: [ 
+			spec postLoadDoIt: #configureJsonRPCControllerInstancesAsTransient.
+			spec requires: #( 'Core' 'JRPC-Deployment' ) ];
 		group: 'JSON-RPC' with: 'Stargate-JSON-RPC';
 		group: 'Deployment' with: 'JSON-RPC'.
 	spec
