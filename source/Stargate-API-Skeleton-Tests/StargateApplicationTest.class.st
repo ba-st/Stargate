@@ -3,9 +3,8 @@ A StargateAPISkeletonTest is a test class for testing the behavior of StargateAP
 "
 Class {
 	#name : 'StargateApplicationTest',
-	#superclass : 'TestCase',
+	#superclass : 'LaunchpadTest',
 	#instVars : [
-		'application',
 		'port',
 		'baseUrl'
 	],
@@ -76,12 +75,6 @@ StargateApplicationTest >> run: count concurrentInstancesOf: block [
 	^ results
 ]
 
-{ #category : 'running' }
-StargateApplicationTest >> runCase [
-
-	self shouldnt: [ super runCase ] raise: Exit
-]
-
 { #category : 'private' }
 StargateApplicationTest >> secret [
 
@@ -97,26 +90,6 @@ StargateApplicationTest >> setUp [
 ]
 
 { #category : 'private' }
-StargateApplicationTest >> start: aLaunchpadApplication withAll: arguments [
-
-	String streamContents: [ :stream | 
-		| context rootCommand |
-
-
-		rootCommand := LaunchpadRootCommand new.
-		context := LaunchpadCommandLineProcessingContext
-			           handling: ( CommandLineArguments withArguments: { 
-						             'launchpad'.
-						             'start'.
-						             aLaunchpadApplication commandName } , arguments )
-			           writingTo: stream.
-		self assert: ( rootCommand canHandle: ( context nextCommandLineArgumentIfNone: [ self fail ] ) ).
-		rootCommand evaluateWithin: context.
-		application := LaunchpadApplication currentlyRunning
-		]
-]
-
-{ #category : 'private' }
 StargateApplicationTest >> startConcurrentConnectionsApp [
 
 	self start: ConcurrentConnectionsTestApplication withAll: { 
@@ -124,7 +97,7 @@ StargateApplicationTest >> startConcurrentConnectionsApp [
 			'--stargate.port=<1p>' expandMacrosWith: port.
 			'--stargate.operations-secret=<1s>' expandMacrosWith: self secret.
 			'--stargate.concurrent-connections-threshold=1' }.
-	baseUrl := application configuration stargate publicURL
+	baseUrl := runningApplication configuration stargate publicURL
 ]
 
 { #category : 'private' }
@@ -134,7 +107,7 @@ StargateApplicationTest >> startPetStore [
 			'--pet-store.stargate.public-url=http://localhost:<1p>' expandMacrosWith: port.
 			'--pet-store.stargate.port=<1p>' expandMacrosWith: port.
 			'--pet-store.stargate.operations-secret=<1s>' expandMacrosWith: self secret }.
-	baseUrl := application configuration petStore stargate publicURL
+	baseUrl := runningApplication configuration petStore stargate publicURL
 ]
 
 { #category : 'private' }
@@ -144,13 +117,12 @@ StargateApplicationTest >> startSouthAmericanCurrencies [
 			'--stargate.public-url=http://localhost:<1p>' expandMacrosWith: port.
 			'--stargate.port=<1p>' expandMacrosWith: port.
 			'--stargate.operations-secret=<1s>' expandMacrosWith: self secret }.
-	baseUrl := application configuration stargate publicURL
+	baseUrl := runningApplication configuration stargate publicURL
 ]
 
 { #category : 'running' }
 StargateApplicationTest >> tearDown [
 
-	application ifNotNil: [ :theApplication | theApplication stop ].
 	ZnOptions resetGlobalDefault.
 	super tearDown
 ]
