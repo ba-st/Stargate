@@ -102,7 +102,8 @@ BaselineOfStargate >> setUpDependencies: spec [
 
 	spec
 		baseline: 'Launchpad' with: [ spec repository: 'github://ba-st/Launchpad:v5' ];
-		project: 'Launchpad-Deployment' copyFrom: 'Launchpad' with: [ spec loads: 'Deployment' ]
+		project: 'Launchpad-Deployment' copyFrom: 'Launchpad' with: [ spec loads: 'Deployment' ];
+		project: 'Launchpad-SUnit' copyFrom: 'Launchpad' with: [ spec loads: 'Dependent-SUnit-Extensions' ]
 ]
 
 { #category : 'baselines' }
@@ -228,7 +229,7 @@ BaselineOfStargate >> setUpTestPackages: spec [
 		group: 'Tests' with: 'Stargate-JSON-RPC-Tests'.
 	spec
 		package: 'Stargate-API-Skeleton-Tests'
-		with: [ spec requires: #( 'Dependent-SUnit-Extensions' 'Stargate-Examples' 'Hyperspace-SUnit' ) ];
+		with: [ spec requires: #( 'Dependent-SUnit-Extensions' 'Stargate-Examples' 'Hyperspace-SUnit' 'Launchpad-SUnit' ) ];
 		group: 'Tests' with: 'Stargate-API-Skeleton-Tests'.
 	spec
 		package: 'Stargate-Examples-Tests'
