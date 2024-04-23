@@ -1,1 +1,1 @@
-Package { #name : #'Stargate-NeoJSON-Extensions' }
+Package { #name : 'Stargate-NeoJSON-Extensions' }

@@ -480,6 +480,26 @@ PetOrdersRESTfulControllerTest >> testOrderCreation [
 		assert: orderRepository findAll first pet equals: self petUrl
 ]
 
+{ #category : 'tests - orders' }
+PetOrdersRESTfulControllerTest >> testOrderCreationWhenDecodingFailsDueToMissingKey [
+
+	self
+		should: [
+			| request |
+
+			request := self requestToPOSTAsOrder: ( '{"pet":"<1p>"}' expandMacrosWith: self petUrl ).
+			resourceController createOrderBasedOn: request within: self newHttpRequestContext
+			]
+		raise: HTTPClientError badRequest withMessageText: 'Missing required keys (#date)';
+		should: [
+			| request |
+
+			request := self requestToPOSTAsOrder: '{"date":"2018-10-24T18:05:46.418Z"}'.
+			resourceController createOrderBasedOn: request within: self newHttpRequestContext
+			]
+		raise: HTTPClientError badRequest withMessageText: 'Missing required keys (#pet)'
+]
+
 { #category : 'tests' }
 PetOrdersRESTfulControllerTest >> testRoutes [
 
