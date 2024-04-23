@@ -602,6 +602,15 @@ PetsRESTfulControllerTest >> testPetCreation [
 ]
 
 { #category : 'tests - creation' }
+PetsRESTfulControllerTest >> testPetCreationWhenDecodingFailsDueToMissingName [
+
+	self
+		should: [ self requestToCreatePetFrom: '{"type":"dog"}' ]
+		raise: HTTPClientError badRequest
+		withMessageText: '? (something along the lines of missing name)'
+]
+
+{ #category : 'tests - creation' }
 PetsRESTfulControllerTest >> testPetCreationWhenNoAcceptHeaderPresentInRequest [
 
 	| request response |
