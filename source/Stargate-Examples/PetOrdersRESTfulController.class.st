@@ -114,7 +114,7 @@ PetOrdersRESTfulController >> completeTemplate [
 PetOrdersRESTfulController >> configureOrderDecodingOn: reader [
 
 	^ reader
-		  for: PetOrder do: [ :mapping |
+		  for: PetOrder strictDo: [ :mapping |
 			  mapping
 				  mapInstVar: #date;
 				  mapProperty: #pet
