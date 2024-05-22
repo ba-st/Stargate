@@ -49,6 +49,16 @@ PetOrdersRESTfulControllerTest >> createOrder [
 ]
 
 { #category : 'private - support' }
+PetOrdersRESTfulControllerTest >> createOverlyComplexOrder [
+
+	^ resourceController
+		  createOrderBasedOn: ( self requestToPOSTAsOverlyComplexOrder:
+				    ( '{"date":{"date":{"year":2018,"month":10,"day":24,"offset":0},"time":"18:05:46.418Z"},"pet":"<1p>"}'
+					      expandMacrosWith: self petUrl ) )
+		  within: self newHttpRequestContext
+]
+
+{ #category : 'private - support' }
 PetOrdersRESTfulControllerTest >> getFirstOrderAndWithJsonDo: aBlock [
 
 	| response |
@@ -115,6 +125,12 @@ PetOrdersRESTfulControllerTest >> requestToPOST: url identifiedBy: anIdentifier 
 PetOrdersRESTfulControllerTest >> requestToPOSTAsOrder: json [
 
 	^ self requestToPOST: json as: resourceController orderVersion1dot0dot0MediaType
+]
+
+{ #category : 'private - HTTP requests' }
+PetOrdersRESTfulControllerTest >> requestToPOSTAsOverlyComplexOrder: json [
+
+	^ self requestToPOST: json as: resourceController overlyComplexOrderVersion1dot0dot0MediaType
 ]
 
 { #category : 'private - HTTP requests' }
@@ -498,6 +514,27 @@ PetOrdersRESTfulControllerTest >> testOrderCreationWhenDecodingFailsDueToMissing
 			resourceController createOrderBasedOn: request within: self newHttpRequestContext
 			]
 		raise: HTTPClientError badRequest withMessageText: 'Missing required keys (#pet)'
+]
+
+{ #category : 'tests - orders' }
+PetOrdersRESTfulControllerTest >> testOverlyComplexOrderCreation [
+
+	| response order |
+
+	response := self createOverlyComplexOrder.
+
+	self
+		assert: response isSuccess;
+		assert: response status equals: 201;
+		assertUrl: response location equals: 'https://petstore.example.com/orders/1';
+		assert: response hasEntity;
+		assert: orderRepository count equals: 1.
+	order := orderRepository findAll first.
+	self
+		assert: order pet equals: self petUrl;
+		assert: order date equals: ( DateAndTime
+				  date: ( Date readFrom: '2018-10-24' pattern: 'yyyy-mm-dd' )
+				  time: ( Time fromString: '18:05:46.418' ) )
 ]
 
 { #category : 'tests' }

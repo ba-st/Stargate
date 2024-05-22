@@ -113,30 +113,59 @@ PetOrdersRESTfulController >> completeTemplate [
 { #category : 'private' }
 PetOrdersRESTfulController >> configureOrderDecodingOn: reader [
 
-	^ reader
-		  for: PetOrder strictDo: [ :mapping |
-			  mapping
-				  mapInstVar: #date;
-				  mapProperty: #pet
-				  setter: [ :order :url |
-					  LanguagePlatform current atInstanceVariableNamed: 'pet' on: order put: url asUrl ]
-			  ];
-		  nextAs: PetOrder
+	reader for: #Url customDo: [ :mapping | mapping decoder: [ :string | string asUrl ] ].
+	reader for: PetOrder createInstanceUsing: [ :mapping |
+		mapping
+			mapProperty: #date;
+			mapProperty: #pet as: #Url.
+		mapping mapCreationSending: #for:on: withArguments: { #pet. #date }
+		].
+
+	^ reader nextAs: PetOrder
 ]
 
 { #category : 'private' }
 PetOrdersRESTfulController >> configureOrderEncodingOn: writer within: requestContext [
 
 	writer
+		for: DateAndTime
+		customDo: [ :mapping | mapping encoder: [ :dateAndTime | dateAndTime printString ] ];
 		for: ZnUrl customDo: [ :mapping | mapping encoder: [ :url | url printString ] ];
-		for: #Order
-			do: [ :mapping | 
+		for: #Order do: [ :mapping |
 			mapping
 				mapProperty: #pet getter: #pet;
-				mapProperty: #name getter: #date;
+				mapProperty: #date getter: #date;
 				mapProperty: #status getter: [ :object | requestContext objectUnder: #status ];
 				mapAsHypermediaControls: [ :order | requestContext hypermediaControlsFor: order ]
 			]
+]
+
+{ #category : 'private' }
+PetOrdersRESTfulController >> configureOverlyComplexOrderDecodingOn: reader [
+
+	reader for: #Url customDo: [ :mapping | mapping decoder: [ :string | string asUrl ] ].
+	reader for: #Time customDo: [ :mapping | mapping decoder: [ :string | string asTime ] ].
+	reader for: Date createInstanceUsing: [ :mapping |
+		mapping
+			mapProperty: #year;
+			mapProperty: #month;
+			mapProperty: #day.
+		mapping mapCreationSending: #newDay:month:year: withArguments: { #day. #month. #year }
+		].
+	reader for: DateAndTime createInstanceUsing: [ :mapping |
+		mapping
+			mapProperty: #date as: Date;
+			mapProperty: #time as: #Time.
+		mapping mapCreationSending: #date:time: withArguments: { #date. #time }
+		].
+	reader for: PetOrder createInstanceUsing: [ :mapping |
+		mapping
+			mapProperty: #date as: DateAndTime;
+			mapProperty: #pet as: #Url.
+		mapping mapCreationSending: #for:on: withArguments: { #pet. #date }
+		].
+
+	^ reader nextAs: PetOrder
 ]
 
 { #category : 'API - comments' }
@@ -316,23 +345,29 @@ PetOrdersRESTfulController >> initializeCommentsRequestHandler [
 PetOrdersRESTfulController >> initializeOrdersRequestHandler [
 
 	ordersRequestHandler := RESTfulRequestHandlerBuilder new
-		handling: 'orders'
-			locatingResourcesWith: [ :order :requestContext | ordersRepository identifierOf: order ]
-			extractingIdentifierWith: [ :httpRequest | self identifierIn: httpRequest ];
-		beHypermediaDrivenBy:
-				[ :builder :order :requestContext :orderLocation | self affect: builder withMediaControlsFor: order locatedAt: orderLocation ];
-		whenAccepting: self orderVersion1dot0dot0MediaType
-			decodeFromJsonApplying: [ :json :reader | self configureOrderDecodingOn: reader ];
-		whenResponding: self orderVersion1dot0dot0MediaType
-			encodeToJsonApplying: [ :resource :requestContext :writer | self configureOrderEncodingOn: writer within: requestContext ]
-			as: #Order;
-		createEntityTagHashing: [ :hasher :order :requestContext | 
-			hasher
-				include: ( ordersRepository identifierOf: order );
-				include: ( ordersRepository lastModificationOf: order )
-			];
-		directCachingWith: [ :caching | caching beAvailableFor: 1 minute ];
-		build
+		                        handling: 'orders'
+		                        locatingResourcesWith: [ :order :requestContext |
+			                        ordersRepository identifierOf: order ]
+		                        extractingIdentifierWith: [ :httpRequest | self identifierIn: httpRequest ];
+		                        beHypermediaDrivenBy: [ :builder :order :requestContext :orderLocation |
+			                        self affect: builder withMediaControlsFor: order locatedAt: orderLocation ];
+		                        whenAccepting: self orderVersion1dot0dot0MediaType
+		                        decodeFromJsonApplying: [ :json :reader |
+			                        self configureOrderDecodingOn: reader ];
+		                        whenAccepting: self overlyComplexOrderVersion1dot0dot0MediaType
+		                        decodeFromJsonApplying: [ :json :reader |
+			                        self configureOverlyComplexOrderDecodingOn: reader ];
+		                        whenResponding: self orderVersion1dot0dot0MediaType
+		                        encodeToJsonApplying: [ :resource :requestContext :writer |
+			                        self configureOrderEncodingOn: writer within: requestContext ]
+		                        as: #Order;
+		                        createEntityTagHashing: [ :hasher :order :requestContext |
+			                        hasher
+				                        include: ( ordersRepository identifierOf: order );
+				                        include: ( ordersRepository lastModificationOf: order )
+			                        ];
+		                        directCachingWith: [ :caching | caching beAvailableFor: 1 minute ];
+		                        build
 ]
 
 { #category : 'initialization' }
@@ -368,6 +403,12 @@ PetOrdersRESTfulController >> orderCommentsBasedOn: httpRequest within: requestC
 PetOrdersRESTfulController >> orderVersion1dot0dot0MediaType [
 
 	^ self jsonMediaType: 'order' vendoredBy: 'stargate' version: '1.0.0'
+]
+
+{ #category : 'private' }
+PetOrdersRESTfulController >> overlyComplexOrderVersion1dot0dot0MediaType [
+
+	^ self jsonMediaType: 'overly-complex-order' vendoredBy: 'stargate' version: '1.0.0'
 ]
 
 { #category : 'private' }
