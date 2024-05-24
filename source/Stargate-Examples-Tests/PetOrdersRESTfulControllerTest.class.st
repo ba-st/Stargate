@@ -49,6 +49,15 @@ PetOrdersRESTfulControllerTest >> createOrder [
 ]
 
 { #category : 'private - support' }
+PetOrdersRESTfulControllerTest >> createOverlyComplexOrder [
+
+	^ resourceController
+		  createOrderBasedOn: ( self requestToPOSTAsOverlyComplexOrder:
+				    '{"date":"2018-10-24T18:05:46.418Z","pet":{"alternativeName":"Fido","itsType":"Dog","theStatus":"happy"}}' )
+		  within: self newHttpRequestContext
+]
+
+{ #category : 'private - support' }
 PetOrdersRESTfulControllerTest >> getFirstOrderAndWithJsonDo: aBlock [
 
 	| response |
@@ -115,6 +124,12 @@ PetOrdersRESTfulControllerTest >> requestToPOST: url identifiedBy: anIdentifier 
 PetOrdersRESTfulControllerTest >> requestToPOSTAsOrder: json [
 
 	^ self requestToPOST: json as: resourceController orderVersion1dot0dot0MediaType
+]
+
+{ #category : 'private - HTTP requests' }
+PetOrdersRESTfulControllerTest >> requestToPOSTAsOverlyComplexOrder: json [
+
+	^ self requestToPOST: json as: resourceController overlyComplexOrderVersion1dot0dot0MediaType
 ]
 
 { #category : 'private - HTTP requests' }
@@ -498,6 +513,27 @@ PetOrdersRESTfulControllerTest >> testOrderCreationWhenDecodingFailsDueToMissing
 			resourceController createOrderBasedOn: request within: self newHttpRequestContext
 			]
 		raise: HTTPClientError badRequest withMessageText: 'Missing required keys (#pet)'
+]
+
+{ #category : 'tests - orders' }
+PetOrdersRESTfulControllerTest >> testOverlyComplexOrderCreation [
+
+	| response order |
+
+	response := self createOverlyComplexOrder.
+
+	self
+		assert: response isSuccess;
+		assert: response status equals: 201;
+		assertUrl: response location equals: 'https://petstore.example.com/orders/1';
+		assert: response hasEntity;
+		assert: orderRepository count equals: 1.
+	order := orderRepository findAll first.
+	self
+		assert: order pet name equals: 'Fido';
+		assert: order pet type equals: 'Dog';
+		assert: order pet status equals: 'HAPPY';
+		assert: order date equals: '2018-10-24T18:05:46.418Z'
 ]
 
 { #category : 'tests' }
