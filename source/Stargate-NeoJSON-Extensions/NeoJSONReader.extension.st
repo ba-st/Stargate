@@ -1,11 +1,11 @@
 Extension { #name : 'NeoJSONReader' }
 
 { #category : '*Stargate-NeoJSON-Extensions' }
-NeoJSONReader >> for: schemaName createInstanceUsing: block [
+NeoJSONReader >> for: smalltalkClass createInstanceUsing: block [
 
 	| mapping |
 
-	mapping := self instanceCreationMappingFor: schemaName.
+	mapping := self instanceCreationMappingFor: smalltalkClass.
 	block value: mapping.
 	^ mapping
 ]

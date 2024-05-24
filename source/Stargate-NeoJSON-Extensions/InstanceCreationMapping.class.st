@@ -1,5 +1,5 @@
 "
-I am NeoJSONStrictObjectMapping, I'm equivalent to NeoJSONObjectMapping but more strict.
+I am InstanceCreationMapping, I'm equivalent to NeoJSONObjectMapping but require an instance creation method to build instances.
 I will fail on reading properties of an object if some of the mapped properties are missing in the incoming JSON.
 
 "
