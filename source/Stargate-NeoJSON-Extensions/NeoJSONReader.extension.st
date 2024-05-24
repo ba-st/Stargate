@@ -5,7 +5,7 @@ NeoJSONReader >> for: schemaName createInstanceUsing: block [
 
 	| mapping |
 
-	mapping := self validCompleteInstanceMappingFor: schemaName.
+	mapping := self instanceCreationMappingFor: schemaName.
 	block value: mapping.
 	^ mapping
 ]
@@ -21,20 +21,20 @@ NeoJSONReader >> for: schemaName strictDo: block [
 ]
 
 { #category : '*Stargate-NeoJSON-Extensions' }
-NeoJSONReader >> strictMappingFor: smalltalkClass [
+NeoJSONReader >> instanceCreationMappingFor: smalltalkClass [
 
 	^ self mappings at: smalltalkClass ifAbsentPut: [
-		  NeoJSONStrictObjectMapping new
+		  InstanceCreationMapping new
 			  subjectClass: smalltalkClass;
 			  yourself
 		  ]
 ]
 
 { #category : '*Stargate-NeoJSON-Extensions' }
-NeoJSONReader >> validCompleteInstanceMappingFor: smalltalkClass [
+NeoJSONReader >> strictMappingFor: smalltalkClass [
 
 	^ self mappings at: smalltalkClass ifAbsentPut: [
-		  ValidCompleteInstanceMapping new
+		  NeoJSONStrictObjectMapping new
 			  subjectClass: smalltalkClass;
 			  yourself
 		  ]

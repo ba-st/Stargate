@@ -53,8 +53,7 @@ PetOrdersRESTfulControllerTest >> createOverlyComplexOrder [
 
 	^ resourceController
 		  createOrderBasedOn: ( self requestToPOSTAsOverlyComplexOrder:
-				    ( '{"date":{"date":{"year":2018,"month":10,"day":24,"offset":0},"time":"18:05:46.418Z"},"pet":"<1p>"}'
-					      expandMacrosWith: self petUrl ) )
+				    '{"date":"2018-10-24T18:05:46.418Z","pet":{"alternativeName":"Fido","itsType":"Dog","theStatus":"happy"}}' )
 		  within: self newHttpRequestContext
 ]
 
@@ -531,10 +530,10 @@ PetOrdersRESTfulControllerTest >> testOverlyComplexOrderCreation [
 		assert: orderRepository count equals: 1.
 	order := orderRepository findAll first.
 	self
-		assert: order pet equals: self petUrl;
-		assert: order date equals: ( DateAndTime
-				  date: ( Date readFrom: '2018-10-24' pattern: 'yyyy-mm-dd' )
-				  time: ( Time fromString: '18:05:46.418' ) )
+		assert: order pet name equals: 'Fido';
+		assert: order pet type equals: 'Dog';
+		assert: order pet status equals: 'HAPPY';
+		assert: order date equals: '2018-10-24T18:05:46.418Z'
 ]
 
 { #category : 'tests' }

@@ -4,7 +4,7 @@ I will fail on reading properties of an object if some of the mapped properties 
 
 "
 Class {
-	#name : 'ValidCompleteInstanceMapping',
+	#name : 'InstanceCreationMapping',
 	#superclass : 'NeoJSONObjectMapping',
 	#instVars : [
 		'instanceCreationSelector',
@@ -15,7 +15,7 @@ Class {
 }
 
 { #category : 'private' }
-ValidCompleteInstanceMapping >> errorDescriptionForMissing: propertyNames [
+InstanceCreationMapping >> errorDescriptionForMissing: propertyNames [
 
 	^ String streamContents: [ :stream |
 		  stream
@@ -38,14 +38,14 @@ ValidCompleteInstanceMapping >> errorDescriptionForMissing: propertyNames [
 ]
 
 { #category : 'mapping' }
-ValidCompleteInstanceMapping >> mapCreationSending: anInstanceCreationSelector withArguments: anArgumentCollection [
+InstanceCreationMapping >> mapCreationSending: anInstanceCreationSelector withArguments: anArgumentCollection [
 
 	instanceCreationSelector := anInstanceCreationSelector.
 	argumentNames := anArgumentCollection
 ]
 
 { #category : 'mapping' }
-ValidCompleteInstanceMapping >> mapProperty: aKey [
+InstanceCreationMapping >> mapProperty: aKey [
 
 	^ self
 		  mapProperty: aKey
@@ -54,13 +54,13 @@ ValidCompleteInstanceMapping >> mapProperty: aKey [
 ]
 
 { #category : 'mapping' }
-ValidCompleteInstanceMapping >> mapProperty: aKey as: aValueSchema [
+InstanceCreationMapping >> mapProperty: aKey as: aValueSchema [
 
 	( self mapProperty: aKey ) valueSchema: aValueSchema
 ]
 
 { #category : 'parsing' }
-ValidCompleteInstanceMapping >> readFrom: jsonReader [
+InstanceCreationMapping >> readFrom: jsonReader [
 
 	| argumentByName arguments missingArguments |
 

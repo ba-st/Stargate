@@ -128,8 +128,7 @@ PetOrdersRESTfulController >> configureOrderDecodingOn: reader [
 PetOrdersRESTfulController >> configureOrderEncodingOn: writer within: requestContext [
 
 	writer
-		for: DateAndTime
-		customDo: [ :mapping | mapping encoder: [ :dateAndTime | dateAndTime printString ] ];
+		for: Pet do: [ :mapping | mapping mapInstVars ];
 		for: ZnUrl customDo: [ :mapping | mapping encoder: [ :url | url printString ] ];
 		for: #Order do: [ :mapping |
 			mapping
@@ -143,25 +142,20 @@ PetOrdersRESTfulController >> configureOrderEncodingOn: writer within: requestCo
 { #category : 'private' }
 PetOrdersRESTfulController >> configureOverlyComplexOrderDecodingOn: reader [
 
-	reader for: #Url customDo: [ :mapping | mapping decoder: [ :string | string asUrl ] ].
-	reader for: #Time customDo: [ :mapping | mapping decoder: [ :string | string asTime ] ].
-	reader for: Date createInstanceUsing: [ :mapping |
+	reader for: #Status customDo: [ :mapping | mapping decoder: [ :string | string asUppercase ] ].
+	reader for: Pet createInstanceUsing: [ :mapping |
 		mapping
-			mapProperty: #year;
-			mapProperty: #month;
-			mapProperty: #day.
-		mapping mapCreationSending: #newDay:month:year: withArguments: { #day. #month. #year }
-		].
-	reader for: DateAndTime createInstanceUsing: [ :mapping |
+			mapProperty: #alternativeName;
+			mapProperty: #itsType;
+			mapProperty: #theStatus as: #Status.
 		mapping
-			mapProperty: #date as: Date;
-			mapProperty: #time as: #Time.
-		mapping mapCreationSending: #date:time: withArguments: { #date. #time }
+			mapCreationSending: #named:ofType:withStatus:
+			withArguments: { #alternativeName. #itsType. #theStatus }
 		].
 	reader for: PetOrder createInstanceUsing: [ :mapping |
 		mapping
-			mapProperty: #date as: DateAndTime;
-			mapProperty: #pet as: #Url.
+			mapProperty: #date;
+			mapProperty: #pet as: Pet.
 		mapping mapCreationSending: #for:on: withArguments: { #pet. #date }
 		].
 
