@@ -37,17 +37,16 @@ HypermediaDrivenRESTfulRequestHandler >> encodeResource: resource as: mediaType 
 { #category : 'private' }
 HypermediaDrivenRESTfulRequestHandler >> encodeResourceCollection: resourceCollection basedOn: httpRequest within: requestContext [
 
-	requestContext
-		holdAsHypermediaControls:
-			( self paginationPolicy
-				addPaginationControlsTo: ( Array with: 'self' -> httpRequest absoluteUrl )
-				within: requestContext )
-		for: resourceCollection.
-	resourceCollection do: [ :resource | self holdResource: resource controlsWithin: requestContext ].
-	^ super
-		encodeResourceCollection: ( ResourceCollection wrapping: resourceCollection )
-		basedOn: httpRequest
-		within: requestContext
+  requestContext
+    holdAsHypermediaControls: ( self paginationPolicy
+          addPaginationControlsTo: { httpRequest absoluteUrl asWebLink toMyself }
+          within: requestContext )
+    for: resourceCollection.
+  resourceCollection do: [ :resource | self holdResource: resource controlsWithin: requestContext ].
+  ^ super
+      encodeResourceCollection: ( ResourceCollection wrapping: resourceCollection )
+      basedOn: httpRequest
+      within: requestContext
 ]
 
 { #category : 'private' }

@@ -28,13 +28,13 @@ MediaControlsBuilder >> addAsSelfLink: aUrl [
 { #category : 'adding' }
 MediaControlsBuilder >> addLink: aUrl relatedTo: aRelationType [
 
-	mediaControls add: aRelationType -> aUrl
+  mediaControls add: ( aUrl asWebLink relationType: aRelationType )
 ]
 
 { #category : 'adding' }
 MediaControlsBuilder >> addRelativeLink: aRelativeUrl relatedTo: aRelationType [
 
-	mediaControls add: aRelationType -> ( resourceLocatorBinding content baseUrl / aRelativeUrl )
+  self addLink: resourceLocatorBinding content baseUrl / aRelativeUrl relatedTo: aRelationType
 ]
 
 { #category : 'building' }

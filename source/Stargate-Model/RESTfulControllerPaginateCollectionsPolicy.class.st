@@ -28,11 +28,7 @@ RESTfulControllerPaginateCollectionsPolicy >> addPaginationControlsTo: mediaCont
 { #category : 'applying' }
 RESTfulControllerPaginateCollectionsPolicy >> affect: response within: requestContext [
 
-	requestContext paginationControls do: [ :assoc | 
-		response addLink: ( ( WebLink to: assoc value )
-				  relationType: assoc key;
-				  yourself )
-		]
+  requestContext paginationControls do: [ :link | response addLink: link ]
 ]
 
 { #category : 'applying' }

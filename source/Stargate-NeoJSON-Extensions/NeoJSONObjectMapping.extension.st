@@ -3,9 +3,13 @@ Extension { #name : 'NeoJSONObjectMapping' }
 { #category : '*Stargate-NeoJSON-Extensions' }
 NeoJSONObjectMapping >> mapAsHypermediaControls: aBlock [
 
-	self
-		mapProperty: #links
-		getter: [ :object | ( ( aBlock cull: object ) collect: [ :assoc | assoc key -> assoc value printString ] ) asDictionary ]
+  self mapProperty: #links getter: [ :object |
+      | controls |
+      controls := OrderedDictionary new.
+      ( aBlock cull: object ) do: [ :webLink |
+          controls at: webLink relationType put: webLink url printString ].
+      controls
+    ]
 ]
 
 { #category : '*Stargate-NeoJSON-Extensions' }
