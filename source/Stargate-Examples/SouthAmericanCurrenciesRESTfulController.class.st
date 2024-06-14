@@ -137,15 +137,22 @@ SouthAmericanCurrenciesRESTfulController >> initializeBanknotesByCurrency [
 { #category : 'initialization' }
 SouthAmericanCurrenciesRESTfulController >> initializeBanknotesRequestHandler [
 
-	banknotesRequestHandler := RESTfulRequestHandlerBuilder new
-		handling: 'banknotes'
-			extractingIdentifierWith: [ :httpRequest | self identifierIn: httpRequest ]
-			locatingParentResourceWith: currenciesRequestHandler resourceLocator;
-		whenResponding: ZnMimeType applicationJson
-			encodeToJsonApplying: [ :resource :requestContext :writer |  ];
-		createEntityTagHashing: [ :hasher :banknote :requestContext | hasher include: banknote ];
-		directCachingWith: [ :caching | caching doNotExpire ];
-		build
+  banknotesRequestHandler := RESTfulRequestHandlerBuilder new
+                               handling: 'banknotes'
+                               extractingIdentifierWith: [ :httpRequest |
+                                   self identifierIn: httpRequest ]
+                               locatingParentResourceWith: currenciesRequestHandler resourceLocator;
+                               whenResponding: ZnMimeType applicationJson
+                               encodeToJsonApplying: [ :resource :requestContext :writer |
+                                   writer
+                                     for: #Banknotes
+                                     customDo: [ :mapping |
+                                         mapping encoder: [ :banknotes | banknotes ] ] ]
+                               as: #Banknotes;
+                               createEntityTagHashing: [ :hasher :banknote :requestContext |
+                                   hasher include: banknote ];
+                               directCachingWith: [ :caching | caching doNotExpire ];
+                               build
 ]
 
 { #category : 'initialization' }
