@@ -9,11 +9,12 @@ Class {
 		'encodingRules',
 		'paginationPolicyFactory',
 		'entityTagFactoryBinding',
-		'handlerFactory',
 		'resourceLocator',
 		'exceptionHandler',
 		'cachingDirectives',
-		'allowedLanguageTags'
+		'allowedLanguageTags',
+		'requestHandlerClass',
+		'requestHandlerFactory'
 	],
 	#category : 'Stargate-Model-Controllers',
 	#package : 'Stargate-Model',
@@ -35,34 +36,37 @@ RESTfulRequestHandlerBuilder >> beHypermediaDriven [
 { #category : 'configuring' }
 RESTfulRequestHandlerBuilder >> beHypermediaDrivenBy: aMediaControlsFactoryBlock [
 
-	AssertionChecker
-		enforce: [ resourceLocator canLookupResources ]
-		because: 'Missing location resolution.'.
-	handlerFactory := [ HypermediaDrivenRESTfulRequestHandler
-		resourceLocator: resourceLocator
-		paginationPolicy: paginationPolicyFactory
-		decodingRules: decodingRules
-		encodingRules: encodingRules
-		calculateEntityTagsWith: entityTagFactoryBinding content
-		cachingDirectives: cachingDirectives
-		allowedLanguageTags: allowedLanguageTags
-		drivenBy: [ :builder :resource :requestContext :resourceLocation | 
-			builder addAsSelfLink: resourceLocation.
-			aMediaControlsFactoryBlock
-				cull: builder
-				cull: resource
-				cull: requestContext
-				cull: resourceLocation.
-			builder build
-			]
-		handleErrorsWith: exceptionHandler
-	]
+  AssertionChecker
+    enforce: [ resourceLocator canLookupResources ] because: 'Missing location resolution.';
+    enforce: [ encodingRules isEmpty ]
+    because: 'Encoding rules needs to be configured after hypermedia'.
+  requestHandlerClass := HypermediaDrivenRESTfulRequestHandler.
+  requestHandlerFactory := [
+                             requestHandlerClass
+                               resourceLocator: resourceLocator
+                               paginationPolicy: paginationPolicyFactory
+                               decodingRules: decodingRules
+                               encodingRules: encodingRules
+                               calculateEntityTagsWith: entityTagFactoryBinding content
+                               cachingDirectives: cachingDirectives
+                               allowedLanguageTags: allowedLanguageTags
+                               drivenBy: [ :builder :resource :requestContext :resourceLocation |
+                                   builder addAsSelfLink: resourceLocation.
+                                   aMediaControlsFactoryBlock
+                                     cull: builder
+                                     cull: resource
+                                     cull: requestContext
+                                     cull: resourceLocation.
+                                   builder build
+                                 ]
+                               handleErrorsWith: exceptionHandler
+                           ]
 ]
 
 { #category : 'building' }
 RESTfulRequestHandlerBuilder >> build [
 
-	^  handlerFactory value
+	^  requestHandlerFactory value
 ]
 
 { #category : 'configuring' }
@@ -159,24 +163,27 @@ RESTfulRequestHandlerBuilder >> handling: anEndpoint locatingSubresourcesWith: a
 { #category : 'initialization' }
 RESTfulRequestHandlerBuilder >> initialize [
 
-	super initialize.
-	decodingRules := Dictionary new.
-	encodingRules := Dictionary new.
-	entityTagFactoryBinding := Binding undefinedExplainedBy: 'Missing ETag calculation'.
-	cachingDirectives := #().
-	allowedLanguageTags := OrderedCollection new.
-	paginationPolicyFactory := [ :requestHandler | RESTfulControllerDoNotPaginateCollectionsPolicy for: requestHandler ].
-	exceptionHandler := RESTfulRequestExceptionHandler new.
-	handlerFactory := [ RESTfulRequestHandler
-		resourceLocator: resourceLocator
-		paginationPolicy: paginationPolicyFactory
-		decodingRules: decodingRules
-		encodingRules: encodingRules
-		calculateEntityTagsWith: entityTagFactoryBinding content
-		cachingDirectives: cachingDirectives
-		allowedLanguageTags: allowedLanguageTags
-		handleErrorsWith: exceptionHandler
-	]
+  super initialize.
+  decodingRules := Dictionary new.
+  encodingRules := Dictionary new.
+  entityTagFactoryBinding := Binding undefinedExplainedBy: 'Missing ETag calculation'.
+  cachingDirectives := #(  ).
+  allowedLanguageTags := OrderedCollection new.
+  paginationPolicyFactory := [ :requestHandler |
+                               RESTfulControllerDoNotPaginateCollectionsPolicy for: requestHandler ].
+  exceptionHandler := RESTfulRequestExceptionHandler new.
+  requestHandlerClass := RESTfulRequestHandler.
+  requestHandlerFactory := [
+                             requestHandlerClass
+                               resourceLocator: resourceLocator
+                               paginationPolicy: paginationPolicyFactory
+                               decodingRules: decodingRules
+                               encodingRules: encodingRules
+                               calculateEntityTagsWith: entityTagFactoryBinding content
+                               cachingDirectives: cachingDirectives
+                               allowedLanguageTags: allowedLanguageTags
+                               handleErrorsWith: exceptionHandler
+                           ]
 ]
 
 { #category : 'private' }
@@ -227,43 +234,30 @@ RESTfulRequestHandlerBuilder >> whenResponding: aMediaType encodeApplying: anEnc
 { #category : 'encoding' }
 RESTfulRequestHandlerBuilder >> whenResponding: aMediaType encodeToJsonApplying: aBlock [
 
-	self whenResponding: aMediaType encodeApplying: [ :resource :requestContext | 
-		self
-			jsonFor: resource
-			within: requestContext
-			applying: aBlock
-			writingResourceWith: [ :writer | 
-				writer for: ResourceCollection do: [ :mapping | 
-					mapping
-						mapInstVar: #items;
-						mapAsHypermediaControls: [ :collection | 
-							requestContext hypermediaControlsFor: collection items ]
-					].
-				writer nextPut: resource
-				]
-		]
+  self whenResponding: aMediaType encodeApplying: [ :resource :requestContext |
+      self
+        jsonFor: resource
+        within: requestContext
+        applying: aBlock
+        writingResourceWith: [ :writer |
+          requestHandlerClass encode: resource toJsonUsing: writer within: requestContext ]
+    ]
 ]
 
 { #category : 'encoding' }
 RESTfulRequestHandlerBuilder >> whenResponding: aMediaType encodeToJsonApplying: aBlock as: schema [
 
-	self whenResponding: aMediaType encodeApplying: [ :resource :requestContext | 
-		self
-			jsonFor: resource
-			within: requestContext
-			applying: aBlock
-			writingResourceWith: [ :writer | 
-				writer
-					for: ResourceCollection do: [ :mapping | 
-						( mapping mapInstVar: #items ) valueSchema: #ResourceCollectionItems.
-						mapping mapAsHypermediaControls: [ :collection | 
-								requestContext hypermediaControlsFor: collection items ]
-						];
-					for: #ResourceCollectionItems customDo: [ :mapping | mapping listOfElementSchema: schema ].
-
-				[ writer nextPut: resource as: schema ]
-					unless: ( resource isA: ResourceCollection )
-					inWhichCase: [ writer nextPut: resource ]
-				]
-		]
+  self whenResponding: aMediaType encodeApplying: [ :resource :requestContext |
+      self
+        jsonFor: resource
+        within: requestContext
+        applying: aBlock
+        writingResourceWith: [ :writer |
+            requestHandlerClass
+              encode: resource
+              toJsonUsing: writer
+              as: schema
+              within: requestContext
+          ]
+    ]
 ]

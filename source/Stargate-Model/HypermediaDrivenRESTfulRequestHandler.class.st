@@ -12,6 +12,35 @@ Class {
 	#tag : 'HATEOAS'
 }
 
+{ #category : 'encoding' }
+HypermediaDrivenRESTfulRequestHandler class >> encode: resource toJsonUsing: writer as: schema within: requestContext [
+
+  writer
+    for: ResourceCollection do: [ :mapping |
+        ( mapping mapInstVar: #items ) valueSchema: #ResourceCollectionItems.
+        mapping mapAsHypermediaControls: [ :collection |
+              requestContext hypermediaControlsFor: collection items ]
+      ];
+    for: #ResourceCollectionItems customDo: [ :mapping | mapping listOfElementSchema: schema ].
+
+  [ writer nextPut: resource as: schema ]
+    unless: ( resource isA: ResourceCollection )
+    inWhichCase: [ writer nextPut: resource ]
+]
+
+{ #category : 'encoding' }
+HypermediaDrivenRESTfulRequestHandler class >> encode: resource toJsonUsing: writer within: requestContext [
+
+  writer for: ResourceCollection do: [ :mapping |
+      mapping
+        mapInstVar: #items;
+        mapAsHypermediaControls: [ :collection |
+            requestContext hypermediaControlsFor: collection items ]
+    ].
+
+  writer nextPut: resource
+]
+
 { #category : 'instance creation' }
 HypermediaDrivenRESTfulRequestHandler class >> resourceLocator: aResouceLocator paginationPolicy: aPaginationPolicy decodingRules: theDecodingRules encodingRules: theEncodingRules calculateEntityTagsWith: entityTagCalculator cachingDirectives: theCachingDirectives allowedLanguageTags: allowedLanguageTags drivenBy: aMediaControlsFactory handleErrorsWith: anExceptionHandler [
 

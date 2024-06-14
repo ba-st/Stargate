@@ -10,6 +10,18 @@ Class {
 	#tag : 'Controllers'
 }
 
+{ #category : 'encoding' }
+RESTfulRequestHandler class >> encode: resource toJsonUsing: writer as: schema within: requestContext [
+
+  writer nextPut: resource as: schema
+]
+
+{ #category : 'encoding' }
+RESTfulRequestHandler class >> encode: resource toJsonUsing: writer within: requestContext [
+
+  writer nextPut: resource
+]
+
 { #category : 'instance creation' }
 RESTfulRequestHandler class >> resourceLocator: aResouceLocator paginationPolicy: aPaginationPolicy decodingRules: theDecodingRules encodingRules: theEncodingRules calculateEntityTagsWith: entityTagCalculator cachingDirectives: theCachingDirectives allowedLanguageTags: allowedLanguageTags handleErrorsWith: anExceptionHandler [
 
