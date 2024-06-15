@@ -19,6 +19,18 @@ Class {
 	#tag : 'Controllers'
 }
 
+{ #category : 'encoding' }
+RESTfulRequestHandlerBehavior class >> encode: resource toJsonUsing: writer as: schema within: requestContext [
+
+  self subclassResponsibility
+]
+
+{ #category : 'encoding' }
+RESTfulRequestHandlerBehavior class >> encode: resource toJsonUsing: writer within: requestContext [
+
+  self subclassResponsibility
+]
+
 { #category : 'private' }
 RESTfulRequestHandlerBehavior >> applyCachingDirectivesFor: aResource to: response within: requestContext [
 
