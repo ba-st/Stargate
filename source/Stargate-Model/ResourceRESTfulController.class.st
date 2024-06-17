@@ -22,6 +22,13 @@ ResourceRESTfulController class >> isAbstract [
 	^ self = ResourceRESTfulController
 ]
 
+{ #category : 'asserting' }
+ResourceRESTfulController >> assert: httpRequest isAuthorizedTo: permission within: requestContext [
+
+	( requestContext includesPermission: permission ) ifFalse: [ 
+		httpRequest abort: ZnResponse forbidden ]
+]
+
 { #category : 'private' }
 ResourceRESTfulController >> jsonMediaType: aSubType vendoredBy: aVendorName version: aVersion [
 
