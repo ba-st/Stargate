@@ -39,6 +39,30 @@ SouthAmericanCurrenciesRESTfulControllerTest >> languageRange [
 	^ 'de,en;q=0.5,es;q=0.6'
 ]
 
+{ #category : 'private' }
+SouthAmericanCurrenciesRESTfulControllerTest >> performTest [
+
+  self
+    use: [ :translator |
+        translator
+          translationFor: 'Argentine peso' in: 'es-AR' is: 'Peso';
+          translationFor: 'Bolivian boliviano' in: 'es-AR' is: 'Boliviano';
+          translationFor: 'Brazilian real' in: 'es-AR' is: 'Real brasileño';
+          translationFor: 'Chilean peso' in: 'es-AR' is: 'Peso chileno';
+          translationFor: 'Colombian peso' in: 'es-AR' is: 'Peso colombiano';
+          translationFor: 'Guyanese dollar' in: 'es-AR' is: 'Dólar guyanés';
+          translationFor: 'Paraguayan guaraní' in: 'es-AR' is: 'Guaraní';
+          translationFor: 'Peruvian sol' in: 'es-AR' is: 'Sol';
+          translationFor: 'Surinamese dollar' in: 'es-AR' is: 'Dólar surinamés';
+          translationFor: 'Uruguayan peso' in: 'es-AR' is: 'Peso uruguayo';
+          translationFor: 'Venezuelan bolívar soberano' in: 'es-AR' is: 'Bolívar';
+          translationFor: '{1} was not found in the system'
+          in: 'es-AR'
+          is: 'No se encontró {1} en el sistema'
+      ]
+    asNaturalLanguageTranslatorDuring: [ super performTest ]
+]
+
 { #category : 'running' }
 SouthAmericanCurrenciesRESTfulControllerTest >> setUpResourceController [
 
@@ -54,7 +78,7 @@ SouthAmericanCurrenciesRESTfulControllerTest >> spanish [
 { #category : 'private - language ranges' }
 SouthAmericanCurrenciesRESTfulControllerTest >> supportedLanguages [
 
-	^ Array with: self argentineSpanish with: self unitedStatesEnglish
+  ^ { self argentineSpanish . self unitedStatesEnglish }
 ]
 
 { #category : 'tests' }
@@ -447,14 +471,36 @@ SouthAmericanCurrenciesRESTfulControllerTest >> testGetCurrenciesInSpanish [
 { #category : 'tests' }
 SouthAmericanCurrenciesRESTfulControllerTest >> testGetCurrencyNotFoundShouldFail [
 
-	self
-		should: [ 
-			resourceController
-				currencyBasedOn: ( self requestToGETResourceIdentifiedBy: 'ZZZ' accepting: '*/*' )
-				within: self newHttpRequestContext
-			]
-		raise: HTTPClientError
-		withExceptionDo: [ :error | self assert: error code equals: 404 ]
+  self
+    should: [
+        resourceController
+          currencyBasedOn: ( self requestToGETResourceIdentifiedBy: 'ZZZ' accepting: '*/*' )
+          within: self newHttpRequestContext
+      ]
+    raise: HTTPClientError
+    withExceptionDo: [ :error |
+        self
+          assert: error code equals: 404;
+          assert: error messageText equals: 'ZZZ was not found in the system'
+      ]
+]
+
+{ #category : 'tests' }
+SouthAmericanCurrenciesRESTfulControllerTest >> testGetCurrencyNotFoundShouldFailInSpanish [
+
+  self
+    should: [
+        | request |
+        request := self requestToGETResourceIdentifiedBy: 'ZZZ' accepting: '*/*'.
+        request setAcceptLanguage: self spanish.
+        resourceController currencyBasedOn: request within: self newHttpRequestContext
+      ]
+    raise: HTTPClientError
+    withExceptionDo: [ :error |
+        self
+          assert: error code equals: 404;
+          assert: error messageText equals: 'No se encontró ZZZ en el sistema'
+      ]
 ]
 
 { #category : 'tests' }

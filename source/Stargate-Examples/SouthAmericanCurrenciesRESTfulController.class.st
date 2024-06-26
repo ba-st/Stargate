@@ -11,7 +11,7 @@ Class {
 		'banknotesByCurrency',
 		'banknotesRequestHandler',
 		'currenciesRequestHandler',
-		'currenciesByLanguage'
+		'currencies'
 	],
 	#category : 'Stargate-Examples-Currencies',
 	#package : 'Stargate-Examples',
@@ -27,21 +27,7 @@ SouthAmericanCurrenciesRESTfulController >> banknotesTemplate [
 { #category : 'API' }
 SouthAmericanCurrenciesRESTfulController >> currenciesBasedOn: httpRequest within: requestContext [
 
-	^ currenciesRequestHandler
-		from: httpRequest
-		within: requestContext
-		getCollection: [ self currenciesInLanguageAt: requestContext ]
-]
-
-{ #category : 'private' }
-SouthAmericanCurrenciesRESTfulController >> currenciesInLanguageAt: requestContext [
-
-	| targetLanguage |
-
-	targetLanguage := [ requestContext targetLanguageTag ]
-		on: NotFound
-		do: [ :error | error return: 'en-US' asLanguageTag ].
-	^ currenciesByLanguage at: targetLanguage
+  ^ currenciesRequestHandler from: httpRequest within: requestContext getCollection: [ currencies ]
 ]
 
 { #category : 'API' }
@@ -56,14 +42,12 @@ SouthAmericanCurrenciesRESTfulController >> currencyBanknotesBasedOn: httpReques
 { #category : 'API' }
 SouthAmericanCurrenciesRESTfulController >> currencyBasedOn: httpRequest within: requestContext [
 
-	^ currenciesRequestHandler
-		from: httpRequest
-		within: requestContext
-		get: [ :isoCode | 
-			( self currenciesInLanguageAt: requestContext )
-				detect: [ :currency | currency isoCode = isoCode ]
-				ifNone: [ NotFound signal ]
-			]
+  ^ currenciesRequestHandler from: httpRequest within: requestContext get: [ :isoCode |
+        currencies
+          detect: [ :currency | currency isoCode = isoCode ]
+          ifNone: [
+            NotFound signal: ( '{1} was not found in the system' localizedWithAll: { isoCode } ) ]
+      ]
 ]
 
 { #category : 'private' }
@@ -158,66 +142,61 @@ SouthAmericanCurrenciesRESTfulController >> initializeBanknotesRequestHandler [
 { #category : 'initialization' }
 SouthAmericanCurrenciesRESTfulController >> initializeCurrencies [
 
-	currenciesByLanguage := Dictionary new
-		at: 'en-US' asLanguageTag
-			put:
-			( OrderedCollection new
-				add: ( self currencyNamed: 'Argentine peso' symbol: '$' isoCode: 'ARS' );
-				add: ( self currencyNamed: 'Bolivian boliviano' symbol: 'Bs.' isoCode: 'BOB' );
-				add: ( self currencyNamed: 'Brazilian real' symbol: 'R$' isoCode: 'BRL' );
-				add: ( self currencyNamed: 'Chilean peso' symbol: '$' isoCode: 'CLP' );
-				add: ( self currencyNamed: 'Colombian peso' symbol: '$' isoCode: 'COP' );
-				add: ( self currencyNamed: 'Guyanese dollar' symbol: '$' isoCode: 'GYD' );
-				add: ( self currencyNamed: 'Paraguayan guaraní' symbol: '₲' isoCode: 'PYG' );
-				add: ( self currencyNamed: 'Peruvian sol' symbol: 'S/.' isoCode: 'PEN' );
-				add: ( self currencyNamed: 'Surinamese dollar' symbol: '$' isoCode: 'SRD' );
-				add: ( self currencyNamed: 'Uruguayan peso' symbol: '$' isoCode: 'UYU' );
-				add: ( self currencyNamed: 'Venezuelan bolívar soberano' symbol: 'Bs.S' isoCode: 'VES' );
-				asArray );
-		at: 'es-AR' asLanguageTag
-			put:
-			( OrderedCollection new
-				add: ( self currencyNamed: 'Peso' symbol: '$' isoCode: 'ARS' );
-				add: ( self currencyNamed: 'Boliviano' symbol: 'Bs.' isoCode: 'BOB' );
-				add: ( self currencyNamed: 'Real brasileño' symbol: 'R$' isoCode: 'BRL' );
-				add: ( self currencyNamed: 'Peso chileno' symbol: '$' isoCode: 'CLP' );
-				add: ( self currencyNamed: 'Peso colombiano' symbol: '$' isoCode: 'COP' );
-				add: ( self currencyNamed: 'Dólar guyanés' symbol: '$' isoCode: 'GYD' );
-				add: ( self currencyNamed: 'Guaraní' symbol: '₲' isoCode: 'PYG' );
-				add: ( self currencyNamed: 'Sol' symbol: 'S/.' isoCode: 'PEN' );
-				add: ( self currencyNamed: 'Dólar surinamés' symbol: '$' isoCode: 'SRD' );
-				add: ( self currencyNamed: 'Peso uruguayo' symbol: '$' isoCode: 'UYU' );
-				add: ( self currencyNamed: 'Bolívar' symbol: 'Bs.S' isoCode: 'VES' );
-				asArray );
-		yourself
+  currencies := OrderedCollection new
+                  add: ( self currencyNamed: 'Argentine peso' symbol: '$' isoCode: 'ARS' );
+                  add: ( self currencyNamed: 'Bolivian boliviano' symbol: 'Bs.' isoCode: 'BOB' );
+                  add: ( self currencyNamed: 'Brazilian real' symbol: 'R$' isoCode: 'BRL' );
+                  add: ( self currencyNamed: 'Chilean peso' symbol: '$' isoCode: 'CLP' );
+                  add: ( self currencyNamed: 'Colombian peso' symbol: '$' isoCode: 'COP' );
+                  add: ( self currencyNamed: 'Guyanese dollar' symbol: '$' isoCode: 'GYD' );
+                  add: ( self currencyNamed: 'Paraguayan guaraní' symbol: '₲' isoCode: 'PYG' );
+                  add: ( self currencyNamed: 'Peruvian sol' symbol: 'S/.' isoCode: 'PEN' );
+                  add: ( self currencyNamed: 'Surinamese dollar' symbol: '$' isoCode: 'SRD' );
+                  add: ( self currencyNamed: 'Uruguayan peso' symbol: '$' isoCode: 'UYU' );
+                  add:
+                    ( self
+                        currencyNamed: 'Venezuelan bolívar soberano'
+                        symbol: 'Bs.S'
+                        isoCode: 'VES' );
+                  asArray
 ]
 
 { #category : 'initialization' }
 SouthAmericanCurrenciesRESTfulController >> initializeCurrenciesRequestHandler [
 
-	currenciesRequestHandler := RESTfulRequestHandlerBuilder new
-		handling: 'currencies'
-			extractingIdentifierWith: [ :httpRequest | self identifierIn: httpRequest ];
-		whenResponding: self currencyVersion1dot0dot0MediaType
-			encodeToJsonApplying:
-				[ :resource :requestContext :writer | writer for: StargateCurrency do: [ :mapping | mapping mapInstVars ] ];
-		createEntityTagHashing: [ :hasher :currency :requestContext | 
-			hasher
-				include: currency name;
-				include: currency symbol;
-				include: currency isoCode
-			];
-		handleExceptionsApplying: [ :handler | handler addAsNotFoundError: NotFound ];
-		directCachingWith: [ :caching | 
-			caching
-				beImmutable;
-				when: [ :response :resource | resource isCollection ] apply: [ caching beStaleAfter: 1 day ];
-				when: [ :response :resource | resource isCollection not and: [ resource symbol = '$' ] ]
-					apply: [ caching bePublic ]
-			];
-		addAsSupportedLanguage: 'en-US';
-		addAsSupportedLanguage: 'es-AR';
-		build
+  currenciesRequestHandler := RESTfulRequestHandlerBuilder new
+                                handling: 'currencies'
+                                extractingIdentifierWith: [ :httpRequest |
+                                    self identifierIn: httpRequest ];
+                                whenResponding: self currencyVersion1dot0dot0MediaType
+                                encodeToJsonApplying: [ :resource :requestContext :writer |
+                                    writer for: StargateCurrency do: [ :mapping |
+                                          mapping
+                                            mapInstVars: #( #symbol #isoCode );
+                                            mapProperty: #name
+                                            getter: [ :currency | currency name localized ]
+                                        ]
+                                  ];
+                                createEntityTagHashing: [ :hasher :currency :requestContext |
+                                    hasher
+                                      include: currency name localized;
+                                      include: currency symbol;
+                                      include: currency isoCode
+                                  ];
+                                handleExceptionsApplying: [ :handler |
+                                  handler addAsNotFoundError: NotFound ];
+                                directCachingWith: [ :caching |
+                                    caching
+                                      beImmutable;
+                                      when: [ :response :resource | resource isCollection ]
+                                      apply: [ caching beStaleAfter: 1 day ];
+                                      when: [ :response :resource |
+                                          resource isCollection not and: [ resource symbol = '$' ] ]
+                                      apply: [ caching bePublic ]
+                                  ];
+                                addAsSupportedLanguage: 'en-US';
+                                addAsSupportedLanguage: 'es-AR';
+                                build
 ]
 
 { #category : 'private' }
