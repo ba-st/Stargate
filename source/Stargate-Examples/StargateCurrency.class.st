@@ -37,7 +37,7 @@ StargateCurrency >> isoCode [
 { #category : 'accessing' }
 StargateCurrency >> name [
 
-	^ name
+	^ name localized
 ]
 
 { #category : 'accessing' }

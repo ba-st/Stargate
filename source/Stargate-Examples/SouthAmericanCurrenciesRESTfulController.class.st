@@ -170,16 +170,13 @@ SouthAmericanCurrenciesRESTfulController >> initializeCurrenciesRequestHandler [
                                     self identifierIn: httpRequest ];
                                 whenResponding: self currencyVersion1dot0dot0MediaType
                                 encodeToJsonApplying: [ :resource :requestContext :writer |
-                                    writer for: StargateCurrency do: [ :mapping |
-                                          mapping
-                                            mapInstVars: #( #symbol #isoCode );
-                                            mapProperty: #name
-                                            getter: [ :currency | currency name localized ]
-                                        ]
-                                  ];
+                                    writer
+                                      for: StargateCurrency
+                                      do: [ :mapping |
+                                          mapping mapAccessors: #( #symbol #isoCode #name ) ] ];
                                 createEntityTagHashing: [ :hasher :currency :requestContext |
                                     hasher
-                                      include: currency name localized;
+                                      include: currency name;
                                       include: currency symbol;
                                       include: currency isoCode
                                   ];
