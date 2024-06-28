@@ -173,13 +173,16 @@ RESTfulRequestHandlerBehavior >> from: httpRequest within: requestContext get: a
 { #category : 'API' }
 RESTfulRequestHandlerBehavior >> from: httpRequest within: requestContext get: aQueryEvaluationBlock thenDo: actionBlock [
 
-	| resource |
+  self holdTargetLanguageFrom: httpRequest within: requestContext.
 
-	resource := resourceLocator
-		lookupResourceIdentifiedBy: httpRequest
-		evaluating: aQueryEvaluationBlock.
-	self exceptionHandler handleConflictsDuring: [ actionBlock value: resource ].
-	^ ZnResponse noContent
+  ^ self useTargetLanguageTagIn: requestContext asCurrentLocaleDuring: [
+        | resource |
+        resource := resourceLocator
+                      lookupResourceIdentifiedBy: httpRequest
+                      evaluating: aQueryEvaluationBlock.
+        self exceptionHandler handleConflictsDuring: [ actionBlock value: resource ].
+        ZnResponse noContent
+      ]
 ]
 
 { #category : 'API' }
@@ -234,12 +237,18 @@ RESTfulRequestHandlerBehavior >> from: httpRequest within: requestContext getCol
 ]
 
 { #category : 'private' }
+RESTfulRequestHandlerBehavior >> holdTargetLanguageFrom: httpRequest within: requestContext [
+
+  httpRequest hasLanguageProrityList then: [
+      requestContext targetLanguageTag: ( acceptNegotiator bestLanguageFor: httpRequest ) ]
+]
+
+{ #category : 'private' }
 RESTfulRequestHandlerBehavior >> holdTargetMediaTypeAndLanguageFrom: httpRequest within: requestContext [
 
-	httpRequest hasLanguageProrityList
-		then: [ requestContext targetLanguageTag: ( acceptNegotiator bestLanguageFor: httpRequest ) ].
+  self holdTargetLanguageFrom: httpRequest within: requestContext.
 
-	^ requestContext targetMediaType: ( acceptNegotiator bestRepresentationFor: httpRequest )
+  ^ requestContext targetMediaType: ( acceptNegotiator bestRepresentationFor: httpRequest )
 ]
 
 { #category : 'private' }
