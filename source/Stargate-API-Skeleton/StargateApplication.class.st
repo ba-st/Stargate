@@ -105,14 +105,8 @@ StargateApplication class >> stargateConfigurationParameters [
             inside: self sectionsForStargateConfiguration
             convertingWith: #asByteArray ) asSensitive;
       add: ( OptionalConfigurationParameter
-            named: 'Log Incoming HTTP Requests'
-            describedBy: 'Boolean that indicates whether to log all the Incoming HTTP Requests'
-            inside: self sectionsForStargateConfiguration
-            defaultingTo: false
-            convertingWith: #asBoolean );
-      add: ( OptionalConfigurationParameter
-            named: 'Log Outgoing HTTP Requests'
-            describedBy: 'Boolean that indicates whether to log all the Outgoing HTTP Requests'
+            named: 'Log HTTP Requests'
+            describedBy: 'Boolean that indicates whether to log all the incoming HTTP requests'
             inside: self sectionsForStargateConfiguration
             defaultingTo: false
             convertingWith: #asBoolean );
@@ -243,10 +237,9 @@ StargateApplication >> configureGlobalErrorHandlerIn: api [
 { #category : 'private - activation/deactivation' }
 StargateApplication >> configureHTTPRequestsLogging [
 
-  znEventToLogRecordAdapter logOutgoingRequests: self stargateConfiguration logOutgoingHTTPRequests.
-  znEventToLogRecordAdapter logIncomingRequests: self stargateConfiguration logIncomingHTTPRequests.
-
-  znEventToLogRecordAdapter startUpListeners
+  znEventToLogRecordAdapter
+    logIncomingRequests: self stargateConfiguration logHTTPRequests;
+    startUpListeners
 ]
 
 { #category : 'private - activation/deactivation' }
