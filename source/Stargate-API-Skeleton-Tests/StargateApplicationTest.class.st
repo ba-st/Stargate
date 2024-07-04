@@ -29,14 +29,6 @@ StargateApplicationTest >> assert: aString isExpectedIncomingSummaryWith: aReque
 ]
 
 { #category : 'private' }
-StargateApplicationTest >> assert: aString isExpectedOutgoingSummaryWith: aRequestShortDescription [
-
-  self assert: ( aString matchesRegex:
-        ( '\d{4}-\d{2}-\d{2} \d{2}\:\d{2}\:\d{2} ((\d+) (\d+))? <1s> (\d+) (\d+)B (\d+)ms'
-            expandMacrosWith: aRequestShortDescription ) )
-]
-
-{ #category : 'private' }
 StargateApplicationTest >> assert: string isLineEndingInsensitiveEqualsTo: anotherString [
 
 	self
