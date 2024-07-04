@@ -6,7 +6,9 @@ Class {
 	#superclass : 'LaunchpadTest',
 	#instVars : [
 		'port',
-		'baseUrl'
+		'baseUrl',
+		'logger',
+		'logHTTPRequests'
 	],
 	#category : 'Stargate-API-Skeleton-Tests',
 	#package : 'Stargate-API-Skeleton-Tests'
@@ -16,6 +18,14 @@ Class {
 StargateApplicationTest class >> defaultTimeLimit [
 
 	^5 minute
+]
+
+{ #category : 'private' }
+StargateApplicationTest >> assert: aString isExpectedIncomingSummaryWith: aRequestShortDescription [
+
+  self assert: ( aString matchesRegex:
+        ( '\d{4}-\d{2}-\d{2} \d{2}\:\d{2}\:\d{2} ((\d+) (\d+))? Request Handled a\s{0,1}ZnRequest\(<1s>\) (\d+)ms'
+            expandMacrosWith: aRequestShortDescription ) )
 ]
 
 { #category : 'private' }
@@ -85,8 +95,11 @@ StargateApplicationTest >> secret [
 StargateApplicationTest >> setUp [
 
 	super setUp.
+	logger := MemoryLogger new.
 	port := self freeListeningTCPPort.
-	StargateApplication logsDirectory ensureCreateDirectory
+	StargateApplication logsDirectory ensureCreateDirectory.
+	
+	logHTTPRequests := false
 ]
 
 { #category : 'private' }
@@ -103,11 +116,14 @@ StargateApplicationTest >> startConcurrentConnectionsApp [
 { #category : 'private' }
 StargateApplicationTest >> startPetStore [
 
-	self start: PetStoreApplication withAll: { 
-			'--pet-store.stargate.public-url=http://localhost:<1p>' expandMacrosWith: port.
-			'--pet-store.stargate.port=<1p>' expandMacrosWith: port.
-			'--pet-store.stargate.operations-secret=<1s>' expandMacrosWith: self secret }.
-	baseUrl := runningApplication configuration petStore stargate publicURL
+  self
+    start: PetStoreApplication
+    withAll: { ( '--pet-store.stargate.public-url=http://localhost:<1p>' expandMacrosWith: port ) .
+        ( '--pet-store.stargate.port=<1p>' expandMacrosWith: port ) .
+        ( '--pet-store.stargate.operations-secret=<1s>' expandMacrosWith: self secret ) .
+        ( '--pet-store.stargate.log-http-requests=<1p>' expandMacrosWith:
+            logHTTPRequests ) }.
+  baseUrl := runningApplication configuration petStore stargate publicURL
 ]
 
 { #category : 'private' }
@@ -264,6 +280,78 @@ StargateApplicationTest >> testGetPets [
 		assert: json links size equals: 1
 ]
 
+{ #category : 'tests - logs' }
+StargateApplicationTest >> testLogRequestsDuringSuccessfulGet [
+
+  | logRecord |
+  logger runDuring: [
+      logHTTPRequests := true.
+      self testGetPets
+    ].
+
+  logRecord := NeoJSONObject fromString: ( String streamContents: [ :stream |
+                       ( logger recordings at: logger recordings size - 1 ) printOneLineJsonOn:
+                         stream ] ).
+
+  self
+    assert: logRecord level equals: 'DEBUG';
+    assert: logRecord message equals: 'Incoming HTTP request responded';
+    assert: logRecord process equals: 'ZnManagingMultiThreadedServer HTTP worker';
+    assert: logRecord summary isExpectedIncomingSummaryWith: 'GET \/pets';
+    assert: logRecord request method equals: 'GET';
+    assert: logRecord request uri equals: ( 'http://localhost:<1p>/pets' expandMacrosWith: port );
+    assert: logRecord response code equals: 200;
+    assert: logRecord response totalSize equals: 59
+]
+
+{ #category : 'tests - logs' }
+StargateApplicationTest >> testLogRequestsDuringSucessfulPost [
+
+  | logRecord |
+  logger runDuring: [
+      logHTTPRequests := true.
+      self testCreatePet
+    ].
+
+  logRecord := NeoJSONObject fromString: ( String streamContents: [ :stream |
+                       ( logger recordings at: logger recordings size - 1 ) printOneLineJsonOn:
+                         stream ] ).
+
+  self
+    assert: logRecord level equals: 'DEBUG';
+    assert: logRecord message equals: 'Incoming HTTP request responded';
+    assert: logRecord process equals: 'ZnManagingMultiThreadedServer HTTP worker';
+    assert: logRecord summary isExpectedIncomingSummaryWith: 'POST \/pets';
+    assert: logRecord request method equals: 'POST';
+    assert: logRecord request uri equals: ( 'http://localhost:<1p>/pets' expandMacrosWith: port );
+    assert: logRecord response code equals: 201;
+    assert: logRecord response totalSize equals: 96
+]
+
+{ #category : 'tests - logs' }
+StargateApplicationTest >> testLogRequestsDuringUnsucessfulPost [
+
+  | logRecord |
+  logger runDuring: [
+      logHTTPRequests := true.
+      self testUnsupportedMediaType
+    ].
+
+  logRecord := NeoJSONObject fromString: ( String streamContents: [ :stream |
+                       ( logger recordings at: logger recordings size - 1 ) printOneLineJsonOn:
+                         stream ] ).
+
+  self
+    assert: logRecord level equals: 'DEBUG';
+    assert: logRecord message equals: 'Incoming HTTP request responded';
+    assert: logRecord process equals: 'ZnManagingMultiThreadedServer HTTP worker';
+    assert: logRecord summary isExpectedIncomingSummaryWith: 'POST \/pets';
+    assert: logRecord request method equals: 'POST';
+    assert: logRecord request uri equals: ( 'http://localhost:<1p>/pets' expandMacrosWith: port );
+    assert: logRecord response code equals: 415;
+    assert: logRecord response totalSize equals: 72
+]
+
 { #category : 'tests - api' }
 StargateApplicationTest >> testMethodNotAllowed [
 
@@ -320,7 +408,7 @@ StargateApplicationTest >> testPrintHelpOn [
 	self assert: help isLineEndingInsensitiveEqualsTo: ('NAME
 		pet-store [<1s>] - A RESTful API for Pet stores
 SYNOPSYS
-		pet-store --pet-store.stargate.public-url=%<publicURL%> --pet-store.stargate.port=%<port%> --pet-store.stargate.operations-secret=%<operationsSecret%> [--pet-store.stargate.concurrent-connections-threshold=%<concurrentConnectionsThreshold%>]
+		pet-store --pet-store.stargate.public-url=%<publicURL%> --pet-store.stargate.port=%<port%> --pet-store.stargate.operations-secret=%<operationsSecret%> [--pet-store.stargate.log-http-requests=%<logHTTPRequests%>] [--pet-store.stargate.concurrent-connections-threshold=%<concurrentConnectionsThreshold%>]
 PARAMETERS
 		--pet-store.stargate.public-url=%<publicURL%>
 			Public URL where the API is deployed. Used to create hypermedia links.
@@ -328,6 +416,8 @@ PARAMETERS
 			Listening port.
 		--pet-store.stargate.operations-secret=%<operationsSecret%>
 			Secret key for checking JWT signatures.
+		--pet-store.stargate.log-http-requests=%<logHTTPRequests%>
+			Boolean that indicates whether to log all the incoming HTTP requests. Defaults to false.
 		--pet-store.stargate.concurrent-connections-threshold=%<concurrentConnectionsThreshold%>
 			Set the maximum number of concurrent connections that I will accept. When this threshold is reached, a 503 Service Unavailable response will be sent and the connection will be closed. Defaults to 32.
 ENVIRONMENT
@@ -337,6 +427,8 @@ ENVIRONMENT
 			Listening port.
 		PET_STORE__STARGATE__OPERATIONS_SECRET
 			Secret key for checking JWT signatures.
+		PET_STORE__STARGATE__LOG_HTTP_REQUESTS
+			Boolean that indicates whether to log all the incoming HTTP requests. Defaults to false.
 		PET_STORE__STARGATE__CONCURRENT_CONNECTIONS_THRESHOLD
 			Set the maximum number of concurrent connections that I will accept. When this threshold is reached, a 503 Service Unavailable response will be sent and the connection will be closed. Defaults to 32.
 ' expandMacrosWith: PetStoreApplication version)

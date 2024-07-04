@@ -2,7 +2,8 @@ Class {
 	#name : 'StargateApplication',
 	#superclass : 'LaunchpadApplication',
 	#instVars : [
-		'apiOptional'
+		'apiOptional',
+		'znEventToLogRecordAdapter'
 	],
 	#classInstVars : [
 		'Version'
@@ -87,29 +88,36 @@ StargateApplication class >> stackTraceDumpExtension [
 { #category : 'private' }
 StargateApplication class >> stargateConfigurationParameters [
 
-	^ Array
-		  with: ( MandatoryConfigurationParameter
-				    named: 'Public URL'
-				    describedBy: 'Public URL where the API is deployed. Used to create hypermedia links'
-				    inside: self sectionsForStargateConfiguration
-				    convertingWith: #asUrl )
-		  with: ( MandatoryConfigurationParameter
-				    named: 'Port'
-				    describedBy: 'Listening port'
-				    inside: self sectionsForStargateConfiguration
-				    convertingWith: #asNumber )
-		  with: ( MandatoryConfigurationParameter
-				    named: 'Operations Secret'
-				    describedBy: 'Secret key for checking JWT signatures'
-				    inside: self sectionsForStargateConfiguration
-				    convertingWith: #asByteArray ) asSensitive
-		  with: ( OptionalConfigurationParameter
-				    named: 'Concurrent Connections Threshold'
-				    describedBy:
-				    'Set the maximum number of concurrent connections that I will accept. When this threshold is reached, a 503 Service Unavailable response will be sent and the connection will be closed'
-				    inside: self sectionsForStargateConfiguration
-				    defaultingTo: 32
-				    convertingWith: #asNumber )
+  ^ OrderedCollection new
+      add: ( MandatoryConfigurationParameter
+            named: 'Public URL'
+            describedBy: 'Public URL where the API is deployed. Used to create hypermedia links'
+            inside: self sectionsForStargateConfiguration
+            convertingWith: #asUrl );
+      add: ( MandatoryConfigurationParameter
+            named: 'Port'
+            describedBy: 'Listening port'
+            inside: self sectionsForStargateConfiguration
+            convertingWith: #asNumber );
+      add: ( MandatoryConfigurationParameter
+            named: 'Operations Secret'
+            describedBy: 'Secret key for checking JWT signatures'
+            inside: self sectionsForStargateConfiguration
+            convertingWith: #asByteArray ) asSensitive;
+      add: ( OptionalConfigurationParameter
+            named: 'Log HTTP Requests'
+            describedBy: 'Boolean that indicates whether to log all the incoming HTTP requests'
+            inside: self sectionsForStargateConfiguration
+            defaultingTo: false
+            convertingWith: #asBoolean );
+      add: ( OptionalConfigurationParameter
+            named: 'Concurrent Connections Threshold'
+            describedBy:
+              'Set the maximum number of concurrent connections that I will accept. When this threshold is reached, a 503 Service Unavailable response will be sent and the connection will be closed'
+            inside: self sectionsForStargateConfiguration
+            defaultingTo: 32
+            convertingWith: #asNumber );
+      yourself
 ]
 
 { #category : 'accessing' }
@@ -177,8 +185,9 @@ StargateApplication >> authAlgorithm [
 StargateApplication >> basicStartWithin: context [
 
 	| api |
-
+	
 	self logAPIVersion.
+	self configureHTTPRequestsLogging.
 	api := self createAPI.
 	self
 		configureGlobalErrorHandlerIn: api;
@@ -190,6 +199,7 @@ StargateApplication >> basicStartWithin: context [
 StargateApplication >> basicStop [
 
 	apiOptional withContentDo: [ :api | api stop ].
+	znEventToLogRecordAdapter stopListeners.
 	super basicStop
 ]
 
@@ -224,10 +234,12 @@ StargateApplication >> configureGlobalErrorHandlerIn: api [
 	] unless: self isDebugModeEnabled
 ]
 
-{ #category : 'private - accessing' }
-StargateApplication >> controllersToInstall [
+{ #category : 'private - activation/deactivation' }
+StargateApplication >> configureHTTPRequestsLogging [
 
-	^ self subclassResponsibility
+  znEventToLogRecordAdapter
+    logIncomingRequests: self stargateConfiguration logHTTPRequests;
+    startUpListeners
 ]
 
 { #category : 'private - activation/deactivation' }
@@ -245,7 +257,8 @@ StargateApplication >> createAPI [
 StargateApplication >> initialize [
 
 	super initialize.
-	apiOptional := Optional unused
+	apiOptional := Optional unused.
+	znEventToLogRecordAdapter := ZnEventToLogRecordAdapter new
 ]
 
 { #category : 'private - activation/deactivation' }
