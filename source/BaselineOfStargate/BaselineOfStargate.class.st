@@ -76,12 +76,12 @@ BaselineOfStargate >> setUpCorePackages: spec [
 BaselineOfStargate >> setUpDependencies: spec [
 
 	spec
-		baseline: 'Buoy' with: [ spec repository: 'github://ba-st/Buoy:v7' ];
+		baseline: 'Buoy' with: [ spec repository: 'github://ba-st/Buoy:v8' ];
 		project: 'Buoy-Deployment' copyFrom: 'Buoy' with: [ spec loads: 'Deployment' ];
 		project: 'Buoy-SUnit' copyFrom: 'Buoy' with: [ spec loads: 'Dependent-SUnit-Extensions' ].
 
 	spec
-		baseline: 'Hyperspace' with: [ spec repository: 'github://ba-st/Hyperspace:v5' ];
+		baseline: 'Hyperspace' with: [ spec repository: 'github://ba-st/Hyperspace:v6' ];
 		project: 'Hyperspace-Deployment' copyFrom: 'Hyperspace' with: [ spec loads: 'Deployment' ];
 		project: 'Hyperspace-Tools' copyFrom: 'Hyperspace' with: [ spec loads: 'Tools' ];
 		project: 'Hyperspace-SUnit'
@@ -89,19 +89,19 @@ BaselineOfStargate >> setUpDependencies: spec [
 		with: [ spec loads: 'Dependent-SUnit-Extensions' ].
 
 	spec
-		baseline: 'Teapot' with: [ spec repository: 'github://ba-st-dependencies/Teapot:v2' ];
+		baseline: 'Teapot' with: [ spec repository: 'github://ba-st-dependencies/Teapot:v3' ];
 		project: 'Teapot-Deployment' copyFrom: 'Teapot' with: [ spec loads: 'Deployment' ].
 
 	spec
-		baseline: 'JSONWebToken' with: [ spec repository: 'github://ba-st-dependencies/JSONWebToken:v1' ];
+		baseline: 'JSONWebToken' with: [ spec repository: 'github://ba-st-dependencies/JSONWebToken:v2' ];
 		project: 'JSONWebToken-Deployment' copyFrom: 'JSONWebToken' with: [ spec loads: 'SSL' ].
 
 	spec
-		baseline: 'JRPC' with: [ spec repository: 'github://ba-st-dependencies/JRPC:v4' ];
+		baseline: 'JRPC' with: [ spec repository: 'github://ba-st-dependencies/JRPC:v5' ];
 		project: 'JRPC-Deployment' copyFrom: 'JRPC' with: [ spec loads: 'Server-Deployment' ].
 
 	spec
-		baseline: 'Launchpad' with: [ spec repository: 'github://ba-st/Launchpad:v5' ];
+		baseline: 'Launchpad' with: [ spec repository: 'github://ba-st/Launchpad:v6' ];
 		project: 'Launchpad-Deployment' copyFrom: 'Launchpad' with: [ spec loads: 'Deployment' ];
 		project: 'Launchpad-SUnit' copyFrom: 'Launchpad' with: [ spec loads: 'Dependent-SUnit-Extensions' ]
 ]

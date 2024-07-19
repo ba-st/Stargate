@@ -2,7 +2,7 @@ RwLoadSpecificationV2 {
   #specName: 'SortFunctions',
   #projectName : 'SortFunctions',
   #gitUrl : 'https://github.com/ba-st-dependencies/SortFunctions.git',
-  #revision : 'v1',
+  #revision : 'v2',
   #projectSpecFile : 'rowan/project.ston',
   #componentNames : [
     'Deployment'
