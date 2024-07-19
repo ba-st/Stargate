@@ -139,3 +139,9 @@ HttpRequestContext >> withTargetLanguageTagDo: aBlock [
 
 	knownObjects at: #targetLanguageTag ifPresent: aBlock
 ]
+
+{ #category : 'accessing' }
+HttpRequestContext >> withTargetLanguageTagDo: aBlock ifNone: noneBlock [
+
+  ^ knownObjects at: #targetLanguageTag ifPresent: aBlock ifAbsent: noneBlock
+]

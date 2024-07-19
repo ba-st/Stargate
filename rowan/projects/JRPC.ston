@@ -2,7 +2,7 @@ RwLoadSpecificationV2 {
   #specName: 'JRPC',
   #projectName : 'JRPC',
   #gitUrl : 'https://github.com/ba-st-dependencies/JRPC.git',
-  #revision : 'v4',
+  #revision : 'v5',
   #projectSpecFile : 'rowan/project.ston',
   #componentNames : [
     'Deployment'
