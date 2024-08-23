@@ -39,10 +39,24 @@ RESTfulRequestHandlerBehavior >> applyCachingDirectivesFor: aResource to: respon
 ]
 
 { #category : 'private' }
-RESTfulRequestHandlerBehavior >> assert: etag matchesEntityTagOf: entity encodedAs: mediaType within: requestContext [
+RESTfulRequestHandlerBehavior >> assert: etag matchesEntityTagOf: entity encodedAs: httpRequest within: requestContext [
 
-	etag = ( self entityTagOf: entity encodedAs: mediaType within: requestContext )
-		ifFalse: [ HTTPClientError preconditionFailed signal ]
+  | calculatedEtag entityTagCalculation |
+  entityTagCalculation := [
+                            self
+                              entityTagOf: entity
+                              encodedAs: httpRequest contentType
+                              within: requestContext ].
+
+  "The request content can be in another language that the one requested
+	in the Accept header, so in that case we need to calculated the etag
+	of the entity with this language as the current one"
+  calculatedEtag := httpRequest contentLanguageTags
+                      ifEmpty: entityTagCalculation
+                      ifNotEmpty: [ :languages |
+                        CurrentLocale use: languages first during: entityTagCalculation ].
+
+  etag = calculatedEtag ifFalse: [ HTTPClientError preconditionFailed signal ]
 ]
 
 { #category : 'decoding/encoding' }
@@ -188,29 +202,26 @@ RESTfulRequestHandlerBehavior >> from: httpRequest within: requestContext get: a
 { #category : 'API' }
 RESTfulRequestHandlerBehavior >> from: httpRequest within: requestContext get: findBlock thenUpdateWith: updateBlock [
 
-	| etag |
+  | etag |
 
-	etag := self entityTagToMatchBasedOn: httpRequest.
+  etag := self entityTagToMatchBasedOn: httpRequest.
 
-	^ self
-		from: httpRequest
-		within: requestContext
-		get: [ :id | 
-		  | resourceToUpdate updatedResource |
+  ^ self from: httpRequest within: requestContext get: [ :id |
+        | resourceToUpdate updatedResource |
 
-		  resourceToUpdate := findBlock cull: id.
-		  self
-			  assert: etag
-			  matchesEntityTagOf: resourceToUpdate
-			  encodedAs: httpRequest contentType
-			  within: requestContext.
+        resourceToUpdate := findBlock cull: id.
+        self
+          assert: etag
+          matchesEntityTagOf: resourceToUpdate
+          encodedAs: httpRequest
+          within: requestContext.
 
-		  updatedResource := self decode: httpRequest within: requestContext.
-		  self exceptionHandler handleConflictsDuring: [ 
-			  self exceptionHandler handleDecodingFailedDuring: [ 
-				  updateBlock value: resourceToUpdate value: updatedResource ]
-			  ]
-		  ]
+        updatedResource := self decode: httpRequest within: requestContext.
+        self exceptionHandler handleConflictsDuring: [
+            self exceptionHandler handleDecodingFailedDuring: [
+                updateBlock value: resourceToUpdate value: updatedResource ]
+          ]
+      ]
 ]
 
 { #category : 'API' }
