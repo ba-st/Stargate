@@ -8,11 +8,24 @@ Class {
 	#superclass : 'NeoJSONObjectMapping',
 	#instVars : [
 		'instanceCreationSelector',
-		'argumentNames'
+		'argumentNames',
+		'defaultsByArgumentName'
 	],
 	#category : 'Stargate-NeoJSON-Extensions',
 	#package : 'Stargate-NeoJSON-Extensions'
 }
+
+{ #category : 'mapping' }
+InstanceCreationMapping >> argumentNamed: anArgumentName defaultingTo: aValue [
+
+  defaultsByArgumentName at: anArgumentName put: aValue
+]
+
+{ #category : 'private' }
+InstanceCreationMapping >> defaultFor: argumentName ifAbsent: aBlock [
+
+  ^ defaultsByArgumentName at: argumentName ifAbsent: aBlock
+]
 
 { #category : 'private' }
 InstanceCreationMapping >> errorDescriptionForMissing: propertyNames [
@@ -40,8 +53,9 @@ InstanceCreationMapping >> errorDescriptionForMissing: propertyNames [
 { #category : 'mapping' }
 InstanceCreationMapping >> mapCreationSending: anInstanceCreationSelector withArguments: anArgumentCollection [
 
-	instanceCreationSelector := anInstanceCreationSelector.
-	argumentNames := anArgumentCollection
+  instanceCreationSelector := anInstanceCreationSelector.
+  argumentNames := anArgumentCollection.
+  defaultsByArgumentName := Dictionary new
 ]
 
 { #category : 'mapping' }
@@ -62,20 +76,25 @@ InstanceCreationMapping >> mapProperty: aKey as: aValueSchema [
 { #category : 'parsing' }
 InstanceCreationMapping >> readFrom: jsonReader [
 
-	| argumentByName arguments missingArguments |
+  | argumentByName arguments missingArguments |
+  argumentByName := Dictionary new.
+  jsonReader parseMapKeysDo: [ :key |
+      ( self propertyNamed: key ifAbsent: [ nil ] )
+        ifNil: [ "read, skip & ignore value" jsonReader next ]
+        ifNotNil: [ :mapping | mapping readObject: argumentByName from: jsonReader ]
+    ].
 
-	argumentByName := Dictionary new.
-	jsonReader parseMapKeysDo: [ :key |
-		( self propertyNamed: key ifAbsent: [ nil ] )
-			ifNil: [ "read, skip & ignore value" jsonReader next ]
-			ifNotNil: [ :mapping | mapping readObject: argumentByName from: jsonReader ]
-		].
+  missingArguments := OrderedCollection new.
+  arguments := argumentNames collect: [ :argumentName |
+                   argumentByName
+                     at: argumentName
+                     ifAbsent: [
+                       self
+                         defaultFor: argumentName
+                         ifAbsent: [ missingArguments add: argumentName ] ]
+                 ].
+  missingArguments ifNotEmpty: [
+      jsonReader error: ( self errorDescriptionForMissing: missingArguments ) ].
 
-	missingArguments := OrderedCollection new.
-	arguments := argumentNames collect: [ :argumentName |
-		             argumentByName at: argumentName ifAbsent: [ missingArguments add: argumentName ] ].
-	missingArguments ifNotEmpty: [
-		jsonReader error: ( self errorDescriptionForMissing: missingArguments ) ].
-
-	^ subjectClass perform: instanceCreationSelector withArguments: arguments
+  ^ subjectClass perform: instanceCreationSelector withArguments: arguments
 ]

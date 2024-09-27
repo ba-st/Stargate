@@ -150,7 +150,8 @@ PetOrdersRESTfulController >> configureOverlyComplexOrderDecodingOn: reader [
 			mapProperty: #theStatus as: #Status.
 		mapping
 			mapCreationSending: #named:ofType:withStatus:
-			withArguments: { #alternativeName. #itsType. #theStatus }
+			withArguments: { #alternativeName. #itsType. #theStatus };
+			argumentNamed: #theStatus defaultingTo: 'UNKNOWN'
 		].
 	reader for: PetOrder createInstanceUsing: [ :mapping |
 		mapping

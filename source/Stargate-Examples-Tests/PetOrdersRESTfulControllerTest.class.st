@@ -536,6 +536,30 @@ PetOrdersRESTfulControllerTest >> testOverlyComplexOrderCreation [
 		assert: order date equals: '2018-10-24T18:05:46.418Z'
 ]
 
+{ #category : 'tests - orders' }
+PetOrdersRESTfulControllerTest >> testOverlyComplexOrderCreationWithoutSpecifyingStatusUsesDefaultValue [
+
+	| response order |
+
+	response := resourceController
+		  createOrderBasedOn: ( self requestToPOSTAsOverlyComplexOrder:
+				    '{"date":"2018-10-24T18:05:46.418Z","pet":{"alternativeName":"Fido","itsType":"Dog"}}' )
+		  within: self newHttpRequestContext.
+
+	self
+		assert: response isSuccess;
+		assert: response status equals: 201;
+		assertUrl: response location equals: 'https://petstore.example.com/orders/1';
+		assert: response hasEntity;
+		assert: orderRepository count equals: 1.
+	order := orderRepository findAll first.
+	self
+		assert: order pet name equals: 'Fido';
+		assert: order pet type equals: 'Dog';
+		assert: order pet status equals: 'UNKNOWN';
+		assert: order date equals: '2018-10-24T18:05:46.418Z'
+]
+
 { #category : 'tests' }
 PetOrdersRESTfulControllerTest >> testRoutes [
 
