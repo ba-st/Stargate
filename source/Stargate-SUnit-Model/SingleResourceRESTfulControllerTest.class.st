@@ -126,6 +126,21 @@ SingleResourceRESTfulControllerTest >> requestToGETSubresource: aSubresourceUrl 
 ]
 
 { #category : 'private - HTTP requests' }
+SingleResourceRESTfulControllerTest >> requestToPATCH: content at: aUrl as: aMediaType withPathParams: aDictionary applying: aConfiguration conditionalTo: anETag [
+
+  | request |
+  request := ( ZnRequest patch: aUrl )
+               setAccept: aMediaType;
+               setIfMatchTo: anETag;
+               entity: ( ZnEntity with: content type: aMediaType );
+               yourself.
+
+  aConfiguration value: request.
+
+  ^ TeaRequest fromZnRequest: request pathParams: aDictionary
+]
+
+{ #category : 'private - HTTP requests' }
 SingleResourceRESTfulControllerTest >> requestToPATCHResourceIdentifiedBy: anIdentifier with: aRequestBody accepting: aMediaRange conditionalTo: anETag [
 
 	^ TeaRequest
@@ -146,6 +161,27 @@ SingleResourceRESTfulControllerTest >> requestToPOST: content as: aMediaType [
 			((ZnRequest post: self resourceUrl)
 				entity: (ZnEntity with: content type: aMediaType);
 				yourself)
+]
+
+{ #category : 'private - HTTP requests' }
+SingleResourceRESTfulControllerTest >> requestToPOST: content at: aUrl as: aMediaType withPathParams: aDictionary applying: aConfiguration [
+
+  | request |
+  request := ( ZnRequest post: aUrl )
+               entity: ( ZnEntity with: content type: aMediaType );
+               yourself.
+
+  aConfiguration value: request.
+
+  ^ TeaRequest fromZnRequest: request pathParams: aDictionary
+]
+
+{ #category : 'private - HTTP requests' }
+SingleResourceRESTfulControllerTest >> requestToPOSTWithoutContentAt: aUrl identifiedBy: anIdentifier [
+
+  ^ TeaRequest
+      fromZnRequest: ( ZnRequest post: aUrl )
+      pathParams: ( self parametersWith: anIdentifier )
 ]
 
 { #category : 'private - support' }
