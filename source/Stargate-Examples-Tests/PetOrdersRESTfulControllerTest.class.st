@@ -30,12 +30,12 @@ PetOrdersRESTfulControllerTest >> commentsRelatedTo: order [
 { #category : 'private - support' }
 PetOrdersRESTfulControllerTest >> createCommentFor: order identifiedBy: anId withContent: aComment [
 
-	| request |
+  | request |
+  request := self requestToPOST: order links comments asUrl identifiedBy: anId.
+  request entity: ( ZnEntity with: aComment type: ZnMimeType textPlain ).
+  request setAccept: ZnMimeType textPlain.
 
-	request := self requestToPOST: order links comments asUrl identifiedBy: anId.
-	request entity: ( ZnEntity with: aComment type: ZnMimeType textPlain ).
-
-	^ resourceController createCommentBasedOn: request within: self newHttpRequestContext
+  ^ resourceController createCommentBasedOn: request within: self newHttpRequestContext
 ]
 
 { #category : 'private - support' }
@@ -134,14 +134,16 @@ PetOrdersRESTfulControllerTest >> requestToPOSTAsOverlyComplexOrder: json [
 
 { #category : 'private - HTTP requests' }
 PetOrdersRESTfulControllerTest >> requestToPUTComment: aComment on: aSubresourceUrl at: aCommentIndex forOrder: anOrderId conditionalTo: anETag [
-
-	^ TeaRequest
-		fromZnRequest:
-			( ( ZnRequest put: aSubresourceUrl asUrl / aCommentIndex asString )
-				setIfMatchTo: anETag;
-				entity: ( ZnEntity text: aComment );
-				yourself )
-		pathParams: ( self parametersWith: anOrderId and: aCommentIndex )
+	
+  | request |
+  request := TeaRequest
+               fromZnRequest: ( ( ZnRequest put: aSubresourceUrl asUrl / aCommentIndex asString )
+                     setIfMatchTo: anETag;
+                     entity: ( ZnEntity text: aComment );
+                     yourself )
+               pathParams: ( self parametersWith: anOrderId and: aCommentIndex ).
+  request setAccept: ZnMimeType textPlain.
+  ^ request
 ]
 
 { #category : 'running' }
