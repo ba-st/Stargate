@@ -2,7 +2,7 @@ RwLoadSpecificationV2 {
   #specName: 'Teapot',
   #projectName : 'Teapot',
   #gitUrl : 'https://github.com/ba-st-dependencies/Teapot.git',
-  #revision : 'v3',
+  #revision : 'v4',
   #projectSpecFile : 'rowan/project.ston',
   #componentNames : [
     'Deployment'

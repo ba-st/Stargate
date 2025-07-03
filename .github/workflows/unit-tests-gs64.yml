@@ -4,16 +4,6 @@ on:
   - pull_request
   - workflow_dispatch
 jobs:
-  unit-tests-3_7_0:
-    runs-on: ubuntu-latest
-    name: GS64 v3.7.0 Unit Tests
-    steps:
-      - uses: actions/checkout@v4
-      - name: Load Image and Run Tests
-        uses: ba-st-actions/gs64-ci@v2
-        with:
-          project_name: 'Stargate'
-          run_tests: 'true'
   unit-tests-3_7_1:
     runs-on: ubuntu-latest
     name: GS64 v3.7.1 Unit Tests

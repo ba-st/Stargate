@@ -81,7 +81,7 @@ BaselineOfStargate >> setUpDependencies: spec [
 		project: 'Buoy-SUnit' copyFrom: 'Buoy' with: [ spec loads: 'Dependent-SUnit-Extensions' ].
 
 	spec
-		baseline: 'Hyperspace' with: [ spec repository: 'github://ba-st/Hyperspace:v6' ];
+		baseline: 'Hyperspace' with: [ spec repository: 'github://ba-st/Hyperspace:v7' ];
 		project: 'Hyperspace-Deployment' copyFrom: 'Hyperspace' with: [ spec loads: 'Deployment' ];
 		project: 'Hyperspace-Tools' copyFrom: 'Hyperspace' with: [ spec loads: 'Tools' ];
 		project: 'Hyperspace-SUnit'
@@ -89,19 +89,19 @@ BaselineOfStargate >> setUpDependencies: spec [
 		with: [ spec loads: 'Dependent-SUnit-Extensions' ].
 
 	spec
-		baseline: 'Teapot' with: [ spec repository: 'github://ba-st-dependencies/Teapot:v3' ];
+		baseline: 'Teapot' with: [ spec repository: 'github://ba-st-dependencies/Teapot:v4' ];
 		project: 'Teapot-Deployment' copyFrom: 'Teapot' with: [ spec loads: 'Deployment' ].
 
 	spec
-		baseline: 'JSONWebToken' with: [ spec repository: 'github://ba-st-dependencies/JSONWebToken:v2' ];
+		baseline: 'JSONWebToken' with: [ spec repository: 'github://ba-st-dependencies/JSONWebToken:v3' ];
 		project: 'JSONWebToken-Deployment' copyFrom: 'JSONWebToken' with: [ spec loads: 'SSL' ].
 
 	spec
-		baseline: 'JRPC' with: [ spec repository: 'github://ba-st-dependencies/JRPC:v5' ];
+		baseline: 'JRPC' with: [ spec repository: 'github://ba-st-dependencies/JRPC:v6' ];
 		project: 'JRPC-Deployment' copyFrom: 'JRPC' with: [ spec loads: 'Server-Deployment' ].
 
 	spec
-		baseline: 'Launchpad' with: [ spec repository: 'github://ba-st/Launchpad:v6' ];
+		baseline: 'Launchpad' with: [ spec repository: 'github://ba-st/Launchpad:v7' ];
 		project: 'Launchpad-Deployment' copyFrom: 'Launchpad' with: [ spec loads: 'Deployment' ];
 		project: 'Launchpad-SUnit' copyFrom: 'Launchpad' with: [ spec loads: 'Dependent-SUnit-Extensions' ]
 ]
