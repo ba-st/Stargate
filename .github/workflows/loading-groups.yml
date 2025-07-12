@@ -13,6 +13,8 @@ jobs:
         smalltalk:
           - Pharo64-10
           - Pharo64-11
+          - Pharo64-12
+          - Pharo64-13
         load-spec:
           - app-config
           - app-control
