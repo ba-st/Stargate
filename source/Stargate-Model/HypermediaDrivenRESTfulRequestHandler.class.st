@@ -66,16 +66,17 @@ HypermediaDrivenRESTfulRequestHandler >> encodeResource: resource as: mediaType 
 { #category : 'private' }
 HypermediaDrivenRESTfulRequestHandler >> encodeResourceCollection: resourceCollection basedOn: httpRequest within: requestContext [
 
-  requestContext
-    holdAsHypermediaControls: ( self paginationPolicy
-          addPaginationControlsTo: { httpRequest absoluteUrl asWebLink toMyself }
-          within: requestContext )
-    for: resourceCollection.
-  resourceCollection do: [ :resource | self holdResource: resource controlsWithin: requestContext ].
-  ^ super
-      encodeResourceCollection: ( ResourceCollection wrapping: resourceCollection )
-      basedOn: httpRequest
-      within: requestContext
+	requestContext
+		holdAsHypermediaControls: ( self paginationPolicy
+				  addPaginationControlsTo:
+				  { ( self resourceUrlEquivalentTo: httpRequest absoluteUrl ) asWebLink toMyself }
+				  within: requestContext )
+		for: resourceCollection.
+	resourceCollection do: [ :resource | self holdResource: resource controlsWithin: requestContext ].
+	^ super
+		  encodeResourceCollection: ( ResourceCollection wrapping: resourceCollection )
+		  basedOn: httpRequest
+		  within: requestContext
 ]
 
 { #category : 'private' }
@@ -119,4 +120,14 @@ HypermediaDrivenRESTfulRequestHandler >> mediaControlsFor: resource within: requ
 		cull: resource
 		cull: requestContext
 		cull: ( self locationOf: resource within: requestContext )
+]
+
+{ #category : 'accessing' }
+HypermediaDrivenRESTfulRequestHandler >> resourceUrlEquivalentTo: aUrl [
+
+	| adjustedUrl |
+
+	adjustedUrl := resourceLocator baseUrl / resourceLocator endpoint asUrl.
+	aUrl queryDo: [ :key :value | adjustedUrl queryAt: key put: value ].
+	^ adjustedUrl
 ]

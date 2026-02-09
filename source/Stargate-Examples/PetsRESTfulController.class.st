@@ -28,26 +28,31 @@ PetsRESTfulController class >> persistingTo: aPetRepository [
 { #category : 'private' }
 PetsRESTfulController >> addPaginationControlsTo: requestContext basedOn: url start: start limit: limit end: end count: total [
 
-	start = 1
-		ifFalse: [ requestContext
-				addPaginationLink: ( self urlFrom: url startingAt: 1 limitedTo: limit )
+	| adjustedUrl |
+
+	adjustedUrl := self requestHandler resourceUrlEquivalentTo: url.
+
+	start = 1 ifFalse: [
+			requestContext
+				addPaginationLink: ( self urlFrom: adjustedUrl startingAt: 1 limitedTo: limit )
 				relatedTo: 'first'
-			].
-	start > limit
-		ifTrue: [ requestContext
-				addPaginationLink: ( self urlFrom: url startingAt: start - limit limitedTo: limit )
+		].
+	start > limit ifTrue: [
+			requestContext
+				addPaginationLink: ( self urlFrom: adjustedUrl startingAt: start - limit limitedTo: limit )
 				relatedTo: 'prev'
-			].
-	total > end
-		ifTrue: [ requestContext
-				addPaginationLink: ( self urlFrom: url startingAt: end + 1 limitedTo: limit )
+		].
+	total > end ifTrue: [
+			requestContext
+				addPaginationLink: ( self urlFrom: adjustedUrl startingAt: end + 1 limitedTo: limit )
 				relatedTo: 'next'
-			].
-	total = end
-		ifFalse: [ requestContext
-				addPaginationLink: ( self urlFrom: url startingAt: ( total - 1 ) // limit * limit + 1 limitedTo: limit )
+		].
+	total = end ifFalse: [
+			requestContext
+				addPaginationLink:
+				( self urlFrom: adjustedUrl startingAt: total - 1 // limit * limit + 1 limitedTo: limit )
 				relatedTo: 'last'
-			]
+		]
 ]
 
 { #category : 'private' }
