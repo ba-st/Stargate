@@ -2,22 +2,24 @@
 A RESTfulRequestExceptionHandlerTest is a test class for testing the behavior of RESTfulRequestExceptionHandler
 "
 Class {
-	#name : #RESTfulRequestExceptionHandlerTest,
-	#superclass : #TestCase,
+	#name : 'RESTfulRequestExceptionHandlerTest',
+	#superclass : 'TestCase',
 	#instVars : [
 		'exceptionHandler'
 	],
-	#category : #'Stargate-Model-Tests-Controllers'
+	#category : 'Stargate-Model-Tests-Controllers',
+	#package : 'Stargate-Model-Tests',
+	#tag : 'Controllers'
 }
 
-{ #category : #running }
+{ #category : 'running' }
 RESTfulRequestExceptionHandlerTest >> setUp [
 
 	super setUp.
 	exceptionHandler := RESTfulRequestExceptionHandler new
 ]
 
-{ #category : #tests }
+{ #category : 'tests' }
 RESTfulRequestExceptionHandlerTest >> testHandlingConflict [
 
 	self
@@ -34,7 +36,7 @@ RESTfulRequestExceptionHandlerTest >> testHandlingConflict [
 		should: [ exceptionHandler handleConflictsDuring: [ 1 / 0 ] ] raise: HTTPClientError conflict
 ]
 
-{ #category : #tests }
+{ #category : 'tests' }
 RESTfulRequestExceptionHandlerTest >> testHandlingDecodingFailed [
 
 	self
@@ -56,7 +58,7 @@ RESTfulRequestExceptionHandlerTest >> testHandlingDecodingFailed [
 			raise: HTTPClientError badRequest
 ]
 
-{ #category : #tests }
+{ #category : 'tests' }
 RESTfulRequestExceptionHandlerTest >> testHandlingDecodingFailedWhenEntityIsUnprocessable [
 
 	self
@@ -70,7 +72,7 @@ RESTfulRequestExceptionHandlerTest >> testHandlingDecodingFailedWhenEntityIsUnpr
 		raise: HTTPClientError unprocessableEntity
 ]
 
-{ #category : #tests }
+{ #category : 'tests' }
 RESTfulRequestExceptionHandlerTest >> testHandlingMissingQueryParameters [
 
 	self
@@ -88,7 +90,7 @@ RESTfulRequestExceptionHandlerTest >> testHandlingMissingQueryParameters [
 			raise: HTTPClientError badRequest
 ]
 
-{ #category : #tests }
+{ #category : 'tests' }
 RESTfulRequestExceptionHandlerTest >> testHandlingNotFound [
 
 	self

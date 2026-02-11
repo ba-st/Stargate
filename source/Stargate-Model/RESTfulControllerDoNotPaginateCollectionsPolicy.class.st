@@ -29,9 +29,12 @@ RESTfulControllerDoNotPaginateCollectionsPolicy >> affect: response within: requ
 ]
 
 { #category : 'applying' }
-RESTfulControllerDoNotPaginateCollectionsPolicy >> evaluateQuery: aQueryEvaluationBlock basedOn: httpRequest [
+RESTfulControllerDoNotPaginateCollectionsPolicy >> evaluateQuery: aQueryEvaluationBlock basedOn: httpRequest within: requestContext [
 
-	^ requestHandler evaluateCollectionQuery: aQueryEvaluationBlock
+  ^ requestHandler
+      evaluateCollectionQuery: aQueryEvaluationBlock
+      basedOn: httpRequest
+      within: requestContext
 ]
 
 { #category : 'initialization' }

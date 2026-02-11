@@ -32,14 +32,16 @@ RESTfulControllerPaginateCollectionsPolicy >> affect: response within: requestCo
 ]
 
 { #category : 'applying' }
-RESTfulControllerPaginateCollectionsPolicy >> evaluateQuery: aQueryEvaluationBlock basedOn: httpRequest [
+RESTfulControllerPaginateCollectionsPolicy >> evaluateQuery: aQueryEvaluationBlock basedOn: httpRequest within: requestContext [
 
-	| pagination |
-
-	pagination := [ self paginationFrom: httpRequest ]
-		on: InstanceCreationFailed
-		do: [ :error | HTTPClientError badRequest signal: error messageText ].
-	^ requestHandler evaluateCollectionQuery: [ aQueryEvaluationBlock cull: pagination ]
+  | pagination |
+  pagination := [ self paginationFrom: httpRequest ]
+                  on: InstanceCreationFailed
+                  do: [ :error | HTTPClientError badRequest signal: error messageText ].
+  ^ requestHandler
+      evaluateCollectionQuery: [ aQueryEvaluationBlock cull: pagination ]
+      basedOn: httpRequest
+      within: requestContext
 ]
 
 { #category : 'initialization' }

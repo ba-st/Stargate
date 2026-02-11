@@ -2,12 +2,14 @@
 I'm testing extensions to UUID
 "
 Class {
-	#name : #UUIDExtensionsTest,
-	#superclass : #TestCase,
-	#category : #'Stargate-Model-Tests-Extensions'
+	#name : 'UUIDExtensionsTest',
+	#superclass : 'TestCase',
+	#category : 'Stargate-Model-Tests-Extensions',
+	#package : 'Stargate-Model-Tests',
+	#tag : 'Extensions'
 }
 
-{ #category : #tests }
+{ #category : 'tests' }
 UUIDExtensionsTest >> testJSONMapping [
 
 	| uuid |

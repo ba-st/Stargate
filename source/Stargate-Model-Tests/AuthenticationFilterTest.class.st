@@ -2,18 +2,20 @@
 I'm an abstract test case for authentication filters
 "
 Class {
-	#name : #AuthenticationFilterTest,
-	#superclass : #TestCase,
-	#category : #'Stargate-Model-Tests-Auth'
+	#name : 'AuthenticationFilterTest',
+	#superclass : 'TestCase',
+	#category : 'Stargate-Model-Tests-Auth',
+	#package : 'Stargate-Model-Tests',
+	#tag : 'Auth'
 }
 
-{ #category : #testing }
+{ #category : 'testing' }
 AuthenticationFilterTest class >> isAbstract [
 
 	^ self name = #AuthenticationFilterTest
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 AuthenticationFilterTest >> assertResponseFor: request isUnauthorizedAfterApplying: filter [
 
 	self
@@ -26,7 +28,7 @@ AuthenticationFilterTest >> assertResponseFor: request isUnauthorizedAfterApplyi
 			]
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 AuthenticationFilterTest >> newFilter [
 
 	"Return a new instance of the authentication filter under test"
@@ -34,31 +36,31 @@ AuthenticationFilterTest >> newFilter [
 	^ self subclassResponsibility
 ]
 
-{ #category : #tests }
+{ #category : 'tests' }
 AuthenticationFilterTest >> testAuthChallenge [
 
 	self subclassResponsibility
 ]
 
-{ #category : #tests }
+{ #category : 'tests' }
 AuthenticationFilterTest >> testBasedOnConfiguration [
 
 	self subclassResponsibility
 ]
 
-{ #category : #tests }
+{ #category : 'tests' }
 AuthenticationFilterTest >> testInvalidCredentials [
 
 	self subclassResponsibility
 ]
 
-{ #category : #tests }
+{ #category : 'tests' }
 AuthenticationFilterTest >> testInvalidType [
 
 	self subclassResponsibility
 ]
 
-{ #category : #tests }
+{ #category : 'tests' }
 AuthenticationFilterTest >> testMissingHeader [
 
 	| request |
@@ -68,7 +70,7 @@ AuthenticationFilterTest >> testMissingHeader [
 	self assertResponseFor: request isUnauthorizedAfterApplying: self newFilter
 ]
 
-{ #category : #tests }
+{ #category : 'tests' }
 AuthenticationFilterTest >> testValidCredentials [
 
 	self subclassResponsibility

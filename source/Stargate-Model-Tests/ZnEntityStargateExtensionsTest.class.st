@@ -1,10 +1,12 @@
 Class {
-	#name : #ZnEntityStargateExtensionsTest,
-	#superclass : #TestCase,
-	#category : #'Stargate-Model-Tests-Extensions'
+	#name : 'ZnEntityStargateExtensionsTest',
+	#superclass : 'TestCase',
+	#category : 'Stargate-Model-Tests-Extensions',
+	#package : 'Stargate-Model-Tests',
+	#tag : 'Extensions'
 }
 
-{ #category : #tests }
+{ #category : 'tests' }
 ZnEntityStargateExtensionsTest >> testAsString [
 
 	self

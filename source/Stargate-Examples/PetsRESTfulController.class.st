@@ -28,29 +28,29 @@ PetsRESTfulController class >> persistingTo: aPetRepository [
 { #category : 'private' }
 PetsRESTfulController >> addPaginationControlsTo: requestContext basedOn: url start: start limit: limit end: end count: total [
 
-	| adjustedUrl |
+	| collectionLink |
 
-	adjustedUrl := self requestHandler resourceUrlEquivalentTo: url.
+	collectionLink := requestContext collectionLink.
 
 	start = 1 ifFalse: [
 			requestContext
-				addPaginationLink: ( self urlFrom: adjustedUrl startingAt: 1 limitedTo: limit )
+				addPaginationLink: ( self urlFrom: collectionLink startingAt: 1 limitedTo: limit )
 				relatedTo: 'first'
 		].
 	start > limit ifTrue: [
 			requestContext
-				addPaginationLink: ( self urlFrom: adjustedUrl startingAt: start - limit limitedTo: limit )
+				addPaginationLink: ( self urlFrom: collectionLink startingAt: start - limit limitedTo: limit )
 				relatedTo: 'prev'
 		].
 	total > end ifTrue: [
 			requestContext
-				addPaginationLink: ( self urlFrom: adjustedUrl startingAt: end + 1 limitedTo: limit )
+				addPaginationLink: ( self urlFrom: collectionLink startingAt: end + 1 limitedTo: limit )
 				relatedTo: 'next'
 		].
 	total = end ifFalse: [
 			requestContext
 				addPaginationLink:
-				( self urlFrom: adjustedUrl startingAt: total - 1 // limit * limit + 1 limitedTo: limit )
+				( self urlFrom: collectionLink startingAt: total - 1 // limit * limit + 1 limitedTo: limit )
 				relatedTo: 'last'
 		]
 ]
@@ -271,8 +271,5 @@ PetsRESTfulController >> updatePetBasedOn: httpRequest within: requestContext [
 { #category : 'private' }
 PetsRESTfulController >> urlFrom: url startingAt: start limitedTo: limit [
 
-	^ url copy
-		queryAt: 'start' put: start;
-		queryAt: 'limit' put: limit;
-		yourself
+  ^ url copy start: start limit: limit
 ]

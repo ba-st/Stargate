@@ -615,7 +615,7 @@ PetsRESTfulControllerTest >> testPaginationLinksUseServerlUrl [
 
 			response := resourceController
 				            getPetsBasedOn:
-				            ( self requestToGET: json links next accepting: response contentType )
+				            ( self requestToGET: 'https://pets.example.com/pets?start=6&limit=5' accepting: response contentType )
 				            within: self newHttpRequestContext.
 			self
 				assert: response isSuccess;

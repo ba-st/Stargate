@@ -2,12 +2,14 @@
 A QualifiedLanguageRangeTest is a test class for testing the behavior of QualifiedLanguageRange
 "
 Class {
-	#name : #QualifiedLanguageRangeTest,
-	#superclass : #TestCase,
-	#category : #'Stargate-Model-Tests-Controllers'
+	#name : 'QualifiedLanguageRangeTest',
+	#superclass : 'TestCase',
+	#category : 'Stargate-Model-Tests-Controllers',
+	#package : 'Stargate-Model-Tests',
+	#tag : 'Controllers'
 }
 
-{ #category : #tests }
+{ #category : 'tests' }
 QualifiedLanguageRangeTest >> testCantParseInvalidStrings [
 
 	self
@@ -18,7 +20,7 @@ QualifiedLanguageRangeTest >> testCantParseInvalidStrings [
 		should: [ QualifiedLanguageRange fromString: 'en;q=A' ] raise: Error
 ]
 
-{ #category : #tests }
+{ #category : 'tests' }
 QualifiedLanguageRangeTest >> testFromString [
 
 	| qualifiedRange |
@@ -30,7 +32,7 @@ QualifiedLanguageRangeTest >> testFromString [
 		assert: qualifiedRange range equals: ( LanguageRange fromString: 'en-US' )
 ]
 
-{ #category : #tests }
+{ #category : 'tests' }
 QualifiedLanguageRangeTest >> testFromStringAndExtraParameters [
 
 	| qualifiedRange |
@@ -42,7 +44,7 @@ QualifiedLanguageRangeTest >> testFromStringAndExtraParameters [
 		assert: qualifiedRange range equals: ( LanguageRange fromString: 'en-US' )
 ]
 
-{ #category : #tests }
+{ #category : 'tests' }
 QualifiedLanguageRangeTest >> testFromStringWithAny [
 
 	| qualifiedRange |
@@ -54,7 +56,7 @@ QualifiedLanguageRangeTest >> testFromStringWithAny [
 		assert: qualifiedRange range equals: LanguageRange any
 ]
 
-{ #category : #tests }
+{ #category : 'tests' }
 QualifiedLanguageRangeTest >> testFromStringWithAnyQualifier [
 
 	| qualifiedRange |
@@ -66,7 +68,7 @@ QualifiedLanguageRangeTest >> testFromStringWithAnyQualifier [
 		assert: qualifiedRange range equals: LanguageRange any
 ]
 
-{ #category : #tests }
+{ #category : 'tests' }
 QualifiedLanguageRangeTest >> testFromStringWithQualifier [
 
 	| qualifiedRange |
@@ -78,7 +80,7 @@ QualifiedLanguageRangeTest >> testFromStringWithQualifier [
 		assert: qualifiedRange range equals: ( LanguageRange fromString: 'en-US' )
 ]
 
-{ #category : #tests }
+{ #category : 'tests' }
 QualifiedLanguageRangeTest >> testFromStringWithQualifierAndExtraParameters [
 
 	| qualifiedRange |

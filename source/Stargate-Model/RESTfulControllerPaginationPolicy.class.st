@@ -22,7 +22,7 @@ RESTfulControllerPaginationPolicy >> affect: response within: requestContext [
 ]
 
 { #category : 'applying' }
-RESTfulControllerPaginationPolicy >> evaluateQuery: aQueryEvaluationBlock basedOn: httpRequest [
+RESTfulControllerPaginationPolicy >> evaluateQuery: aQueryEvaluationBlock basedOn: httpRequest within: requestContext [
 
 	self subclassResponsibility
 ]

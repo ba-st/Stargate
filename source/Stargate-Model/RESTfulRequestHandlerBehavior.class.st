@@ -138,7 +138,7 @@ RESTfulRequestHandlerBehavior >> entityTagToMatchBasedOn: httpRequest [
 ]
 
 { #category : 'private' }
-RESTfulRequestHandlerBehavior >> evaluateCollectionQuery: aQueryEvaluationBlock [
+RESTfulRequestHandlerBehavior >> evaluateCollectionQuery: aQueryEvaluationBlock basedOn: httpRequest within: requestContext [
 
 	^ self exceptionHandler handleMissingQueryParametersDuring: aQueryEvaluationBlock
 ]
@@ -232,7 +232,8 @@ RESTfulRequestHandlerBehavior >> from: httpRequest within: requestContext getCol
         | resourceCollection encodedResourceCollection response |
         resourceCollection := paginationPolicy
                                 evaluateQuery: aQueryEvaluationBlock
-                                basedOn: httpRequest.
+                                basedOn: httpRequest
+                                within: requestContext.
         encodedResourceCollection := self
                                        encodeResourceCollection: resourceCollection
                                        basedOn: httpRequest
