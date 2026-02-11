@@ -28,31 +28,18 @@ PetsRESTfulController class >> persistingTo: aPetRepository [
 { #category : 'private' }
 PetsRESTfulController >> addPaginationControlsTo: requestContext start: start limit: limit end: end count: total [
 
-	| collectionLink |
-
-	collectionLink := requestContext collectionLink.
-
-	start = 1 ifFalse: [
-			requestContext
-				addPaginationLink: ( self urlFrom: collectionLink startingAt: 1 limitedTo: limit )
-				relatedTo: 'first'
-		].
-	start > limit ifTrue: [
-			requestContext
-				addPaginationLink: ( self urlFrom: collectionLink startingAt: start - limit limitedTo: limit )
-				relatedTo: 'prev'
-		].
-	total > end ifTrue: [
-			requestContext
-				addPaginationLink: ( self urlFrom: collectionLink startingAt: end + 1 limitedTo: limit )
-				relatedTo: 'next'
-		].
-	total = end ifFalse: [
-			requestContext
-				addPaginationLink:
-				( self urlFrom: collectionLink startingAt: total - 1 // limit * limit + 1 limitedTo: limit )
-				relatedTo: 'last'
-		]
+  start = 1 ifFalse: [
+      requestContext addPaginationLinkStartingAt: 1 limitedTo: limit relatedTo: 'first' ].
+  start > limit ifTrue: [
+      requestContext addPaginationLinkStartingAt: start - limit limitedTo: limit relatedTo: 'prev' ].
+  total > end ifTrue: [
+      requestContext addPaginationLinkStartingAt: end + 1 limitedTo: limit relatedTo: 'next' ].
+  total = end ifFalse: [
+      requestContext
+        addPaginationLinkStartingAt: total - 1 // limit * limit + 1
+        limitedTo: limit
+        relatedTo: 'last'
+    ]
 ]
 
 { #category : 'private' }
@@ -259,10 +246,4 @@ PetsRESTfulController >> updatePetBasedOn: httpRequest within: requestContext [
 						ofType: ( decoded at: #type ifAbsent: [ pet type ] )
 						withStatus: ( decoded at: #status ifAbsent: [ pet status ] ) )
 			]
-]
-
-{ #category : 'private' }
-PetsRESTfulController >> urlFrom: url startingAt: start limitedTo: limit [
-
-  ^ url copy start: start limit: limit
 ]
