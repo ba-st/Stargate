@@ -2,12 +2,14 @@
 A CachingDirectivesBuilderTest is a test class for testing the behavior of CachingDirectivesBuilder
 "
 Class {
-	#name : #CachingDirectivesBuilderTest,
-	#superclass : #TestCase,
-	#category : #'Stargate-Model-Tests-Caching'
+	#name : 'CachingDirectivesBuilderTest',
+	#superclass : 'TestCase',
+	#category : 'Stargate-Model-Tests-Caching',
+	#package : 'Stargate-Model-Tests',
+	#tag : 'Caching'
 }
 
-{ #category : #'private - asserting' }
+{ #category : 'private - asserting' }
 CachingDirectivesBuilderTest >> assertExpiresHeaderFor: response with: aDuration [
 
 	| oneMinuteBeforeFourHours fourHoursInTheFuture expiresString |
@@ -22,7 +24,7 @@ CachingDirectivesBuilderTest >> assertExpiresHeaderFor: response with: aDuration
 		assert: ( expiresString = oneMinuteBeforeFourHours or: [ expiresString = fourHoursInTheFuture ] )
 ]
 
-{ #category : #'private - asserting' }
+{ #category : 'private - asserting' }
 CachingDirectivesBuilderTest >> assertThereAre: aNumber directivesFrom: aBuilder whichSetCacheControlHeaderTo: anArray [
 
 	| directives response |
@@ -33,7 +35,7 @@ CachingDirectivesBuilderTest >> assertThereAre: aNumber directivesFrom: aBuilder
 	self assert: response cachingDirectives equals: anArray
 ]
 
-{ #category : #'private - asserting' }
+{ #category : 'private - asserting' }
 CachingDirectivesBuilderTest >> assertThereAre: aNumber directivesFrom: aBuilder whichSetExpiresHeaderTo: aDuration andCacheControlHeaderTo: anArray [
 
 	| directives response |
@@ -45,13 +47,13 @@ CachingDirectivesBuilderTest >> assertThereAre: aNumber directivesFrom: aBuilder
 	self assertExpiresHeaderFor: response with: aDuration
 ]
 
-{ #category : #'private - accessing' }
+{ #category : 'private - accessing' }
 CachingDirectivesBuilderTest >> requestContext [
 
 	^ HttpRequestContext new
 ]
 
-{ #category : #'private - accessing' }
+{ #category : 'private - accessing' }
 CachingDirectivesBuilderTest >> responseAffectedBy: directives [
 
 	| response resource |
@@ -62,7 +64,7 @@ CachingDirectivesBuilderTest >> responseAffectedBy: directives [
 	^ response
 ]
 
-{ #category : #tests }
+{ #category : 'tests' }
 CachingDirectivesBuilderTest >> testBeAvailableFor [
 
 	| builder |
@@ -77,7 +79,7 @@ CachingDirectivesBuilderTest >> testBeAvailableFor [
 		andCacheControlHeaderTo: #('public' 'Max-Age=21600')
 ]
 
-{ #category : #tests }
+{ #category : 'tests' }
 CachingDirectivesBuilderTest >> testBeImmutable [
 
 	| builder |
@@ -88,7 +90,7 @@ CachingDirectivesBuilderTest >> testBeImmutable [
 	self assertThereAre: 1 directivesFrom: builder whichSetCacheControlHeaderTo: #('immutable')
 ]
 
-{ #category : #tests }
+{ #category : 'tests' }
 CachingDirectivesBuilderTest >> testBePrivate [
 
 	| builder |
@@ -99,7 +101,7 @@ CachingDirectivesBuilderTest >> testBePrivate [
 	self assertThereAre: 1 directivesFrom: builder whichSetCacheControlHeaderTo: #('private')
 ]
 
-{ #category : #tests }
+{ #category : 'tests' }
 CachingDirectivesBuilderTest >> testBePrivateRestrictedTo [
 
 	| builder |
@@ -113,7 +115,7 @@ CachingDirectivesBuilderTest >> testBePrivateRestrictedTo [
 		whichSetCacheControlHeaderTo: #('private="server, user"')
 ]
 
-{ #category : #tests }
+{ #category : 'tests' }
 CachingDirectivesBuilderTest >> testBePublic [
 
 	| builder |
@@ -124,7 +126,7 @@ CachingDirectivesBuilderTest >> testBePublic [
 	self assertThereAre: 1 directivesFrom: builder whichSetCacheControlHeaderTo: #('public')
 ]
 
-{ #category : #tests }
+{ #category : 'tests' }
 CachingDirectivesBuilderTest >> testBeStaleAfter [
 
 	| builder |
@@ -135,13 +137,13 @@ CachingDirectivesBuilderTest >> testBeStaleAfter [
 	self assertThereAre: 1 directivesFrom: builder whichSetCacheControlHeaderTo: #('Max-Age=120')
 ]
 
-{ #category : #tests }
+{ #category : 'tests' }
 CachingDirectivesBuilderTest >> testBuild [
 
 	self assert: CachingDirectivesBuilder new build isEmpty
 ]
 
-{ #category : #tests }
+{ #category : 'tests' }
 CachingDirectivesBuilderTest >> testConfigureUsing [
 
 	| builder |
@@ -152,7 +154,7 @@ CachingDirectivesBuilderTest >> testConfigureUsing [
 	self assertThereAre: 1 directivesFrom: builder whichSetCacheControlHeaderTo: #('no-transform')
 ]
 
-{ #category : #tests }
+{ #category : 'tests' }
 CachingDirectivesBuilderTest >> testDoNotCache [
 
 	| builder |
@@ -163,7 +165,7 @@ CachingDirectivesBuilderTest >> testDoNotCache [
 	self assertThereAre: 1 directivesFrom: builder whichSetCacheControlHeaderTo: #('no-cache')
 ]
 
-{ #category : #tests }
+{ #category : 'tests' }
 CachingDirectivesBuilderTest >> testDoNotCacheRestrictedTo [
 
 	| builder |
@@ -177,7 +179,7 @@ CachingDirectivesBuilderTest >> testDoNotCacheRestrictedTo [
 		whichSetCacheControlHeaderTo: #('no-cache="account"')
 ]
 
-{ #category : #tests }
+{ #category : 'tests' }
 CachingDirectivesBuilderTest >> testDoNotExpire [
 
 	| builder |
@@ -192,7 +194,7 @@ CachingDirectivesBuilderTest >> testDoNotExpire [
 		andCacheControlHeaderTo: #('immutable' 'public' 'Max-Age=365000000')
 ]
 
-{ #category : #tests }
+{ #category : 'tests' }
 CachingDirectivesBuilderTest >> testDoNotStore [
 
 	| builder |
@@ -203,7 +205,7 @@ CachingDirectivesBuilderTest >> testDoNotStore [
 	self assertThereAre: 1 directivesFrom: builder whichSetCacheControlHeaderTo: #('no-store')
 ]
 
-{ #category : #tests }
+{ #category : 'tests' }
 CachingDirectivesBuilderTest >> testDoNotTransform [
 
 	| builder |
@@ -214,7 +216,7 @@ CachingDirectivesBuilderTest >> testDoNotTransform [
 	self assertThereAre: 1 directivesFrom: builder whichSetCacheControlHeaderTo: #('no-transform')
 ]
 
-{ #category : #tests }
+{ #category : 'tests' }
 CachingDirectivesBuilderTest >> testExpireIn [
 
 	| directives response builder |
@@ -229,7 +231,7 @@ CachingDirectivesBuilderTest >> testExpireIn [
 	self assertExpiresHeaderFor: response with: 3 hours
 ]
 
-{ #category : #tests }
+{ #category : 'tests' }
 CachingDirectivesBuilderTest >> testMustRevalidate [
 
 	| builder |
@@ -240,7 +242,7 @@ CachingDirectivesBuilderTest >> testMustRevalidate [
 	self assertThereAre: 1 directivesFrom: builder whichSetCacheControlHeaderTo: #('must-revalidate')
 ]
 
-{ #category : #tests }
+{ #category : 'tests' }
 CachingDirectivesBuilderTest >> testRequireRevalidation [
 
 	| builder |
@@ -254,7 +256,7 @@ CachingDirectivesBuilderTest >> testRequireRevalidation [
 		whichSetCacheControlHeaderTo: #('no-cache' 'Max-Age=0')
 ]
 
-{ #category : #tests }
+{ #category : 'tests' }
 CachingDirectivesBuilderTest >> testWhenSharedBeStaleAfter [
 
 	| builder |
@@ -265,7 +267,7 @@ CachingDirectivesBuilderTest >> testWhenSharedBeStaleAfter [
 	self assertThereAre: 1 directivesFrom: builder whichSetCacheControlHeaderTo: #('S-MaxAge=900')
 ]
 
-{ #category : #tests }
+{ #category : 'tests' }
 CachingDirectivesBuilderTest >> testWhenSharedMustRevalidate [
 
 	| builder |

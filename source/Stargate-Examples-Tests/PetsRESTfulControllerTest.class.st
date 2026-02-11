@@ -581,6 +581,66 @@ PetsRESTfulControllerTest >> testGetPetsWithPagination [
 		]
 ]
 
+{ #category : 'tests - get collection' }
+PetsRESTfulControllerTest >> testPaginationLinksUseServerlUrl [
+
+	| response |
+
+	resourceController serverUrl: 'https://pets.example.com/beta' asZnUrl.
+	self createSixPets.
+
+	response := resourceController
+		            getPetsBasedOn: ( self
+				              requestToGET: 'https://pets.example.com/pets' asZnUrl
+				              accepting: resourceController petSummaryVersion1dot0dot0MediaType )
+		            within: self newHttpRequestContext.
+
+	self
+		assert: response isSuccess;
+		assert: response status equals: 200;
+		assert: response contentType asMediaType
+		equals: resourceController petSummaryVersion1dot0dot0MediaType;
+		assert: response links size equals: 2;
+		assertUrl: response links first url equals: 'https://pets.example.com/beta/pets?start=6&limit=5';
+		assert: response links first relationType equals: 'next';
+		assertUrl: response links second url equals: 'https://pets.example.com/beta/pets?start=6&limit=5';
+		assert: response links second relationType equals: 'last'.
+
+	self withJsonFromContentsIn: response do: [ :json |
+			self
+				assertUrl: json selfLocation equals: 'https://pets.example.com/beta/pets';
+				assertUrl: json links next equals: 'https://pets.example.com/beta/pets?start=6&limit=5';
+				assertUrl: json links last equals: 'https://pets.example.com/beta/pets?start=6&limit=5';
+				assert: json items size equals: 5.
+
+			response := resourceController
+				            getPetsBasedOn:
+				            ( self requestToGET: 'https://pets.example.com/pets?start=6&limit=5' accepting: response contentType )
+				            within: self newHttpRequestContext.
+			self
+				assert: response isSuccess;
+				assert: response status equals: 200;
+				assert: response contentType asMediaType
+				equals: resourceController petSummaryVersion1dot0dot0MediaType;
+				assert: response links size equals: 2;
+				assertUrl: response links first url
+				equals: 'https://pets.example.com/beta/pets?start=1&limit=5';
+				assert: response links first relationType equals: 'first';
+				assertUrl: response links second url
+				equals: 'https://pets.example.com/beta/pets?start=1&limit=5';
+				assert: response links second relationType equals: 'prev'.
+			self withJsonFromContentsIn: response do: [ :json2 |
+					self
+						assertUrl: json2 selfLocation equals: 'https://pets.example.com/beta/pets?start=6&limit=5';
+						assertUrl: json2 links first equals: 'https://pets.example.com/beta/pets?start=1&limit=5';
+						assertUrl: json2 links prev equals: 'https://pets.example.com/beta/pets?start=1&limit=5';
+						assert: json2 links next isNil;
+						assert: json2 links last isNil;
+						assert: json2 items size equals: 1
+				]
+		]
+]
+
 { #category : 'tests - creation' }
 PetsRESTfulControllerTest >> testPetCreation [
 

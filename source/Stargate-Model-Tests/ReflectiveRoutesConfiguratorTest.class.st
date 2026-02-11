@@ -2,12 +2,14 @@
 I'm a test case for ReflectiveRoutesConfigurator
 "
 Class {
-	#name : #ReflectiveRoutesConfiguratorTest,
-	#superclass : #TestCase,
-	#category : #'Stargate-Model-Tests-Routing'
+	#name : 'ReflectiveRoutesConfiguratorTest',
+	#superclass : 'TestCase',
+	#category : 'Stargate-Model-Tests-Routing',
+	#package : 'Stargate-Model-Tests',
+	#tag : 'Routing'
 }
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 ReflectiveRoutesConfiguratorTest >> createTestRoute [
 
 	^ RouteSpecification
@@ -16,7 +18,7 @@ ReflectiveRoutesConfiguratorTest >> createTestRoute [
 		evaluating: [ :httpRequest :requestContext | self fail ] 
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 ReflectiveRoutesConfiguratorTest >> getTestsRoute [
 
 	^ RouteSpecification
@@ -25,13 +27,13 @@ ReflectiveRoutesConfiguratorTest >> getTestsRoute [
 		evaluating: [ :httpRequest :requestContext | self fail ]
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 ReflectiveRoutesConfiguratorTest >> routes [
 
 	^ (UnaryMessageSendingCollector sendingAllMessagesEndingWith: 'Route' to: self) value
 ]
 
-{ #category : #tests }
+{ #category : 'tests' }
 ReflectiveRoutesConfiguratorTest >> testConfiguringCrossOriginResourceSharingAwareRoutes [
 
 	| teapot |
@@ -43,7 +45,7 @@ ReflectiveRoutesConfiguratorTest >> testConfiguringCrossOriginResourceSharingAwa
 	self assert: teapot routes size equals: 2
 ]
 
-{ #category : #tests }
+{ #category : 'tests' }
 ReflectiveRoutesConfiguratorTest >> testConfiguringPetsControllerRoutes [
 
 	| teapot |

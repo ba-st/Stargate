@@ -2,18 +2,20 @@
 A ZnAuthenticationFilterTest is a test class for testing the behavior of ZnAuthenticationFilter
 "
 Class {
-	#name : #ZnAuthenticationFilterTest,
-	#superclass : #AuthenticationFilterTest,
-	#category : #'Stargate-Model-Tests-Auth'
+	#name : 'ZnAuthenticationFilterTest',
+	#superclass : 'AuthenticationFilterTest',
+	#category : 'Stargate-Model-Tests-Auth',
+	#package : 'Stargate-Model-Tests',
+	#tag : 'Auth'
 }
 
-{ #category : #private }
+{ #category : 'private' }
 ZnAuthenticationFilterTest >> newFilter [
 
 	^ ZnAuthenticationFilter username: self username password: self password
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 ZnAuthenticationFilterTest >> newHttpRequestWithBasicAuthenticationUsername: username password: password [
 
 	^ ( TeaRequest fromZnRequest: ( ZnRequest get: '/secure' asUrl ) )
@@ -21,19 +23,19 @@ ZnAuthenticationFilterTest >> newHttpRequestWithBasicAuthenticationUsername: use
 		yourself
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 ZnAuthenticationFilterTest >> password [
 
 	^ 'xxx'
 ]
 
-{ #category : #tests }
+{ #category : 'tests' }
 ZnAuthenticationFilterTest >> testAuthChallenge [
 
 	self assert: self newFilter authChallenge equals: 'Basic realm=ZincHTTPComponents'
 ]
 
-{ #category : #tests }
+{ #category : 'tests' }
 ZnAuthenticationFilterTest >> testBasedOnConfiguration [
 
 	| filter |
@@ -54,7 +56,7 @@ ZnAuthenticationFilterTest >> testBasedOnConfiguration [
 			raise: TeaAbort
 ]
 
-{ #category : #tests }
+{ #category : 'tests' }
 ZnAuthenticationFilterTest >> testInvalidCredentials [
 
 	| filter |
@@ -74,7 +76,7 @@ ZnAuthenticationFilterTest >> testInvalidCredentials [
 		isUnauthorizedAfterApplying: filter
 ]
 
-{ #category : #tests }
+{ #category : 'tests' }
 ZnAuthenticationFilterTest >> testInvalidType [
 
 	| filter httpRequest |
@@ -86,7 +88,7 @@ ZnAuthenticationFilterTest >> testInvalidType [
 	self assertResponseFor: httpRequest isUnauthorizedAfterApplying: filter
 ]
 
-{ #category : #tests }
+{ #category : 'tests' }
 ZnAuthenticationFilterTest >> testMissingPasswordConfiguration [
 
 	self
@@ -101,7 +103,7 @@ ZnAuthenticationFilterTest >> testMissingPasswordConfiguration [
 		withMessageText: 'Missing password'
 ]
 
-{ #category : #tests }
+{ #category : 'tests' }
 ZnAuthenticationFilterTest >> testMissingSchemaConfiguration [
 
 	self
@@ -110,7 +112,7 @@ ZnAuthenticationFilterTest >> testMissingSchemaConfiguration [
 		withMessageText: 'Missing authentication configuration'
 ]
 
-{ #category : #tests }
+{ #category : 'tests' }
 ZnAuthenticationFilterTest >> testMissingUsernameConfiguration [
 
 	self
@@ -125,7 +127,7 @@ ZnAuthenticationFilterTest >> testMissingUsernameConfiguration [
 		withMessageText: 'Missing username'
 ]
 
-{ #category : #tests }
+{ #category : 'tests' }
 ZnAuthenticationFilterTest >> testValidCredentials [
 
 	| filter |
@@ -139,7 +141,7 @@ ZnAuthenticationFilterTest >> testValidCredentials [
 		raise: TeaAbort
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 ZnAuthenticationFilterTest >> username [
 
 	^ 'admin'

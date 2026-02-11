@@ -2,24 +2,26 @@
 A JWTBearerAuthenticationFilterTest is a test class for testing the behavior of JWTBearerAuthenticationFilter
 "
 Class {
-	#name : #JWTBearerAuthenticationFilterTest,
-	#superclass : #AuthenticationFilterTest,
-	#category : #'Stargate-Model-Tests-Auth'
+	#name : 'JWTBearerAuthenticationFilterTest',
+	#superclass : 'AuthenticationFilterTest',
+	#category : 'Stargate-Model-Tests-Auth',
+	#package : 'Stargate-Model-Tests',
+	#tag : 'Auth'
 }
 
-{ #category : #private }
+{ #category : 'private' }
 JWTBearerAuthenticationFilterTest >> algorithmName [
 
 	^ 'HS256'
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 JWTBearerAuthenticationFilterTest >> newFilter [
 
 	^ JWTBearerAuthenticationFilter with: self secret forAlgorithmNamed: self algorithmName
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 JWTBearerAuthenticationFilterTest >> newHttpRequestWithJWTBearerAuthenticationFor: aKey [
 
 	^ ( TeaRequest fromZnRequest: ( ZnRequest get: '/secure' asUrl ) )
@@ -27,7 +29,7 @@ JWTBearerAuthenticationFilterTest >> newHttpRequestWithJWTBearerAuthenticationFo
 		yourself
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 JWTBearerAuthenticationFilterTest >> newHttpRequestWithJWTBearerAuthenticationScrappingSignatureFor: aKey [
 
 	| strippedToken |
@@ -39,7 +41,7 @@ JWTBearerAuthenticationFilterTest >> newHttpRequestWithJWTBearerAuthenticationSc
 		yourself
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 JWTBearerAuthenticationFilterTest >> newHttpRequestWithUnsecuredJWTBearerAuthenticationFor: aKey [
 
 	^ ( TeaRequest fromZnRequest: ( ZnRequest get: '/secure' asUrl ) )
@@ -47,19 +49,19 @@ JWTBearerAuthenticationFilterTest >> newHttpRequestWithUnsecuredJWTBearerAuthent
 		yourself
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 JWTBearerAuthenticationFilterTest >> secret [
 
 	^ 'secret'
 ]
 
-{ #category : #tests }
+{ #category : 'tests' }
 JWTBearerAuthenticationFilterTest >> testAuthChallenge [
 
 	self assert: self newFilter authChallenge equals: 'Bearer'
 ]
 
-{ #category : #tests }
+{ #category : 'tests' }
 JWTBearerAuthenticationFilterTest >> testBasedOnConfiguration [
 
 	| filter |
@@ -78,7 +80,7 @@ JWTBearerAuthenticationFilterTest >> testBasedOnConfiguration [
 			raise: TeaAbort
 ]
 
-{ #category : #tests }
+{ #category : 'tests' }
 JWTBearerAuthenticationFilterTest >> testInvalidCredentials [
 
 	| filter |
@@ -98,7 +100,7 @@ JWTBearerAuthenticationFilterTest >> testInvalidCredentials [
 		isUnauthorizedAfterApplying: filter
 ]
 
-{ #category : #tests }
+{ #category : 'tests' }
 JWTBearerAuthenticationFilterTest >> testInvalidType [
 
 	| filter httpRequest |
@@ -110,7 +112,7 @@ JWTBearerAuthenticationFilterTest >> testInvalidType [
 	self assertResponseFor: httpRequest isUnauthorizedAfterApplying: filter
 ]
 
-{ #category : #tests }
+{ #category : 'tests' }
 JWTBearerAuthenticationFilterTest >> testMissingAlgorithmConfiguration [
 
 	self
@@ -125,7 +127,7 @@ JWTBearerAuthenticationFilterTest >> testMissingAlgorithmConfiguration [
 		withMessageText: 'Missing authentication configuration'
 ]
 
-{ #category : #tests }
+{ #category : 'tests' }
 JWTBearerAuthenticationFilterTest >> testMissingSecretConfiguration [
 
 	self
@@ -140,7 +142,7 @@ JWTBearerAuthenticationFilterTest >> testMissingSecretConfiguration [
 		withMessageText: 'Missing authentication configuration'
 ]
 
-{ #category : #tests }
+{ #category : 'tests' }
 JWTBearerAuthenticationFilterTest >> testValidCredentials [
 
 	| filter |
@@ -153,7 +155,7 @@ JWTBearerAuthenticationFilterTest >> testValidCredentials [
 		raise: TeaAbort
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 JWTBearerAuthenticationFilterTest >> tokenWithKey: aKey [
 
 	| jws |
@@ -167,7 +169,7 @@ JWTBearerAuthenticationFilterTest >> tokenWithKey: aKey [
 	^ jws compactSerialized
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 JWTBearerAuthenticationFilterTest >> unsecuredTokenWithKey: aKey [
 
 	| jws |

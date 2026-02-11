@@ -2,15 +2,17 @@
 An OperationalPluginsRESTfulControllerTest is a test class for testing the behavior of OperationalPluginsRESTfulController
 "
 Class {
-	#name : #OperationalPluginsRESTfulControllerTest,
-	#superclass : #OperationalPluginRESTfulControllerTest,
+	#name : 'OperationalPluginsRESTfulControllerTest',
+	#superclass : 'OperationalPluginRESTfulControllerTest',
 	#instVars : [
 		'isPluginEnabled'
 	],
-	#category : #'Stargate-Model-Tests-Operations'
+	#category : 'Stargate-Model-Tests-Operations',
+	#package : 'Stargate-Model-Tests',
+	#tag : 'Operations'
 }
 
-{ #category : #'private - asserting' }
+{ #category : 'private - asserting' }
 OperationalPluginsRESTfulControllerTest >> assertApplicationConfigurationStatusOn: plugins [
 
 	^ plugins
@@ -24,7 +26,7 @@ OperationalPluginsRESTfulControllerTest >> assertApplicationConfigurationStatusO
 		ifNone: [ self fail ]
 ]
 
-{ #category : #'private - asserting' }
+{ #category : 'private - asserting' }
 OperationalPluginsRESTfulControllerTest >> assertApplicationControlStatusOn: plugins [
 
 	^ plugins
@@ -38,7 +40,7 @@ OperationalPluginsRESTfulControllerTest >> assertApplicationControlStatusOn: plu
 		ifNone: [ self fail ]
 ]
 
-{ #category : #'private - asserting' }
+{ #category : 'private - asserting' }
 OperationalPluginsRESTfulControllerTest >> assertApplicationInfoStatusOn: plugins [
 
 	^ plugins
@@ -52,7 +54,7 @@ OperationalPluginsRESTfulControllerTest >> assertApplicationInfoStatusOn: plugin
 		ifNone: [ self fail ]
 ]
 
-{ #category : #'private - asserting' }
+{ #category : 'private - asserting' }
 OperationalPluginsRESTfulControllerTest >> assertHealthcheckStatusOn: plugins [
 
 	^ plugins
@@ -66,7 +68,7 @@ OperationalPluginsRESTfulControllerTest >> assertHealthcheckStatusOn: plugins [
 		ifNone: [ self fail ]
 ]
 
-{ #category : #'private - asserting' }
+{ #category : 'private - asserting' }
 OperationalPluginsRESTfulControllerTest >> assertLoggersStatusOn: plugins [
 
 	^ plugins
@@ -79,7 +81,7 @@ OperationalPluginsRESTfulControllerTest >> assertLoggersStatusOn: plugins [
 		  ifNone: [ self fail ]
 ]
 
-{ #category : #'private - asserting' }
+{ #category : 'private - asserting' }
 OperationalPluginsRESTfulControllerTest >> assertMetricsStatusOn: plugins [
 
 	^ plugins
@@ -92,38 +94,38 @@ OperationalPluginsRESTfulControllerTest >> assertMetricsStatusOn: plugins [
 		ifNone: [ self fail ]
 ]
 
-{ #category : #'private - support' }
+{ #category : 'private - support' }
 OperationalPluginsRESTfulControllerTest >> disable: anOperationalPluginType [
 
 	isPluginEnabled := false
 ]
 
-{ #category : #'private - support' }
+{ #category : 'private - support' }
 OperationalPluginsRESTfulControllerTest >> enable: aPluginEndpoint [
 
 	isPluginEnabled := true
 ]
 
-{ #category : #'private - support' }
+{ #category : 'private - support' }
 OperationalPluginsRESTfulControllerTest >> isEnabled: aPlugin [
 
 	^ isPluginEnabled
 ]
 
-{ #category : #running }
+{ #category : 'running' }
 OperationalPluginsRESTfulControllerTest >> setUp [
 
 	super setUp .
 	isPluginEnabled := true
 ]
 
-{ #category : #running }
+{ #category : 'running' }
 OperationalPluginsRESTfulControllerTest >> setUpResourceController [
 
 	resourceController := OperationalPluginsRESTfulController on: self
 ]
 
-{ #category : #tests }
+{ #category : 'tests' }
 OperationalPluginsRESTfulControllerTest >> testDisableHealtCheckPlugin [
 
 	| getResponse response |
@@ -160,7 +162,7 @@ OperationalPluginsRESTfulControllerTest >> testDisableHealtCheckPlugin [
 		]
 ]
 
-{ #category : #tests }
+{ #category : 'tests' }
 OperationalPluginsRESTfulControllerTest >> testEnablePreviouslyDisabledHealtCheckPlugin [
 
 	| getResponse disableResponse response |
@@ -208,7 +210,7 @@ OperationalPluginsRESTfulControllerTest >> testEnablePreviouslyDisabledHealtChec
 		]
 ]
 
-{ #category : #tests }
+{ #category : 'tests' }
 OperationalPluginsRESTfulControllerTest >> testGetHealtCheckPlugin [
 
 	| response |
@@ -235,7 +237,7 @@ OperationalPluginsRESTfulControllerTest >> testGetHealtCheckPlugin [
 		]
 ]
 
-{ #category : #tests }
+{ #category : 'tests' }
 OperationalPluginsRESTfulControllerTest >> testGetPlugins [
 
 	| response |

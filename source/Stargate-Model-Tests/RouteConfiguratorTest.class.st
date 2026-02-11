@@ -2,12 +2,14 @@
 A RouteConfiguratorTest is a test class for testing the behavior of RouteConfigurator
 "
 Class {
-	#name : #RouteConfiguratorTest,
-	#superclass : #TestCase,
-	#category : #'Stargate-Model-Tests-Routing'
+	#name : 'RouteConfiguratorTest',
+	#superclass : 'TestCase',
+	#category : 'Stargate-Model-Tests-Routing',
+	#package : 'Stargate-Model-Tests',
+	#tag : 'Routing'
 }
 
-{ #category : #tests }
+{ #category : 'tests' }
 RouteConfiguratorTest >> testConfiguringPetsControllerRoutes [
 
 	| configurator teapot |

@@ -31,6 +31,26 @@ HttpRequestContext >> addPaginationLink: aUrl relatedTo: aRelationType [
 				build )
 ]
 
+{ #category : 'pagination' }
+HttpRequestContext >> addPaginationLinkStartingAt: start limitedTo: limit relatedTo: aRelationType [
+
+  self
+    addPaginationLink: ( self collectionLink copy start: start limit: limit )
+    relatedTo: aRelationType
+]
+
+{ #category : 'accessing' }
+HttpRequestContext >> collectionLink [
+
+  ^ self objectUnder: #collectionLink
+]
+
+{ #category : 'accessing' }
+HttpRequestContext >> collectionLink: url [
+
+  ^ self hold: url under: #collectionLink
+]
+
 { #category : 'accessing' }
 HttpRequestContext >> hold: anObject under: aConcept [
 

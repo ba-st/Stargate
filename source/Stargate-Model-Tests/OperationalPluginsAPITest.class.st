@@ -2,18 +2,20 @@
 I'm a test case for the self-provided API of the operational plugins.
 "
 Class {
-	#name : #OperationalPluginsAPITest,
-	#superclass : #OperationalPluginAPITest,
-	#category : #'Stargate-Model-Tests-Operations'
+	#name : 'OperationalPluginsAPITest',
+	#superclass : 'OperationalPluginAPITest',
+	#category : 'Stargate-Model-Tests-Operations',
+	#package : 'Stargate-Model-Tests',
+	#tag : 'Operations'
 }
 
-{ #category : #private }
+{ #category : 'private' }
 OperationalPluginsAPITest >> healthCheckSummaryMediaType [
 
 	^ 'application/vnd.stargate.health-check.summary+json;version=1.0.0' asMediaType
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 OperationalPluginsAPITest >> newJWTAuthorizedClientForUpdates [
 
 	^ self newJWTAuthorizedClientClaiming: ( self claimSet
@@ -21,20 +23,20 @@ OperationalPluginsAPITest >> newJWTAuthorizedClientForUpdates [
 			    yourself )
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 OperationalPluginsAPITest >> requiredPermissions [
 
 	^ #('read:operations')
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 OperationalPluginsAPITest >> statusChangeEntityTo: status [
 
 	^ ZnEntity with: ( '{"status":"<1s>"}' expandMacrosWith: status )
 		  ofType: 'application/vnd.stargate.operational-plugin+json;version=1.0.0' asMediaType
 ]
 
-{ #category : #tests }
+{ #category : 'tests' }
 OperationalPluginsAPITest >> testCannotDisableHealtCheckPluginWhenMissingPermission [
 
 	| json getResponse |
@@ -59,7 +61,7 @@ OperationalPluginsAPITest >> testCannotDisableHealtCheckPluginWhenMissingPermiss
 		withExceptionDo: [ :error | self assert: error response code equals: 403 ]
 ]
 
-{ #category : #tests }
+{ #category : 'tests' }
 OperationalPluginsAPITest >> testDisableHealtCheckPlugin [
 
 	| json getResponse patchResponse |
@@ -89,7 +91,7 @@ OperationalPluginsAPITest >> testDisableHealtCheckPlugin [
 		]
 ]
 
-{ #category : #tests }
+{ #category : 'tests' }
 OperationalPluginsAPITest >> testEnablePreviouslyDisabledHealtCheckPlugin [
 
 	| json getResponse patchResponse |
@@ -130,7 +132,7 @@ OperationalPluginsAPITest >> testEnablePreviouslyDisabledHealtCheckPlugin [
 		]
 ]
 
-{ #category : #tests }
+{ #category : 'tests' }
 OperationalPluginsAPITest >> testGetHealtCheckPlugin [
 
 	| json healthCheckResponse |
@@ -158,7 +160,7 @@ OperationalPluginsAPITest >> testGetHealtCheckPlugin [
 		do: [ :summary | self assert: summary status equals: 'PASS' ]
 ]
 
-{ #category : #tests }
+{ #category : 'tests' }
 OperationalPluginsAPITest >> testGetHealtCheckPluginForbidden [
 
 	self
@@ -169,7 +171,7 @@ OperationalPluginsAPITest >> testGetHealtCheckPluginForbidden [
 		withExceptionDo: [ :error | self assert: error response code equals: 403 ]
 ]
 
-{ #category : #tests }
+{ #category : 'tests' }
 OperationalPluginsAPITest >> testGetHealtCheckPluginUnauthorized [
 
 	self
@@ -178,7 +180,7 @@ OperationalPluginsAPITest >> testGetHealtCheckPluginUnauthorized [
 		withExceptionDo: [ :error | self assert: error response isAuthenticationRequired ]
 ]
 
-{ #category : #tests }
+{ #category : 'tests' }
 OperationalPluginsAPITest >> testGetHealtCheckPluginWhenDisabled [
 
 	| json |
@@ -206,7 +208,7 @@ OperationalPluginsAPITest >> testGetHealtCheckPluginWhenDisabled [
 		withExceptionDo: [ :error | self assert: error response isNotFound ]
 ]
 
-{ #category : #tests }
+{ #category : 'tests' }
 OperationalPluginsAPITest >> testGetOperationalPlugins [
 
 	| json |
@@ -218,7 +220,7 @@ OperationalPluginsAPITest >> testGetOperationalPlugins [
 		assert: json links size equals: 1
 ]
 
-{ #category : #tests }
+{ #category : 'tests' }
 OperationalPluginsAPITest >> testGetOperationalPluginsForbidden [
 
 	self
@@ -227,7 +229,7 @@ OperationalPluginsAPITest >> testGetOperationalPluginsForbidden [
 		withExceptionDo: [ :error | self assert: error response code equals: 403 ]
 ]
 
-{ #category : #tests }
+{ #category : 'tests' }
 OperationalPluginsAPITest >> testGetOperationalPluginsUnauthorized [
 
 	self

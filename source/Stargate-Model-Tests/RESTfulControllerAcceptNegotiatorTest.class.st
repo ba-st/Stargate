@@ -2,16 +2,18 @@
 I'm a Test Case for AcceptNegotiator
 "
 Class {
-	#name : #RESTfulControllerAcceptNegotiatorTest,
-	#superclass : #TestCase,
+	#name : 'RESTfulControllerAcceptNegotiatorTest',
+	#superclass : 'TestCase',
 	#instVars : [
 		'apiMediaTypes',
 		'allowedLanguageTags'
 	],
-	#category : #'Stargate-Model-Tests-Controllers'
+	#category : 'Stargate-Model-Tests-Controllers',
+	#package : 'Stargate-Model-Tests',
+	#tag : 'Controllers'
 }
 
-{ #category : #'private - asserting' }
+{ #category : 'private - asserting' }
 RESTfulControllerAcceptNegotiatorTest >> assertBestLanguageFor: aLanguageProrityList given: theAvailableLanguageTags is: expectedLanguage [
 
 	self
@@ -22,13 +24,13 @@ RESTfulControllerAcceptNegotiatorTest >> assertBestLanguageFor: aLanguagePrority
 		equals: expectedLanguage asLanguageTag
 ]
 
-{ #category : #'private - asserting' }
+{ #category : 'private - asserting' }
 RESTfulControllerAcceptNegotiatorTest >> assertBestRepresentationFor: anAcceptHeaderContent given: theAvailableMediaTypes is: aMediaType [
 
 	self assert: (self bestRepresentationFor: anAcceptHeaderContent given: theAvailableMediaTypes) equals: aMediaType
 ]
 
-{ #category : #'private - accessing' }
+{ #category : 'private - accessing' }
 RESTfulControllerAcceptNegotiatorTest >> bestLanguageFor: aLanguageProrityList given: theAvailableLanguageTags [
 
 	^ ( RESTfulControllerAcceptNegotiator accepting: #() inAnyOf: theAvailableLanguageTags )
@@ -38,7 +40,7 @@ RESTfulControllerAcceptNegotiatorTest >> bestLanguageFor: aLanguageProrityList g
 				yourself )
 ]
 
-{ #category : #'private - accessing' }
+{ #category : 'private - accessing' }
 RESTfulControllerAcceptNegotiatorTest >> bestRepresentationFor: anAcceptHeaderContent given: theAvailableMediaTypes [
 
 	^ (RESTfulControllerAcceptNegotiator accepting: theAvailableMediaTypes)
@@ -48,19 +50,19 @@ RESTfulControllerAcceptNegotiatorTest >> bestRepresentationFor: anAcceptHeaderCo
 				yourself)
 ]
 
-{ #category : #'private - accessing' }
+{ #category : 'private - accessing' }
 RESTfulControllerAcceptNegotiatorTest >> pearAcceptHeader [
 
 	^ 'text/html,application/xhtml+xml,application/xml;q=0.9,text/*;q=0.7,*/*,image/gif; q=0.8, image/jpeg; q=0.6, image/*'
 ]
 
-{ #category : #'private - accessing' }
+{ #category : 'private - accessing' }
 RESTfulControllerAcceptNegotiatorTest >> rfcHeader [
 
 	^ 'text/*;q=0.3, text/html;q=0.7, text/html;level=1, text/html;level=2;q=0.4, */*;q=0.5'
 ]
 
-{ #category : #running }
+{ #category : 'running' }
 RESTfulControllerAcceptNegotiatorTest >> setUp [
 
 	super setUp.
@@ -72,7 +74,7 @@ RESTfulControllerAcceptNegotiatorTest >> setUp [
 	allowedLanguageTags := #('en' 'es-AR' 'es-MX') collect: #asLanguageTag
 ]
 
-{ #category : #tests }
+{ #category : 'tests' }
 RESTfulControllerAcceptNegotiatorTest >> testAPIExactMatch [
 
 	self
@@ -80,7 +82,7 @@ RESTfulControllerAcceptNegotiatorTest >> testAPIExactMatch [
 		assertBestRepresentationFor: 'application/vnd.stargate.pet.summary+json;version=1.0.0' given: apiMediaTypes is: 'application/vnd.stargate.pet.summary+json;version=1.0.0' asMediaType
 ]
 
-{ #category : #tests }
+{ #category : 'tests' }
 RESTfulControllerAcceptNegotiatorTest >> testAcceptHeaderContentIsAnArray [
 
 	"Fixes a bug discovered when using the Consul HTTP Check method and configuring an Accept header on the check"
@@ -98,7 +100,7 @@ RESTfulControllerAcceptNegotiatorTest >> testAcceptHeaderContentIsAnArray [
 		equals: 'application/vnd.stargate.pet+json;version=2.0.0' asMediaType
 ]
 
-{ #category : #tests }
+{ #category : 'tests' }
 RESTfulControllerAcceptNegotiatorTest >> testAcceptingAnything [
 
 	self
@@ -107,7 +109,7 @@ RESTfulControllerAcceptNegotiatorTest >> testAcceptingAnything [
 		is: 'application/vnd.stargate.pet+json;version=2.0.0' asMediaType
 ]
 
-{ #category : #'tests - languages' }
+{ #category : 'tests - languages' }
 RESTfulControllerAcceptNegotiatorTest >> testInvalidLanguageRangesAreIgnored [
 
 	self
@@ -115,7 +117,7 @@ RESTfulControllerAcceptNegotiatorTest >> testInvalidLanguageRangesAreIgnored [
 		assertBestLanguageFor: '-, en' given: #('en-us' 'en-nz' 'en-au') is: 'en-us'
 ]
 
-{ #category : #'tests - languages' }
+{ #category : 'tests - languages' }
 RESTfulControllerAcceptNegotiatorTest >> testLanguageWithQualityLevel [
 
 	self
@@ -126,7 +128,7 @@ RESTfulControllerAcceptNegotiatorTest >> testLanguageWithQualityLevel [
 			is: 'es-AR'
 ]
 
-{ #category : #'tests - languages' }
+{ #category : 'tests - languages' }
 RESTfulControllerAcceptNegotiatorTest >> testLanguageWithoutQualityLevel [
 
 	self
@@ -139,7 +141,7 @@ RESTfulControllerAcceptNegotiatorTest >> testLanguageWithoutQualityLevel [
 		assertBestLanguageFor: 'es, *' given: #('en-us' 'en-nz' 'en-au') is: 'en-us'
 ]
 
-{ #category : #tests }
+{ #category : 'tests' }
 RESTfulControllerAcceptNegotiatorTest >> testMissingVersionSelectsTheNewOne [
 
 	self
@@ -147,7 +149,7 @@ RESTfulControllerAcceptNegotiatorTest >> testMissingVersionSelectsTheNewOne [
 		assertBestRepresentationFor: 'application/vnd.stargate.pet.summary+json' given: apiMediaTypes is: 'application/vnd.stargate.pet.summary+json;version=1.0.0' asMediaType
 ]
 
-{ #category : #'tests - languages' }
+{ #category : 'tests - languages' }
 RESTfulControllerAcceptNegotiatorTest >> testNoLanguageIsAcceptable [
 
 	self
@@ -173,7 +175,7 @@ RESTfulControllerAcceptNegotiatorTest >> testNoLanguageIsAcceptable [
 			withMessageText: 'Cannot generate a response entity with acceptable characteristics.'
 ]
 
-{ #category : #tests }
+{ #category : 'tests' }
 RESTfulControllerAcceptNegotiatorTest >> testRFC2616Sec14 [
 
 	self
@@ -187,7 +189,7 @@ RESTfulControllerAcceptNegotiatorTest >> testRFC2616Sec14 [
 			is: 'application/xml' asMediaType
 ]
 
-{ #category : #tests }
+{ #category : 'tests' }
 RESTfulControllerAcceptNegotiatorTest >> testSemanticVersioning [
 
 	self

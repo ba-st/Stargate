@@ -1,16 +1,18 @@
 Class {
-	#name : #AllOperationalPluginsAPITest,
-	#superclass : #OperationalPluginAPITest,
-	#category : #'Stargate-Model-Tests-Operations'
+	#name : 'AllOperationalPluginsAPITest',
+	#superclass : 'OperationalPluginAPITest',
+	#category : 'Stargate-Model-Tests-Operations',
+	#package : 'Stargate-Model-Tests',
+	#tag : 'Operations'
 }
 
-{ #category : #running }
+{ #category : 'running' }
 AllOperationalPluginsAPITest >> enable: pluginClass in: operationsConfiguration [
 
 	operationsConfiguration at: pluginClass endpoint put: { #enabled -> true } asDictionary
 ]
 
-{ #category : #running }
+{ #category : 'running' }
 AllOperationalPluginsAPITest >> operationsConfiguration [
 
 	| operationsConfiguration |
@@ -27,13 +29,13 @@ AllOperationalPluginsAPITest >> operationsConfiguration [
 	^ operationsConfiguration
 ]
 
-{ #category : #running }
+{ #category : 'running' }
 AllOperationalPluginsAPITest >> requiredPermissions [
 
 	^ #('read:operations')
 ]
 
-{ #category : #tests }
+{ #category : 'tests' }
 AllOperationalPluginsAPITest >> testGetOperationalPlugins [
 
 	"This case is similar to OperationalPluginsAPITest>>#testGetOperationalPlugins, but	 with

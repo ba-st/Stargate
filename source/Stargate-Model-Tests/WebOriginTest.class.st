@@ -1,10 +1,12 @@
 Class {
-	#name : #WebOriginTest,
-	#superclass : #TestCase,
-	#category : #'Stargate-Model-Tests-CORS'
+	#name : 'WebOriginTest',
+	#superclass : 'TestCase',
+	#category : 'Stargate-Model-Tests-CORS',
+	#package : 'Stargate-Model-Tests',
+	#tag : 'CORS'
 }
 
-{ #category : #tests }
+{ #category : 'tests' }
 WebOriginTest >> testAsUrl [
 
 	| origin |
@@ -13,7 +15,7 @@ WebOriginTest >> testAsUrl [
 	self assertUrl: origin asUrl equals: 'http://example.com'
 ]
 
-{ #category : #tests }
+{ #category : 'tests' }
 WebOriginTest >> testAsWebOrigin [
 
 	| origin |
@@ -22,7 +24,7 @@ WebOriginTest >> testAsWebOrigin [
 	self assert: origin asWebOrigin == origin
 ]
 
-{ #category : #tests }
+{ #category : 'tests' }
 WebOriginTest >> testComparing [
 
 	self assert: 'http://example.com/' asWebOrigin hash equals: 'http://example.com' hash.
@@ -43,7 +45,7 @@ WebOriginTest >> testComparing [
 		withMessageText: 'mailto:John.doe@example.com does not comply with a valid origin'
 ]
 
-{ #category : #tests }
+{ #category : 'tests' }
 WebOriginTest >> testPrintString [
 
 	self
@@ -59,7 +61,7 @@ WebOriginTest >> testPrintString [
 		equals: 'https://www.example.com:123'
 ]
 
-{ #category : #tests }
+{ #category : 'tests' }
 WebOriginTest >> testValidOrigins [
 
 	self assert: 'http://example.com/' asUrl hasValidOrigin.

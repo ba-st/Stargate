@@ -1,10 +1,12 @@
 Class {
-	#name : #CrossOriginResourceSharingFilterBuilderTest,
-	#superclass : #TestCase,
-	#category : #'Stargate-Model-Tests-CORS'
+	#name : 'CrossOriginResourceSharingFilterBuilderTest',
+	#superclass : 'TestCase',
+	#category : 'Stargate-Model-Tests-CORS',
+	#package : 'Stargate-Model-Tests',
+	#tag : 'CORS'
 }
 
-{ #category : #tests }
+{ #category : 'tests' }
 CrossOriginResourceSharingFilterBuilderTest >> testBuildActualRequestFilter [
 
 	| filter teapot |
@@ -21,7 +23,7 @@ CrossOriginResourceSharingFilterBuilderTest >> testBuildActualRequestFilter [
 	self assert: teapot afterFilters size equals: 1
 ]
 
-{ #category : #tests }
+{ #category : 'tests' }
 CrossOriginResourceSharingFilterBuilderTest >> testBuildPreflightFilter [
 
 	| filter teapot |

@@ -2,12 +2,14 @@
 I'm a test case for CrossOriginResourceSharingHandler
 "
 Class {
-	#name : #CrossOriginResourceSharingPreflightHandlerTest,
-	#superclass : #TestCase,
-	#category : #'Stargate-Model-Tests-CORS'
+	#name : 'CrossOriginResourceSharingPreflightHandlerTest',
+	#superclass : 'TestCase',
+	#category : 'Stargate-Model-Tests-CORS',
+	#package : 'Stargate-Model-Tests',
+	#tag : 'CORS'
 }
 
-{ #category : #'tests - support' }
+{ #category : 'tests - support' }
 CrossOriginResourceSharingPreflightHandlerTest >> assert: aResponse canBeSharedWithRequestsFrom: anOriginLocation [
 
 	self
@@ -15,7 +17,7 @@ CrossOriginResourceSharingPreflightHandlerTest >> assert: aResponse canBeSharedW
 		equals: anOriginLocation asWebOrigin asString
 ]
 
-{ #category : #'tests - support' }
+{ #category : 'tests - support' }
 CrossOriginResourceSharingPreflightHandlerTest >> assert: aHandlerBuilderConfiguration handles: aRequest byResponding: responseAssertions [
 
 	| handler response |
@@ -37,7 +39,7 @@ CrossOriginResourceSharingPreflightHandlerTest >> assert: aHandlerBuilderConfigu
 			]
 ]
 
-{ #category : #'tests - support' }
+{ #category : 'tests - support' }
 CrossOriginResourceSharingPreflightHandlerTest >> crossOriginResourceSharingPreflightHandlerBuilderApplying: aHandlerBuilderConfigurationBlock [
 
 	| handlerBuilder |
@@ -47,7 +49,7 @@ CrossOriginResourceSharingPreflightHandlerTest >> crossOriginResourceSharingPref
 	^ handlerBuilder build
 ]
 
-{ #category : #'tests - support' }
+{ #category : 'tests - support' }
 CrossOriginResourceSharingPreflightHandlerTest >> requestOptionsFor: aLocation originatedAt: anOrigin configuringHeadersWith: aBlock [
 
 	| request |
@@ -60,7 +62,7 @@ CrossOriginResourceSharingPreflightHandlerTest >> requestOptionsFor: aLocation o
 	^ TeaRequest fromZnRequest: request
 ]
 
-{ #category : #tests }
+{ #category : 'tests' }
 CrossOriginResourceSharingPreflightHandlerTest >> testAllowAnyOrigin [
 
 	| allowedMethods request |
@@ -90,7 +92,7 @@ CrossOriginResourceSharingPreflightHandlerTest >> testAllowAnyOrigin [
 			]
 ]
 
-{ #category : #tests }
+{ #category : 'tests' }
 CrossOriginResourceSharingPreflightHandlerTest >> testAllowCredentials [
 
 	| allowedMethods request |
@@ -122,7 +124,7 @@ CrossOriginResourceSharingPreflightHandlerTest >> testAllowCredentials [
 			]
 ]
 
-{ #category : #tests }
+{ #category : 'tests' }
 CrossOriginResourceSharingPreflightHandlerTest >> testAllowExactlyOneOrigin [
 
 	| allowedMethods request |
@@ -152,7 +154,7 @@ CrossOriginResourceSharingPreflightHandlerTest >> testAllowExactlyOneOrigin [
 			]
 ]
 
-{ #category : #tests }
+{ #category : 'tests' }
 CrossOriginResourceSharingPreflightHandlerTest >> testAllowHeadersMatchRequestHeaders [
 
 	| allowedMethods request |
@@ -183,7 +185,7 @@ CrossOriginResourceSharingPreflightHandlerTest >> testAllowHeadersMatchRequestHe
 			]
 ]
 
-{ #category : #tests }
+{ #category : 'tests' }
 CrossOriginResourceSharingPreflightHandlerTest >> testAllowHeadersWithEmptyRequestHeaders [
 
 	| request allowedMethods |
@@ -213,7 +215,7 @@ CrossOriginResourceSharingPreflightHandlerTest >> testAllowHeadersWithEmptyReque
 			]
 ]
 
-{ #category : #tests }
+{ #category : 'tests' }
 CrossOriginResourceSharingPreflightHandlerTest >> testAllowMoreThanOneOrigin [
 
 	| allowedMethods request |
@@ -245,7 +247,7 @@ CrossOriginResourceSharingPreflightHandlerTest >> testAllowMoreThanOneOrigin [
 			]
 ]
 
-{ #category : #tests }
+{ #category : 'tests' }
 CrossOriginResourceSharingPreflightHandlerTest >> testAllowedMethodsReflectsDefinedByRoutes [
 
 	| allowedMethods request |
@@ -306,7 +308,7 @@ CrossOriginResourceSharingPreflightHandlerTest >> testAllowedMethodsReflectsDefi
 			]
 ]
 
-{ #category : #tests }
+{ #category : 'tests' }
 CrossOriginResourceSharingPreflightHandlerTest >> testAllowedMethodsReflectsDefinedByRoutesIgnoringRequested [
 
 	| allowedMethods request |
@@ -340,7 +342,7 @@ CrossOriginResourceSharingPreflightHandlerTest >> testAllowedMethodsReflectsDefi
 			]
 ]
 
-{ #category : #tests }
+{ #category : 'tests' }
 CrossOriginResourceSharingPreflightHandlerTest >> testDisableCache [
 
 	| allowedMethods request |
@@ -372,7 +374,7 @@ CrossOriginResourceSharingPreflightHandlerTest >> testDisableCache [
 			]
 ]
 
-{ #category : #tests }
+{ #category : 'tests' }
 CrossOriginResourceSharingPreflightHandlerTest >> testDontHandleIfRouteDoesNotMatch [
 
 	| handler allowedMethods request |
@@ -395,7 +397,7 @@ CrossOriginResourceSharingPreflightHandlerTest >> testDontHandleIfRouteDoesNotMa
 	self shouldnt: [ handler teaEvalActionOnRequest: request ] raise: TeaAbort
 ]
 
-{ #category : #tests }
+{ #category : 'tests' }
 CrossOriginResourceSharingPreflightHandlerTest >> testExpireIn [
 
 	| allowedMethods request |
@@ -427,7 +429,7 @@ CrossOriginResourceSharingPreflightHandlerTest >> testExpireIn [
 			]
 ]
 
-{ #category : #tests }
+{ #category : 'tests' }
 CrossOriginResourceSharingPreflightHandlerTest >> testExposeHeaders [
 
 	| allowedMethods request |
@@ -460,7 +462,7 @@ CrossOriginResourceSharingPreflightHandlerTest >> testExposeHeaders [
 			]
 ]
 
-{ #category : #tests }
+{ #category : 'tests' }
 CrossOriginResourceSharingPreflightHandlerTest >> testHandlingUrlWithPlaceholders [
 
 	| allowedMethods request |
@@ -485,7 +487,7 @@ CrossOriginResourceSharingPreflightHandlerTest >> testHandlingUrlWithPlaceholder
 		raise: TeaAbort
 ]
 
-{ #category : #tests }
+{ #category : 'tests' }
 CrossOriginResourceSharingPreflightHandlerTest >> testRespondWithEmptyHeadersIfOriginNotAllowed [
 
 	| allowedMethods request handler |
@@ -517,7 +519,7 @@ CrossOriginResourceSharingPreflightHandlerTest >> testRespondWithEmptyHeadersIfO
 			]
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 CrossOriginResourceSharingPreflightHandlerTest >> websiteLocation [
 
 	^ 'http://website.com' asUrl

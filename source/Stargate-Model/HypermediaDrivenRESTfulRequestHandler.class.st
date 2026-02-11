@@ -68,7 +68,7 @@ HypermediaDrivenRESTfulRequestHandler >> encodeResourceCollection: resourceColle
 
   requestContext
     holdAsHypermediaControls: ( self paginationPolicy
-          addPaginationControlsTo: { httpRequest absoluteUrl asWebLink toMyself }
+          addPaginationControlsTo: { requestContext collectionLink asWebLink toMyself }
           within: requestContext )
     for: resourceCollection.
   resourceCollection do: [ :resource | self holdResource: resource controlsWithin: requestContext ].
@@ -76,6 +76,15 @@ HypermediaDrivenRESTfulRequestHandler >> encodeResourceCollection: resourceColle
       encodeResourceCollection: ( ResourceCollection wrapping: resourceCollection )
       basedOn: httpRequest
       within: requestContext
+]
+
+{ #category : 'private' }
+HypermediaDrivenRESTfulRequestHandler >> evaluateCollectionQuery: aQueryEvaluationBlock basedOn: httpRequest within: requestContext [
+
+  requestContext collectionLink: ( ( resourceLocator baseUrl / resourceLocator endpoint )
+        query: httpRequest absoluteUrl query;
+        yourself ).
+  ^ super evaluateCollectionQuery: aQueryEvaluationBlock basedOn: httpRequest within: requestContext
 ]
 
 { #category : 'private' }

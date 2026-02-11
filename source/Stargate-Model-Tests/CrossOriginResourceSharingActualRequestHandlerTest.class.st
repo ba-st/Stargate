@@ -1,10 +1,12 @@
 Class {
-	#name : #CrossOriginResourceSharingActualRequestHandlerTest,
-	#superclass : #TestCase,
-	#category : #'Stargate-Model-Tests-CORS'
+	#name : 'CrossOriginResourceSharingActualRequestHandlerTest',
+	#superclass : 'TestCase',
+	#category : 'Stargate-Model-Tests-CORS',
+	#package : 'Stargate-Model-Tests',
+	#tag : 'CORS'
 }
 
-{ #category : #'tests - support' }
+{ #category : 'tests - support' }
 CrossOriginResourceSharingActualRequestHandlerTest >> assert: aResponse canBeSharedWithRequestsFrom: anOriginLocation [
 
 	self
@@ -12,7 +14,7 @@ CrossOriginResourceSharingActualRequestHandlerTest >> assert: aResponse canBeSha
 		equals: anOriginLocation asWebOrigin asString
 ]
 
-{ #category : #'tests - support' }
+{ #category : 'tests - support' }
 CrossOriginResourceSharingActualRequestHandlerTest >> assert: aHandlerBuilderConfiguration handles: aRequest byResponding: responseAssertions [
 
 	| handler response |
@@ -24,7 +26,7 @@ CrossOriginResourceSharingActualRequestHandlerTest >> assert: aHandlerBuilderCon
 	responseAssertions value: response
 ]
 
-{ #category : #'tests - support' }
+{ #category : 'tests - support' }
 CrossOriginResourceSharingActualRequestHandlerTest >> crossOriginResourceSharingActualRequestHandlerBuilderApplying: aHandlerBuilderConfigurationBlock [
 
 	| handlerBuilder |
@@ -34,7 +36,7 @@ CrossOriginResourceSharingActualRequestHandlerTest >> crossOriginResourceSharing
 	^ handlerBuilder build
 ]
 
-{ #category : #'tests - support' }
+{ #category : 'tests - support' }
 CrossOriginResourceSharingActualRequestHandlerTest >> postRequestOriginatedAt: origin [
 
 	| request |
@@ -45,13 +47,13 @@ CrossOriginResourceSharingActualRequestHandlerTest >> postRequestOriginatedAt: o
 	^ TeaRequest fromZnRequest: request
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 CrossOriginResourceSharingActualRequestHandlerTest >> serverLocation [
 
 	^ 'http://server.com' asUrl 
 ]
 
-{ #category : #tests }
+{ #category : 'tests' }
 CrossOriginResourceSharingActualRequestHandlerTest >> testAllowAnyOrigin [
 
 	| request |
@@ -69,7 +71,7 @@ CrossOriginResourceSharingActualRequestHandlerTest >> testAllowAnyOrigin [
 			]
 ]
 
-{ #category : #tests }
+{ #category : 'tests' }
 CrossOriginResourceSharingActualRequestHandlerTest >> testAllowCredentials [
 
 	| request |
@@ -92,7 +94,7 @@ CrossOriginResourceSharingActualRequestHandlerTest >> testAllowCredentials [
 			]
 ]
 
-{ #category : #tests }
+{ #category : 'tests' }
 CrossOriginResourceSharingActualRequestHandlerTest >> testAllowExactlyOneOrigin [
 
 	| request |
@@ -110,7 +112,7 @@ CrossOriginResourceSharingActualRequestHandlerTest >> testAllowExactlyOneOrigin 
 			]
 ]
 
-{ #category : #tests }
+{ #category : 'tests' }
 CrossOriginResourceSharingActualRequestHandlerTest >> testAllowMoreThanOneOrigin [
 
 	| request |
@@ -133,7 +135,7 @@ CrossOriginResourceSharingActualRequestHandlerTest >> testAllowMoreThanOneOrigin
 			]
 ]
 
-{ #category : #tests }
+{ #category : 'tests' }
 CrossOriginResourceSharingActualRequestHandlerTest >> testExposeHeaders [
 
 	| request |
@@ -156,7 +158,7 @@ CrossOriginResourceSharingActualRequestHandlerTest >> testExposeHeaders [
 			]
 ]
 
-{ #category : #tests }
+{ #category : 'tests' }
 CrossOriginResourceSharingActualRequestHandlerTest >> testRespondWithEmptyHeadersIfOriginNotAllowed [
 
 	| request handler |
@@ -181,7 +183,7 @@ CrossOriginResourceSharingActualRequestHandlerTest >> testRespondWithEmptyHeader
 			]
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 CrossOriginResourceSharingActualRequestHandlerTest >> websiteLocation [
 
 	^ 'http://website.com' asUrl

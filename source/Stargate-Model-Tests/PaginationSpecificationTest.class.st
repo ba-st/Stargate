@@ -2,12 +2,14 @@
 I'm a Test Case for PaginationSpec
 "
 Class {
-	#name : #PaginationSpecificationTest,
-	#superclass : #TestCase,
-	#category : #'Stargate-Model-Tests-Pagination'
+	#name : 'PaginationSpecificationTest',
+	#superclass : 'TestCase',
+	#category : 'Stargate-Model-Tests-Pagination',
+	#package : 'Stargate-Model-Tests',
+	#tag : 'Pagination'
 }
 
-{ #category : #tests }
+{ #category : 'tests' }
 PaginationSpecificationTest >> testAccessing [
 
 	| spec |
@@ -20,7 +22,7 @@ PaginationSpecificationTest >> testAccessing [
 		assert: spec end equals: 5
 ]
 
-{ #category : #tests }
+{ #category : 'tests' }
 PaginationSpecificationTest >> testPrintString [
 
 	self

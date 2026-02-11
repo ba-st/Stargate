@@ -2,12 +2,14 @@
 Test case
 "
 Class {
-	#name : #RouteSpecificationTest,
-	#superclass : #TestCase,
-	#category : #'Stargate-Model-Tests-Routing'
+	#name : 'RouteSpecificationTest',
+	#superclass : 'TestCase',
+	#category : 'Stargate-Model-Tests-Routing',
+	#package : 'Stargate-Model-Tests',
+	#tag : 'Routing'
 }
 
-{ #category : #tests }
+{ #category : 'tests' }
 RouteSpecificationTest >> testInstanceCreationAndAccessing [
 
 	| route |

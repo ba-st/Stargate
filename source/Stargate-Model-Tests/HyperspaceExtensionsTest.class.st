@@ -2,12 +2,14 @@
 I'm testing extensions to classes in the Hyperspace project
 "
 Class {
-	#name : #HyperspaceExtensionsTest,
-	#superclass : #TestCase,
-	#category : #'Stargate-Model-Tests-Extensions'
+	#name : 'HyperspaceExtensionsTest',
+	#superclass : 'TestCase',
+	#category : 'Stargate-Model-Tests-Extensions',
+	#package : 'Stargate-Model-Tests',
+	#tag : 'Extensions'
 }
 
-{ #category : #tests }
+{ #category : 'tests' }
 HyperspaceExtensionsTest >> testBadRequestAsJSON [
 
 	| error json |
@@ -20,7 +22,7 @@ HyperspaceExtensionsTest >> testBadRequestAsJSON [
 		assert: json code equals: 400
 ]
 
-{ #category : #tests }
+{ #category : 'tests' }
 HyperspaceExtensionsTest >> testNotAcceptableAsJSON [
 
 	| error json |
