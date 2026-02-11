@@ -26,7 +26,7 @@ PetsRESTfulController class >> persistingTo: aPetRepository [
 ]
 
 { #category : 'private' }
-PetsRESTfulController >> addPaginationControlsTo: requestContext basedOn: url start: start limit: limit end: end count: total [
+PetsRESTfulController >> addPaginationControlsTo: requestContext start: start limit: limit end: end count: total [
 
 	| collectionLink |
 
@@ -157,28 +157,21 @@ PetsRESTfulController >> getPetBasedOn: httpRequest within: requestContext [
 { #category : 'API' }
 PetsRESTfulController >> getPetsBasedOn: httpRequest within: requestContext [
 
-	^ requestHandler
-		from: httpRequest
-		within: requestContext
-		getCollection: [ :pagination | 
-			petsRepository findAll
-				ifEmpty: [ #() ]
-				ifNotEmpty: [ :allPets | 
-					| start end total |
-
-					total := allPets size.
-					start := pagination start min: total.
-					end := pagination end min: total.
-					self
-						addPaginationControlsTo: requestContext
-						basedOn: httpRequest absoluteUrl
-						start: start
-						limit: pagination limit
-						end: end
-						count: total.
-					allPets copyFrom: start to: end
-					]
-			]
+  ^ requestHandler from: httpRequest within: requestContext getCollection: [ :pagination |
+        petsRepository findAll ifEmpty: [ #(  ) ] ifNotEmpty: [ :allPets |
+            | start end total |
+            total := allPets size.
+            start := pagination start min: total.
+            end := pagination end min: total.
+            self
+              addPaginationControlsTo: requestContext
+              start: start
+              limit: pagination limit
+              end: end
+              count: total.
+            allPets copyFrom: start to: end
+          ]
+      ]
 ]
 
 { #category : 'initialization' }
