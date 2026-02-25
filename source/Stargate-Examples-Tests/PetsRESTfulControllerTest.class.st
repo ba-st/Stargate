@@ -581,6 +581,19 @@ PetsRESTfulControllerTest >> testGetPetsWithPagination [
 		]
 ]
 
+{ #category : 'tests - update' }
+PetsRESTfulControllerTest >> testInvalidETagFormatMustRaiseBadRequest [
+
+  self
+    createPet;
+    should: [
+        | request |
+        request := self requestToUpdatePetIdentifiedBy: 1 nameTo: 'Mendieta' using: 'invalid'.
+        resourceController updatePetBasedOn: request within: self newHttpRequestContext
+      ]
+    raise: HTTPClientError badRequest
+]
+
 { #category : 'tests - get collection' }
 PetsRESTfulControllerTest >> testPaginationLinksUseServerlUrl [
 
