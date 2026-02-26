@@ -132,9 +132,9 @@ RESTfulRequestHandlerBehavior >> entityTagOf: resource encodedAs: mediaType with
 { #category : 'private' }
 RESTfulRequestHandlerBehavior >> entityTagToMatchBasedOn: httpRequest [
 
-	^ (httpRequest headers at: 'If-Match' ifAbsent: [ 
-		   HTTPClientError preconditionRequired signal:
-			   'Missing If-Match header.' ]) asEntityTag
+  ^ self parseEntityTag: ( httpRequest headers
+          at: 'If-Match'
+          ifAbsent: [ HTTPClientError preconditionRequired signal: 'Missing If-Match header.' ] )
 ]
 
 { #category : 'private' }
@@ -266,10 +266,10 @@ RESTfulRequestHandlerBehavior >> holdTargetMediaTypeAndLanguageFrom: httpRequest
 { #category : 'private' }
 RESTfulRequestHandlerBehavior >> ifNoneMatchHeaderPresentIn: httpRequest do: aMonadycBlock [
 
-	httpRequest headers
-		at: 'If-None-Match'
-		ifPresent: [ :ifNoneMatchHeader | 
-			aMonadycBlock value: ifNoneMatchHeader asEntityTag ]
+  httpRequest headers
+    at: 'If-None-Match'
+    ifPresent: [ :ifNoneMatchHeader |
+      aMonadycBlock value: ( self parseEntityTag: ifNoneMatchHeader ) ]
 ]
 
 { #category : 'initialization' }
@@ -302,6 +302,14 @@ RESTfulRequestHandlerBehavior >> locationOf: resource within: requestContext [
 RESTfulRequestHandlerBehavior >> paginationPolicy [
 
 	^ paginationPolicy
+]
+
+{ #category : 'private' }
+RESTfulRequestHandlerBehavior >> parseEntityTag: string [
+
+  ^ [ string asEntityTag ]
+      on: InstanceCreationFailed
+      do: [ :error | HTTPClientError badRequest signal: error messageText ]
 ]
 
 { #category : 'private' }

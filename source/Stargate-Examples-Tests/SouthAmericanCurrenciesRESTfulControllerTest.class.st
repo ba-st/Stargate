@@ -538,6 +538,21 @@ SouthAmericanCurrenciesRESTfulControllerTest >> testGetNotModifiedWhenValidETag 
 ]
 
 { #category : 'tests' }
+SouthAmericanCurrenciesRESTfulControllerTest >> testInvalidETagFormatMustRaiseBadRequest [
+
+  self
+    should: [
+        | request |
+        request := self
+                     requestToGETResourceIdentifiedBy: 'ARS'
+                     accepting: resourceController currencyVersion1dot0dot0MediaType.
+        request setIfNoneMatchTo: 'invalid'.
+        resourceController currencyBasedOn: request within: self newHttpRequestContext
+      ]
+    raise: HTTPClientError badRequest
+]
+
+{ #category : 'tests' }
 SouthAmericanCurrenciesRESTfulControllerTest >> testTemplates [
 
 	| routes |
