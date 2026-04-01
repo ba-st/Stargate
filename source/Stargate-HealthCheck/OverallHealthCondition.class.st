@@ -3,40 +3,41 @@ I represent a health condition composed of other conditions.
 My riskScore is derived of the composing conditions, like my critical state.
 "
 Class {
-	#name : #OverallHealthCondition,
-	#superclass : #HealthCondition,
+	#name : 'OverallHealthCondition',
+	#superclass : 'HealthCondition',
 	#instVars : [
 		'conditions'
 	],
-	#category : #'Stargate-HealthCheck'
+	#category : 'Stargate-HealthCheck',
+	#package : 'Stargate-HealthCheck'
 }
 
-{ #category : #adding }
+{ #category : 'adding' }
 OverallHealthCondition >> addCondition: aHealthCondition [
 
 	conditions add: aHealthCondition
 ]
 
-{ #category : #enumerating }
+{ #category : 'enumerating' }
 OverallHealthCondition >> conditionsDo: aBlockClosure [
 
 	conditions do: aBlockClosure
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 OverallHealthCondition >> initialize [
 
 	super initialize.
 	conditions := OrderedCollection new
 ]
 
-{ #category : #testing }
+{ #category : 'testing' }
 OverallHealthCondition >> isNotCritical [
 
 	^ conditions allSatisfy: #isNotCritical
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 OverallHealthCondition >> riskScore [
 
 	^ conditions maxUsing: [ :condition | condition riskScore ] ifEmpty: [ 1 ]

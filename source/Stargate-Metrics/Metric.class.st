@@ -2,30 +2,31 @@
 I'm a abstract class representing a metric
 "
 Class {
-	#name : #Metric,
-	#superclass : #Object,
-	#category : #'Stargate-Metrics'
+	#name : 'Metric',
+	#superclass : 'Object',
+	#category : 'Stargate-Metrics',
+	#package : 'Stargate-Metrics'
 }
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 Metric >> description [
 
 	^ self subclassResponsibility
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 Metric >> name [
 
 	^ self subclassResponsibility
 ]
 
-{ #category : #printing }
+{ #category : 'printing' }
 Metric >> printDetailsOn: stream [
 
 	self subclassResponsibility
 ]
 
-{ #category : #printing }
+{ #category : 'printing' }
 Metric >> printOn: stream [
 
 	stream
@@ -36,13 +37,13 @@ Metric >> printOn: stream [
 	self printDetailsOn: stream
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 Metric >> type [
 
 	^ self subclassResponsibility
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 Metric >> value [
 
 	^ self subclassResponsibility

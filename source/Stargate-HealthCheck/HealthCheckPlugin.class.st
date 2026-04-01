@@ -3,15 +3,16 @@ I'm one of the operational plugins.
 I provide the notion of health checks that can be run and report a health condition.
 "
 Class {
-	#name : #HealthCheckPlugin,
-	#superclass : #OperationalPlugin,
+	#name : 'HealthCheckPlugin',
+	#superclass : 'OperationalPlugin',
 	#instVars : [
 		'healthChecks'
 	],
-	#category : #'Stargate-HealthCheck'
+	#category : 'Stargate-HealthCheck',
+	#package : 'Stargate-HealthCheck'
 }
 
-{ #category : #configuring }
+{ #category : 'configuring' }
 HealthCheckPlugin class >> configureMediaControlsIn: builder within: requestContext [
 
 	builder
@@ -19,62 +20,62 @@ HealthCheckPlugin class >> configureMediaControlsIn: builder within: requestCont
 		relatedTo: 'run'
 ]
 
-{ #category : #'instance creation' }
+{ #category : 'instance creation' }
 HealthCheckPlugin class >> configuredBy: configuration [
 
 	^ self new
 ]
 
-{ #category : #testing }
+{ #category : 'testing' }
 HealthCheckPlugin class >> enabledByDefault [
 
 	^ true
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 HealthCheckPlugin class >> endpoint [
 
 	^ 'health-check'
 ]
 
-{ #category : #'instance creation' }
+{ #category : 'instance creation' }
 HealthCheckPlugin class >> new [
 
 	^ self runningAll: #()
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 HealthCheckPlugin class >> pluginName [
 
 	^ 'Health Check'
 ]
 
-{ #category : #'instance creation' }
+{ #category : 'instance creation' }
 HealthCheckPlugin class >> running: aHealthCheck [
 
 	^ self runningAll: {aHealthCheck}
 ]
 
-{ #category : #'instance creation' }
+{ #category : 'instance creation' }
 HealthCheckPlugin class >> runningAll: aHealthCheckCollection [
 
 	^ self basicNew initializeRunningAll: aHealthCheckCollection
 ]
 
-{ #category : #configuring }
+{ #category : 'configuring' }
 HealthCheckPlugin >> includeControllersIn: api [
 
 	api
 		addController: ( HealthCheckRESTfulController over: self configuredBy: api operationsConfiguration )
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 HealthCheckPlugin >> initializeRunningAll: aHealthCheckCollection [
 
 	healthChecks := aHealthCheckCollection
 ]
 
-{ #category : #actions }
+{ #category : 'actions' }
 HealthCheckPlugin >> runHealthChecks [
 
 	^ healthChecks

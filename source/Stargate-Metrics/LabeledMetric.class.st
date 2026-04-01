@@ -2,59 +2,60 @@
 I'm a metric that assigns labels to another metric
 "
 Class {
-	#name : #LabeledMetric,
-	#superclass : #Metric,
+	#name : 'LabeledMetric',
+	#superclass : 'Metric',
 	#instVars : [
 		'metric',
 		'labels'
 	],
-	#category : #'Stargate-Metrics'
+	#category : 'Stargate-Metrics',
+	#package : 'Stargate-Metrics'
 }
 
-{ #category : #'instance creation' }
+{ #category : 'instance creation' }
 LabeledMetric class >> over: aMetric labeledBy: labelingOptions [
 
 	^ self new initializeOver: aMetric labeledBy: labelingOptions asOrderedDictionary 
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 LabeledMetric >> description [
 
 	^ metric description
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 LabeledMetric >> initializeOver: aMetric labeledBy: aLabelMap [
 
 	metric := aMetric.
 	labels := aLabelMap
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 LabeledMetric >> labelAt: aLabelName [
 
 	^ labels at: aLabelName
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 LabeledMetric >> labels [
 
 	^ labels
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 LabeledMetric >> metric [
 
 	^ metric
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 LabeledMetric >> name [
 
 	^ metric name
 ]
 
-{ #category : #printing }
+{ #category : 'printing' }
 LabeledMetric >> printDetailsOn: stream [
 
 	stream nextPut: $[.
@@ -69,13 +70,13 @@ LabeledMetric >> printDetailsOn: stream [
 	metric printDetailsOn: stream
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 LabeledMetric >> type [
 
 	^ metric type
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 LabeledMetric >> value [
 
 	^ metric value

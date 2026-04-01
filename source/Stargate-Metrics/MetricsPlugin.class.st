@@ -3,15 +3,16 @@ I'm one of the operational plugins.
 I provide metrics of the running system.
 "
 Class {
-	#name : #MetricsPlugin,
-	#superclass : #OperationalPlugin,
+	#name : 'MetricsPlugin',
+	#superclass : 'OperationalPlugin',
 	#instVars : [
 		'metricProviders'
 	],
-	#category : #'Stargate-Metrics'
+	#category : 'Stargate-Metrics',
+	#package : 'Stargate-Metrics'
 }
 
-{ #category : #configuring }
+{ #category : 'configuring' }
 MetricsPlugin class >> configureMediaControlsIn: builder within: requestContext [
 
 	builder
@@ -19,25 +20,25 @@ MetricsPlugin class >> configureMediaControlsIn: builder within: requestContext 
 		relatedTo: 'metrics'
 ]
 
-{ #category : #'instance creation' }
+{ #category : 'instance creation' }
 MetricsPlugin class >> configuredBy: configuration [
 
 	^ self new initializeConfiguredBy: ( self pluginConfigurationOn: configuration )
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 MetricsPlugin class >> endpoint [
 
 	^ 'metrics'
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 MetricsPlugin class >> pluginName [
 
 	^ 'Metrics'
 ]
 
-{ #category : #querying }
+{ #category : 'querying' }
 MetricsPlugin >> gatherMetrics [
 
 	^ metricProviders
@@ -49,14 +50,14 @@ MetricsPlugin >> gatherMetrics [
 			]
 ]
 
-{ #category : #configuring }
+{ #category : 'configuring' }
 MetricsPlugin >> includeControllersIn: api [
 
 	api
 		addController: ( MetricsRESTfulController over: self configuredBy: api operationsConfiguration )
 ]
 
-{ #category : #initialize }
+{ #category : 'initialize' }
 MetricsPlugin >> initializeConfiguredBy: pluginConfiguration [
 
 	| enabledMetricNames |
@@ -68,13 +69,13 @@ MetricsPlugin >> initializeConfiguredBy: pluginConfiguration [
 		thenCollect: [ :providerClass | providerClass configuredBy: pluginConfiguration ]
 ]
 
-{ #category : #controlling }
+{ #category : 'controlling' }
 MetricsPlugin >> startOn: teapotServer [
 
 	metricProviders do: [ :provider | provider installOn: teapotServer ]
 ]
 
-{ #category : #controlling }
+{ #category : 'controlling' }
 MetricsPlugin >> stop [
 
 	metricProviders do: #uninstall

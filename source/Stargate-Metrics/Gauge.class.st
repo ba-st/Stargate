@@ -4,17 +4,18 @@ A gauge is a metric that represents a single numerical value that can arbitraril
 Gauges are typically used for measured values like temperatures or current memory usage, but also ""counts"" that can go up and down, like the number of concurrent requests.
 "
 Class {
-	#name : #Gauge,
-	#superclass : #Metric,
+	#name : 'Gauge',
+	#superclass : 'Metric',
 	#instVars : [
 		'name',
 		'description',
 		'value'
 	],
-	#category : #'Stargate-Metrics'
+	#category : 'Stargate-Metrics',
+	#package : 'Stargate-Metrics'
 }
 
-{ #category : #'instance creation' }
+{ #category : 'instance creation' }
 Gauge class >> named: aMetricName describedBy: aMetricDescription withValue: aNumber [
 
 	AssertionCheckerBuilder new
@@ -30,13 +31,13 @@ Gauge class >> named: aMetricName describedBy: aMetricDescription withValue: aNu
 	^ self new initializeNamed: aMetricName describedBy: aMetricDescription withValue: aNumber
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 Gauge >> description [
 
 	^ description
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 Gauge >> initializeNamed: aMetricName describedBy: aMetricDescription withValue: aNumber [
 
 	name := aMetricName.
@@ -44,25 +45,25 @@ Gauge >> initializeNamed: aMetricName describedBy: aMetricDescription withValue:
 	value := aNumber
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 Gauge >> name [
 
 	^ name
 ]
 
-{ #category : #printing }
+{ #category : 'printing' }
 Gauge >> printDetailsOn: stream [
 
 	value printOn: stream
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 Gauge >> type [
 
 	^ self class
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 Gauge >> value [
 
 	^ value

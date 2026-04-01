@@ -2,15 +2,16 @@
 I'm an encoder to convert a metric or metric collection into the Phrometheus v0.0.4 plain text format
 "
 Class {
-	#name : #PrometheusMetricsEncoder,
-	#superclass : #Object,
+	#name : 'PrometheusMetricsEncoder',
+	#superclass : 'Object',
 	#instVars : [
 		'encodingActionByMetricType'
 	],
-	#category : #'Stargate-Metrics'
+	#category : 'Stargate-Metrics',
+	#package : 'Stargate-Metrics'
 }
 
-{ #category : #'encoding - private' }
+{ #category : 'encoding - private' }
 PrometheusMetricsEncoder >> encode: aType asTypeLineFor: aMetric on: aWriteStream [
 
 	aWriteStream nextPutAll: '# TYPE '.
@@ -21,7 +22,7 @@ PrometheusMetricsEncoder >> encode: aType asTypeLineFor: aMetric on: aWriteStrea
 	aWriteStream lf
 ]
 
-{ #category : #encoding }
+{ #category : 'encoding' }
 PrometheusMetricsEncoder >> encode: aMetric on: aWriteStream [
 
 	self
@@ -31,7 +32,7 @@ PrometheusMetricsEncoder >> encode: aMetric on: aWriteStream [
 	aWriteStream lf
 ]
 
-{ #category : #'encoding - private' }
+{ #category : 'encoding - private' }
 PrometheusMetricsEncoder >> encodeBasic: aBasicMetric on: aWriteStream [
 
 	self encodeMetricNameFor: aBasicMetric on: aWriteStream.
@@ -39,7 +40,7 @@ PrometheusMetricsEncoder >> encodeBasic: aBasicMetric on: aWriteStream [
 	self encodeMetricValue: aBasicMetric value on: aWriteStream
 ]
 
-{ #category : #'encoding - private' }
+{ #category : 'encoding - private' }
 PrometheusMetricsEncoder >> encodeComposite: aCompositeMetric on: aWriteStream [
 
 	aCompositeMetric metrics
@@ -47,7 +48,7 @@ PrometheusMetricsEncoder >> encodeComposite: aCompositeMetric on: aWriteStream [
 		separatedBy: [ aWriteStream lf ]
 ]
 
-{ #category : #'encoding - private' }
+{ #category : 'encoding - private' }
 PrometheusMetricsEncoder >> encodeHelpLineFor: aMetric on: aWriteStream [
 
 	aWriteStream
@@ -62,7 +63,7 @@ PrometheusMetricsEncoder >> encodeHelpLineFor: aMetric on: aWriteStream [
 		lf
 ]
 
-{ #category : #'encoding - private' }
+{ #category : 'encoding - private' }
 PrometheusMetricsEncoder >> encodeLabeledMetric: aLabeledMetric on: aWriteStream [
 
 	self encodeMetricNameFor: aLabeledMetric metric on: aWriteStream.
@@ -83,19 +84,19 @@ PrometheusMetricsEncoder >> encodeLabeledMetric: aLabeledMetric on: aWriteStream
 	self encodeMetricValue: aLabeledMetric metric value on: aWriteStream
 ]
 
-{ #category : #'encoding - private' }
+{ #category : 'encoding - private' }
 PrometheusMetricsEncoder >> encodeMetricNameFor: aMetric on: aWriteStream [
 
 	self encodeName: aMetric name on: aWriteStream
 ]
 
-{ #category : #'encoding - private' }
+{ #category : 'encoding - private' }
 PrometheusMetricsEncoder >> encodeMetricValue: aNumber on: aWriteStream [
 
 	aWriteStream nextPutAll: ( [ aNumber asFloat ] unless: aNumber isInteger inWhichCase: [ aNumber ] ) asString
 ]
 
-{ #category : #'encoding - private' }
+{ #category : 'encoding - private' }
 PrometheusMetricsEncoder >> encodeName: aName on: aWriteStream [
 
 	aName do: [ :character |
@@ -105,7 +106,7 @@ PrometheusMetricsEncoder >> encodeName: aName on: aWriteStream [
 		]
 ]
 
-{ #category : #'encoding - private' }
+{ #category : 'encoding - private' }
 PrometheusMetricsEncoder >> encodeTimestampedMetric: aTimestampedMetric on: aWriteStream [
 
 	self valueEncodingActionFor: aTimestampedMetric metric on: aWriteStream.
@@ -114,25 +115,25 @@ PrometheusMetricsEncoder >> encodeTimestampedMetric: aTimestampedMetric on: aWri
 		nextPutAll: ( aTimestampedMetric timestamp asUTC - DateAndTime unixEpoch ) asMilliSeconds asString
 ]
 
-{ #category : #'encoding - private' }
+{ #category : 'encoding - private' }
 PrometheusMetricsEncoder >> encodingActionFor: aMetricType [
 
 	^ encodingActionByMetricType at: aMetricType
 ]
 
-{ #category : #'encoding - private' }
+{ #category : 'encoding - private' }
 PrometheusMetricsEncoder >> escapeBackslashAndLineFeeds: aString [
 
 	^ ( aString copyReplaceAll: '\' with: '\\' ) copyReplaceAll: String lf with: '\n'
 ]
 
-{ #category : #'encoding - private' }
+{ #category : 'encoding - private' }
 PrometheusMetricsEncoder >> escapeQuotesBackslashAndLineFeeds: aString [
 
 	^ ( self escapeBackslashAndLineFeeds: aString ) copyReplaceAll: '"' with: '\"'
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 PrometheusMetricsEncoder >> initialize [
 
 	super initialize.
@@ -145,7 +146,7 @@ PrometheusMetricsEncoder >> initialize [
 		at: TimestampedMetric put: [ :metric :stream | self encodeTimestampedMetric: metric on: stream ]
 ]
 
-{ #category : #'encoding - private' }
+{ #category : 'encoding - private' }
 PrometheusMetricsEncoder >> valueEncodingActionFor: aMetric on: aWriteStream [
 
 	( self encodingActionFor: aMetric class ) value: aMetric value: aWriteStream

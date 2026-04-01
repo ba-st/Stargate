@@ -2,30 +2,31 @@
 I'm a provider of information over the running application
 "
 Class {
-	#name : #ApplicationInformationProvider,
-	#superclass : #Object,
-	#category : #'Stargate-Application-Info'
+	#name : 'ApplicationInformationProvider',
+	#superclass : 'Object',
+	#category : 'Stargate-Application-Info',
+	#package : 'Stargate-Application-Info'
 }
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 ApplicationInformationProvider class >> allProviderNames [
 
 	^ ApplicationInformationProvider allSubclasses collect: [ :class | class providerName ]
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 ApplicationInformationProvider class >> providerName [
 
 	^ self subclassResponsibility
 ]
 
-{ #category : #querying }
+{ #category : 'querying' }
 ApplicationInformationProvider >> gatherInformation [
 
 	^ self subclassResponsibility
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 ApplicationInformationProvider >> name [
 
 	^ self class providerName
