@@ -1,12 +1,11 @@
-Extension { #name : #HTTPClientError }
+Extension { #name : 'HTTPClientError' }
 
-{ #category : #'*Stargate-Hyperspace-Extensions' }
+{ #category : '*Stargate-Hyperspace-Extensions' }
 HTTPClientError >> neoJsonOn: neoJSONWriter [
 
-	neoJSONWriter
-		writeMap:
-			( Dictionary new
-				at: #code put: self code;
-				at: #message put: self messageText;
-				yourself )
+  neoJSONWriter writeMapStreamingDo: [ :jsonMapWriter |
+      jsonMapWriter
+        writeKey: #code value: self code;
+        writeKey: #message value: self messageText
+    ]
 ]
