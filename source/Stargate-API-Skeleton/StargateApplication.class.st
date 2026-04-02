@@ -129,12 +129,11 @@ StargateApplication class >> version [
 { #category : 'private - accessing' }
 StargateApplication >> apiConfiguration [
 
-	^ {
-		  #serverUrl -> self stargateConfiguration publicURL.
-		  #port -> self stargateConfiguration port.
-		  #maximumNumberOfConcurrentConnections -> self stargateConfiguration concurrentConnectionsThreshold.
-		  #debugMode -> self isDebugModeEnabled.
-		  #operations -> self operationsConfiguration }
+  ^ { #serverUrl -> self publicURL.
+		 #port -> self stargateConfiguration port.
+		 #maximumNumberOfConcurrentConnections -> self concurrentConnectionsThreshold.
+      #debugMode -> self isDebugModeEnabled.
+		 #operations -> self operationsConfiguration }
 ]
 
 { #category : 'private - accessing' }
@@ -184,73 +183,84 @@ StargateApplication >> authAlgorithm [
 { #category : 'private - activation/deactivation' }
 StargateApplication >> basicStartWithin: context [
 
-	| api |
-	
-	self logAPIVersion.
-	self configureHTTPRequestsLogging.
-	api := self createAPI.
-	self
-		configureGlobalErrorHandlerIn: api;
-		installAndStart: api.
-	apiOptional := Optional containing: api
+  self
+    logAPIVersion;
+    configureHTTPRequestsLogging;
+    createAPI;
+    configureAPIGlobalErrorHandler;
+    installAndStartAPI
 ]
 
 { #category : 'private - activation/deactivation' }
 StargateApplication >> basicStop [
 
-	apiOptional withContentDo: [ :api | api stop ].
-	znEventToLogRecordAdapter stopListeners.
-	super basicStop
+  self withAPIDo: [ :api | api stop ].
+  znEventToLogRecordAdapter stopListeners.
+  super basicStop
+]
+
+{ #category : 'private - accessing' }
+StargateApplication >> concurrentConnectionsThreshold [
+
+  ^ self stargateConfiguration concurrentConnectionsThreshold
+]
+
+{ #category : 'private - activation/deactivation' }
+StargateApplication >> configureAPIGlobalErrorHandler [
+
+  [
+    LogRecord emitInfo: 'Configuring error handlers' during: [
+        self withAPIDo: [ :api |
+            api
+              on: Error addErrorHandler: [ :error :request |
+                  | response |
+                  LogRecord emitError:
+                      ( 'Unexpected error: "<1s>"' expandMacrosWith: error messageText ).
+                  self stackTraceDumper dumpStackTraceFor: error.
+                  response := ZnResponse serverError: error messageText.
+                  api applyCrossSharingResourceConfigurationTo: response accordingTo: request.
+                  response
+                ];
+              on: Exit addErrorHandler: [ :exit |
+                  exit isSuccess then: [ self stop ].
+                  exit pass
+                ]
+          ]
+      ]
+  ] unless: self isDebugModeEnabled
 ]
 
 { #category : 'private - activation/deactivation' }
 StargateApplication >> configureConcurrentConnectionsThreshold [
 
-	ZnOptions globalDefault
-		at: #maximumNumberOfConcurrentConnections
-		put: self stargateConfiguration concurrentConnectionsThreshold
-]
-
-{ #category : 'private - activation/deactivation' }
-StargateApplication >> configureGlobalErrorHandlerIn: api [
-
-	[
-	LogRecord emitInfo: 'Configuring error handlers' during: [
-		api
-			on: Error addErrorHandler: [ :error :request |
-				| response |
-
-				LogRecord emitError: ( 'Unexpected error: "<1s>"' expandMacrosWith: error messageText ).
-				self stackTraceDumper dumpStackTraceFor: error.
-				response := ZnResponse serverError: error messageText.
-				api applyCrossSharingResourceConfigurationTo: response accordingTo: request.
-				response
-				];
-			on: Exit addErrorHandler: [ :exit |
-				exit isSuccess then: [ self stop ].
-				exit pass
-				]
-		]
-	] unless: self isDebugModeEnabled
+  ZnOptions globalDefault
+    at: #maximumNumberOfConcurrentConnections
+    put: self concurrentConnectionsThreshold
 ]
 
 { #category : 'private - activation/deactivation' }
 StargateApplication >> configureHTTPRequestsLogging [
 
   znEventToLogRecordAdapter
-    logIncomingRequests: self stargateConfiguration logHTTPRequests;
+    logIncomingRequests: self logHTTPRequests;
     startUpListeners
+]
+
+{ #category : 'private - accessing' }
+StargateApplication >> controllersToInstall [
+
+  ^ self subclassResponsibility
 ]
 
 { #category : 'private - activation/deactivation' }
 StargateApplication >> createAPI [
 
-	| api |
-
-	LogRecord emitInfo: 'Creating API' during: [ 
-		api := HTTPBasedRESTfulAPI configuredBy: self apiConfiguration
-			       installing: self controllersToInstall ].
-	^ api
+  LogRecord emitInfo: 'Creating API' during: [
+      apiOptional := Optional containing:
+                       ( HTTPBasedRESTfulAPI
+                           configuredBy: self apiConfiguration
+                           installing: self controllersToInstall )
+    ]
 ]
 
 { #category : 'initialization' }
@@ -262,14 +272,16 @@ StargateApplication >> initialize [
 ]
 
 { #category : 'private - activation/deactivation' }
-StargateApplication >> installAndStart: api [
+StargateApplication >> installAndStartAPI [
 
-	LogRecord
-		emitInfo: 'Installing API' during: [ api install ];
-		emitInfo: 'Starting API' during: [
-			self configureConcurrentConnectionsThreshold.
-			api start
-			]
+  self withAPIDo: [ :api |
+      LogRecord
+        emitInfo: 'Installing API' during: [ api install ];
+        emitInfo: 'Starting API' during: [
+            self configureConcurrentConnectionsThreshold.
+            api start
+          ]
+    ]
 ]
 
 { #category : 'private - activation/deactivation' }
@@ -279,6 +291,12 @@ StargateApplication >> logAPIVersion [
 		describedBy: self class description
 		version: self class version.
 	LogRecord emitInfo: ( 'API Version: <1s>' expandMacrosWith: self class version )
+]
+
+{ #category : 'private - accessing' }
+StargateApplication >> logHTTPRequests [
+
+  ^ self stargateConfiguration logHTTPRequests
 ]
 
 { #category : 'private - accessing' }
@@ -292,28 +310,40 @@ StargateApplication >> loggersConfiguration [
 { #category : 'private - accessing' }
 StargateApplication >> metricsConfiguration [
 
-	^ Dictionary new
-		  at: #enabled put: true;
-		  at: #metrics put: MetricProvider allProviderNames;
-		  at: HTTPMetrics providerName put: ( Dictionary new
-				    at: #breakdownCategories put: #( http_method response_code url_template );
-				    yourself );
-		  yourself
+  ^ Dictionary new
+      at: #enabled put: true;
+      at: #metrics put: MetricProvider allProviderNames;
+      at: HTTPMetrics providerName put: ( Dictionary new
+            at: #breakdownCategories put: #( http_method response_code url_template );
+            yourself );
+      yourself
 ]
 
 { #category : 'private - accessing' }
 StargateApplication >> operationsConfiguration [
 
-	^ Dictionary new
-		  at: #authSchema put: 'jwt';
-		  at: #authAlgorithm put: self authAlgorithm;
-		  at: #authSecret put: self stargateConfiguration operationsSecret;
-		  at: MetricsPlugin endpoint put: self metricsConfiguration;
-		  at: ApplicationInfoPlugin endpoint put: self applicationInfoConfiguration;
-		  at: ApplicationConfigurationPlugin endpoint put: self applicationConfigurationConfiguration;
-		  at: ApplicationControlPlugin endpoint put: self applicationControlConfiguration;
-		  at: LoggersPlugin endpoint put: self loggersConfiguration;
-		  yourself
+  ^ Dictionary new
+      at: #authSchema put: 'jwt';
+      at: #authAlgorithm put: self authAlgorithm;
+      at: #authSecret put: self operationsSecret;
+      at: MetricsPlugin endpoint put: self metricsConfiguration;
+      at: ApplicationInfoPlugin endpoint put: self applicationInfoConfiguration;
+      at: ApplicationConfigurationPlugin endpoint put: self applicationConfigurationConfiguration;
+      at: ApplicationControlPlugin endpoint put: self applicationControlConfiguration;
+      at: LoggersPlugin endpoint put: self loggersConfiguration;
+      yourself
+]
+
+{ #category : 'private - accessing' }
+StargateApplication >> operationsSecret [
+
+  ^ self stargateConfiguration operationsSecret
+]
+
+{ #category : 'private - accessing' }
+StargateApplication >> publicURL [
+
+  ^ self stargateConfiguration publicURL
 ]
 
 { #category : 'error handling' }
@@ -329,4 +359,10 @@ StargateApplication >> stackTraceDumper [
 StargateApplication >> stargateConfiguration [
 
 	^ self configuration stargate
+]
+
+{ #category : 'private - accessing' }
+StargateApplication >> withAPIDo: aBlock [
+
+  apiOptional withContentDo: aBlock
 ]
