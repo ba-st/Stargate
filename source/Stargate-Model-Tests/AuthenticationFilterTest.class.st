@@ -18,14 +18,14 @@ AuthenticationFilterTest class >> isAbstract [
 { #category : 'private' }
 AuthenticationFilterTest >> assertResponseFor: request isUnauthorizedAfterApplying: filter [
 
-	self
-		should: [ filter teaEvalActionOnRequest: request ]
-		raise: TeaAbort
-		withExceptionDo: [ :abort | 
-			self
-				assert: abort response code equals: 401;
-				assert: ( ( abort response headers at: 'WWW-Authenticate' ) beginsWith: filter authChallenge )
-			]
+  self
+    should: [ filter teaEvalActionOnRequest: request ]
+    raise: HTTPUnauthorized
+    withExceptionDo: [ :error |
+        self
+          assert: error code equals: 401;
+          assert: ( error challenge beginsWith: filter authChallenge )
+      ]
 ]
 
 { #category : 'private' }

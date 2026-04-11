@@ -326,12 +326,19 @@ StargateApplication >> operationsConfiguration [
       at: #authSchema put: 'jwt';
       at: #authAlgorithm put: self authAlgorithm;
       at: #authSecret put: self operationsSecret;
+      at: #authRealm put: self operationsRealm;
       at: MetricsPlugin endpoint put: self metricsConfiguration;
       at: ApplicationInfoPlugin endpoint put: self applicationInfoConfiguration;
       at: ApplicationConfigurationPlugin endpoint put: self applicationConfigurationConfiguration;
       at: ApplicationControlPlugin endpoint put: self applicationControlConfiguration;
       at: LoggersPlugin endpoint put: self loggersConfiguration;
       yourself
+]
+
+{ #category : 'private - accessing' }
+StargateApplication >> operationsRealm [
+
+  ^ 'operations@<1s>' expandMacrosWith: self publicURL authority
 ]
 
 { #category : 'private - accessing' }

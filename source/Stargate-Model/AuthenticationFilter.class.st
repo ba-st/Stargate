@@ -43,7 +43,7 @@ AuthenticationFilter >> authChallenge [
 ]
 
 { #category : 'private' }
-AuthenticationFilter >> checkCredentials: authorization for: httpRequest within: requestContext ifInvalid: aBlock [
+AuthenticationFilter >> checkCredentials: authorization for: httpRequest within: requestContext [
 
 	self subclassResponsibility
 ]
@@ -51,16 +51,11 @@ AuthenticationFilter >> checkCredentials: authorization for: httpRequest within:
 { #category : 'evaluating' }
 AuthenticationFilter >> evaluateActionOnRequest: httpRequest within: requestContext [
 
-	| authorization |
-
-	authorization := httpRequest headers
-		at: 'Authorization'
-		ifAbsent: [ httpRequest abort: ( ZnResponse unauthorized: self authChallenge ) ].
-	self
-		checkCredentials: authorization
-		for: httpRequest
-		within: requestContext
-		ifInvalid: [ httpRequest abort: ( ZnResponse unauthorized: self authChallenge ) ]
+  | authorization |
+  authorization := httpRequest headers
+                     at: 'Authorization'
+                     ifAbsent: [ HTTPUnauthorized signal: 'Unauthorized' with: self authChallenge ].
+  self checkCredentials: authorization for: httpRequest within: requestContext
 ]
 
 { #category : 'evaluating' }

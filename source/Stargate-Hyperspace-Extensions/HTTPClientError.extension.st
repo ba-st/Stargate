@@ -1,6 +1,12 @@
 Extension { #name : 'HTTPClientError' }
 
 { #category : '*Stargate-Hyperspace-Extensions' }
+HTTPClientError >> affectResponse: response [
+
+  
+]
+
+{ #category : '*Stargate-Hyperspace-Extensions' }
 HTTPClientError >> neoJsonOn: neoJSONWriter [
 
   neoJSONWriter writeMapStreamingDo: [ :jsonMapWriter |

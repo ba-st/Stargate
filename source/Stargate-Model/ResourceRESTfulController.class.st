@@ -25,10 +25,12 @@ ResourceRESTfulController class >> isAbstract [
 { #category : 'asserting' }
 ResourceRESTfulController >> assertRequestIsAuthorizedTo: permission within: requestContext [
 
-  AssertionChecker
-    enforce: [ requestContext includesPermission: permission ]
-    because: 'Missing permissions'
-    raising: HTTPClientError forbidden
+  ( requestContext includesPermission: permission ) ifFalse: [
+      HTTPForbidden
+        signal: 'Missing permissions'
+        becauseScopeIsInsufficientFor: { permission }
+        with: requestContext authChallenge
+    ]
 ]
 
 { #category : 'private' }

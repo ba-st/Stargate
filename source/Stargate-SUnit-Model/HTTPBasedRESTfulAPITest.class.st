@@ -85,7 +85,14 @@ HTTPBasedRESTfulAPITest >> operationsConfiguration [
 		at: #authSchema put: 'jwt';
 		at: #authAlgorithm put: self algorithmName;
 		at: #authSecret put: self secret;
+		at: #authRealm put: self operationsRealm;
 		yourself
+]
+
+{ #category : 'running' }
+HTTPBasedRESTfulAPITest >> operationsRealm [
+
+  ^ 'api.operations.example.com'
 ]
 
 { #category : 'private' }

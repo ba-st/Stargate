@@ -2,12 +2,13 @@
 I'm a test case for plugin disable options
 "
 Class {
-	#name : #ApplicationControlPluginConfigurationAPITest,
-	#superclass : #OperationalPluginAPITest,
-	#category : #'Stargate-Application-Control-Tests'
+	#name : 'ApplicationControlPluginConfigurationAPITest',
+	#superclass : 'OperationalPluginAPITest',
+	#category : 'Stargate-Application-Control-Tests',
+	#package : 'Stargate-Application-Control-Tests'
 }
 
-{ #category : #tests }
+{ #category : 'tests' }
 ApplicationControlPluginConfigurationAPITest >> operationsConfiguration [
 
 	^ super operationsConfiguration
@@ -15,13 +16,13 @@ ApplicationControlPluginConfigurationAPITest >> operationsConfiguration [
 		yourself
 ]
 
-{ #category : #running }
+{ #category : 'running' }
 ApplicationControlPluginConfigurationAPITest >> requiredPermissions [
 
 	^ #('execute:application-control')
 ]
 
-{ #category : #tests }
+{ #category : 'tests' }
 ApplicationControlPluginConfigurationAPITest >> testPluginIsDisabled [
 
 	self

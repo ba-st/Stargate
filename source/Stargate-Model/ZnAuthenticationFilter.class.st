@@ -48,10 +48,11 @@ ZnAuthenticationFilter >> authChallenge [
 ]
 
 { #category : 'private' }
-ZnAuthenticationFilter >> checkCredentials: authorization for: httpRequest within: requestContext ifInvalid: aBlock [
+ZnAuthenticationFilter >> checkCredentials: authorization for: httpRequest within: requestContext [
 
-	( authenticator isRequestAuthenticated: httpRequest )
-		ifFalse: aBlock
+  ( authenticator isRequestAuthenticated: httpRequest ) ifFalse: [
+      HTTPUnauthorized signal: 'Unauthorized' with: self authChallenge ].
+  requestContext authChallenge: self authChallenge
 ]
 
 { #category : 'initialization' }

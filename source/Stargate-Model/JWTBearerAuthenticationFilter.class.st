@@ -6,7 +6,8 @@ Class {
 	#superclass : 'AuthenticationFilter',
 	#instVars : [
 		'key',
-		'algorithm'
+		'algorithm',
+		'realm'
 	],
 	#category : 'Stargate-Model-Auth',
 	#package : 'Stargate-Model',
@@ -27,45 +28,56 @@ JWTBearerAuthenticationFilter class >> canHandle: configuration [
 { #category : 'private' }
 JWTBearerAuthenticationFilter class >> configuredBy: configuration [
 
-	^ self
-		with: ( configuration at: #authSecret ifAbsent: [ self signalMissingConfiguration ] )
-		forAlgorithmNamed: ( configuration at: #authAlgorithm )
+  ^ self
+      with: ( configuration at: #authSecret ifAbsent: [ self signalMissingConfiguration ] )
+      forAlgorithmNamed: ( configuration at: #authAlgorithm )
+      on: ( configuration at: #authRealm )
 ]
 
 { #category : 'instance creation' }
-JWTBearerAuthenticationFilter class >> with: aKey forAlgorithmNamed: anAlgorithmName [
+JWTBearerAuthenticationFilter class >> with: aKey forAlgorithmNamed: anAlgorithmName on: aRealm [
 
-	^ self new initializeWith: aKey forAlgorithm: ( JsonWebAlgorithm named: anAlgorithmName )
+  ^ self new
+      initializeWith: aKey
+      forAlgorithm: ( JsonWebAlgorithm named: anAlgorithmName )
+      on: aRealm
 ]
 
 { #category : 'accessing' }
 JWTBearerAuthenticationFilter >> authChallenge [
 
-	^ 'Bearer'
+  ^ 'Bearer realm=<1s>' expandMacrosWith: realm asString
 ]
 
 { #category : 'private' }
-JWTBearerAuthenticationFilter >> checkCredentials: authorization for: httpRequest within: requestContext ifInvalid: aBlock [
+JWTBearerAuthenticationFilter >> checkCredentials: authorization for: httpRequest within: requestContext [
 
-	| tokenString |
-
-	( authorization beginsWith: 'Bearer ' )
-		ifFalse: aBlock.
-	tokenString := authorization allButFirst: 7.
-	[ | jws |
-
-	jws := JsonWebSignature materializeCompact: tokenString key: key.
-	jws algorithm = algorithm
-		ifFalse: aBlock.
-	requestContext permissions: jws payload permissions
-	]
-		on: Error
-		do: [ :error | error return: aBlock value ]
+  | tokenString |
+  ( authorization beginsWith: 'Bearer ' ) ifFalse: [
+      HTTPUnauthorized signal: 'Unsupported authentication scheme' with: self authChallenge ].
+  tokenString := authorization allButFirst: 7.
+  [
+    | jws |
+    jws := JsonWebSignature materializeCompact: tokenString key: key.
+    jws algorithm = algorithm ifFalse: [
+        HTTPUnauthorized
+          signal: 'Unsupported algorithm'
+          becauseTokenIsInvalidWith: self authChallenge ].
+    requestContext
+      authChallenge: self authChallenge;
+      permissions: jws payload permissions
+  ]
+    on: Error
+    do: [ :error |
+        error return:
+          ( HTTPUnauthorized signal: 'Invalid token' becauseTokenIsInvalidWith: self authChallenge )
+      ]
 ]
 
 { #category : 'initialization' }
-JWTBearerAuthenticationFilter >> initializeWith: aKey forAlgorithm: anAlgorithm [
+JWTBearerAuthenticationFilter >> initializeWith: aKey forAlgorithm: anAlgorithm on: aRealm [
 
 	key := aKey .
-	algorithm := anAlgorithm 
+	algorithm := anAlgorithm.
+	realm := aRealm
 ]

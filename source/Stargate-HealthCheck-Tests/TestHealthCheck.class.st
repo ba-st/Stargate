@@ -2,27 +2,28 @@
 I'm a health check created for testing purposes.
 "
 Class {
-	#name : #TestHealthCheck,
-	#superclass : #HealthCheck,
+	#name : 'TestHealthCheck',
+	#superclass : 'HealthCheck',
 	#instVars : [
 		'healthCondition'
 	],
-	#category : #'Stargate-HealthCheck-Tests'
+	#category : 'Stargate-HealthCheck-Tests',
+	#package : 'Stargate-HealthCheck-Tests'
 }
 
-{ #category : #'instance creation' }
+{ #category : 'instance creation' }
 TestHealthCheck class >> responding: aHealthCondition [
 
 	^ self new initializeResponding: aHealthCondition
 ]
 
-{ #category : #initialize }
+{ #category : 'initialize' }
 TestHealthCheck >> initializeResponding: aHealthCondition [
 
 	healthCondition := aHealthCondition
 ]
 
-{ #category : #running }
+{ #category : 'running' }
 TestHealthCheck >> run [
 
 	^ healthCondition
