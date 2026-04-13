@@ -22,7 +22,7 @@ jobs:
           - JSON-RPC
     name: GS64 v3.7.1 + ${{ matrix.load-spec }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
       - name: Load component in image
         uses: ba-st-actions/gs64-ci@v3
         with:
