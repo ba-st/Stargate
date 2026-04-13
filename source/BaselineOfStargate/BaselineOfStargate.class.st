@@ -101,7 +101,7 @@ BaselineOfStargate >> setUpDependencies: spec [
 		project: 'JRPC-Deployment' copyFrom: 'JRPC' with: [ spec loads: 'Server-Deployment' ].
 
 	spec
-		baseline: 'Launchpad' with: [ spec repository: 'github://ba-st/Launchpad:v7' ];
+		baseline: 'Launchpad' with: [ spec repository: 'github://ba-st/Launchpad:v8' ];
 		project: 'Launchpad-Deployment' copyFrom: 'Launchpad' with: [ spec loads: 'Deployment' ];
 		project: 'Launchpad-SUnit' copyFrom: 'Launchpad' with: [ spec loads: 'Dependent-SUnit-Extensions' ]
 ]
