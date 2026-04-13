@@ -2,23 +2,24 @@
 I'm a controller exposing the API of MetricsPlugin
 "
 Class {
-	#name : #MetricsRESTfulController,
-	#superclass : #OperationsRESTfulController,
+	#name : 'MetricsRESTfulController',
+	#superclass : 'OperationsRESTfulController',
 	#instVars : [
 		'requestHandler',
 		'plugin',
 		'prometheusEncoder'
 	],
-	#category : #'Stargate-Metrics'
+	#category : 'Stargate-Metrics',
+	#package : 'Stargate-Metrics'
 }
 
-{ #category : #'instance creation' }
+{ #category : 'instance creation' }
 MetricsRESTfulController class >> over: aMetricsPlugin configuredBy: configuration [
 
 	^ ( self authenticationFilterBasedOn: configuration ) initializeOver: aMetricsPlugin
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 MetricsRESTfulController >> configureMetricsEncodingOn: aWriter [
 
 	aWriter
@@ -63,7 +64,7 @@ MetricsRESTfulController >> configureMetricsEncodingOn: aWriter [
 			]
 ]
 
-{ #category : #routes }
+{ #category : 'routes' }
 MetricsRESTfulController >> declareGetMetricsRoute [
 
 	^ RouteSpecification
@@ -72,22 +73,22 @@ MetricsRESTfulController >> declareGetMetricsRoute [
 		evaluating: [ :httpRequest :requestContext | self getMetricsBasedOn: httpRequest within: requestContext ]
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 MetricsRESTfulController >> encodeMetricsInPrometheusTextFormat: resource [
 
 	^ String
 		streamContents: [ :stream | resource do: [ :metric | prometheusEncoder encode: metric on: stream ] ]
 ]
 
-{ #category : #API }
+{ #category : 'API' }
 MetricsRESTfulController >> getMetricsBasedOn: httpRequest within: requestContext [
 
-	self assert: httpRequest isAuthorizedWithin: requestContext.
+  self assertRequestIsAuthorizedWithin: requestContext.
 
-	^ requestHandler from: httpRequest within: requestContext getCollection: [ plugin gatherMetrics ]
+  ^ requestHandler from: httpRequest within: requestContext getCollection: [ plugin gatherMetrics ]
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 MetricsRESTfulController >> initializeOver: aMetricsPlugin [
 
 	plugin := aMetricsPlugin.
@@ -95,7 +96,7 @@ MetricsRESTfulController >> initializeOver: aMetricsPlugin [
 	prometheusEncoder := PrometheusMetricsEncoder new
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 MetricsRESTfulController >> initializeRequestHandler [
 
 	requestHandler := RESTfulRequestHandlerBuilder new
@@ -110,31 +111,31 @@ MetricsRESTfulController >> initializeRequestHandler [
 		build
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 MetricsRESTfulController >> operationalMetricsVersion1dot0dot0MediaType [
 
 	^ self jsonMediaType: 'operational-metrics' vendoredBy: 'stargate' version: '1.0.0'
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 MetricsRESTfulController >> pluginEndpoint [
 
 	^ plugin endpoint
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 MetricsRESTfulController >> requestHandler [
 
 	^ requestHandler
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 MetricsRESTfulController >> requiredPermission [
 
 	^ 'read:<1s>' expandMacrosWith: self pluginEndpoint
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 MetricsRESTfulController >> textPlainVersion0dot0dot4MediaType [
 
 	"This is Prometheus Client Data Exposition Format v0.0.4. The Prometheus server requires the text/plain as the media type,
@@ -143,7 +144,7 @@ MetricsRESTfulController >> textPlainVersion0dot0dot4MediaType [
 	^ ZnMimeType textPlain version: '0.0.4'
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 MetricsRESTfulController >> textPrometheusClientDataExpositionFormatVersion0dot0dot4MediaType [
 
 	^ 'text/vnd.stargate.prometheus.client-data-exposition' asMediaType version: '0.0.4'

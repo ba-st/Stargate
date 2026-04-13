@@ -18,7 +18,10 @@ JWTBearerAuthenticationFilterTest >> algorithmName [
 { #category : 'private' }
 JWTBearerAuthenticationFilterTest >> newFilter [
 
-	^ JWTBearerAuthenticationFilter with: self secret forAlgorithmNamed: self algorithmName
+  ^ JWTBearerAuthenticationFilter
+      with: self secret
+      forAlgorithmNamed: self algorithmName
+      on: self realm
 ]
 
 { #category : 'private' }
@@ -50,6 +53,12 @@ JWTBearerAuthenticationFilterTest >> newHttpRequestWithUnsecuredJWTBearerAuthent
 ]
 
 { #category : 'private' }
+JWTBearerAuthenticationFilterTest >> realm [
+
+	^ 'api.example.com'
+]
+
+{ #category : 'private' }
 JWTBearerAuthenticationFilterTest >> secret [
 
 	^ 'secret'
@@ -58,26 +67,26 @@ JWTBearerAuthenticationFilterTest >> secret [
 { #category : 'tests' }
 JWTBearerAuthenticationFilterTest >> testAuthChallenge [
 
-	self assert: self newFilter authChallenge equals: 'Bearer'
+  self assert: self newFilter authChallenge equals: 'Bearer realm=api.example.com'
 ]
 
 { #category : 'tests' }
 JWTBearerAuthenticationFilterTest >> testBasedOnConfiguration [
 
-	| filter |
+  | filter |
+  filter := AuthenticationFilter basedOn: ( Dictionary new
+                  at: #authSchema put: 'jwt';
+                  at: #authAlgorithm put: self algorithmName;
+                  at: #authSecret put: self secret;
+                  at: #authRealm put: self realm;
+                  yourself ).
 
-	filter := AuthenticationFilter
-		basedOn:
-			( Dictionary new
-				at: #authSchema put: 'jwt';
-				at: #authAlgorithm put: self algorithmName;
-				at: #authSecret put: self secret;
-				yourself ).
-
-	self
-		assert: ( filter isA: JWTBearerAuthenticationFilter );
-		shouldnt: [ filter teaEvalActionOnRequest: ( self newHttpRequestWithJWTBearerAuthenticationFor: self secret ) ]
-			raise: TeaAbort
+  self
+    assert: ( filter isA: JWTBearerAuthenticationFilter );
+    shouldnt: [
+        filter teaEvalActionOnRequest:
+            ( self newHttpRequestWithJWTBearerAuthenticationFor: self secret ) ]
+    raise: TeaAbort
 ]
 
 { #category : 'tests' }

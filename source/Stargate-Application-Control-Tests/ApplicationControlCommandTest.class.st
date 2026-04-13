@@ -2,12 +2,13 @@
 An ApplicationControlCommandTest is a test class for testing the behavior of ApplicationControlCommand
 "
 Class {
-	#name : #ApplicationControlCommandTest,
-	#superclass : #TestCase,
-	#category : #'Stargate-Application-Control-Tests'
+	#name : 'ApplicationControlCommandTest',
+	#superclass : 'TestCase',
+	#category : 'Stargate-Application-Control-Tests',
+	#package : 'Stargate-Application-Control-Tests'
 }
 
-{ #category : #tests }
+{ #category : 'tests' }
 ApplicationControlCommandTest >> testAccessing [
 
 	| command |
@@ -20,7 +21,7 @@ ApplicationControlCommandTest >> testAccessing [
 		assert: command parameterNames isEmpty
 ]
 
-{ #category : #tests }
+{ #category : 'tests' }
 ApplicationControlCommandTest >> testCannotCreateUnnamed [
 
 	self should: [ ApplicationControlCommand named: '' executing: [ self fail ] ]
@@ -28,7 +29,7 @@ ApplicationControlCommandTest >> testCannotCreateUnnamed [
 		withMessageText: 'Cannot create an unnamed command'
 ]
 
-{ #category : #tests }
+{ #category : 'tests' }
 ApplicationControlCommandTest >> testCannotCreateWhenArgumentCountIsMismatched [
 
 	self

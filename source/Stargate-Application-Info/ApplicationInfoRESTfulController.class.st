@@ -2,22 +2,23 @@
 I'm a controller exposing the API of ApplicationInfoPlugin
 "
 Class {
-	#name : #ApplicationInfoRESTfulController,
-	#superclass : #OperationsRESTfulController,
+	#name : 'ApplicationInfoRESTfulController',
+	#superclass : 'OperationsRESTfulController',
 	#instVars : [
 		'requestHandler',
 		'plugin'
 	],
-	#category : #'Stargate-Application-Info'
+	#category : 'Stargate-Application-Info',
+	#package : 'Stargate-Application-Info'
 }
 
-{ #category : #'instance creation' }
+{ #category : 'instance creation' }
 ApplicationInfoRESTfulController class >> over: anApplicationInfoPlugin configuredBy: configuration [
 
 	^ ( self authenticationFilterBasedOn: configuration ) initializeOver: anApplicationInfoPlugin
 ]
 
-{ #category : #routes }
+{ #category : 'routes' }
 ApplicationInfoRESTfulController >> declareGetApplicationInfoRoute [
 
 	^ RouteSpecification
@@ -27,25 +28,25 @@ ApplicationInfoRESTfulController >> declareGetApplicationInfoRoute [
 			[ :httpRequest :requestContext | self getApplicationInfoBasedOn: httpRequest within: requestContext ]
 ]
 
-{ #category : #API }
+{ #category : 'API' }
 ApplicationInfoRESTfulController >> getApplicationInfoBasedOn: httpRequest within: requestContext [
 
-	self assert: httpRequest isAuthorizedWithin: requestContext.
+  self assertRequestIsAuthorizedWithin: requestContext.
 
-	^ requestHandler
-		from: httpRequest
-		within: requestContext
-		getCollection: [ plugin gatherInformation ]
+  ^ requestHandler
+      from: httpRequest
+      within: requestContext
+      getCollection: [ plugin gatherInformation ]
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 ApplicationInfoRESTfulController >> initializeOver: anApplicationInfoPlugin [
 
 	plugin := anApplicationInfoPlugin.
 	self initializeRequestHandler
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 ApplicationInfoRESTfulController >> initializeRequestHandler [
 
 	requestHandler := RESTfulRequestHandlerBuilder new
@@ -56,25 +57,25 @@ ApplicationInfoRESTfulController >> initializeRequestHandler [
 		build
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 ApplicationInfoRESTfulController >> operationalApplicationInfoVersion1dot0dot0MediaType [
 
 	^ self jsonMediaType: 'operational-application-info' vendoredBy: 'stargate' version: '1.0.0'
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 ApplicationInfoRESTfulController >> pluginEndpoint [
 
 	^ plugin endpoint
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 ApplicationInfoRESTfulController >> requestHandler [
 
 	^ requestHandler
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 ApplicationInfoRESTfulController >> requiredPermission [
 
 	^ 'read:<1s>' expandMacrosWith: self pluginEndpoint

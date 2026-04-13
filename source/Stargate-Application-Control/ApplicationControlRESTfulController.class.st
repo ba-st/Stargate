@@ -2,22 +2,23 @@
 I'm a controller exposing the API of ApplicationControlPlugin
 "
 Class {
-	#name : #ApplicationControlRESTfulController,
-	#superclass : #OperationsRESTfulController,
+	#name : 'ApplicationControlRESTfulController',
+	#superclass : 'OperationsRESTfulController',
 	#instVars : [
 		'requestHandler',
 		'plugin'
 	],
-	#category : #'Stargate-Application-Control'
+	#category : 'Stargate-Application-Control',
+	#package : 'Stargate-Application-Control'
 }
 
-{ #category : #'instance creation' }
+{ #category : 'instance creation' }
 ApplicationControlRESTfulController class >> over: anApplicationControlPlugin configuredBy: configuration [
 
 	^ ( self authenticationFilterBasedOn: configuration ) initializeOver: anApplicationControlPlugin
 ]
 
-{ #category : #routes }
+{ #category : 'routes' }
 ApplicationControlRESTfulController >> declareRunApplicationControlMethodRoute [
 
 	^ RouteSpecification
@@ -26,7 +27,7 @@ ApplicationControlRESTfulController >> declareRunApplicationControlMethodRoute [
 		evaluating: [ :httpRequest :requestContext | self runApplicationControlMethodBasedOn: httpRequest within: requestContext ]
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 ApplicationControlRESTfulController >> initializeOver: anApplicationControlPlugin [
 
 	plugin := anApplicationControlPlugin.
@@ -35,27 +36,27 @@ ApplicationControlRESTfulController >> initializeOver: anApplicationControlPlugi
 	plugin configureHandlersIn: requestHandler
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 ApplicationControlRESTfulController >> pluginEndpoint [
 
 	^ plugin endpoint
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 ApplicationControlRESTfulController >> requestHandler [
 
 	^ requestHandler
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 ApplicationControlRESTfulController >> requiredPermission [
 
 	^ 'execute:<1s>' expandMacrosWith: self pluginEndpoint
 ]
 
-{ #category : #API }
+{ #category : 'API' }
 ApplicationControlRESTfulController >> runApplicationControlMethodBasedOn: httpRequest within: requestContext [
 
-	self assert: httpRequest isAuthorizedWithin: requestContext.
-	^ requestHandler process: httpRequest within: requestContext
+  self assertRequestIsAuthorizedWithin: requestContext.
+  ^ requestHandler process: httpRequest within: requestContext
 ]

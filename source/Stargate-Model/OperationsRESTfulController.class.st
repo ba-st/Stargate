@@ -26,9 +26,9 @@ OperationsRESTfulController class >> isAbstract [
 ]
 
 { #category : 'private' }
-OperationsRESTfulController >> assert: httpRequest isAuthorizedWithin: requestContext [
+OperationsRESTfulController >> assertRequestIsAuthorizedWithin: requestContext [
 
-	self assert: httpRequest isAuthorizedTo: self requiredPermission within: requestContext
+  self assertRequestIsAuthorizedTo: self requiredPermission within: requestContext
 ]
 
 { #category : 'initialization' }

@@ -1,1 +1,1 @@
-Package { #name : #'Stargate-Hyperspace-Extensions' }
+Package { #name : 'Stargate-Hyperspace-Extensions' }

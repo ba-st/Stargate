@@ -20,17 +20,18 @@ OperationalPluginRESTfulControllerTest >> baseUrl [
 { #category : 'private - support' }
 OperationalPluginRESTfulControllerTest >> newHttpRequestContext [
 
-	^ super newHttpRequestContext
-		permissions: ( Array with: resourceController requiredPermission );
-		yourself
+  ^ super newHttpRequestContext
+      permissions: { resourceController requiredPermission };
+      yourself
 ]
 
 { #category : 'private - support' }
 OperationalPluginRESTfulControllerTest >> operationsConfiguration [
 
-	^ Dictionary new
-		at: #authSchema put: 'jwt';
-		at: #authAlgorithm put: 'HS256';
-		at: #authSecret put: 'secret';
-		yourself
+  ^ Dictionary new
+      at: #authSchema put: 'jwt';
+      at: #authAlgorithm put: 'HS256';
+      at: #authSecret put: 'secret';
+      at: #authRealm put: 'operations';
+      yourself
 ]

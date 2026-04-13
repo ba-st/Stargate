@@ -2,47 +2,48 @@
 I represent a critical health condition. An API in this state is unable to work correctly.
 "
 Class {
-	#name : #CriticalHealth,
-	#superclass : #HealthCondition,
+	#name : 'CriticalHealth',
+	#superclass : 'HealthCondition',
 	#instVars : [
 		'details',
 		'concern'
 	],
-	#category : #'Stargate-HealthCheck'
+	#category : 'Stargate-HealthCheck',
+	#package : 'Stargate-HealthCheck'
 }
 
-{ #category : #'Instance Creation' }
+{ #category : 'Instance Creation' }
 CriticalHealth class >> detailedBy: aDetailsObject onHealthCheckNamed: aName [
 
 	^ self new initializeDetailedBy: aDetailsObject onHealthCheckNamed: aName
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 CriticalHealth >> concern [
 
 	^ concern
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 CriticalHealth >> details [
 
 	^ details
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 CriticalHealth >> initializeDetailedBy: aDetailsObject onHealthCheckNamed: aName [
 
 	details := aDetailsObject.
 	concern := aName
 ]
 
-{ #category : #testing }
+{ #category : 'testing' }
 CriticalHealth >> isNotCritical [
 
 	^ false
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 CriticalHealth >> riskScore [
 
 	^ 3

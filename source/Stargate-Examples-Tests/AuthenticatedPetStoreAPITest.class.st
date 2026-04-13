@@ -28,11 +28,13 @@ AuthenticatedPetStoreAPITest >> controllersToInstall [
 { #category : 'running' }
 AuthenticatedPetStoreAPITest >> setUpAPI [
 
-	petsController := PetsRESTfulController new.
-	ordersController := PetOrdersRESTfulController new.
-	super setUpAPI.
-	api authenticatedBy:
-		( JWTBearerAuthenticationFilter with: self secret forAlgorithmNamed: self algorithmName )
+  petsController := PetsRESTfulController new.
+  ordersController := PetOrdersRESTfulController new.
+  super setUpAPI.
+  api authenticatedBy: ( JWTBearerAuthenticationFilter
+        with: self secret
+        forAlgorithmNamed: self algorithmName
+        on: 'api.pets.example.com' )
 ]
 
 { #category : 'tests - client errors' }
@@ -295,25 +297,51 @@ AuthenticatedPetStoreAPITest >> testCreatePet [
 { #category : 'tests - authentication' }
 AuthenticatedPetStoreAPITest >> testCreatePetUnauthorized [
 
-	self
-		should: [ 
-			self newClient
-				url: self baseUrl / 'pets' asUrl;
-				entity: ( ZnEntity with: '{"name":"Firulais","type":"dog"}'
-						  ofType: petsController petVersion1dot0dot0MediaType );
-				setAccept: petsController petVersion1dot0dot0MediaType;
-				post
-			]
-		raise: ZnHttpUnsuccessful
-		withExceptionDo: [ :error | self assert: error response code equals: 401 ]
+  self
+    should: [
+        self newClient
+          url: self baseUrl / 'pets' asUrl;
+          entity: ( ZnEntity
+                with: '{"name":"Firulais","type":"dog"}'
+                ofType: petsController petVersion1dot0dot0MediaType );
+          setAccept: petsController petVersion1dot0dot0MediaType;
+          post
+      ]
+    raise: ZnHttpUnsuccessful
+    withExceptionDo: [ :error |
+        | response |
+        response := error response.
+        self
+          assert: response code equals: 401;
+          assert: ( response headers at: 'WWW-Authenticate' )
+          equals: 'Bearer realm=api.pets.example.com';
+          withJsonFromContentsIn: response do: [ :payload |
+              self
+                assert: payload message equals: 'Unauthorized';
+                assert: payload code equals: 401
+            ]
+      ]
 ]
 
 { #category : 'tests - authentication' }
 AuthenticatedPetStoreAPITest >> testGetOrdersUnauthorized [
 
-	self should: [ self newClient get: self baseUrl / 'orders' asUrl ]
-		raise: ZnHttpUnsuccessful
-		withExceptionDo: [ :error | self assert: error response code equals: 401 ]
+  self
+    should: [ self newClient get: self baseUrl / 'orders' asUrl ]
+    raise: ZnHttpUnsuccessful
+    withExceptionDo: [ :error |
+        | response |
+        response := error response.
+        self
+          assert: response code equals: 401;
+          assert: ( response headers at: 'WWW-Authenticate' )
+          equals: 'Bearer realm=api.pets.example.com';
+          withJsonFromContentsIn: response do: [ :payload |
+              self
+                assert: payload message equals: 'Unauthorized';
+                assert: payload code equals: 401
+            ]
+      ]
 ]
 
 { #category : 'tests' }
@@ -331,9 +359,22 @@ AuthenticatedPetStoreAPITest >> testGetPets [
 { #category : 'tests - authentication' }
 AuthenticatedPetStoreAPITest >> testGetPetsUnauthorized [
 
-	self should: [ self newClient get: self baseUrl / 'pets' asUrl ]
-		raise: ZnHttpUnsuccessful
-		withExceptionDo: [ :error | self assert: error response code equals: 401 ]
+  self
+    should: [ self newClient get: self baseUrl / 'pets' asUrl ]
+    raise: ZnHttpUnsuccessful
+    withExceptionDo: [ :error |
+        | response |
+        response := error response.
+        self
+          assert: response code equals: 401;
+          assert: ( response headers at: 'WWW-Authenticate' )
+          equals: 'Bearer realm=api.pets.example.com';
+          withJsonFromContentsIn: response do: [ :payload |
+              self
+                assert: payload message equals: 'Unauthorized';
+                assert: payload code equals: 401
+            ]
+      ]
 ]
 
 { #category : 'tests - client errors' }
@@ -383,23 +424,48 @@ AuthenticatedPetStoreAPITest >> testNotFound [
 { #category : 'tests - authentication' }
 AuthenticatedPetStoreAPITest >> testNotFoundEndpointUnauthorized [
 
-	self should: [ self newClient get: self baseUrl / 'inexistent' asUrl ]
-		raise: ZnHttpUnsuccessful
-		withExceptionDo: [ :error | self assert: error response code equals: 401 ]
+  self
+    should: [ self newClient get: self baseUrl / 'inexistent' asUrl ]
+    raise: ZnHttpUnsuccessful
+    withExceptionDo: [ :error |
+        | response |
+        response := error response.
+        self
+          assert: response code equals: 401;
+          assert: ( response headers at: 'WWW-Authenticate' )
+          equals: 'Bearer realm=api.pets.example.com';
+          withJsonFromContentsIn: response do: [ :payload |
+              self
+                assert: payload message equals: 'Unauthorized';
+                assert: payload code equals: 401
+            ]
+      ]
 ]
 
 { #category : 'tests - authentication' }
 AuthenticatedPetStoreAPITest >> testNotPreflightOptionsUnauthorized [
 
-	self
-		should: [ 
-			self newClient
-				url: self baseUrl / 'pets' asUrl;
-				headerAt: 'Access-Control-Request-Headers' put: 'Content-Type';
-				options
-			]
-		raise: ZnHttpUnsuccessful
-		withExceptionDo: [ :error | self assert: error response code equals: 401 ]
+  self
+    should: [
+        self newClient
+          url: self baseUrl / 'pets' asUrl;
+          headerAt: 'Access-Control-Request-Headers' put: 'Content-Type';
+          options
+      ]
+    raise: ZnHttpUnsuccessful
+    withExceptionDo: [ :error |
+        | response |
+        response := error response.
+        self
+          assert: response code equals: 401;
+          assert: ( response headers at: 'WWW-Authenticate' )
+          equals: 'Bearer realm=api.pets.example.com';
+          withJsonFromContentsIn: response do: [ :payload |
+              self
+                assert: payload message equals: 'Unauthorized';
+                assert: payload code equals: 401
+            ]
+      ]
 ]
 
 { #category : 'tests - client errors' }

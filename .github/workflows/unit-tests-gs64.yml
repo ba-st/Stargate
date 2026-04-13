@@ -8,7 +8,7 @@ jobs:
     runs-on: ubuntu-latest
     name: GS64 v3.7.1 Unit Tests
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
       - name: Load Image and Run Tests
         uses: ba-st-actions/gs64-ci@v3
         with:

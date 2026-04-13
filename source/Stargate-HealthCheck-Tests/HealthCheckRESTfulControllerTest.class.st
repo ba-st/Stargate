@@ -2,15 +2,16 @@
 A HealthCheckRESTfulControllerTest is a test class for testing the behavior of HealthCheckRESTfulController
 "
 Class {
-	#name : #HealthCheckRESTfulControllerTest,
-	#superclass : #OperationalPluginRESTfulControllerTest,
+	#name : 'HealthCheckRESTfulControllerTest',
+	#superclass : 'OperationalPluginRESTfulControllerTest',
 	#instVars : [
 		'healthChecks'
 	],
-	#category : #'Stargate-HealthCheck-Tests'
+	#category : 'Stargate-HealthCheck-Tests',
+	#package : 'Stargate-HealthCheck-Tests'
 }
 
-{ #category : #'private - support' }
+{ #category : 'private - support' }
 HealthCheckRESTfulControllerTest >> requestToPOSTAccepting: aMediaType [
 
 	^ TeaRequest
@@ -20,14 +21,14 @@ HealthCheckRESTfulControllerTest >> requestToPOSTAccepting: aMediaType [
 				yourself )
 ]
 
-{ #category : #running }
+{ #category : 'running' }
 HealthCheckRESTfulControllerTest >> setUp [
 
 	healthChecks := OrderedCollection new.
 	super setUp
 ]
 
-{ #category : #running }
+{ #category : 'running' }
 HealthCheckRESTfulControllerTest >> setUpResourceController [
 
 	resourceController := HealthCheckRESTfulController
@@ -35,7 +36,7 @@ HealthCheckRESTfulControllerTest >> setUpResourceController [
 		configuredBy: self operationsConfiguration
 ]
 
-{ #category : #tests }
+{ #category : 'tests' }
 HealthCheckRESTfulControllerTest >> testRunHealthChecksWithFailuresAskingDetailedData [
 
 	| response |
@@ -73,7 +74,7 @@ HealthCheckRESTfulControllerTest >> testRunHealthChecksWithFailuresAskingDetaile
 			]
 ]
 
-{ #category : #tests }
+{ #category : 'tests' }
 HealthCheckRESTfulControllerTest >> testRunHealthChecksWithFailuresAskingSummarizedData [
 
 	| response |
@@ -94,7 +95,7 @@ HealthCheckRESTfulControllerTest >> testRunHealthChecksWithFailuresAskingSummari
 		withJsonFromContentsIn: response do: [ :json | self assert: json status equals: 'FAIL' ]
 ]
 
-{ #category : #tests }
+{ #category : 'tests' }
 HealthCheckRESTfulControllerTest >> testRunHealthChecksWithWarningsAskingDetailedData [
 
 	| response |
@@ -119,7 +120,7 @@ HealthCheckRESTfulControllerTest >> testRunHealthChecksWithWarningsAskingDetaile
 			]
 ]
 
-{ #category : #tests }
+{ #category : 'tests' }
 HealthCheckRESTfulControllerTest >> testRunHealthChecksWithWarningsAskingSummarizedData [
 
 	| response |
@@ -138,7 +139,7 @@ HealthCheckRESTfulControllerTest >> testRunHealthChecksWithWarningsAskingSummari
 		withJsonFromContentsIn: response do: [ :json | self assert: json status equals: 'WARN' ]
 ]
 
-{ #category : #tests }
+{ #category : 'tests' }
 HealthCheckRESTfulControllerTest >> testRunSeveralHealthChecksAskingDetailedData [
 
 	| response |
@@ -168,7 +169,7 @@ HealthCheckRESTfulControllerTest >> testRunSeveralHealthChecksAskingDetailedData
 			]
 ]
 
-{ #category : #tests }
+{ #category : 'tests' }
 HealthCheckRESTfulControllerTest >> testSuccessfullyRunHealthChecksAskingDetailedData [
 
 	| response |
@@ -189,7 +190,7 @@ HealthCheckRESTfulControllerTest >> testSuccessfullyRunHealthChecksAskingDetaile
 			]
 ]
 
-{ #category : #tests }
+{ #category : 'tests' }
 HealthCheckRESTfulControllerTest >> testSuccessfullyRunHealthChecksAskingSummarizedData [
 
 	| response |

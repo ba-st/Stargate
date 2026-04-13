@@ -178,16 +178,16 @@ HTTPBasedRESTfulAPI >> initializeEnabledOperationalPlugins [
 { #category : 'initialization' }
 HTTPBasedRESTfulAPI >> initializeErrorHandlers [
 
-	errorHandlers := OrderedCollection new.
-	self on: HTTPClientError addErrorHandler: [ :clientError :request |
-		| json response |
-
-		json := NeoJSONWriter toStringPretty: clientError.
-		response := ZnResponse statusCode: clientError code.
-		response entity: ( ZnEntity json: json ).
-		self applyCrossSharingResourceConfigurationTo: response accordingTo: request.
-		response
-		]
+  errorHandlers := OrderedCollection new.
+  self on: HTTPClientError addErrorHandler: [ :clientError :request |
+      | json response |
+      json := NeoJSONWriter toStringPretty: clientError.
+      response := ZnResponse statusCode: clientError code.
+      response entity: ( ZnEntity json: json ).
+      clientError affectResponse: response.
+      self applyCrossSharingResourceConfigurationTo: response accordingTo: request.
+      response
+    ]
 ]
 
 { #category : 'actions' }

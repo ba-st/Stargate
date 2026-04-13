@@ -2,15 +2,16 @@
 I'm a metric composed of other metrics. I was supposed to be constructed using CompositeMetricBuilder.
 "
 Class {
-	#name : #CompositeMetric,
-	#superclass : #Metric,
+	#name : 'CompositeMetric',
+	#superclass : 'Metric',
 	#instVars : [
 		'metrics'
 	],
-	#category : #'Stargate-Metrics'
+	#category : 'Stargate-Metrics',
+	#package : 'Stargate-Metrics'
 }
 
-{ #category : #'instance creation' }
+{ #category : 'instance creation' }
 CompositeMetric class >> withAll: aMetricCollection [
 
 	AssertionChecker
@@ -21,37 +22,37 @@ CompositeMetric class >> withAll: aMetricCollection [
 	^ self new initializeWith: aMetricCollection
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 CompositeMetric >> anyMetric [
 
 	^ metrics first
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 CompositeMetric >> description [
 
 	^ self anyMetric description
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 CompositeMetric >> initializeWith: aMetricCollection [
 
 	metrics := aMetricCollection 
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 CompositeMetric >> metrics [
 
 	^ metrics
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 CompositeMetric >> name [
 	
 	^ self anyMetric name
 ]
 
-{ #category : #printing }
+{ #category : 'printing' }
 CompositeMetric >> printDetailsOn: stream [
 
 	metrics
@@ -62,13 +63,13 @@ CompositeMetric >> printDetailsOn: stream [
 		separatedBy: [ stream cr ]
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 CompositeMetric >> type [
 
 	^ self anyMetric type
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 CompositeMetric >> value [
 
 	^ metrics inject: 0 into: [ :sum :metric | sum + metric value ]

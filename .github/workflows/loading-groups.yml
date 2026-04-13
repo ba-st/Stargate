@@ -1,20 +1,14 @@
-name: Baseline groups
+name: Pharo Groups Loading
 on:
   - push
   - pull_request
   - workflow_dispatch
-
 jobs:
-   group-loading:
-    runs-on: ubuntu-latest
+  group-loading:
+    name: ${{ matrix.load-spec }}
     strategy:
       fail-fast: false
       matrix:
-        smalltalk:
-          - Pharo64-10
-          - Pharo64-11
-          - Pharo64-12
-          - Pharo64-13
         load-spec:
           - app-config
           - app-control
@@ -31,14 +25,6 @@ jobs:
           - metrics-http
           - tests
           - tools
-    name: ${{ matrix.smalltalk }} + ${{ matrix.load-spec }}
-    steps:
-      - uses: actions/checkout@v4
-      - uses: hpi-swa/setup-smalltalkCI@v1
-        with:
-          smalltalk-image: ${{ matrix.smalltalk }}
-      - name: Load group in image
-        run: smalltalkci -s ${{ matrix.smalltalk }} .smalltalkci/.loading.${{ matrix.load-spec }}.ston
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        timeout-minutes: 15
+    uses: ./.github/workflows/loading-pharo-group.yml
+    with:
+      load-spec: ${{ matrix.load-spec }}

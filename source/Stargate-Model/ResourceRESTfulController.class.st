@@ -23,10 +23,14 @@ ResourceRESTfulController class >> isAbstract [
 ]
 
 { #category : 'asserting' }
-ResourceRESTfulController >> assert: httpRequest isAuthorizedTo: permission within: requestContext [
+ResourceRESTfulController >> assertRequestIsAuthorizedTo: permission within: requestContext [
 
-	( requestContext includesPermission: permission ) ifFalse: [ 
-		httpRequest abort: ZnResponse forbidden ]
+  ( requestContext includesPermission: permission ) ifFalse: [
+      HTTPForbidden
+        signal: 'Missing permissions'
+        becauseScopeIsInsufficientFor: { permission }
+        with: requestContext authChallenge
+    ]
 ]
 
 { #category : 'private' }

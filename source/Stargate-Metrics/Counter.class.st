@@ -5,17 +5,18 @@ For example, you can use a counter to represent the number of requests served, t
 Do not use a counter to expose a value that can decrease. For example, do not use a counter for the number of currently running processes; instead use a gauge.
 "
 Class {
-	#name : #Counter,
-	#superclass : #Metric,
+	#name : 'Counter',
+	#superclass : 'Metric',
 	#instVars : [
 		'name',
 		'description',
 		'value'
 	],
-	#category : #'Stargate-Metrics'
+	#category : 'Stargate-Metrics',
+	#package : 'Stargate-Metrics'
 }
 
-{ #category : #'instance creation' }
+{ #category : 'instance creation' }
 Counter class >> named: aMetricName describedBy: aMetricDescription withValue: aNumber [
 
 	AssertionCheckerBuilder new
@@ -31,13 +32,13 @@ Counter class >> named: aMetricName describedBy: aMetricDescription withValue: a
 	^ self new initializeNamed: aMetricName describedBy: aMetricDescription withValue: aNumber
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 Counter >> description [
 
 	^ description
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 Counter >> initializeNamed: aMetricName describedBy: aMetricDescription withValue: aNumber [
 
 	name := aMetricName.
@@ -45,25 +46,25 @@ Counter >> initializeNamed: aMetricName describedBy: aMetricDescription withValu
 	value := aNumber
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 Counter >> name [
 
 	^ name
 ]
 
-{ #category : #printing }
+{ #category : 'printing' }
 Counter >> printDetailsOn: stream [
 
 	value printOn: stream
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 Counter >> type [
 	
 	^ self class
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 Counter >> value [
 
 	^ value

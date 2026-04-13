@@ -43,6 +43,13 @@ StargateApplicationTest >> baseUrl [
 ]
 
 { #category : 'private' }
+StargateApplicationTest >> enableHTTPRequestLogging [
+
+  logHTTPRequests := true.
+  ZnLogEvent announcer subscriptions reset
+]
+
+{ #category : 'private' }
 StargateApplicationTest >> newClient [
 
 	^ ZnClient new
@@ -55,6 +62,14 @@ StargateApplicationTest >> newClient [
 StargateApplicationTest >> orderVersion1dot0dot0MediaType [
 
 	^ 'application/vnd.stargate.order+json;version=1.0.0' asMediaType
+]
+
+{ #category : 'private' }
+StargateApplicationTest >> penultimateLogRecord [
+
+  ^ NeoJSONObject fromString: ( String streamContents: [ :stream |
+            ( loggingAsserter logRecords at: loggingAsserter logRecords size - 1 )
+              printOneLineJsonOn: stream ] )
 ]
 
 { #category : 'private' }
@@ -118,11 +133,10 @@ StargateApplicationTest >> startPetStore [
 
   self
     start: PetStoreApplication
-    withAll: { ( '--pet-store.stargate.public-url=http://localhost:<1p>' expandMacrosWith: port ) .
-        ( '--pet-store.stargate.port=<1p>' expandMacrosWith: port ) .
-        ( '--pet-store.stargate.operations-secret=<1s>' expandMacrosWith: self secret ) .
-        ( '--pet-store.stargate.log-http-requests=<1p>' expandMacrosWith:
-            logHTTPRequests ) }.
+    withAll: { '--pet-store.stargate.public-url=http://localhost:<1p>' expandMacrosWith: port .
+        '--pet-store.stargate.port=<1p>' expandMacrosWith: port .
+        '--pet-store.stargate.operations-secret=<1s>' expandMacrosWith: self secret .
+        '--pet-store.stargate.log-http-requests=<1p>' expandMacrosWith: logHTTPRequests }.
   baseUrl := runningApplication configuration petStore stargate publicURL
 ]
 
@@ -284,15 +298,10 @@ StargateApplicationTest >> testGetPets [
 StargateApplicationTest >> testLogRequestsDuringSuccessfulGet [
 
   | logRecord |
-  logger runDuring: [
-      logHTTPRequests := true.
-      self testGetPets
-    ].
-
-  logRecord := NeoJSONObject fromString: ( String streamContents: [ :stream |
-                       ( logger recordings at: logger recordings size - 1 ) printOneLineJsonOn:
-                         stream ] ).
-
+  self enableHTTPRequestLogging.
+  self startPetStore.
+  self runMemoryLoggerDuring: [ self newClient get: self baseUrl / 'pets' asUrl ].
+  logRecord := self penultimateLogRecord.
   self
     assert: logRecord level equals: 'DEBUG';
     assert: logRecord message equals: 'Incoming HTTP request responded';
@@ -308,14 +317,19 @@ StargateApplicationTest >> testLogRequestsDuringSuccessfulGet [
 StargateApplicationTest >> testLogRequestsDuringSucessfulPost [
 
   | logRecord |
-  logger runDuring: [
-      logHTTPRequests := true.
-      self testCreatePet
+  self enableHTTPRequestLogging.
+  self startPetStore.
+  self runMemoryLoggerDuring: [
+      self newClient
+        url: self baseUrl / 'pets' asUrl;
+        entity:
+          ( ZnEntity
+              with: '{"name":"Firulais","type":"dog"}'
+              ofType: self petVersion1dot0dot0MediaType );
+        setAccept: self petVersion1dot0dot0MediaType;
+        post
     ].
-
-  logRecord := NeoJSONObject fromString: ( String streamContents: [ :stream |
-                       ( logger recordings at: logger recordings size - 1 ) printOneLineJsonOn:
-                         stream ] ).
+  logRecord := self penultimateLogRecord.
 
   self
     assert: logRecord level equals: 'DEBUG';
@@ -332,15 +346,16 @@ StargateApplicationTest >> testLogRequestsDuringSucessfulPost [
 StargateApplicationTest >> testLogRequestsDuringUnsucessfulPost [
 
   | logRecord |
-  logger runDuring: [
-      logHTTPRequests := true.
-      self testUnsupportedMediaType
+  self enableHTTPRequestLogging.
+  self startPetStore.
+  self runMemoryLoggerDuring: [
+      self newClient
+        enforceHttpSuccess: false;
+        url: self baseUrl / 'pets' asUrl;
+        entity: ( ZnEntity json: '{"name":"Firulais","type":"dog"}' );
+        post
     ].
-
-  logRecord := NeoJSONObject fromString: ( String streamContents: [ :stream |
-                       ( logger recordings at: logger recordings size - 1 ) printOneLineJsonOn:
-                         stream ] ).
-
+  logRecord := self penultimateLogRecord.
   self
     assert: logRecord level equals: 'DEBUG';
     assert: logRecord message equals: 'Incoming HTTP request responded';

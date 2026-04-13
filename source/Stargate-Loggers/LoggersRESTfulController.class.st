@@ -39,17 +39,18 @@ LoggersRESTfulController >> declareGetLoggersRoute [
 { #category : 'API' }
 LoggersRESTfulController >> getLoggerBasedOn: httpRequest within: requestContext [
 
-	self assert: httpRequest isAuthorizedWithin: requestContext.
-	^ requestHandler from: httpRequest
-		  within: requestContext
-		  get: [ :name | plugin activeLoggerNamed: name ]
+  self assertRequestIsAuthorizedWithin: requestContext.
+  ^ requestHandler
+      from: httpRequest
+      within: requestContext
+      get: [ :name | plugin activeLoggerNamed: name ]
 ]
 
 { #category : 'API' }
 LoggersRESTfulController >> getLoggersBasedOn: httpRequest within: requestContext [
 
-	self assert: httpRequest isAuthorizedWithin: requestContext.
-	^ requestHandler from: httpRequest within: requestContext getCollection: [ plugin activeLoggers ]
+  self assertRequestIsAuthorizedWithin: requestContext.
+  ^ requestHandler from: httpRequest within: requestContext getCollection: [ plugin activeLoggers ]
 ]
 
 { #category : 'initialization' }

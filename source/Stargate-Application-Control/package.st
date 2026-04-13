@@ -1,1 +1,1 @@
-Package { #name : #'Stargate-Application-Control' }
+Package { #name : 'Stargate-Application-Control' }

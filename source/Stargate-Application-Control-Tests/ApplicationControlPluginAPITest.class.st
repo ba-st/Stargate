@@ -2,12 +2,13 @@
 I'm a test case for the application-control API
 "
 Class {
-	#name : #ApplicationControlPluginAPITest,
-	#superclass : #OperationalPluginAPITest,
-	#category : #'Stargate-Application-Control-Tests'
+	#name : 'ApplicationControlPluginAPITest',
+	#superclass : 'OperationalPluginAPITest',
+	#category : 'Stargate-Application-Control-Tests',
+	#package : 'Stargate-Application-Control-Tests'
 }
 
-{ #category : #private }
+{ #category : 'private' }
 ApplicationControlPluginAPITest >> echoCommandEntity [
 
 	^ ZnEntity
@@ -20,7 +21,7 @@ ApplicationControlPluginAPITest >> echoCommandEntity [
 }'
 ]
 
-{ #category : #running }
+{ #category : 'running' }
 ApplicationControlPluginAPITest >> operationsConfiguration [
 
 	^ super operationsConfiguration
@@ -33,13 +34,13 @@ ApplicationControlPluginAPITest >> operationsConfiguration [
 		yourself
 ]
 
-{ #category : #running }
+{ #category : 'running' }
 ApplicationControlPluginAPITest >> requiredPermissions [
 
 	^ #('execute:application-control')
 ]
 
-{ #category : #running }
+{ #category : 'running' }
 ApplicationControlPluginAPITest >> setUp [
 
 	ApplicationControlPlugin registerAsAvailableCommand: ( ApplicationControlCommand named: 'echo'
@@ -48,7 +49,7 @@ ApplicationControlPluginAPITest >> setUp [
 	super setUp
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 ApplicationControlPluginAPITest >> shutdownCommandEntity [
 
 	^ ZnEntity
@@ -60,14 +61,14 @@ ApplicationControlPluginAPITest >> shutdownCommandEntity [
 }'
 ]
 
-{ #category : #running }
+{ #category : 'running' }
 ApplicationControlPluginAPITest >> tearDown [
 
 	ApplicationControlPlugin unregisterCommandNamed: 'echo'.
 	super tearDown
 ]
 
-{ #category : #tests }
+{ #category : 'tests' }
 ApplicationControlPluginAPITest >> testDisablePlugin [
 
 	self assertIsEnabled: ApplicationControlPlugin.
@@ -87,7 +88,7 @@ ApplicationControlPluginAPITest >> testDisablePlugin [
 		withExceptionDo: [ :error | self assert: error response isNotFound ]
 ]
 
-{ #category : #tests }
+{ #category : 'tests' }
 ApplicationControlPluginAPITest >> testEnablePreviouslyDisabledPlugin [
 
 	self assertIsEnabled: ApplicationControlPlugin.
@@ -101,7 +102,7 @@ ApplicationControlPluginAPITest >> testEnablePreviouslyDisabledPlugin [
 	self testRunCommandWithPermissions
 ]
 
-{ #category : #tests }
+{ #category : 'tests' }
 ApplicationControlPluginAPITest >> testInvalidFormat [
 
 	| response |
@@ -124,7 +125,7 @@ ApplicationControlPluginAPITest >> testInvalidFormat [
 			]
 ]
 
-{ #category : #tests }
+{ #category : 'tests' }
 ApplicationControlPluginAPITest >> testMethodNotAllowed [
 
 	self
@@ -138,7 +139,7 @@ ApplicationControlPluginAPITest >> testMethodNotAllowed [
 			]
 ]
 
-{ #category : #tests }
+{ #category : 'tests' }
 ApplicationControlPluginAPITest >> testNotAcceptable [
 
 	self
@@ -164,7 +165,7 @@ ApplicationControlPluginAPITest >> testNotAcceptable [
 			]
 ]
 
-{ #category : #tests }
+{ #category : 'tests' }
 ApplicationControlPluginAPITest >> testRunCommandWithPermissions [
 
 	| response |
@@ -187,35 +188,63 @@ ApplicationControlPluginAPITest >> testRunCommandWithPermissions [
 			]
 ]
 
-{ #category : #tests }
+{ #category : 'tests' }
 ApplicationControlPluginAPITest >> testRunCommandWithoutAuthentication [
 
-	self
-		should: [ self newClient
-				url: self operationsUrl / ApplicationControlPlugin endpoint asUrl;
-				entity: self echoCommandEntity;
-				post;
-				response
-			]
-		raise: ZnHttpUnsuccessful
-		withExceptionDo: [ :error | self assert: error response code equals: 401 ]
+  self
+    should: [
+        self newClient
+          url: self operationsUrl / ApplicationControlPlugin endpoint asUrl;
+          entity: self echoCommandEntity;
+          post;
+          response
+      ]
+    raise: ZnHttpUnsuccessful
+    withExceptionDo: [ :error |
+        | response |
+        response := error response.
+        self
+          assert: response code equals: 401;
+          assert: ( response headers at: 'WWW-Authenticate' )
+          equals: 'Bearer realm=api.operations.example.com';
+          withJsonFromContentsIn: response do: [ :payload |
+              self
+                assert: payload message equals: 'Unauthorized';
+                assert: payload code equals: 401
+            ]
+      ]
 ]
 
-{ #category : #tests }
+{ #category : 'tests' }
 ApplicationControlPluginAPITest >> testRunCommandWithoutPermissions [
 
-	self
-		should: [ self newJWTAuthorizedClientLackingPermissions
-				url: self operationsUrl / ApplicationControlPlugin endpoint asUrl;
-				entity: self echoCommandEntity;
-				post;
-				response
-			]
-		raise: ZnHttpUnsuccessful
-		withExceptionDo: [ :error | self assert: error response code equals: 403 ]
+  self
+    should: [
+        self newJWTAuthorizedClientLackingPermissions
+          url: self operationsUrl / ApplicationControlPlugin endpoint asUrl;
+          entity: self echoCommandEntity;
+          post;
+          response
+      ]
+    raise: ZnHttpUnsuccessful
+    withExceptionDo: [ :error |
+        | response |
+        response := error response.
+        self
+          assert: response code equals: 403;
+          assert: ( response headers at: 'WWW-Authenticate' )
+          equals: 'Bearer realm=api.operations.example.com';
+          withJsonFromContentsIn: response do: [ :payload |
+              self
+                assert: payload message equals: 'Missing permissions';
+                assert: payload code equals: 403;
+                assert: payload errorCode equals: 'insufficient_scope';
+                assert: payload scope equals: 'execute:application-control'
+            ]
+      ]
 ]
 
-{ #category : #tests }
+{ #category : 'tests' }
 ApplicationControlPluginAPITest >> testRunDisabledCommandWithPermissions [
 
 	| response |
@@ -238,7 +267,7 @@ ApplicationControlPluginAPITest >> testRunDisabledCommandWithPermissions [
 			]
 ]
 
-{ #category : #tests }
+{ #category : 'tests' }
 ApplicationControlPluginAPITest >> testRunUnknownCommandWithPermissions [
 
 	| response |
@@ -261,7 +290,7 @@ ApplicationControlPluginAPITest >> testRunUnknownCommandWithPermissions [
 			]
 ]
 
-{ #category : #tests }
+{ #category : 'tests' }
 ApplicationControlPluginAPITest >> testUnsupportedMediaType [
 
 	self
@@ -280,7 +309,7 @@ ApplicationControlPluginAPITest >> testUnsupportedMediaType [
 			]
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 ApplicationControlPluginAPITest >> unknownCommandEntity [
 
 	^ ZnEntity
