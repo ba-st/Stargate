@@ -15,6 +15,6 @@ HTTPForbidden >> neoJsonOn: neoJSONWriter [
         writeKey: #message value: self messageText;
         writeKey: #errorCode value: self errorCode.
       self withRequiredPermissionsDo: [ :permissions |
-          jsonMapWriter writeKey: #scope value: ( Character space join: permissions ) ]
+          jsonMapWriter writeKey: #scope value: ( Character space asString join: permissions ) ]
     ]
 ]
