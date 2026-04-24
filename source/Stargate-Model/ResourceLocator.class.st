@@ -67,6 +67,12 @@ ResourceLocator >> canLookupResources [
 	^ locationResolverBinding isDefined
 ]
 
+{ #category : 'querying' }
+ResourceLocator >> collectionLocationWithin: requestContext [
+
+  ^ self baseUrl / endpoint asUrl
+]
+
 { #category : 'accessing' }
 ResourceLocator >> endpoint [
 

@@ -24,6 +24,12 @@ ResourceLocatorBehavior >> canLookupResources [
 	self subclassResponsibility
 ]
 
+{ #category : 'querying' }
+ResourceLocatorBehavior >> collectionLocationWithin: requestContext [
+
+	self subclassResponsibility
+]
+
 { #category : 'accessing' }
 ResourceLocatorBehavior >> endpoint [
 
