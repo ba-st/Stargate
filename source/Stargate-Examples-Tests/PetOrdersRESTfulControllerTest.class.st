@@ -627,9 +627,8 @@ PetOrdersRESTfulControllerTest >> testShipmentHistorySelfLink [
         ].
       self withJsonFromContentsIn: response do: [ :json |
           self
-            assertCollection: json links
-            hasSameElements: #( 'https://petstore.example.com/orders/1/shipment-history' )
-        ]
+            assert: json links self
+            equals: 'https://petstore.example.com/orders/1/shipment-history' ]
     ]
 ]
 
