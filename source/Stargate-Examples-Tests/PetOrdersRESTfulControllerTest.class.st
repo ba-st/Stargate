@@ -594,7 +594,7 @@ PetOrdersRESTfulControllerTest >> testRoutes [
 	routes := resourceController routes.
 
 	self
-		assert: routes size equals: 12;
+		assert: routes size equals: 11;
 		assert: ( ( routes collect: #urlTemplate ) includesAll:
 					  #( 	'/orders'
 							'/orders/<identifier:IsInteger>'
@@ -602,8 +602,7 @@ PetOrdersRESTfulControllerTest >> testRoutes [
 							'/orders/<identifier:IsInteger>/complete'
 							'/orders/<identifier:IsInteger>/comments'
 							'/orders/<identifier:IsInteger>/comments/<commentIdentifier:IsInteger>'
-							'/orders/<identifier:IsInteger>/shipment-history'
-							'/orders/<identifier:IsInteger>/shipment-history/<shipmentHistoryIdentifier:IsInteger>' ) )
+							'/orders/<identifier:IsInteger>/shipment-history' ) )
 ]
 
 { #category : 'tests - shipment history' }

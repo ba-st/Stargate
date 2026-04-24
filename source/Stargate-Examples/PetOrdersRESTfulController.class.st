@@ -297,16 +297,6 @@ PetOrdersRESTfulController >> declareGetOrderRoute [
 ]
 
 { #category : 'routes' }
-PetOrdersRESTfulController >> declareGetOrderShipmentHistoryEntryRoute [
-
-  ^ RouteSpecification
-      handling: #GET
-      at: self shipmentHistoryIdentifierTemplate
-      evaluating: [ :httpRequest :requestContext |
-          self orderShipmentHistoryEntryBasedOn: httpRequest within: requestContext ]
-]
-
-{ #category : 'routes' }
 PetOrdersRESTfulController >> declareGetOrderShipmentHistoryRoute [
 
   ^ RouteSpecification
@@ -458,8 +448,7 @@ PetOrdersRESTfulController >> initializeShipmentHistoryRequestHandler [
                                        ]
                                      as: PetOrderShipmentHistoryEntry;
                                      createEntityTagHashingEncodedResource;
-                                     directCachingWith: [ :caching |
-                                         caching beAvailableFor: 24 hours ];
+                                     directCachingWith: [ :caching | caching beAvailableFor: 1 hour ];
                                      build
 ]
 
@@ -493,15 +482,6 @@ PetOrdersRESTfulController >> orderShipmentHistoryBasedOn: httpRequest within: r
       from: httpRequest
       within: requestContext
       getCollection: [ ( self shipmentHistoryForOrderIn: httpRequest ) asArray ]
-]
-
-{ #category : 'API - shipment history' }
-PetOrdersRESTfulController >> orderShipmentHistoryEntryBasedOn: httpRequest within: requestContext [
-
-  ^ shipmentHistoryRequestHandler from: httpRequest within: requestContext get: [ :entryIndex |
-        ( self shipmentHistoryForOrderIn: httpRequest )
-          at: entryIndex
-          ifAbsent: [ ObjectNotFound signal ] ]
 ]
 
 { #category : 'private' }
