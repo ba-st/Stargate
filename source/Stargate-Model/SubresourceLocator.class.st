@@ -70,6 +70,13 @@ SubresourceLocator >> canLookupResources [
 	^ locationResolverBinding isDefined
 ]
 
+{ #category : 'querying' }
+SubresourceLocator >> collectionLocationWithin: requestContext [
+
+  ^ ( resourceLocator locationOf: requestContext parentResource within: requestContext )
+    / endpoint asUrl
+]
+
 { #category : 'accessing' }
 SubresourceLocator >> endpoint [
 
@@ -110,7 +117,6 @@ SubresourceLocator >> initializeHandling: aStringOrSymbol
 { #category : 'querying' }
 SubresourceLocator >> locationOf: resource within: requestContext [
 
-	^ ( resourceLocator locationOf: requestContext parentResource within: requestContext )
-		/ endpoint asUrl
-		/ ( locationResolverBinding content cull: resource cull: requestContext ) asString asUrl
+  ^ ( self collectionLocationWithin: requestContext )
+    / ( locationResolverBinding content cull: resource cull: requestContext ) asString asUrl
 ]

@@ -13,6 +13,19 @@ Class {
 }
 
 { #category : 'private - support' }
+PetOrdersRESTfulControllerTest >> addShipmentHistoryEntryFor: order identifiedBy: anId describedBy: aShipmentHistoryEntryDescription [
+
+  | request |
+  request := self requestToPOST: order links shipmentHistory asUrl identifiedBy: anId.
+  request entity: ( ZnEntity
+        with: ( '{"description": "<1s>"}' expandMacrosWith: aShipmentHistoryEntryDescription )
+        type: resourceController shipmentHistoryVersion1dot0dot0MediaType ).
+  request setAccept: resourceController shipmentHistoryVersion1dot0dot0MediaType.
+
+  ^ resourceController createShipmentHistoryEntryBasedOn: request within: self newHttpRequestContext
+]
+
+{ #category : 'private - support' }
 PetOrdersRESTfulControllerTest >> baseUrl [
 
 	^ 'https://petstore.example.com' asUrl
@@ -158,6 +171,17 @@ PetOrdersRESTfulControllerTest >> setUp [
 PetOrdersRESTfulControllerTest >> setUpResourceController [
 
 	resourceController := PetOrdersRESTfulController persistingTo: orderRepository 
+]
+
+{ #category : 'private - support' }
+PetOrdersRESTfulControllerTest >> shipmentHistoryRelatedTo: order [
+
+  ^ resourceController
+      orderShipmentHistoryBasedOn: ( self
+            requestToGETSubresource: order links shipmentHistory
+            identifiedBy: 1
+            accepting: resourceController shipmentHistoryVersion1dot0dot0MediaType )
+      within: self newHttpRequestContext
 ]
 
 { #category : 'tests - comments' }
@@ -570,14 +594,42 @@ PetOrdersRESTfulControllerTest >> testRoutes [
 	routes := resourceController routes.
 
 	self
-		assert: routes size equals: 9;
+		assert: routes size equals: 11;
 		assert: ( ( routes collect: #urlTemplate ) includesAll:
 					  #( 	'/orders'
 							'/orders/<identifier:IsInteger>'
 							'/orders/<identifier:IsInteger>/cancel'
 							'/orders/<identifier:IsInteger>/complete'
 							'/orders/<identifier:IsInteger>/comments'
-							'/orders/<identifier:IsInteger>/comments/<commentIdentifier:IsInteger>' ) )
+							'/orders/<identifier:IsInteger>/comments/<commentIdentifier:IsInteger>'
+							'/orders/<identifier:IsInteger>/shipment-history' ) )
+]
+
+{ #category : 'tests - shipment history' }
+PetOrdersRESTfulControllerTest >> testShipmentHistorySelfLink [
+
+  self withJsonFromContentsIn: self createOrder do: [ :order |
+      | response |
+      self
+        addShipmentHistoryEntryFor: order
+        identifiedBy: 1
+        describedBy: '15:51 2026-04-24 - Out for delivery';
+        addShipmentHistoryEntryFor: order
+        identifiedBy: 1
+        describedBy: '16:27 2026-04-24 - Delivered'.
+      response := self shipmentHistoryRelatedTo: order.
+      self assert: response isSuccess.
+      self withJsonFromItemsIn: response do: [ :jsonItems |
+          self
+            assertCollection: ( jsonItems collect: #description )
+            hasSameElements:
+            #( '15:51 2026-04-24 - Out for delivery' '16:27 2026-04-24 - Delivered' )
+        ].
+      self withJsonFromContentsIn: response do: [ :json |
+          self
+            assert: json links self
+            equals: 'https://petstore.example.com/orders/1/shipment-history' ]
+    ]
 ]
 
 { #category : 'tests' }
