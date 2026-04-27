@@ -8,7 +8,9 @@ Class {
 		'ordersRepository',
 		'commentsRequestHandler',
 		'commentsByOrderId',
-		'ordersRequestHandler'
+		'ordersRequestHandler',
+		'shipmentHistoryRequestHandler',
+		'shipmentHistoryByOrderId'
 	],
 	#category : 'Stargate-Examples-PetStore',
 	#package : 'Stargate-Examples',
@@ -42,7 +44,8 @@ PetOrdersRESTfulController >> affect: builder withMediaControlsFor: order locate
 	status = 'completed'
 		ifTrue: [ builder addLink: location / 'cancel' asUrl relatedTo: 'cancel' ].
 
-	builder addLink: location / 'comments' asUrl relatedTo: 'comments'
+	builder addLink: location / 'comments' asUrl relatedTo: 'comments'.
+	builder addLink: location / 'shipment-history' asUrl relatedTo: 'shipmentHistory'
 ]
 
 { #category : 'API - orders' }
@@ -193,6 +196,33 @@ PetOrdersRESTfulController >> createOrderBasedOn: httpRequest within: requestCon
 			]
 ]
 
+{ #category : 'API - shipment history' }
+PetOrdersRESTfulController >> createShipmentHistoryEntryBasedOn: httpRequest within: requestContext [
+
+  ^ shipmentHistoryRequestHandler
+      withResourceCreatedFrom: httpRequest
+      within: requestContext
+      do: [ :historyEntry |
+          | orderId order history |
+          orderId := self identifierIn: httpRequest.
+          order := ordersRepository findIdentifiedBy: orderId.
+          requestContext parentResource: order.
+          history := shipmentHistoryByOrderId at: orderId ifAbsentPut: [ OrderedCollection new ].
+          history add: historyEntry.
+          historyEntry
+        ]
+]
+
+{ #category : 'routes' }
+PetOrdersRESTfulController >> declareAddOrderShipmentHistoryEntryCommentRoute [
+
+  ^ RouteSpecification
+      handling: #POST
+      at: self shipmentHistoryTemplate
+      evaluating: [ :httpRequest :requestContext |
+          self createShipmentHistoryEntryBasedOn: httpRequest within: requestContext ]
+]
+
 { #category : 'routes' }
 PetOrdersRESTfulController >> declareCancelOrderRoute [
 
@@ -264,6 +294,16 @@ PetOrdersRESTfulController >> declareGetOrderRoute [
 		handling: #GET
 		at: self identifierTemplate
 		evaluating: [ :httpRequest :requestContext | self getOrderBasedOn: httpRequest within: requestContext ]
+]
+
+{ #category : 'routes' }
+PetOrdersRESTfulController >> declareGetOrderShipmentHistoryRoute [
+
+  ^ RouteSpecification
+      handling: #GET
+      at: self shipmentHistoryTemplate
+      evaluating: [ :httpRequest :requestContext |
+          self orderShipmentHistoryBasedOn: httpRequest within: requestContext ]
 ]
 
 { #category : 'routes' }
@@ -370,9 +410,46 @@ PetOrdersRESTfulController >> initializePersistingTo: aPetRepository [
 
 	ordersRepository := aPetRepository.
 	commentsByOrderId := Dictionary new.
+	shipmentHistoryByOrderId := Dictionary new.
 	self
 		initializeOrdersRequestHandler;
-		initializeCommentsRequestHandler
+		initializeCommentsRequestHandler;
+		initializeShipmentHistoryRequestHandler
+]
+
+{ #category : 'initialization' }
+PetOrdersRESTfulController >> initializeShipmentHistoryRequestHandler [
+
+  shipmentHistoryRequestHandler := RESTfulRequestHandlerBuilder new
+                                     handling: 'shipment-history'
+                                     locatingSubresourcesWith: [ :historyEntry :requestContext |
+                                         ( shipmentHistoryByOrderId at:
+                                               ( ordersRepository identifierOf:
+                                                     requestContext parentResource ) ) indexOf:
+                                             historyEntry
+                                       ]
+                                     extractingIdentifierWith: [ :httpRequest |
+                                         httpRequest at: #shipmentHistoryIdentifier asString ]
+                                     locatingParentResourceWith:
+                                       ordersRequestHandler resourceLocator;
+                                     beHypermediaDriven;
+                                     handleExceptionsApplying: [ :handler |
+                                         handler addAsDecodingError: AssertionFailed ];
+                                     whenAccepting: self shipmentHistoryVersion1dot0dot0MediaType
+                                     decodeFromJsonApplying: [ :json :reader |
+                                         PetOrderShipmentHistoryEntry describedBy:
+                                             ( NeoJSONObject fromString: json ) description ];
+                                     whenResponding: self shipmentHistoryVersion1dot0dot0MediaType
+                                     encodeToJsonApplying: [ :resource :requestContext :writer |
+                                         writer
+                                           for: PetOrderShipmentHistoryEntry
+                                           do: [ :mapping | mapping mapAccessor: #description ].
+                                         self
+                                       ]
+                                     as: PetOrderShipmentHistoryEntry;
+                                     createEntityTagHashingEncodedResource;
+                                     directCachingWith: [ :caching | caching beAvailableFor: 1 hour ];
+                                     build
 ]
 
 { #category : 'API - comments' }
@@ -392,6 +469,19 @@ PetOrdersRESTfulController >> orderCommentsBasedOn: httpRequest within: requestC
 		from: httpRequest
 		within: requestContext
 		getCollection: [ ( self commentsForOrderIn: httpRequest ) asArray ]
+]
+
+{ #category : 'API - shipment history' }
+PetOrdersRESTfulController >> orderShipmentHistoryBasedOn: httpRequest within: requestContext [
+
+  | order |
+  order := ordersRepository findIdentifiedBy: ( self identifierIn: httpRequest ).
+  requestContext parentResource: order.
+
+  ^ shipmentHistoryRequestHandler
+      from: httpRequest
+      within: requestContext
+      getCollection: [ ( self shipmentHistoryForOrderIn: httpRequest ) asArray ]
 ]
 
 { #category : 'private' }
@@ -417,6 +507,26 @@ PetOrdersRESTfulController >> serverUrl: aServerUrl [
 
 	super serverUrl: aServerUrl.
 	commentsRequestHandler serverUrl: aServerUrl
+]
+
+{ #category : 'private' }
+PetOrdersRESTfulController >> shipmentHistoryForOrderIn: httpRequest [
+
+	^ shipmentHistoryByOrderId at: ( self identifierIn: httpRequest ) ifAbsent: [ #() ]
+]
+
+{ #category : 'private' }
+PetOrdersRESTfulController >> shipmentHistoryTemplate [
+
+  ^ '<1s><2s>'
+      expandMacrosWith: self identifierTemplate
+      with: shipmentHistoryRequestHandler endpoint
+]
+
+{ #category : 'private' }
+PetOrdersRESTfulController >> shipmentHistoryVersion1dot0dot0MediaType [
+
+  ^ self jsonMediaType: 'shipment-history' vendoredBy: 'stargate' version: '1.0.0'
 ]
 
 { #category : 'private' }

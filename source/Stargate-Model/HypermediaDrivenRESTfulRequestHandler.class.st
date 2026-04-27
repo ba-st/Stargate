@@ -81,7 +81,7 @@ HypermediaDrivenRESTfulRequestHandler >> encodeResourceCollection: resourceColle
 { #category : 'private' }
 HypermediaDrivenRESTfulRequestHandler >> evaluateCollectionQuery: aQueryEvaluationBlock basedOn: httpRequest within: requestContext [
 
-  requestContext collectionLink: ( ( resourceLocator baseUrl / resourceLocator endpoint )
+  requestContext collectionLink: ( ( resourceLocator collectionLocationWithin: requestContext )
         query: httpRequest absoluteUrl query;
         yourself ).
   ^ super evaluateCollectionQuery: aQueryEvaluationBlock basedOn: httpRequest within: requestContext
