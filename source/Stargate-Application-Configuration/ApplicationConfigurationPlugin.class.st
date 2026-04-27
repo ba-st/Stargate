@@ -3,16 +3,17 @@ I'm one of the operational plugins.
 I provide information about the configuration of the running system.
 "
 Class {
-	#name : #ApplicationConfigurationPlugin,
-	#superclass : #OperationalPlugin,
+	#name : 'ApplicationConfigurationPlugin',
+	#superclass : 'OperationalPlugin',
 	#instVars : [
 		'valueProvider',
 		'configurationParameters'
 	],
-	#category : #'Stargate-Application-Configuration'
+	#category : 'Stargate-Application-Configuration',
+	#package : 'Stargate-Application-Configuration'
 }
 
-{ #category : #configuring }
+{ #category : 'configuring' }
 ApplicationConfigurationPlugin class >> configureMediaControlsIn: builder within: requestContext [
 
 	builder
@@ -20,7 +21,7 @@ ApplicationConfigurationPlugin class >> configureMediaControlsIn: builder within
 		relatedTo: 'configuration'
 ]
 
-{ #category : #'instance creation' }
+{ #category : 'instance creation' }
 ApplicationConfigurationPlugin class >> configuredBy: configuration [
 
 	| selfConfiguration |
@@ -33,44 +34,44 @@ ApplicationConfigurationPlugin class >> configuredBy: configuration [
 				    [ ApplicationConfiguration forAll: #(  ) providedBy: NullConfigurationProvider new ] ] )
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 ApplicationConfigurationPlugin class >> endpoint [
 
 	^ 'application-configuration'
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 ApplicationConfigurationPlugin class >> pluginName [
 
 	^ 'Application Configuration'
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 ApplicationConfigurationPlugin >> configurationParameters [
 
 	^ configurationParameters
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 ApplicationConfigurationPlugin >> currentConfiguration [
 
 	^ valueProvider value
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 ApplicationConfigurationPlugin >> currentValueFor: parameter [
 
 	^ parameter valueToLogFrom: self currentConfiguration
 ]
 
-{ #category : #configuring }
+{ #category : 'configuring' }
 ApplicationConfigurationPlugin >> includeControllersIn: api [
 
 	api
 		addController: ( ApplicationConfigurationRESTfulController over: self configuredBy: api operationsConfiguration )
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 ApplicationConfigurationPlugin >> initializeDefinedBy: parameters querying: aConfigurationProvider [
 
 	configurationParameters := parameters.

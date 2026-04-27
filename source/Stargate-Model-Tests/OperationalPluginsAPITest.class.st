@@ -39,26 +39,39 @@ OperationalPluginsAPITest >> statusChangeEntityTo: status [
 { #category : 'tests' }
 OperationalPluginsAPITest >> testCannotDisableHealtCheckPluginWhenMissingPermission [
 
-	| json getResponse |
+  | json getResponse |
+  getResponse := self newJWTAuthorizedClient
+                   url: self operationsPluginsUrl / HealthCheckPlugin endpoint asUrl;
+                   get;
+                   response.
 
-	getResponse := self newJWTAuthorizedClient
-		               url: self operationsPluginsUrl / HealthCheckPlugin endpoint asUrl;
-		               get;
-		               response.
+  json := NeoJSONObject fromString: getResponse contents.
 
-	json := NeoJSONObject fromString: getResponse contents.
+  self assert: json status equals: 'ENABLED'.
 
-	self assert: json status equals: 'ENABLED'.
-
-	self
-		should: [ 
-			self newJWTAuthorizedClient
-				url: json selfLocation;
-				entity: ( self statusChangeEntityTo: 'DISABLED' );
-				patch
-			]
-		raise: ZnHttpUnsuccessful
-		withExceptionDo: [ :error | self assert: error response code equals: 403 ]
+  self
+    should: [
+        self newJWTAuthorizedClient
+          url: json selfLocation;
+          entity: ( self statusChangeEntityTo: 'DISABLED' );
+          patch
+      ]
+    raise: ZnHttpUnsuccessful
+    withExceptionDo: [ :error |
+        | response |
+        response := error response.
+        self
+          assert: response code equals: 403;
+          assert: ( response headers at: 'WWW-Authenticate' )
+          equals: 'Bearer realm=api.operations.example.com';
+          withJsonFromContentsIn: response do: [ :payload |
+              self
+                assert: payload message equals: 'Missing permissions';
+                assert: payload code equals: 403;
+                assert: payload errorCode equals: 'insufficient_scope';
+                assert: payload scope equals: 'update:operations'
+            ]
+      ]
 ]
 
 { #category : 'tests' }
@@ -163,21 +176,48 @@ OperationalPluginsAPITest >> testGetHealtCheckPlugin [
 { #category : 'tests' }
 OperationalPluginsAPITest >> testGetHealtCheckPluginForbidden [
 
-	self
-		should: [ self newJWTAuthorizedClientLackingPermissions
-				get: self operationsPluginsUrl / HealthCheckPlugin endpoint asUrl
-			]
-		raise: ZnHttpUnsuccessful
-		withExceptionDo: [ :error | self assert: error response code equals: 403 ]
+  self
+    should: [
+        self newJWTAuthorizedClientLackingPermissions get:
+          self operationsPluginsUrl / HealthCheckPlugin endpoint asUrl
+      ]
+    raise: ZnHttpUnsuccessful
+    withExceptionDo: [ :error |
+        | response |
+        response := error response.
+        self
+          assert: response code equals: 403;
+          assert: ( response headers at: 'WWW-Authenticate' )
+          equals: 'Bearer realm=api.operations.example.com';
+          withJsonFromContentsIn: response do: [ :payload |
+              self
+                assert: payload message equals: 'Missing permissions';
+                assert: payload code equals: 403;
+                assert: payload errorCode equals: 'insufficient_scope';
+                assert: payload scope equals: 'read:operations'
+            ]
+      ]
 ]
 
 { #category : 'tests' }
 OperationalPluginsAPITest >> testGetHealtCheckPluginUnauthorized [
 
-	self
-		should: [ self newClient get: self operationsPluginsUrl / HealthCheckPlugin endpoint asUrl ]
-		raise: ZnHttpUnsuccessful
-		withExceptionDo: [ :error | self assert: error response isAuthenticationRequired ]
+  self
+    should: [ self newClient get: self operationsPluginsUrl / HealthCheckPlugin endpoint asUrl ]
+    raise: ZnHttpUnsuccessful
+    withExceptionDo: [ :error |
+        | response |
+        response := error response.
+        self
+          assert: response code equals: 401;
+          assert: ( response headers at: 'WWW-Authenticate' )
+          equals: 'Bearer realm=api.operations.example.com';
+          withJsonFromContentsIn: response do: [ :payload |
+              self
+                assert: payload message equals: 'Unauthorized';
+                assert: payload code equals: 401
+            ]
+      ]
 ]
 
 { #category : 'tests' }
@@ -223,17 +263,43 @@ OperationalPluginsAPITest >> testGetOperationalPlugins [
 { #category : 'tests' }
 OperationalPluginsAPITest >> testGetOperationalPluginsForbidden [
 
-	self
-		should: [ self newJWTAuthorizedClientLackingPermissions get: self operationsPluginsUrl ]
-		raise: ZnHttpUnsuccessful
-		withExceptionDo: [ :error | self assert: error response code equals: 403 ]
+  self
+    should: [ self newJWTAuthorizedClientLackingPermissions get: self operationsPluginsUrl ]
+    raise: ZnHttpUnsuccessful
+    withExceptionDo: [ :error |
+        | response |
+        response := error response.
+        self
+          assert: response code equals: 403;
+          assert: ( response headers at: 'WWW-Authenticate' )
+          equals: 'Bearer realm=api.operations.example.com';
+          withJsonFromContentsIn: response do: [ :payload |
+              self
+                assert: payload message equals: 'Missing permissions';
+                assert: payload code equals: 403;
+                assert: payload errorCode equals: 'insufficient_scope';
+                assert: payload scope equals: 'read:operations'
+            ]
+      ]
 ]
 
 { #category : 'tests' }
 OperationalPluginsAPITest >> testGetOperationalPluginsUnauthorized [
 
-	self
-		should: [ self newClient get: self operationsPluginsUrl ]
-		raise: ZnHttpUnsuccessful
-		withExceptionDo: [ :error | self assert: error response isAuthenticationRequired ]
+  self
+    should: [ self newClient get: self operationsPluginsUrl ]
+    raise: ZnHttpUnsuccessful
+    withExceptionDo: [ :error |
+        | response |
+        response := error response.
+        self
+          assert: response code equals: 401;
+          assert: ( response headers at: 'WWW-Authenticate' )
+          equals: 'Bearer realm=api.operations.example.com';
+          withJsonFromContentsIn: response do: [ :payload |
+              self
+                assert: payload message equals: 'Unauthorized';
+                assert: payload code equals: 401
+            ]
+      ]
 ]

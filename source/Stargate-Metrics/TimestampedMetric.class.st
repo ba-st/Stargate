@@ -2,47 +2,48 @@
 I'm a metric that assigns a timestamp over another metric
 "
 Class {
-	#name : #TimestampedMetric,
-	#superclass : #Metric,
+	#name : 'TimestampedMetric',
+	#superclass : 'Metric',
 	#instVars : [
 		'timestamp',
 		'metric'
 	],
-	#category : #'Stargate-Metrics'
+	#category : 'Stargate-Metrics',
+	#package : 'Stargate-Metrics'
 }
 
-{ #category : #'instance creation' }
+{ #category : 'instance creation' }
 TimestampedMetric class >> over: aMetric at: aTimestamp [
 
 	^ self new initializeOver: aMetric at: aTimestamp
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 TimestampedMetric >> description [
 
 	^ metric description
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 TimestampedMetric >> initializeOver: aMetric at: aTimestamp [
 
 	metric := aMetric.
 	timestamp := aTimestamp
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 TimestampedMetric >> metric [
 
 	^ metric
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 TimestampedMetric >> name [
 
 	^ metric name
 ]
 
-{ #category : #printing }
+{ #category : 'printing' }
 TimestampedMetric >> printDetailsOn: stream [
 
 	timestamp printRoundedOn: stream.
@@ -50,19 +51,19 @@ TimestampedMetric >> printDetailsOn: stream [
 	metric printDetailsOn: stream
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 TimestampedMetric >> timestamp [
 
 	^ timestamp
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 TimestampedMetric >> type [
 
 	^ metric type
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 TimestampedMetric >> value [
 
 	^ metric value

@@ -3,30 +3,77 @@ on:
   - push
   - pull_request
   - workflow_dispatch
+
 jobs:
-   unit-tests:
+   unit-tests-pharo-10:
     runs-on: ubuntu-latest
-    strategy:
-      fail-fast: false
-      matrix:
-        smalltalk:
-          - Pharo64-10
-          - Pharo64-11
-          - Pharo64-12
-          - Pharo64-13
-    name: ${{ matrix.smalltalk }}
+    name: Pharo64-10
     steps:
-      - uses: actions/checkout@v4
-      - uses: hpi-swa/setup-smalltalkCI@v1
-        with:
-          smalltalk-image: ${{ matrix.smalltalk }}
+      - uses: actions/checkout@v6
       - name: Load Image and Run Tests
-        run: smalltalkci -s ${{ matrix.smalltalk }} .smalltalkci/.unit-tests.ston
+        uses: ba-st-actions/pharo-ci@v10
+        with:
+          spec: .smalltalkci/.unit-tests.ston
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         timeout-minutes: 15
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v5
         with:
-          name: Unit-Tests-${{matrix.smalltalk}}
+          name: Unit-Tests-Pharo-10
           token: ${{ secrets.CODECOV_TOKEN }}
+          flags: unit
+   unit-tests-pharo-11:
+    runs-on: ubuntu-latest
+    name: Pharo64-11
+    steps:
+      - uses: actions/checkout@v6
+      - name: Load Image and Run Tests
+        uses: ba-st-actions/pharo-ci@v11
+        with:
+          spec: .smalltalkci/.unit-tests.ston
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        timeout-minutes: 15
+      - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@v5
+        with:
+          name: Unit-Tests-Pharo-11
+          token: ${{ secrets.CODECOV_TOKEN }}
+          flags: unit
+   unit-tests-pharo-12:
+    runs-on: ubuntu-latest
+    name: Pharo64-12
+    steps:
+      - uses: actions/checkout@v6
+      - name: Load Image and Run Tests
+        uses: ba-st-actions/pharo-ci@v12
+        with:
+          spec: .smalltalkci/.unit-tests.ston
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        timeout-minutes: 15
+      - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@v5
+        with:
+          name: Unit-Tests-Pharo-12
+          token: ${{ secrets.CODECOV_TOKEN }}
+          flags: unit
+   unit-tests-pharo-13:
+    runs-on: ubuntu-latest
+    name: Pharo64-13
+    steps:
+      - uses: actions/checkout@v6
+      - name: Load Image and Run Tests
+        uses: ba-st-actions/pharo-ci@v13
+        with:
+          spec: .smalltalkci/.unit-tests.ston
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        timeout-minutes: 15
+      - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@v5
+        with:
+          name: Unit-Tests-Pharo-13
+          token: ${{ secrets.CODECOV_TOKEN }}
+          flags: unit

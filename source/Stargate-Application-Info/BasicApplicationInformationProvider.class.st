@@ -2,8 +2,8 @@
 I'm a provider of basic information about the running application
 "
 Class {
-	#name : #BasicApplicationInformationProvider,
-	#superclass : #ApplicationInformationProvider,
+	#name : 'BasicApplicationInformationProvider',
+	#superclass : 'ApplicationInformationProvider',
 	#instVars : [
 		'applicationName',
 		'applicationDescription',
@@ -12,23 +12,24 @@ Class {
 	#classVars : [
 		'UniqueInstance'
 	],
-	#category : #'Stargate-Application-Info'
+	#category : 'Stargate-Application-Info',
+	#package : 'Stargate-Application-Info'
 }
 
-{ #category : #'instance creation' }
+{ #category : 'instance creation' }
 BasicApplicationInformationProvider class >> new [
 
 	UniqueInstance ifNil: [ UniqueInstance := super new ].
 	^ UniqueInstance
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 BasicApplicationInformationProvider class >> providerName [
 
 	^ 'application'
 ]
 
-{ #category : #configuring }
+{ #category : 'configuring' }
 BasicApplicationInformationProvider >> applicationNamed: aName describedBy: aDescription version: aVersion [
 
 	applicationName := aName.
@@ -36,7 +37,7 @@ BasicApplicationInformationProvider >> applicationNamed: aName describedBy: aDes
 	version := aVersion
 ]
 
-{ #category : #querying }
+{ #category : 'querying' }
 BasicApplicationInformationProvider >> gatherInformation [
 
 	^ OrderedDictionary new
@@ -46,7 +47,7 @@ BasicApplicationInformationProvider >> gatherInformation [
 		yourself
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 BasicApplicationInformationProvider >> initialize [
 
 	super initialize.

@@ -2,8 +2,8 @@
 I'm a controller exposing the API of HealthCheckPlugin
 "
 Class {
-	#name : #HealthCheckRESTfulController,
-	#superclass : #OperationsRESTfulController,
+	#name : 'HealthCheckRESTfulController',
+	#superclass : 'OperationsRESTfulController',
 	#instVars : [
 		'requestHandler',
 		'plugin'
@@ -11,23 +11,24 @@ Class {
 	#classVars : [
 		'RiskScoreToStatusMapping'
 	],
-	#category : #'Stargate-HealthCheck'
+	#category : 'Stargate-HealthCheck',
+	#package : 'Stargate-HealthCheck'
 }
 
-{ #category : #'class initialization' }
+{ #category : 'class initialization' }
 HealthCheckRESTfulController class >> initialize [
 
 	<ignoreForCoverage>
 	RiskScoreToStatusMapping := #('PASS' 'WARN' 'FAIL')
 ]
 
-{ #category : #'instance creation' }
+{ #category : 'instance creation' }
 HealthCheckRESTfulController class >> over: aHealthCheckPlugin configuredBy: configuration [
 
 	^ ( self authenticationFilterBasedOn: configuration ) initializeOver: aHealthCheckPlugin
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 HealthCheckRESTfulController >> asHealthConditionDetails: overallHealthCondition [
 
 	| details |
@@ -46,7 +47,7 @@ HealthCheckRESTfulController >> asHealthConditionDetails: overallHealthCondition
 	^ details
 ]
 
-{ #category : #routes }
+{ #category : 'routes' }
 HealthCheckRESTfulController >> declareRunHealthChecksRoute [
 
 	^ RouteSpecification
@@ -55,26 +56,26 @@ HealthCheckRESTfulController >> declareRunHealthChecksRoute [
 		evaluating: [ :httpRequest :requestContext | self runHealthChecksBasedOn: httpRequest within: requestContext ]
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 HealthCheckRESTfulController >> healthCheckDetailsVersion1dot0dot0MediaType [
 
 	^ self jsonMediaType: 'health-check.details' vendoredBy: 'stargate' version: '1.0.0'
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 HealthCheckRESTfulController >> healthCheckSummaryVersion1dot0dot0MediaType [
 
 	^ self jsonMediaType: 'health-check.summary' vendoredBy: 'stargate' version: '1.0.0'
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 HealthCheckRESTfulController >> initializeOver: aHealthCheckPlugin [
 
 	plugin := aHealthCheckPlugin.
 	self initializeRequestHandler
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 HealthCheckRESTfulController >> initializeRequestHandler [
 
 	requestHandler := RESTfulRequestHandlerBuilder new
@@ -99,49 +100,48 @@ HealthCheckRESTfulController >> initializeRequestHandler [
 		build
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 HealthCheckRESTfulController >> pluginEndpoint [
 
 	^ plugin endpoint
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 HealthCheckRESTfulController >> requestHandler [
 
 	^ requestHandler
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 HealthCheckRESTfulController >> requiredPermission [
 
 	^ 'execute:<1s>' expandMacrosWith: self pluginEndpoint
 ]
 
-{ #category : #API }
+{ #category : 'API' }
 HealthCheckRESTfulController >> runHealthChecksBasedOn: httpRequest within: requestContext [
 
-	| healthCondition entity targetMediaType response |
+  | healthCondition entity targetMediaType response |
+  targetMediaType := requestHandler
+                       holdTargetMediaTypeAndLanguageFrom: httpRequest
+                       within: requestContext.
+	"The summary media type can be requested without authorization credentials"
+  [ self assertRequestIsAuthorizedWithin: requestContext ] unless:
+    targetMediaType = self healthCheckSummaryVersion1dot0dot0MediaType.
 
-	targetMediaType := requestHandler
-		holdTargetMediaTypeAndLanguageFrom: httpRequest
-		within: requestContext.	"The summary media type can be requested without authorization credentials"
-	[ self assert: httpRequest isAuthorizedWithin: requestContext ]
-		unless: targetMediaType = self healthCheckSummaryVersion1dot0dot0MediaType.
+  healthCondition := plugin runHealthChecks.
 
-	healthCondition := plugin runHealthChecks.
-
-	entity := requestHandler encodeResource: healthCondition within: requestContext.
-	response := healthCondition isNotCritical
-		then: [ ZnResponse ok: entity ]
-		otherwise: [ ( ZnResponse statusCode: 503 )
-				entity: entity;
-				yourself
-			].
-	response addToVary: 'Accept'.
-	^ response
+  entity := requestHandler encodeResource: healthCondition within: requestContext.
+  response := healthCondition isNotCritical then: [ ZnResponse ok: entity ] otherwise: [
+                  ( ZnResponse statusCode: 503 )
+                    entity: entity;
+                    yourself
+                ].
+  response addToVary: 'Accept'.
+  ^ response
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 HealthCheckRESTfulController >> statusOf: condition [
 
 	^ RiskScoreToStatusMapping at: condition riskScore

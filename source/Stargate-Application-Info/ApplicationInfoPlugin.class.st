@@ -3,15 +3,16 @@ I'm one of the operational plugins.
 I provide information of the running system.
 "
 Class {
-	#name : #ApplicationInfoPlugin,
-	#superclass : #OperationalPlugin,
+	#name : 'ApplicationInfoPlugin',
+	#superclass : 'OperationalPlugin',
 	#instVars : [
 		'informationProviders'
 	],
-	#category : #'Stargate-Application-Info'
+	#category : 'Stargate-Application-Info',
+	#package : 'Stargate-Application-Info'
 }
 
-{ #category : #'instance creation' }
+{ #category : 'instance creation' }
 ApplicationInfoPlugin class >> configureMediaControlsIn: builder within: requestContext [
 
 	builder
@@ -19,7 +20,7 @@ ApplicationInfoPlugin class >> configureMediaControlsIn: builder within: request
 		relatedTo: 'info'
 ]
 
-{ #category : #'instance creation' }
+{ #category : 'instance creation' }
 ApplicationInfoPlugin class >> configuredBy: configuration [
 
 	| selfConfiguration |
@@ -30,19 +31,19 @@ ApplicationInfoPlugin class >> configuredBy: configuration [
 		initializeGatheringAll: ( selfConfiguration at: #'info-providers' ifAbsent: [ self defaultProviderNames ] )
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 ApplicationInfoPlugin class >> endpoint [
 
 	^ 'application-info'
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 ApplicationInfoPlugin class >> pluginName [
 
 	^ 'Application Information'
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 ApplicationInfoPlugin >> gatherInformation [
 
 	^ informationProviders
@@ -54,14 +55,14 @@ ApplicationInfoPlugin >> gatherInformation [
 			]
 ]
 
-{ #category : #configuring }
+{ #category : 'configuring' }
 ApplicationInfoPlugin >> includeControllersIn: api [
 
 	api
 		addController: ( ApplicationInfoRESTfulController over: self configuredBy: api operationsConfiguration )
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 ApplicationInfoPlugin >> initializeGatheringAll: enabledInformationProviderNames [
 
 	informationProviders := ApplicationInformationProvider allSubclasses

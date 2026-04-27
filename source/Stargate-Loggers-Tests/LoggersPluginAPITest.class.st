@@ -96,16 +96,30 @@ LoggersPluginAPITest >> testEnablePreviouslyDisabledPlugin [
 { #category : 'running' }
 LoggersPluginAPITest >> testGetLoggerMissingPermissions [
 
-	self
-		should: [ 
-			self newJWTAuthorizedClientLackingPermissions
-				url: self operationsUrl / LoggersPlugin endpoint asUrl / self stderrLoggerName;
-				setAccept: ZnMimeType applicationJson;
-				get;
-				response
-			]
-		raise: ZnHttpUnsuccessful
-		withExceptionDo: [ :error | self assert: error response code equals: 403 ]
+  self
+    should: [
+        self newJWTAuthorizedClientLackingPermissions
+          url: self operationsUrl / LoggersPlugin endpoint asUrl / self stderrLoggerName;
+          setAccept: ZnMimeType applicationJson;
+          get;
+          response
+      ]
+    raise: ZnHttpUnsuccessful
+    withExceptionDo: [ :error |
+        | response |
+        response := error response.
+        self
+          assert: response code equals: 403;
+          assert: ( response headers at: 'WWW-Authenticate' )
+          equals: 'Bearer realm=api.operations.example.com';
+          withJsonFromContentsIn: response do: [ :payload |
+              self
+                assert: payload message equals: 'Missing permissions';
+                assert: payload code equals: 403;
+                assert: payload errorCode equals: 'insufficient_scope';
+                assert: payload scope equals: 'read:loggers'
+            ]
+      ]
 ]
 
 { #category : 'running' }
@@ -147,16 +161,30 @@ LoggersPluginAPITest >> testGetLoggerWithPermissions [
 { #category : 'running' }
 LoggersPluginAPITest >> testGetLoggersMissingPermissions [
 
-	self
-		should: [ 
-			self newJWTAuthorizedClientLackingPermissions
-				url: self operationsUrl / LoggersPlugin endpoint asUrl;
-				setAccept: ZnMimeType applicationJson;
-				get;
-				response
-			]
-		raise: ZnHttpUnsuccessful
-		withExceptionDo: [ :error | self assert: error response code equals: 403 ]
+  self
+    should: [
+        self newJWTAuthorizedClientLackingPermissions
+          url: self operationsUrl / LoggersPlugin endpoint asUrl;
+          setAccept: ZnMimeType applicationJson;
+          get;
+          response
+      ]
+    raise: ZnHttpUnsuccessful
+    withExceptionDo: [ :error |
+        | response |
+        response := error response.
+        self
+          assert: response code equals: 403;
+          assert: ( response headers at: 'WWW-Authenticate' )
+          equals: 'Bearer realm=api.operations.example.com';
+          withJsonFromContentsIn: response do: [ :payload |
+              self
+                assert: payload message equals: 'Missing permissions';
+                assert: payload code equals: 403;
+                assert: payload errorCode equals: 'insufficient_scope';
+                assert: payload scope equals: 'read:loggers'
+            ]
+      ]
 ]
 
 { #category : 'running' }

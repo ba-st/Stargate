@@ -23,21 +23,22 @@ OperationalPluginsRESTfulController class >> on: anHTTPBasedRESTfulAPI [
 { #category : 'API' }
 OperationalPluginsRESTfulController >> changeOperationalPluginStatusBasedOn: httpRequest within: requestContext [
 
-	self assert: httpRequest isAuthorizedTo: self updatePermission within: requestContext.
+  self assertRequestIsAuthorizedTo: self updatePermission within: requestContext.
 
-	^ requestHandler from: httpRequest
-		  within: requestContext
-		  get: [ :endpoint | OperationalPlugin pluginAt: endpoint ]
-		  thenUpdateWith: [ :plugin :json | 
-			  json
-				  at: #status
-				  ifPresent: [ :status | 
-					  status = 'DISABLED' then: [ api disable: plugin ].
-					  status = 'ENABLED' then: [ api enable: plugin ]
-					  ]
-				  ifAbsent: [ HTTPClientError unprocessableEntity signal: 'Missing #status key' ].
-			  plugin
-			  ]
+  ^ requestHandler
+      from: httpRequest
+      within: requestContext
+      get: [ :endpoint | OperationalPlugin pluginAt: endpoint ]
+      thenUpdateWith: [ :plugin :json |
+          json
+            at: #status
+            ifPresent: [ :status |
+                status = 'DISABLED' then: [ api disable: plugin ].
+                status = 'ENABLED' then: [ api enable: plugin ]
+              ]
+            ifAbsent: [ HTTPClientError unprocessableEntity signal: 'Missing #status key' ].
+          plugin
+        ]
 ]
 
 { #category : 'private' }
@@ -117,12 +118,12 @@ OperationalPluginsRESTfulController >> initializeRequestHandler [
 { #category : 'API' }
 OperationalPluginsRESTfulController >> operationalPluginBasedOn: httpRequest within: requestContext [
 
-	self assert: httpRequest isAuthorizedWithin: requestContext.
+  self assertRequestIsAuthorizedWithin: requestContext.
 
-	^ requestHandler
-		from: httpRequest
-		within: requestContext
-		get: [ :endpoint | OperationalPlugin pluginAt: endpoint ]
+  ^ requestHandler
+      from: httpRequest
+      within: requestContext
+      get: [ :endpoint | OperationalPlugin pluginAt: endpoint ]
 ]
 
 { #category : 'private' }
@@ -134,12 +135,12 @@ OperationalPluginsRESTfulController >> operationalPluginVersion1dot0dot0MediaTyp
 { #category : 'API' }
 OperationalPluginsRESTfulController >> operationalPluginsBasedOn: httpRequest within: requestContext [
 
-	self assert: httpRequest isAuthorizedWithin: requestContext.
+  self assertRequestIsAuthorizedWithin: requestContext.
 
-	^ requestHandler
-		from: httpRequest
-		within: requestContext
-		getCollection: [ OperationalPlugin availablePlugins ]
+  ^ requestHandler
+      from: httpRequest
+      within: requestContext
+      getCollection: [ OperationalPlugin availablePlugins ]
 ]
 
 { #category : 'private' }

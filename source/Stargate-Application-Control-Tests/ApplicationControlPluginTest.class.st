@@ -2,12 +2,13 @@
 An ApplicationControlPluginTest is a test class for testing the behavior of ApplicationControlPlugin
 "
 Class {
-	#name : #ApplicationControlPluginTest,
-	#superclass : #TestCase,
-	#category : #'Stargate-Application-Control-Tests'
+	#name : 'ApplicationControlPluginTest',
+	#superclass : 'TestCase',
+	#category : 'Stargate-Application-Control-Tests',
+	#package : 'Stargate-Application-Control-Tests'
 }
 
-{ #category : #tests }
+{ #category : 'tests' }
 ApplicationControlPluginTest >> testAvailableCommands [
 
 	self
@@ -15,19 +16,19 @@ ApplicationControlPluginTest >> testAvailableCommands [
 		do: [ :command | self assert: command methodName equals: 'shutdown' ]
 ]
 
-{ #category : #tests }
+{ #category : 'tests' }
 ApplicationControlPluginTest >> testEnabledByDefault [
 
 	self deny: ApplicationControlPlugin enabledByDefault
 ]
 
-{ #category : #tests }
+{ #category : 'tests' }
 ApplicationControlPluginTest >> testEndpoint [
 
 	self assert: ApplicationControlPlugin endpoint equals: 'application-control'
 ]
 
-{ #category : #tests }
+{ #category : 'tests' }
 ApplicationControlPluginTest >> testPluginName [
 
 	self assert: ApplicationControlPlugin pluginName equals: 'Application Control'

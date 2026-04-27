@@ -2,24 +2,25 @@
 I'm an abstract class representing health conditions 
 "
 Class {
-	#name : #HealthCondition,
-	#superclass : #Object,
-	#category : #'Stargate-HealthCheck'
+	#name : 'HealthCondition',
+	#superclass : 'Object',
+	#category : 'Stargate-HealthCheck',
+	#package : 'Stargate-HealthCheck'
 }
 
-{ #category : #testing }
+{ #category : 'testing' }
 HealthCondition >> isCritical [
 
 	^ self isNotCritical not
 ]
 
-{ #category : #testing }
+{ #category : 'testing' }
 HealthCondition >> isNotCritical [
 
 	^ self subclassResponsibility
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 HealthCondition >> riskScore [
 
 	^ self subclassResponsibility

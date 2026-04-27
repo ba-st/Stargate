@@ -3,23 +3,24 @@ I model an application control command.
 I must be configured with a command name and an action block to be executed when the command is activated.
 "
 Class {
-	#name : #ApplicationControlCommand,
-	#superclass : #Object,
+	#name : 'ApplicationControlCommand',
+	#superclass : 'Object',
 	#instVars : [
 		'methodName',
 		'actionBlock',
 		'parameterNames'
 	],
-	#category : #'Stargate-Application-Control'
+	#category : 'Stargate-Application-Control',
+	#package : 'Stargate-Application-Control'
 }
 
-{ #category : #'instance creation' }
+{ #category : 'instance creation' }
 ApplicationControlCommand class >> named: aMethodName executing: aBlockClosure [
 
 	^ self named: aMethodName withArgumentNames: #(  ) executing: aBlockClosure
 ]
 
-{ #category : #'instance creation' }
+{ #category : 'instance creation' }
 ApplicationControlCommand class >> named: aMethodName withArgumentNames: argumentNames executing: aBlockClosure [
 
 	AssertionCheckerBuilder new
@@ -36,7 +37,7 @@ ApplicationControlCommand class >> named: aMethodName withArgumentNames: argumen
 	^ self new initializeNamed: aMethodName withArgumentNames: argumentNames executing: aBlockClosure
 ]
 
-{ #category : #configuring }
+{ #category : 'configuring' }
 ApplicationControlCommand >> addTo: aJsonRPCRequestHandler [
 
 	aJsonRPCRequestHandler addHandlerNamed: methodName
@@ -44,7 +45,7 @@ ApplicationControlCommand >> addTo: aJsonRPCRequestHandler [
 		evaluating: actionBlock
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 ApplicationControlCommand >> initializeNamed: aMethodName withArgumentNames: theArgumentNames executing: aBlockClosure [
 
 	methodName := aMethodName.
@@ -52,19 +53,19 @@ ApplicationControlCommand >> initializeNamed: aMethodName withArgumentNames: the
 	actionBlock := aBlockClosure
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 ApplicationControlCommand >> methodName [
 
 	^ methodName
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 ApplicationControlCommand >> parameterCount [
 
 	^ parameterNames size
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 ApplicationControlCommand >> parameterNames [
 
 	^ parameterNames

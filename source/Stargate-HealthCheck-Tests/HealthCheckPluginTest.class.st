@@ -2,19 +2,20 @@
 A HealthCheckPluginTest is a test class for testing the behavior of HealthCheckPlugin
 "
 Class {
-	#name : #HealthCheckPluginTest,
-	#superclass : #TestCase,
-	#category : #'Stargate-HealthCheck-Tests'
+	#name : 'HealthCheckPluginTest',
+	#superclass : 'TestCase',
+	#category : 'Stargate-HealthCheck-Tests',
+	#package : 'Stargate-HealthCheck-Tests'
 }
 
-{ #category : #private }
+{ #category : 'private' }
 HealthCheckPluginTest >> failedHealthCheck [
 
 	^ TestHealthCheck
 		responding: ( CriticalHealth detailedBy: self failureDetails onHealthCheckNamed: 'failing' )
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 HealthCheckPluginTest >> failureDetails [
 
 	^ Dictionary new
@@ -22,19 +23,19 @@ HealthCheckPluginTest >> failureDetails [
 		yourself
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 HealthCheckPluginTest >> successfulHealthCheck [
 
 	^ TestHealthCheck responding: ( Healthy onHealthCheckNamed: 'succeeding' )
 ]
 
-{ #category : #'tests - running' }
+{ #category : 'tests - running' }
 HealthCheckPluginTest >> testEnabledByDefault [
 
 	self assert: HealthCheckPlugin enabledByDefault
 ]
 
-{ #category : #'tests - running' }
+{ #category : 'tests - running' }
 HealthCheckPluginTest >> testHealthCheckMix [
 
 	| healthCondition |
@@ -47,7 +48,7 @@ HealthCheckPluginTest >> testHealthCheckMix [
 	self assert: healthCondition isCritical
 ]
 
-{ #category : #'tests - running' }
+{ #category : 'tests - running' }
 HealthCheckPluginTest >> testHealthCheckSucceedingWithWarnings [
 
 	| healthCondition |
@@ -59,7 +60,7 @@ HealthCheckPluginTest >> testHealthCheckSucceedingWithWarnings [
 	self assert: healthCondition isNotCritical
 ]
 
-{ #category : #'tests - running' }
+{ #category : 'tests - running' }
 HealthCheckPluginTest >> testNoHealthChecksConfigured [
 
 	| healthCondition |
@@ -69,13 +70,13 @@ HealthCheckPluginTest >> testNoHealthChecksConfigured [
 	self assert: healthCondition isNotCritical
 ]
 
-{ #category : #test }
+{ #category : 'test' }
 HealthCheckPluginTest >> testPrintOn [
 
 	self assert: HealthCheckPlugin new printString equals: 'Health Check'
 ]
 
-{ #category : #'tests - running' }
+{ #category : 'tests - running' }
 HealthCheckPluginTest >> testSingleHealthCheckFailing [
 
 	| healthCondition |
@@ -85,7 +86,7 @@ HealthCheckPluginTest >> testSingleHealthCheckFailing [
 	self assert: healthCondition isCritical
 ]
 
-{ #category : #'tests - running' }
+{ #category : 'tests - running' }
 HealthCheckPluginTest >> testSingleHealthCheckSucceeding [
 
 	| healthCondition |
@@ -95,7 +96,7 @@ HealthCheckPluginTest >> testSingleHealthCheckSucceeding [
 	self assert: healthCondition isNotCritical
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 HealthCheckPluginTest >> warningDetails [
 
 	^ Dictionary new
@@ -103,7 +104,7 @@ HealthCheckPluginTest >> warningDetails [
 		yourself
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 HealthCheckPluginTest >> warningHealthCheck [
 
 	^ TestHealthCheck

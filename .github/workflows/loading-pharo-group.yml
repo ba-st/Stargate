@@ -1,0 +1,52 @@
+name: Reusable Baseline groups
+on:
+  workflow_call:
+    inputs:
+      load-spec:
+        required: true
+        type: string
+jobs:
+  group-loading-pharo-10:
+    runs-on: ubuntu-latest
+    name: Pharo64-10
+    steps:
+      - uses: actions/checkout@v6
+      - uses: ba-st-actions/pharo-ci@v10
+        with:
+          spec: .smalltalkci/.loading.${{ inputs.load-spec }}.ston
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        timeout-minutes: 15
+  group-loading-pharo-11:
+    runs-on: ubuntu-latest
+    name: Pharo64-11
+    steps:
+      - uses: actions/checkout@v6
+      - uses: ba-st-actions/pharo-ci@v11
+        with:
+          spec: .smalltalkci/.loading.${{ inputs.load-spec }}.ston
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        timeout-minutes: 15
+  group-loading-pharo-12:
+    runs-on: ubuntu-latest
+    name: Pharo64-12
+    steps:
+      - uses: actions/checkout@v6
+      - uses: ba-st-actions/pharo-ci@v12
+        with:
+          spec: .smalltalkci/.loading.${{ inputs.load-spec }}.ston
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        timeout-minutes: 15
+  group-loading-pharo-13:
+    runs-on: ubuntu-latest
+    name: Pharo64-13
+    steps:
+      - uses: actions/checkout@v6
+      - uses: ba-st-actions/pharo-ci@v13
+        with:
+          spec: .smalltalkci/.loading.${{ inputs.load-spec }}.ston
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        timeout-minutes: 15

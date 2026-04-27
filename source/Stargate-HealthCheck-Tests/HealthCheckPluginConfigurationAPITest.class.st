@@ -2,12 +2,13 @@
 I'm a test case for plugin disable options
 "
 Class {
-	#name : #HealthCheckPluginConfigurationAPITest,
-	#superclass : #OperationalPluginAPITest,
-	#category : #'Stargate-HealthCheck-Tests'
+	#name : 'HealthCheckPluginConfigurationAPITest',
+	#superclass : 'OperationalPluginAPITest',
+	#category : 'Stargate-HealthCheck-Tests',
+	#package : 'Stargate-HealthCheck-Tests'
 }
 
-{ #category : #tests }
+{ #category : 'tests' }
 HealthCheckPluginConfigurationAPITest >> operationsConfiguration [
 
 	^ super operationsConfiguration
@@ -15,13 +16,13 @@ HealthCheckPluginConfigurationAPITest >> operationsConfiguration [
 		yourself
 ]
 
-{ #category : #running }
+{ #category : 'running' }
 HealthCheckPluginConfigurationAPITest >> requiredPermissions [
 
 	^ #('execute:health-check')
 ]
 
-{ #category : #tests }
+{ #category : 'tests' }
 HealthCheckPluginConfigurationAPITest >> testPluginIsDisabled [
 
 	self

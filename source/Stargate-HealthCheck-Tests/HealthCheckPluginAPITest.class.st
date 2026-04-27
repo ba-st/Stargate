@@ -2,18 +2,19 @@
 I'm a test case for the healtcheck API
 "
 Class {
-	#name : #HealthCheckPluginAPITest,
-	#superclass : #OperationalPluginAPITest,
-	#category : #'Stargate-HealthCheck-Tests'
+	#name : 'HealthCheckPluginAPITest',
+	#superclass : 'OperationalPluginAPITest',
+	#category : 'Stargate-HealthCheck-Tests',
+	#package : 'Stargate-HealthCheck-Tests'
 }
 
-{ #category : #running }
+{ #category : 'running' }
 HealthCheckPluginAPITest >> requiredPermissions [
 
 	^ #('execute:health-check')
 ]
 
-{ #category : #tests }
+{ #category : 'tests' }
 HealthCheckPluginAPITest >> testDisablePlugin [
 
 	self assertIsEnabled: HealthCheckPlugin.
@@ -33,7 +34,7 @@ HealthCheckPluginAPITest >> testDisablePlugin [
 		withExceptionDo: [ :error | self assert: error response isNotFound ]
 ]
 
-{ #category : #tests }
+{ #category : 'tests' }
 HealthCheckPluginAPITest >> testEnablePreviouslyDisabledPlugin [
 
 	self assertIsEnabled: HealthCheckPlugin.
@@ -47,7 +48,7 @@ HealthCheckPluginAPITest >> testEnablePreviouslyDisabledPlugin [
 	self testRunHealtCheckPluginAskingDetailsWithPermissions
 ]
 
-{ #category : #tests }
+{ #category : 'tests' }
 HealthCheckPluginAPITest >> testRunHealtCheckPluginAskingDetailsWithPermissions [
 
 	| healthCheckResponse |
@@ -70,49 +71,90 @@ HealthCheckPluginAPITest >> testRunHealtCheckPluginAskingDetailsWithPermissions 
 			]
 ]
 
-{ #category : #tests }
+{ #category : 'tests' }
 HealthCheckPluginAPITest >> testRunHealtCheckPluginAskingDetailsWithoutAuthentication [
 
-	self
-		should: [ self newClient
-				url: self operationsUrl / HealthCheckPlugin endpoint asUrl;
-				setAccept: 'application/vnd.stargate.health-check.details+json;version=1.0.0' asMediaType;
-				post;
-				response
-			]
-		raise: ZnHttpUnsuccessful
-		withExceptionDo: [ :error | self assert: error response code equals: 401 ]
+  self
+    should: [
+        self newClient
+          url: self operationsUrl / HealthCheckPlugin endpoint asUrl;
+          setAccept: 'application/vnd.stargate.health-check.details+json;version=1.0.0' asMediaType;
+          post;
+          response
+      ]
+    raise: ZnHttpUnsuccessful
+    withExceptionDo: [ :error |
+        | response |
+        response := error response.
+        self
+          assert: response code equals: 401;
+          assert: ( response headers at: 'WWW-Authenticate' )
+          equals: 'Bearer realm=api.operations.example.com';
+          withJsonFromContentsIn: response do: [ :payload |
+              self
+                assert: payload message equals: 'Unauthorized';
+                assert: payload code equals: 401
+            ]
+      ]
 ]
 
-{ #category : #tests }
+{ #category : 'tests' }
 HealthCheckPluginAPITest >> testRunHealtCheckPluginAskingDetailsWithoutPermissions [
 
-	self
-		should: [ self newJWTAuthorizedClientLackingPermissions
-				url: self operationsUrl / HealthCheckPlugin endpoint asUrl;
-				setAccept: 'application/vnd.stargate.health-check.details+json;version=1.0.0' asMediaType;
-				post;
-				response
-			]
-		raise: ZnHttpUnsuccessful
-		withExceptionDo: [ :error | self assert: error response code equals: 403 ]
+  self
+    should: [
+        self newJWTAuthorizedClientLackingPermissions
+          url: self operationsUrl / HealthCheckPlugin endpoint asUrl;
+          setAccept: 'application/vnd.stargate.health-check.details+json;version=1.0.0' asMediaType;
+          post;
+          response
+      ]
+    raise: ZnHttpUnsuccessful
+    withExceptionDo: [ :error |
+        | response |
+        response := error response.
+        self
+          assert: response code equals: 403;
+          assert: ( response headers at: 'WWW-Authenticate' )
+          equals: 'Bearer realm=api.operations.example.com';
+          withJsonFromContentsIn: response do: [ :payload |
+              self
+                assert: payload message equals: 'Missing permissions';
+                assert: payload code equals: 403;
+                assert: payload errorCode equals: 'insufficient_scope';
+                assert: payload scope equals: 'execute:health-check'
+            ]
+      ]
 ]
 
-{ #category : #tests }
+{ #category : 'tests' }
 HealthCheckPluginAPITest >> testRunHealtCheckPluginAskingSummaryWithoutAuthentication [
 
-	self
-		should: [ self newClient
-				url: self operationsUrl / HealthCheckPlugin endpoint asUrl;
-				setAccept: 'application/vnd.stargate.health-check.summary+json;version=1.0.0' asMediaType;
-				post;
-				response
-			]
-		raise: ZnHttpUnsuccessful
-		withExceptionDo: [ :error | self assert: error response code equals: 401 ]
+  self
+    should: [
+        self newClient
+          url: self operationsUrl / HealthCheckPlugin endpoint asUrl;
+          setAccept: 'application/vnd.stargate.health-check.summary+json;version=1.0.0' asMediaType;
+          post;
+          response
+      ]
+    raise: ZnHttpUnsuccessful
+    withExceptionDo: [ :error |
+        | response |
+        response := error response.
+        self
+          assert: response code equals: 401;
+          assert: ( response headers at: 'WWW-Authenticate' )
+          equals: 'Bearer realm=api.operations.example.com';
+          withJsonFromContentsIn: response do: [ :payload |
+              self
+                assert: payload message equals: 'Unauthorized';
+                assert: payload code equals: 401
+            ]
+      ]
 ]
 
-{ #category : #tests }
+{ #category : 'tests' }
 HealthCheckPluginAPITest >> testRunHealtCheckPluginAskingSummaryWithoutPermissions [
 
 	| healthCheckResponse |

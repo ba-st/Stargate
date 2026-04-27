@@ -3,8 +3,8 @@ I'm one of the operational plugins.
 I provide commands that can be executed to control the running application.
 "
 Class {
-	#name : #ApplicationControlPlugin,
-	#superclass : #OperationalPlugin,
+	#name : 'ApplicationControlPlugin',
+	#superclass : 'OperationalPlugin',
 	#instVars : [
 		'commands',
 		'configuration'
@@ -12,16 +12,17 @@ Class {
 	#classVars : [
 		'AvailableCommands'
 	],
-	#category : #'Stargate-Application-Control'
+	#category : 'Stargate-Application-Control',
+	#package : 'Stargate-Application-Control'
 }
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 ApplicationControlPlugin class >> availableCommands [
 
 	^ AvailableCommands copy
 ]
 
-{ #category : #configuring }
+{ #category : 'configuring' }
 ApplicationControlPlugin class >> configureMediaControlsIn: builder within: requestContext [
 
 	builder
@@ -29,19 +30,19 @@ ApplicationControlPlugin class >> configureMediaControlsIn: builder within: requ
 		relatedTo: 'run'
 ]
 
-{ #category : #'instance creation' }
+{ #category : 'instance creation' }
 ApplicationControlPlugin class >> configuredBy: configuration [
 
 	^ self new initializeConfiguredBy: ( self pluginConfigurationOn: configuration )
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 ApplicationControlPlugin class >> endpoint [
 
 	^ 'application-control'
 ]
 
-{ #category : #'class initialization' }
+{ #category : 'class initialization' }
 ApplicationControlPlugin class >> initialize [
 
 	<ignoreForCoverage>
@@ -53,39 +54,39 @@ ApplicationControlPlugin class >> initialize [
 				executing: [ Exit signalSuccess: 'Remote SHUTDOWN command was received.' ] )
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 ApplicationControlPlugin class >> pluginName [
 
 	^ 'Application Control'
 ]
 
-{ #category : #configuring }
+{ #category : 'configuring' }
 ApplicationControlPlugin class >> registerAsAvailableCommand: anApplicationControlCommand [
 
 	AvailableCommands add: anApplicationControlCommand
 ]
 
-{ #category : #configuring }
+{ #category : 'configuring' }
 ApplicationControlPlugin class >> unregisterCommandNamed: aMethodName [
 
 	AvailableCommands removeAllSuchThat: [ :command | command methodName = aMethodName ]
 ]
 
-{ #category : #configuring }
+{ #category : 'configuring' }
 ApplicationControlPlugin >> configureHandlersIn: aJsonRPCRequestHandler [
 
 	commands do: [ :command | command addTo: aJsonRPCRequestHandler ].
 	configuration at: #debugMode ifPresent: [ :boolean | aJsonRPCRequestHandler debugMode: boolean ]
 ]
 
-{ #category : #configuring }
+{ #category : 'configuring' }
 ApplicationControlPlugin >> includeControllersIn: api [
 
 	api addController:
 		( ApplicationControlRESTfulController over: self configuredBy: api operationsConfiguration )
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 ApplicationControlPlugin >> initializeCommands [
 
 	| enabledCommandNames |
@@ -95,7 +96,7 @@ ApplicationControlPlugin >> initializeCommands [
 		            enabledCommandNames includes: command methodName ]
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 ApplicationControlPlugin >> initializeConfiguredBy: pluginConfiguration [
 
 	configuration := pluginConfiguration.

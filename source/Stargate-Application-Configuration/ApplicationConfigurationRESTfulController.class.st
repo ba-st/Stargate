@@ -2,22 +2,23 @@
 I'm a controller exposing the API of ApplicationInfoPlugin
 "
 Class {
-	#name : #ApplicationConfigurationRESTfulController,
-	#superclass : #OperationsRESTfulController,
+	#name : 'ApplicationConfigurationRESTfulController',
+	#superclass : 'OperationsRESTfulController',
 	#instVars : [
 		'requestHandler',
 		'plugin'
 	],
-	#category : #'Stargate-Application-Configuration'
+	#category : 'Stargate-Application-Configuration',
+	#package : 'Stargate-Application-Configuration'
 }
 
-{ #category : #'instance creation' }
+{ #category : 'instance creation' }
 ApplicationConfigurationRESTfulController class >> over: aPlugin configuredBy: configuration [
 
 	^ ( self authenticationFilterBasedOn: configuration ) initializeOver: aPlugin
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 ApplicationConfigurationRESTfulController >> configureConfigurationEncodingOn: writer [
 
 	ConfigurationParameter subclassesDo: [ :subclass | 
@@ -46,7 +47,7 @@ ApplicationConfigurationRESTfulController >> configureConfigurationEncodingOn: w
 		for: ZnUrl customDo: [ :mapping | mapping encoder: [ :url | url printString ] ]
 ]
 
-{ #category : #routes }
+{ #category : 'routes' }
 ApplicationConfigurationRESTfulController >> declareGetApplicationConfigurationRoute [
 
 	^ RouteSpecification
@@ -56,7 +57,7 @@ ApplicationConfigurationRESTfulController >> declareGetApplicationConfigurationR
 			[ :httpRequest :requestContext | self getApplicationConfigurationBasedOn: httpRequest within: requestContext ]
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 ApplicationConfigurationRESTfulController >> encodeConfigurationInTextFormat: configurationParameters [
 
 	^ String streamContents: [ :stream | 
@@ -73,25 +74,25 @@ ApplicationConfigurationRESTfulController >> encodeConfigurationInTextFormat: co
 		  ]
 ]
 
-{ #category : #API }
+{ #category : 'API' }
 ApplicationConfigurationRESTfulController >> getApplicationConfigurationBasedOn: httpRequest within: requestContext [
 
-	self assert: httpRequest isAuthorizedWithin: requestContext.
+  self assertRequestIsAuthorizedWithin: requestContext.
 
-	^ requestHandler
-		from: httpRequest
-		within: requestContext
-		getCollection: [ plugin configurationParameters ]
+  ^ requestHandler
+      from: httpRequest
+      within: requestContext
+      getCollection: [ plugin configurationParameters ]
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 ApplicationConfigurationRESTfulController >> initializeOver: aPlugin [
 
 	plugin := aPlugin.
 	self initializeRequestHandler
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 ApplicationConfigurationRESTfulController >> initializeRequestHandler [
 
 	requestHandler := RESTfulRequestHandlerBuilder new
@@ -104,7 +105,7 @@ ApplicationConfigurationRESTfulController >> initializeRequestHandler [
 		build
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 ApplicationConfigurationRESTfulController >> operationalApplicationConfigurationVersion1dot0dot0MediaType [
 
 	^ self
@@ -113,25 +114,25 @@ ApplicationConfigurationRESTfulController >> operationalApplicationConfiguration
 		version: '1.0.0'
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 ApplicationConfigurationRESTfulController >> plainTextVersion1dot0dot0MediaType [
 
 	^ ZnMimeType textPlain version: '1.0.0'
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 ApplicationConfigurationRESTfulController >> pluginEndpoint [
 
 	^ plugin endpoint
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 ApplicationConfigurationRESTfulController >> requestHandler [
 
 	^ requestHandler
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 ApplicationConfigurationRESTfulController >> requiredPermission [
 
 	^ 'read:<1s>' expandMacrosWith: self pluginEndpoint

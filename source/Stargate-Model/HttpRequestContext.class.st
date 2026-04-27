@@ -39,6 +39,18 @@ HttpRequestContext >> addPaginationLinkStartingAt: start limitedTo: limit relate
     relatedTo: aRelationType
 ]
 
+{ #category : 'authorization' }
+HttpRequestContext >> authChallenge [
+
+  ^ self objectUnder: #authChallenge ifNone: [ '' ]
+]
+
+{ #category : 'authorization' }
+HttpRequestContext >> authChallenge: authChallenge [
+
+  self hold: authChallenge under: #authChallenge
+]
+
 { #category : 'accessing' }
 HttpRequestContext >> collectionLink [
 

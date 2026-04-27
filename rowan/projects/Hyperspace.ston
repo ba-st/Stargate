@@ -2,7 +2,7 @@ RwLoadSpecificationV2 {
   #specName: 'Hyperspace',
   #projectName : 'Hyperspace',
   #gitUrl : 'https://github.com/ba-st/Hyperspace.git',
-  #revision : 'v7',
+  #revision : 'v8',
   #projectSpecFile : 'rowan/project.ston',
   #componentNames : [
     'Deployment',

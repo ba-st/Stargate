@@ -2,12 +2,13 @@
 An ApplicationControlRESTfulControllerTest is a test class for testing the behavior of ApplicationControlRESTfulController
 "
 Class {
-	#name : #ApplicationControlRESTfulControllerTest,
-	#superclass : #OperationalPluginRESTfulControllerTest,
-	#category : #'Stargate-Application-Control-Tests'
+	#name : 'ApplicationControlRESTfulControllerTest',
+	#superclass : 'OperationalPluginRESTfulControllerTest',
+	#category : 'Stargate-Application-Control-Tests',
+	#package : 'Stargate-Application-Control-Tests'
 }
 
-{ #category : #'private - support' }
+{ #category : 'private - support' }
 ApplicationControlRESTfulControllerTest >> operationsConfiguration [
 
 	^ super operationsConfiguration
@@ -20,7 +21,7 @@ ApplicationControlRESTfulControllerTest >> operationsConfiguration [
 		yourself
 ]
 
-{ #category : #'private - support' }
+{ #category : 'private - support' }
 ApplicationControlRESTfulControllerTest >> requestToRunUnknownMethod [
 
 	^ ( ZnRequest post: self resourceUrl )
@@ -28,7 +29,7 @@ ApplicationControlRESTfulControllerTest >> requestToRunUnknownMethod [
 		  yourself
 ]
 
-{ #category : #running }
+{ #category : 'running' }
 ApplicationControlRESTfulControllerTest >> setUpResourceController [
 
 	resourceController := ApplicationControlRESTfulController
@@ -36,7 +37,7 @@ ApplicationControlRESTfulControllerTest >> setUpResourceController [
 		configuredBy: self operationsConfiguration
 ]
 
-{ #category : #tests }
+{ #category : 'tests' }
 ApplicationControlRESTfulControllerTest >> testRunShutdownCommandAsCall [
 
 	| response |
@@ -71,7 +72,7 @@ ApplicationControlRESTfulControllerTest >> testRunShutdownCommandAsCall [
 			]
 ]
 
-{ #category : #tests }
+{ #category : 'tests' }
 ApplicationControlRESTfulControllerTest >> testRunShutdownCommandAsNotification [
 
 	| response |
@@ -98,7 +99,7 @@ ApplicationControlRESTfulControllerTest >> testRunShutdownCommandAsNotification 
 		deny: response hasEntity
 ]
 
-{ #category : #tests }
+{ #category : 'tests' }
 ApplicationControlRESTfulControllerTest >> testRunUnknownCommand [
 
 	| response |
@@ -119,7 +120,7 @@ ApplicationControlRESTfulControllerTest >> testRunUnknownCommand [
 			]
 ]
 
-{ #category : #tests }
+{ #category : 'tests' }
 ApplicationControlRESTfulControllerTest >> testRunUnknownCommandInDebugMode [
 
 	| debuggableController configuration |
