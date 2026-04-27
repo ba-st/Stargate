@@ -429,7 +429,7 @@ PetOrdersRESTfulController >> initializeShipmentHistoryRequestHandler [
                                              historyEntry
                                        ]
                                      extractingIdentifierWith: [ :httpRequest |
-                                         httpRequest at: self shipmentHistoryIdentifierKey ]
+                                         httpRequest at: #shipmentHistoryIdentifier asString ]
                                      locatingParentResourceWith:
                                        ordersRequestHandler resourceLocator;
                                      beHypermediaDriven;
@@ -513,21 +513,6 @@ PetOrdersRESTfulController >> serverUrl: aServerUrl [
 PetOrdersRESTfulController >> shipmentHistoryForOrderIn: httpRequest [
 
 	^ shipmentHistoryByOrderId at: ( self identifierIn: httpRequest ) ifAbsent: [ #() ]
-]
-
-{ #category : 'private' }
-PetOrdersRESTfulController >> shipmentHistoryIdentifierKey [
-
-  ^ #shipmentHistoryIdentifier asString
-]
-
-{ #category : 'private' }
-PetOrdersRESTfulController >> shipmentHistoryIdentifierTemplate [
-
-  ^ '<1s>/%<<2s>:<3s>>'
-      expandMacrosWith: self shipmentHistoryTemplate
-      with: self shipmentHistoryIdentifierKey
-      with: self typeIdConstraint asString
 ]
 
 { #category : 'private' }
