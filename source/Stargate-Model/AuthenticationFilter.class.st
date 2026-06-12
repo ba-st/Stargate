@@ -3,7 +3,7 @@ I'm an abstract class representing an authentication filter to be applied as a b
 "
 Class {
 	#name : 'AuthenticationFilter',
-	#superclass : 'Object',
+	#superclass : 'SecurityFilter',
 	#category : 'Stargate-Model-Auth',
 	#package : 'Stargate-Model',
 	#tag : 'Auth'
@@ -30,6 +30,13 @@ AuthenticationFilter class >> configuredBy: configuration [
 	^ self subclassResponsibility
 ]
 
+{ #category : 'testing' }
+AuthenticationFilter class >> isAbstract [
+
+  <ignoreForCoverage>
+  ^ self = AuthenticationFilter
+]
+
 { #category : 'private' }
 AuthenticationFilter class >> signalMissingConfiguration [
 
@@ -43,23 +50,7 @@ AuthenticationFilter >> authChallenge [
 ]
 
 { #category : 'private' }
-AuthenticationFilter >> checkCredentials: authorization for: httpRequest within: requestContext [
+AuthenticationFilter >> signalMissingAuthorizationHeader [
 
-	self subclassResponsibility
-]
-
-{ #category : 'evaluating' }
-AuthenticationFilter >> evaluateActionOnRequest: httpRequest within: requestContext [
-
-  | authorization |
-  authorization := httpRequest headers
-                     at: 'Authorization'
-                     ifAbsent: [ HTTPUnauthorized signal: 'Unauthorized' with: self authChallenge ].
-  self checkCredentials: authorization for: httpRequest within: requestContext
-]
-
-{ #category : 'evaluating' }
-AuthenticationFilter >> teaEvalActionOnRequest: httpRequest [
-
-	self evaluateActionOnRequest: httpRequest within: HttpRequestContext new
+  ^ HTTPUnauthorized signal: 'Unauthorized' with: self authChallenge
 ]
