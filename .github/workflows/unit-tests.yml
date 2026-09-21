@@ -5,24 +5,6 @@ on:
   - workflow_dispatch
 
 jobs:
-   unit-tests-pharo-10:
-    runs-on: ubuntu-latest
-    name: Pharo64-10
-    steps:
-      - uses: actions/checkout@v6
-      - name: Load Image and Run Tests
-        uses: ba-st-actions/pharo-ci@v10
-        with:
-          spec: .smalltalkci/.unit-tests.ston
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        timeout-minutes: 15
-      - name: Upload coverage to Codecov
-        uses: codecov/codecov-action@v5
-        with:
-          name: Unit-Tests-Pharo-10
-          token: ${{ secrets.CODECOV_TOKEN }}
-          flags: unit
    unit-tests-pharo-11:
     runs-on: ubuntu-latest
     name: Pharo64-11
