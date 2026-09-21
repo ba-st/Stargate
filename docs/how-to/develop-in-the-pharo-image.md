@@ -37,17 +37,19 @@ Same image, no window:
 
 ```bash
 pharo eval "3 + 4"
-pharo test --junit-xml-output "Stargate-*"
+pharo test --junit-xml-output "Stargate-.*"
 pharo metacello install github://ba-st/Buoy:release-candidate BaselineOfBuoy
 ```
 
 `pharo` takes the same arguments as the `pharo` command in ba-st's runtime
 image, so anything written for CI runs here unchanged.
 
-The pattern `pharo test` takes is a **glob**, matched against package names, not
-a regular expression: `Stargate-*` selects every Stargate package, while
-`Stargate-.*` selects none — and a run that matched nothing reports no failures,
-so it reads as a pass.
+The pattern `pharo test` takes is read as a **regular expression** first, and
+only as a glob if it does not parse as one. So `Stargate-.*` selects every
+Stargate package, while `Stargate-*` is a valid regex that matches none — and a
+run that matched nothing prints `0 run, 0 passes` and exits successfully, so it
+reads as a pass. Check the package count in `Running tests in N Packages` before
+believing a green run.
 
 ## Load this project's code
 
@@ -140,7 +142,7 @@ copy somewhere else with `PHARO_IMAGE_DIR` and point `PHARO_IMAGE` at it:
 PHARO_IMAGE_DIR=/tmp/fresh create-pharo-image.sh --force
 PHARO_IMAGE=/tmp/fresh/Pharo.image pharo metacello install \
   gitlocal://./source BaselineOfStargate --groups=CI
-PHARO_IMAGE=/tmp/fresh/Pharo.image pharo test --junit-xml-output "Stargate-*"
+PHARO_IMAGE=/tmp/fresh/Pharo.image pharo test --junit-xml-output "Stargate-.*"
 ```
 
 ## When the window does not appear

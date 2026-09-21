@@ -82,7 +82,7 @@ Load and test in a fresh image, the way CI does:
 PHARO_IMAGE_DIR=/tmp/fresh create-pharo-image.sh --force   # any scratch directory
 PHARO_IMAGE=/tmp/fresh/Pharo.image pharo metacello install \
   gitlocal://./source BaselineOfStargate --groups=CI
-PHARO_IMAGE=/tmp/fresh/Pharo.image pharo test --junit-xml-output "Stargate-*"
+PHARO_IMAGE=/tmp/fresh/Pharo.image pharo test --junit-xml-output "Stargate-.*"
 ```
 
 ## Gotchas
@@ -90,7 +90,7 @@ PHARO_IMAGE=/tmp/fresh/Pharo.image pharo test --junit-xml-output "Stargate-*"
 - Local and CI markdownlint are **different installs that can disagree**: `.devcontainer/Dockerfile` pins `markdownlint-cli@0.49.1`, while `.github/workflows/markdown-lint.yml` runs `reviewdog/action-markdownlint@v0` with whatever version that action bundles. Both read `.markdownlint.json`. Dependabot bumps the action, through the `github-actions` ecosystem, but not the npm pin, which is not a manifest.
 - CI runs markdown lint, `shellcheck`, the Pharo unit tests and group loading on Pharo 11–13, and the GS64 unit tests and component loading. `yamllint` is the one linter documented above that runs nowhere but locally. No job builds the devcontainer or exercises its scripts.
 - `.github/workflows/markdown-lint.yml` triggers on `pull_request` only, so a push to a branch with no pull request open lints nothing.
-- The pattern `pharo test` takes is a **glob** matched against package names — `TestCommandLineHandler` runs `pattern match: packageName` — not a regex. `"Stargate-*"` selects every Stargate package; `"Stargate-.*"` selects none, and a run that matched nothing reports no failures, so it looks like a pass.
+- The pattern `pharo test` takes is a **regex first**: `TestCommandLineHandler>>#addPackagesMatching:to:` tries `asRegex`, and only falls back to glob matching when the string does not parse as one. So `"Stargate-.*"` selects the suite, while `"Stargate-*"` parses as a valid regex, matches no package, and reports `Running tests in 0 Packages` / `0 run, 0 passes` while exiting 0 — a vacuous pass.
 - `pharo eval "Smalltalk isHeadless"` always answers `true`, because the `pharo` wrapper passes `--headless` itself. It cannot tell you which VM build you are on. Nor should the VM be invoked directly to find out: without `--headless` and without a reachable display it idles forever, printing nothing, holding your working image open.
 - `gitlocal://` loads what git has **committed**, not the working tree: Iceberg reads packages from the commit, so a package that exists only on disk fails with `KeyNotFound: key 'BaselineOf…' not found`, and an uncommitted edit is silently not loaded. Load uncommitted code with `tonel:///Stargate/source` instead.
 - `.devcontainer/devcontainer-lock.json` is intentionally gitignored, so devcontainer features are not pinned by digest. The feature versions written in `devcontainer.json` are tracked, by the `devcontainers` ecosystem in `.github/dependabot.yml`.
