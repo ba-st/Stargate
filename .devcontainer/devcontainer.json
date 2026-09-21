@@ -1,0 +1,24 @@
+{
+  "name": "Buenos Aires Smalltalk Dev Tools",
+  "dockerComposeFile": "docker-compose.yml",
+  "service": "ba-st-shell",
+  "workspaceFolder": "/Stargate",
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "anthropic.claude-code",
+        "DavidAnson.vscode-markdownlint",
+        "mhutchie.git-graph",
+        "timonwong.shellcheck"
+      ],
+      "settings": {
+        "editor.formatOnSave": true
+      }
+    }
+  },
+  "features": {
+    "ghcr.io/devcontainers/features/github-cli:1": {}
+  },
+  "postCreateCommand": "create-pharo-image.sh && check-iceberg-repositories.sh",
+  "remoteUser": "node"
+}

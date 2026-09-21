@@ -1,0 +1,10 @@
+#!/usr/bin/env bash
+#
+# Run the working Pharo image headless. Every argument is handed to Pharo, so
+# `pharo eval "1 + 1"`, `pharo test Stargate-*` and
+# `pharo metacello install ...` all work.
+
+set -euo pipefail
+
+exec /opt/pharo/vm/pharo --headless \
+  "${PHARO_IMAGE:-/Stargate/pharo/Pharo.image}" "$@"

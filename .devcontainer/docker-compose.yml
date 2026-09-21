@@ -1,0 +1,52 @@
+---
+services:
+  ba-st-shell:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    # SDL reaches for MIT-SHM when it thinks the X server is local, which it is
+    # here, over the socket below. Sharing the host IPC namespace is what makes
+    # those shared segments actually work across the container boundary.
+    ipc: host
+    volumes:
+      - ..:/Stargate
+      - claude-code-bashhistory:/commandhistory
+      - claude-code-config:/home/node/.claude
+      # Iceberg's shared clone of every Metacello dependency. Keeping these out
+      # of the image directory means a rebuild, and a fresh working image, both
+      # reuse the clones instead of fetching the tree again.
+      #
+      # Set ICEBERG_REPOSITORIES_DIR in .devcontainer/.env to an absolute host
+      # path to keep them somewhere you can reach from the host; the source is
+      # then a bind mount. Unset, it names the ba-st-iceberg volume declared
+      # below, which Docker manages and the host cannot browse.
+      - ${ICEBERG_REPOSITORIES_DIR:-ba-st-iceberg}:/home/node/iceberg
+      # The host X server's socket, so the Pharo IDE has somewhere to draw.
+      - /tmp/.X11-unix:/tmp/.X11-unix
+      # Read-only access to other projects for reference.
+      # Set REFERENCE_PROJECTS_DIR in .devcontainer/.env to the folder
+      # containing your projects; it is mounted at /reference.
+      # Defaults to this repository when unset so a rebuild never fails.
+      - ${REFERENCE_PROJECTS_DIR:-..}:/reference:ro
+    environment:
+      # Set TZ in .devcontainer/.env to your local timezone
+      TZ: ${TZ:-UTC}
+      # Link the shell history to the persistent volume
+      HISTFILE: /commandhistory/.bash_history
+      # The X server pharo-ui draws on, inherited from the shell that starts the
+      # devcontainer. Deliberately not defaulted: guessing :0 points at whatever
+      # happens to own that socket, which on a Plasma Wayland session is not the
+      # session's own XWayland server and refuses the connection. Left empty,
+      # pharo-ui says so plainly instead.
+      DISPLAY: ${DISPLAY:-}
+      # Authenticates gh. Set GH_TOKEN in .devcontainer/.env; left empty, gh
+      # treats it as unset and falls back to `gh auth login`.
+      GH_TOKEN: ${GH_TOKEN:-}
+    # Keep the container running so the devcontainer can attach to it
+    command: sleep infinity
+
+
+volumes:
+  claude-code-bashhistory:
+  claude-code-config:
+  ba-st-iceberg:

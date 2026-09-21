@@ -1,0 +1,51 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(markdownlint *)",
+      "Bash(shellcheck *)",
+      "Bash(yamllint *)",
+      "Bash(git add *)",
+      "Bash(git blame *)",
+      "Bash(git branch)",
+      "Bash(git checkout *)",
+      "Bash(git config --get *)",
+      "Bash(git describe *)",
+      "Bash(git diff *)",
+      "Bash(git fetch *)",
+      "Bash(git grep *)",
+      "Bash(git log *)",
+      "Bash(git ls-files *)",
+      "Bash(git remote *)",
+      "Bash(git show *)",
+      "Bash(git stash list)",
+      "Bash(git status *)",
+      "Bash(git tag *)",
+      "WebFetch"
+    ],
+    "deny": [
+      "Read(//**/.env)",
+      "Read(//**/.env.local)",
+      "Read(//**/.env.*.local)",
+      "Edit(//**/.env)",
+      "Edit(//**/.env.local)",
+      "Edit(//**/.env.*.local)",
+      "Bash(env)",
+      "Bash(printenv)",
+      "Bash(printenv *)"
+    ]
+  },
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "\"$CLAUDE_PROJECT_DIR\"/.claude/hooks/block-secret-output.sh",
+            "timeout": 10
+          }
+        ]
+      }
+    ]
+  }
+}

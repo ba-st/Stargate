@@ -36,3 +36,8 @@ To use the project as a dependency of your project, take a look at:
 ---
 
 To migrate your project using a previous version check the [migration guides](MigrationGuide.md)
+
+---
+
+To work on Stargate itself, in the devcontainer this repository ships, see
+[how to develop in the Pharo image](how-to/develop-in-the-pharo-image.md)

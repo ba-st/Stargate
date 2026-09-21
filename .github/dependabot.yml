@@ -1,0 +1,43 @@
+version: 2
+
+# Every ecosystem below waits seven days after a release before proposing
+# it, raising GitHub's three-day default. These ecosystems are not SemVer
+# aware, so only cooldown.default-days applies. Security updates are
+# exempt and still open immediately.
+
+updates:
+  # Actions used by the workflows in .github/workflows.
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: weekly
+    cooldown:
+      default-days: 7
+    commit-message:
+      prefix: chore
+      include: scope
+    groups:
+      github-actions:
+        patterns: ["*"]
+
+  # Base image of the devcontainer (.devcontainer/Dockerfile).
+  - package-ecosystem: docker
+    directory: /.devcontainer
+    schedule:
+      interval: weekly
+    cooldown:
+      default-days: 7
+    commit-message:
+      prefix: chore
+      include: scope
+
+  # Features declared in .devcontainer/devcontainer.json.
+  - package-ecosystem: devcontainers
+    directory: /
+    schedule:
+      interval: weekly
+    cooldown:
+      default-days: 7
+    commit-message:
+      prefix: chore
+      include: scope
