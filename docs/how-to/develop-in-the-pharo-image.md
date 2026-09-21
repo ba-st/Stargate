@@ -38,7 +38,7 @@ Same image, no window:
 ```bash
 pharo eval "3 + 4"
 pharo test --junit-xml-output "Stargate-*"
-pharo metacello install github://ba-st/Buoy:release-candidate/source BaselineOfBuoy
+pharo metacello install github://ba-st/Buoy:release-candidate BaselineOfBuoy
 ```
 
 `pharo` takes the same arguments as the `pharo` command in ba-st's runtime
@@ -79,7 +79,7 @@ they outlive a container rebuild, a fresh working image, and a
 fetches rather than clones.
 
 ```bash
-pharo metacello install github://ba-st/Buoy:release-candidate/source BaselineOfBuoy
+pharo metacello install github://ba-st/Buoy:release-candidate BaselineOfBuoy
 ```
 
 Nothing needs enabling — the pristine image is built with
