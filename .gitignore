@@ -11,3 +11,8 @@ pharo/
 # Working documents: the feature plan, and upstream issues waiting to be filed
 /PLAN.md
 /ISSUES.md
+
+# Left behind by running Pharo in the repository: a debug log, and the stack
+# dumps the example applications write while the tests run
+/PharoDebug.log
+/logs/
