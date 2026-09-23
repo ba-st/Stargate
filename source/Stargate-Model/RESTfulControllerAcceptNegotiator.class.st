@@ -62,11 +62,16 @@ RESTfulControllerAcceptNegotiator >> bestLanguageFor: anHttpRequest [
 
 	"This method returns the best suited language tag for the given request"
 
+	| qualifiedLanguageRanges |
+
+	qualifiedLanguageRanges := self acceptableQualifiedLanguageRangesIn: anHttpRequest.
 	self
-		withAcceptableLanguageRangesIn: anHttpRequest
-		do: [ :languageRange | 
+		withAcceptableLanguageRangesIn: qualifiedLanguageRanges
+		do: [ :languageRange |
 			availableLanguageTags
-				detect: [ :languageTag | languageRange matches: languageTag ]
+				detect: [ :languageTag |
+					( languageRange matches: languageTag ) and: [
+						( self isLanguageTag: languageTag excludedBy: qualifiedLanguageRanges ) not ] ]
 				ifFound: [ :languageTag | ^ languageTag ]
 			].
 	HTTPNotAcceptable
@@ -80,7 +85,16 @@ RESTfulControllerAcceptNegotiator >> bestRepresentationFor: anHttpRequest [
 
 	"This method returns the best suited representation for the given request"
 
-	self withAcceptableMediaTypesIn: anHttpRequest do: [ :mediaType | (self sortByPrecedence: (self mediaTypesAvailableFor: mediaType)) ifNotEmpty: [ :availableTypes | ^ availableTypes first ] ].
+	| acceptableMediaTypes |
+
+	acceptableMediaTypes := self acceptableMediaTypesIn: anHttpRequest.
+	self
+		withAcceptableMediaTypesIn: acceptableMediaTypes
+		do: [ :mediaType |
+			( self sortByPrecedence: ( ( self mediaTypesAvailableFor: mediaType ) reject: [ :available |
+					  self isMediaType: available excludedBy: acceptableMediaTypes ] ) ) ifNotEmpty: [ :availableTypes |
+				^ availableTypes first ]
+			].
 	HTTPNotAcceptable signal: 'Cannot generate a response entity with acceptable characteristics.' accepting: availableMediaTypes
 ]
 
@@ -91,13 +105,49 @@ RESTfulControllerAcceptNegotiator >> initializeAccepting: aMediaTypeCollection i
 	availableLanguageTags := aLanguageTagCollection
 ]
 
+{ #category : 'private - testing' }
+RESTfulControllerAcceptNegotiator >> is: anAvailableMediaType acceptedBy: aMediaType [
+
+	^ ( anAvailableMediaType accepts: aMediaType ) and: [
+		  self versionIn: aMediaType canBeHandledBy: anAvailableMediaType ]
+]
+
+{ #category : 'private - testing' }
+RESTfulControllerAcceptNegotiator >> isExcluded: theMatchingRanges consideringSpecificity: aSpecificityBlock [
+
+	"The most specific ranges matching an offer decide if it is acceptable,
+	and a quality of zero means not acceptable (RFC 9110 §12.4.2 and §12.5)"
+
+	| highestSpecificity |
+
+	highestSpecificity := theMatchingRanges
+		inject: 0
+		into: [ :specificity :range | specificity max: ( aSpecificityBlock value: range ) ].
+	^ theMatchingRanges anySatisfy: [ :range |
+		  ( aSpecificityBlock value: range ) = highestSpecificity and: [ range quality = 0 ] ]
+]
+
+{ #category : 'private - testing' }
+RESTfulControllerAcceptNegotiator >> isLanguageTag: aLanguageTag excludedBy: aQualifiedLanguageRangeCollection [
+
+	^ self
+		  isExcluded: ( aQualifiedLanguageRangeCollection select: [ :qualifiedLanguageRange |
+				    qualifiedLanguageRange range matches: aLanguageTag ] )
+		  consideringSpecificity: [ :qualifiedLanguageRange | qualifiedLanguageRange range specificity ]
+]
+
+{ #category : 'private - testing' }
+RESTfulControllerAcceptNegotiator >> isMediaType: anAvailableMediaType excludedBy: aMediaTypeCollection [
+
+	^ self
+		  isExcluded: ( aMediaTypeCollection select: [ :mediaType | self is: anAvailableMediaType acceptedBy: mediaType ] )
+		  consideringSpecificity: [ :mediaType | self precedenceFor: mediaType ]
+]
+
 { #category : 'private - accessing' }
 RESTfulControllerAcceptNegotiator >> mediaTypesAvailableFor: aMediaType [
 
-	^ availableMediaTypes
-		select: [ :available | 
-			(available accepts: aMediaType)
-				and: [ self versionIn: aMediaType canBeHandledBy: available ] ]
+	^ availableMediaTypes select: [ :available | self is: available acceptedBy: aMediaType ]
 ]
 
 { #category : 'private - accessing' }
@@ -130,7 +180,7 @@ RESTfulControllerAcceptNegotiator >> sortByPrecedence: mediaTypes [
 { #category : 'private - accessing' }
 RESTfulControllerAcceptNegotiator >> splitMediaTypesIn: acceptList [
 
-	^ ( ',' split: acceptList ) collect: [ :type | type asMediaType ]
+	^ ( ',' split: acceptList ) collect: [ :type | type trimBoth asMediaType ]
 ]
 
 { #category : 'private - accessing' }
@@ -167,28 +217,27 @@ RESTfulControllerAcceptNegotiator >> versionIn: acceptable canBeHandledBy: avail
 ]
 
 { #category : 'private - accessing' }
-RESTfulControllerAcceptNegotiator >> withAcceptableLanguageRangesIn: anHttpRequest do: aBlock [
+RESTfulControllerAcceptNegotiator >> withAcceptableLanguageRangesIn: aQualifiedLanguageRangeCollection do: aBlock [
 
-	| acceptable grouped |
+	| grouped |
 
-	"Parse Accept-Language header"
-	acceptable := self acceptableQualifiedLanguageRangesIn: anHttpRequest.	
-	"Group it by quality"
-	grouped := acceptable groupedBy: [ :qualifiedLanguageRange | qualifiedLanguageRange quality ].	
+	"Group it by quality, leaving out the ranges with quality zero: they are not acceptable"
+	grouped := ( aQualifiedLanguageRangeCollection reject: [ :qualifiedLanguageRange |
+		             qualifiedLanguageRange quality = 0 ] ) groupedBy: [ :qualifiedLanguageRange |
+		           qualifiedLanguageRange quality ].
 	"Iterate it by max to minimum quality and for each quality group"
 	grouped keys sorted reverse
 		do: [ :quality | ( grouped at: quality ) do: [ :qualifiedRange | aBlock value: qualifiedRange range ] ]
 ]
 
 { #category : 'private - accessing' }
-RESTfulControllerAcceptNegotiator >> withAcceptableMediaTypesIn: anHttpRequest do: aBlock [
+RESTfulControllerAcceptNegotiator >> withAcceptableMediaTypesIn: aMediaTypeCollection do: aBlock [
 
-	| acceptable grouped |
+	| grouped |
 
-	"Parse accept header"
-	acceptable := self acceptableMediaTypesIn: anHttpRequest.	
-	"Group it by quality"
-	grouped := acceptable groupedBy: [ :mediaType | mediaType quality ].	
+	"Group it by quality, leaving out the media types with quality zero: they are not acceptable"
+	grouped := ( aMediaTypeCollection reject: [ :mediaType | mediaType quality = 0 ] ) groupedBy: [
+		           :mediaType | mediaType quality ].
 	"Iterate it by max to minimum quality and for each quality group by precedence"
 	grouped keys sorted reverse
 		do: [ :quality | ( self sortByPrecedence: ( grouped at: quality ) ) do: aBlock ]
