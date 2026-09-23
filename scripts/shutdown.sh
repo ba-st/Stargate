@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 
-source ".operational-plugin.sh"
+# shellcheck source-path=SCRIPTDIR source=.operational-plugin.sh
+source "$(dirname "${BASH_SOURCE[0]}")/.operational-plugin.sh"
 
 curl --fail --request POST \
 	--header "Authorization: Bearer $JWT" \

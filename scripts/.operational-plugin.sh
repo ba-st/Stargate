@@ -7,7 +7,7 @@ usage()
    fi
 
    cat << EOF
-Usage: $(basename $0) [-b BASE_URL] [-p PORT] -t JWT
+Usage: $(basename "$0") [-b BASE_URL] [-p PORT] -t JWT
 This program will interact with a Stargate-powered API using some operational plugin endpoint.
 Options:
 -b BASE_URL         Base URL where the API is hosted. Defaults to http://localhost
@@ -15,7 +15,7 @@ Options:
 -t JWT              JSON Web Token including the required permissions.
 -h                  Display this usage message and exit.
 Example:
-   $(basename $0) -b http://api.example.com -p 80 -t eyJhbGciOiJIUzI1NiJ9.eyJzY29wZSI6ImV4ZWN1dGU6YXBwbGljYXRpb24tY29udHJvbCJ9.RPtv3mxtaaw+vgRHsZ1cpD59IMvRGw7oCoX2YU767Vk
+   $(basename "$0") -b http://api.example.com -p 80 -t eyJhbGciOiJIUzI1NiJ9.eyJzY29wZSI6ImV4ZWN1dGU6YXBwbGljYXRpb24tY29udHJvbCJ9.RPtv3mxtaaw+vgRHsZ1cpD59IMvRGw7oCoX2YU767Vk
 EOF
 
    exit 1
@@ -35,11 +35,15 @@ while getopts "b:p:t:h" option; do
     p) PORT_OPTION=$OPTARG ;;
     t) JWT_OPTION=$OPTARG ;;
     h) usage ;;
+    *) usage "Invalid option or missing option value" ;;
   esac
 done
-shift $(($OPTIND - 1)); # take out the option flags
+shift $((OPTIND - 1)); # take out the option flags
 
+# BASE_URL and PORT are used by the scripts that source this file
+# shellcheck disable=SC2034
 readonly BASE_URL="${BASE_URL_OPTION:-http://localhost}"
+# shellcheck disable=SC2034
 readonly PORT="${PORT_OPTION:-8080}"
 readonly JWT="$JWT_OPTION"
 if [ -z "$JWT" ] ; then
