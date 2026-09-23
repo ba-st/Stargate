@@ -30,6 +30,25 @@ RESTfulControllerAcceptNegotiatorTest >> assertBestRepresentationFor: anAcceptHe
 	self assert: (self bestRepresentationFor: anAcceptHeaderContent given: theAvailableMediaTypes) equals: aMediaType
 ]
 
+{ #category : 'private - asserting' }
+RESTfulControllerAcceptNegotiatorTest >> assertNoLanguageIsAcceptableFor: aLanguageProrityList given: theAvailableLanguageTags [
+
+	self
+		should: [
+			self
+				bestLanguageFor: aLanguageProrityList
+				given: ( theAvailableLanguageTags collect: #asLanguageTag ) ]
+		raise: HTTPNotAcceptable
+]
+
+{ #category : 'private - asserting' }
+RESTfulControllerAcceptNegotiatorTest >> assertNoRepresentationIsAcceptableFor: anAcceptHeaderContent given: theAvailableMediaTypes [
+
+	self
+		should: [ self bestRepresentationFor: anAcceptHeaderContent given: theAvailableMediaTypes ]
+		raise: HTTPNotAcceptable
+]
+
 { #category : 'private - accessing' }
 RESTfulControllerAcceptNegotiatorTest >> bestLanguageFor: aLanguageProrityList given: theAvailableLanguageTags [
 
@@ -129,6 +148,27 @@ RESTfulControllerAcceptNegotiatorTest >> testLanguageWithQualityLevel [
 ]
 
 { #category : 'tests - languages' }
+RESTfulControllerAcceptNegotiatorTest >> testLanguageWithQualityZeroIsExcluded [
+
+	self
+		assertNoLanguageIsAcceptableFor: 'es;q=0' given: #( 'en' 'es' );
+		assertNoLanguageIsAcceptableFor: 'es;q=0.0' given: #( 'en' 'es' );
+		assertNoLanguageIsAcceptableFor: 'es;q=0.000' given: #( 'en' 'es' );
+		assertNoLanguageIsAcceptableFor: '*;q=0' given: #( 'en' 'es' );
+		assertNoLanguageIsAcceptableFor: 'es;q=0, es' given: #( 'es' );
+		assertBestLanguageFor: 'es;q=0, en;q=0.5' given: #( 'es' 'en' ) is: 'en'
+]
+
+{ #category : 'tests - languages' }
+RESTfulControllerAcceptNegotiatorTest >> testLanguageWithQualityZeroIsNotMatchedByWildcard [
+
+	self
+		assertBestLanguageFor: 'es;q=0, *' given: #( 'es' 'en' ) is: 'en';
+		assertBestLanguageFor: 'es;q=0, *' given: #( 'es-AR' 'es-MX' 'en' ) is: 'en';
+		assertNoLanguageIsAcceptableFor: 'es;q=0, *;q=0.5' given: #( 'es' )
+]
+
+{ #category : 'tests - languages' }
 RESTfulControllerAcceptNegotiatorTest >> testLanguageWithoutQualityLevel [
 
 	self
@@ -142,11 +182,62 @@ RESTfulControllerAcceptNegotiatorTest >> testLanguageWithoutQualityLevel [
 ]
 
 { #category : 'tests' }
+RESTfulControllerAcceptNegotiatorTest >> testMediaTypeWithQualityZeroIsExcluded [
+
+	self
+		assertNoRepresentationIsAcceptableFor: 'application/json;q=0' given: { 'application/json' asMediaType };
+		assertNoRepresentationIsAcceptableFor: 'application/json;q=0.0' given: { 'application/json' asMediaType };
+		assertNoRepresentationIsAcceptableFor: '*/*;q=0' given: apiMediaTypes;
+		assertNoRepresentationIsAcceptableFor: 'application/json;q=0, application/json'
+			given: { 'application/json' asMediaType };
+		assertBestRepresentationFor: 'text/plain;q=0, application/json;q=0.5'
+			given: { 'text/plain' asMediaType. 'application/json' asMediaType }
+			is: 'application/json' asMediaType
+]
+
+{ #category : 'tests' }
+RESTfulControllerAcceptNegotiatorTest >> testMediaTypeWithQualityZeroIsNotMatchedByWildcard [
+
+	self
+		assertBestRepresentationFor: 'application/vnd.stargate.pet+json;version=2;q=0, */*'
+			given: apiMediaTypes
+			is: 'application/vnd.stargate.pet+json;version=1.1.0' asMediaType;
+		assertBestRepresentationFor: 'text/html;q=0, text/*;q=0.5'
+			given: { 'text/html' asMediaType. 'text/plain' asMediaType }
+			is: 'text/plain' asMediaType;
+		assertNoRepresentationIsAcceptableFor: 'text/html;q=0, text/*;q=0.5' given: { 'text/html' asMediaType }
+]
+
+{ #category : 'tests' }
 RESTfulControllerAcceptNegotiatorTest >> testMissingVersionSelectsTheNewOne [
 
 	self
 		assertBestRepresentationFor: 'application/vnd.stargate.pet+json' given: apiMediaTypes is: 'application/vnd.stargate.pet+json;version=2.0.0' asMediaType;
 		assertBestRepresentationFor: 'application/vnd.stargate.pet.summary+json' given: apiMediaTypes is: 'application/vnd.stargate.pet.summary+json;version=1.0.0' asMediaType
+]
+
+{ #category : 'tests - languages' }
+RESTfulControllerAcceptNegotiatorTest >> testMostSpecificLanguageRangeDecidesAcceptability [
+
+	self
+		assertBestLanguageFor: 'es;q=0, es-AR;q=0.5' given: #( 'es-MX' 'es-AR' ) is: 'es-AR';
+		assertBestLanguageFor: '*;q=0, es' given: #( 'en' 'es' ) is: 'es';
+		assertBestLanguageFor: 'es-AR;q=0, es' given: #( 'es-AR' 'es-MX' ) is: 'es-MX'
+]
+
+{ #category : 'tests' }
+RESTfulControllerAcceptNegotiatorTest >> testMostSpecificMediaRangeDecidesAcceptability [
+
+	self
+		assertBestRepresentationFor: '*/*;q=0, application/vnd.stargate.pet+json;version=1'
+			given: apiMediaTypes
+			is: 'application/vnd.stargate.pet+json;version=1.1.0' asMediaType;
+		assertBestRepresentationFor: 'application/vnd.stargate.pet+json;version=2;q=0, application/vnd.stargate.pet+json'
+			given: apiMediaTypes
+			is: 'application/vnd.stargate.pet+json;version=1.1.0' asMediaType;
+		assertBestRepresentationFor: 'text/*;q=0, text/plain;q=0.5'
+			given: { 'text/html' asMediaType. 'text/plain' asMediaType }
+			is: 'text/plain' asMediaType
 ]
 
 { #category : 'tests - languages' }
@@ -218,4 +309,17 @@ RESTfulControllerAcceptNegotiatorTest >> testSemanticVersioning [
 		should: [ self bestRepresentationFor: 'application/vnd.stargate.pet+json;version=3' given: apiMediaTypes ] raise: HTTPClientError;
 		should: [ self bestRepresentationFor: 'application/vnd.stargate.pet+json;version=2.3.0' given: apiMediaTypes ] raise: HTTPClientError;
 		should: [ self bestRepresentationFor: 'application/vnd.stargate.pet+xml' given: apiMediaTypes ] raise: HTTPClientError
+]
+
+{ #category : 'tests' }
+RESTfulControllerAcceptNegotiatorTest >> testWhitespaceAroundMediaRangesIsIgnored [
+
+	self
+		assertBestRepresentationFor: 'application/xml, */*'
+			given: apiMediaTypes
+			is: 'application/vnd.stargate.pet+json;version=2.0.0' asMediaType;
+		assertBestRepresentationFor: ' application/vnd.stargate.pet+json;version=1.0.0 , application/xml'
+			given: apiMediaTypes
+			is: 'application/vnd.stargate.pet+json;version=1.0.0' asMediaType;
+		assertNoRepresentationIsAcceptableFor: '*/*, application/json;q=0' given: { 'application/json' asMediaType }
 ]
