@@ -265,8 +265,23 @@ Both `private` and `no-cache` directives can specify a list of fields that
 restrict them using `bePrivateRestrictedTo: aFieldNameCollection` and
 `doNotCacheRestrictedTo: aFieldNameCollection` respectively.
 
-Additionally, if you may have different caching directive depending on the
-response, you can add a condition before configuring the builder.
+Additionally, if you may have different caching directives depending on the
+response, the resource or the request context, you can add a condition using
+`when:apply:`. The condition takes up to three arguments: the response, the
+resource and the request context, in that order. For example, to keep the
+representations served to administrators out of shared caches:
+
+```smalltalk
+builder directCachingWith: [ :caching |
+    caching
+      when: [ :response :resource :context |
+        context includesPermission: #administrator ]
+      apply: [ caching bePrivate ];
+      when: [ :response :resource :context |
+        ( context includesPermission: #administrator ) not ]
+      apply: [ caching beAvailableFor: 1 hour ]
+    ];
+```
 
 For specific examples on all the different options offered by Stargate, check the
 example classes and their respective tests:

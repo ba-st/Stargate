@@ -16,12 +16,12 @@ Class {
 { #category : 'private' }
 CachingDirectivesBuilder >> addCacheControlNamed: aName [
 
-	| condition |
-
-	condition := currentCondition.
-	directives
-		add:
-			[ :response :context :resource | ( condition cull: response cull: resource ) then: [ response addCachingDirective: aName ] ]
+  | condition |
+  condition := currentCondition.
+  directives add: [ :response :context :resource |
+      ( condition cull: response cull: resource cull: context ) then: [
+          response addCachingDirective: aName ]
+    ]
 ]
 
 { #category : 'private' }
@@ -134,14 +134,12 @@ CachingDirectivesBuilder >> doNotTransform [
 { #category : 'configuring' }
 CachingDirectivesBuilder >> expireIn: aDuration [
 
-	| condition |
-
-	condition := currentCondition.
-	directives
-		add: [ :response :context :resource | 
-			( condition cull: response cull: resource )
-				then: [ response headers at: 'Expires' put: ( ZnUtils httpDate: DateAndTime now + aDuration ) ]
-			]
+  | condition |
+  condition := currentCondition.
+  directives add: [ :response :context :resource |
+      ( condition cull: response cull: resource cull: context ) then: [
+          response headers at: 'Expires' put: ( ZnUtils httpDate: DateAndTime now + aDuration ) ]
+    ]
 ]
 
 { #category : 'private' }
@@ -182,11 +180,13 @@ CachingDirectivesBuilder >> requireRevalidation [
 
 { #category : 'configuring' }
 CachingDirectivesBuilder >> when: aResponseCondition apply: aDirectiveConfiguration [
+  "aResponseCondition can take up to three arguments: the response,
+  the resource and the request context, in that order"
 
-	[ currentCondition := aResponseCondition.
-	aDirectiveConfiguration cull: self
-	]
-		ensure: [ self alwaysApplyDirectives ]
+  [
+    currentCondition := aResponseCondition.
+    aDirectiveConfiguration cull: self
+  ] ensure: [ self alwaysApplyDirectives ]
 ]
 
 { #category : 'configuring' }

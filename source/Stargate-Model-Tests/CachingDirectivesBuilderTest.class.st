@@ -56,12 +56,17 @@ CachingDirectivesBuilderTest >> requestContext [
 { #category : 'private - accessing' }
 CachingDirectivesBuilderTest >> responseAffectedBy: directives [
 
-	| response resource |
+  ^ self responseAffectedBy: directives within: self requestContext
+]
 
-	resource := 'theResource'.
-	response := ZnResponse ok: ( ZnStringEntity text: resource ).
-	directives do: [ :directive | directive cull: response cull: self requestContext cull: resource ].
-	^ response
+{ #category : 'private - accessing' }
+CachingDirectivesBuilderTest >> responseAffectedBy: directives within: aRequestContext [
+
+  | response resource |
+  resource := 'theResource'.
+  response := ZnResponse ok: ( ZnStringEntity text: resource ).
+  directives do: [ :directive | directive cull: response cull: aRequestContext cull: resource ].
+  ^ response
 ]
 
 { #category : 'tests' }
@@ -254,6 +259,84 @@ CachingDirectivesBuilderTest >> testRequireRevalidation [
 		assertThereAre: 2
 		directivesFrom: builder
 		whichSetCacheControlHeaderTo: #('no-cache' 'Max-Age=0')
+]
+
+{ #category : 'tests' }
+CachingDirectivesBuilderTest >> testWhenApplyWithConditionOnTheRequestContext [
+
+  | directives administratorResponse anonymousResponse |
+  directives := CachingDirectivesBuilder new
+                  configureUsing: [ :caching |
+                      caching
+                        when: [ :response :resource :context |
+                            context includesPermission: #administrator ]
+                        apply: [ caching bePrivate ];
+                        when: [ :response :resource :context |
+                            ( context includesPermission: #administrator ) not ]
+                        apply: [
+                            caching
+                              bePublic;
+                              expireIn: 1 hour
+                          ]
+                    ];
+                  build.
+
+  administratorResponse := self responseAffectedBy: directives within: ( HttpRequestContext new
+                                 permissions: #( #administrator );
+                                 yourself ).
+  self
+    assert: administratorResponse cachingDirectives equals: #( 'private' );
+    deny: ( administratorResponse headers includesKey: 'Expires' ).
+
+  anonymousResponse := self responseAffectedBy: directives within: HttpRequestContext new.
+  self
+    assert: anonymousResponse cachingDirectives equals: #( 'public' );
+    assertExpiresHeaderFor: anonymousResponse with: 1 hour
+]
+
+{ #category : 'tests' }
+CachingDirectivesBuilderTest >> testWhenApplyWithConditionOnTheResponse [
+
+  | builder |
+  builder := CachingDirectivesBuilder new
+               configureUsing: [ :caching |
+                   caching
+                     when: [ :response | response isSuccess ] apply: [
+                         caching
+                           bePublic;
+                           expireIn: 4 hours
+                       ];
+                     when: [ :response | response isSuccess not ] apply: [ caching doNotStore ]
+                 ];
+               yourself.
+  self
+    assertThereAre: 3
+    directivesFrom: builder
+    whichSetExpiresHeaderTo: 4 hours
+    andCacheControlHeaderTo: #( 'public' )
+]
+
+{ #category : 'tests' }
+CachingDirectivesBuilderTest >> testWhenApplyWithConditionOnTheResponseAndResource [
+
+  | builder |
+  builder := CachingDirectivesBuilder new
+               configureUsing: [ :caching |
+                   caching
+                     when: [ :response :resource | resource = 'theResource' ] apply: [
+                         caching
+                           bePublic;
+                           expireIn: 4 hours
+                       ];
+                     when: [ :response :resource | resource ~= 'theResource' ]
+                     apply: [ caching doNotStore ]
+                 ];
+               yourself.
+  self
+    assertThereAre: 3
+    directivesFrom: builder
+    whichSetExpiresHeaderTo: 4 hours
+    andCacheControlHeaderTo: #( 'public' )
 ]
 
 { #category : 'tests' }
