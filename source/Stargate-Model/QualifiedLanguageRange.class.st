@@ -48,6 +48,12 @@ QualifiedLanguageRange >> initializeQualifying: aLanguageRange with: aQualityFac
 	quality := aQualityFactor
 ]
 
+{ #category : 'testing' }
+QualifiedLanguageRange >> matches: languageTag [
+
+  ^ languangeRange matches: languageTag
+]
+
 { #category : 'accessing' }
 QualifiedLanguageRange >> quality [
 
@@ -58,4 +64,10 @@ QualifiedLanguageRange >> quality [
 QualifiedLanguageRange >> range [
 
 	^ languangeRange
+]
+
+{ #category : 'accessing' }
+QualifiedLanguageRange >> specificity [
+
+  ^ languangeRange specificity
 ]
