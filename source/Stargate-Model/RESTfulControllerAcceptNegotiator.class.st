@@ -115,6 +115,12 @@ RESTfulControllerAcceptNegotiator >> mediaTypesAvailableFor: aMediaType [
 	^ availableMediaTypes select: [ :available | self is: available acceptedBy: aMediaType ]
 ]
 
+{ #category : 'testing' }
+RESTfulControllerAcceptNegotiator >> offersLanguages [
+
+  ^ availableLanguageTags notEmpty
+]
+
 { #category : 'private - accessing' }
 RESTfulControllerAcceptNegotiator >> precedenceFor: aMediaType [
 
