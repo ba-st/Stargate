@@ -67,11 +67,11 @@ RESTfulControllerAcceptNegotiator >> bestLanguageFor: anHttpRequest [
 	qualifiedLanguageRanges := self acceptableQualifiedLanguageRangesIn: anHttpRequest.
 	self
 		withAcceptableLanguageRangesIn: qualifiedLanguageRanges
-		do: [ :languageRange |
+		do: [ :qualifiedLanguageRange |
 			availableLanguageTags
 				detect: [ :languageTag |
-					( languageRange matches: languageTag ) and: [
-						( self isLanguageTag: languageTag excludedBy: qualifiedLanguageRanges ) not ] ]
+					( qualifiedLanguageRange range matches: languageTag ) and: [
+						( self qualityOfLanguageTag: languageTag in: qualifiedLanguageRanges ) = qualifiedLanguageRange quality ] ]
 				ifFound: [ :languageTag | ^ languageTag ]
 			].
 	HTTPNotAcceptable
@@ -91,9 +91,9 @@ RESTfulControllerAcceptNegotiator >> bestRepresentationFor: anHttpRequest [
 	self
 		withAcceptableMediaTypesIn: acceptableMediaTypes
 		do: [ :mediaType |
-			( self sortByPrecedence: ( ( self mediaTypesAvailableFor: mediaType ) reject: [ :available |
-					  self isMediaType: available excludedBy: acceptableMediaTypes ] ) ) ifNotEmpty: [ :availableTypes |
-				^ availableTypes first ]
+			( self sortByPrecedence: ( ( self mediaTypesAvailableFor: mediaType ) select: [ :available |
+					  ( self qualityOfMediaType: available in: acceptableMediaTypes ) = mediaType quality ] ) )
+				ifNotEmpty: [ :availableTypes | ^ availableTypes first ]
 			].
 	HTTPNotAcceptable signal: 'Cannot generate a response entity with acceptable characteristics.' accepting: availableMediaTypes
 ]
@@ -110,38 +110,6 @@ RESTfulControllerAcceptNegotiator >> is: anAvailableMediaType acceptedBy: aMedia
 
 	^ ( anAvailableMediaType accepts: aMediaType ) and: [
 		  self versionIn: aMediaType canBeHandledBy: anAvailableMediaType ]
-]
-
-{ #category : 'private - testing' }
-RESTfulControllerAcceptNegotiator >> isExcluded: theMatchingRanges consideringSpecificity: aSpecificityBlock [
-
-	"The most specific ranges matching an offer decide if it is acceptable,
-	and a quality of zero means not acceptable (RFC 9110 §12.4.2 and §12.5)"
-
-	| highestSpecificity |
-
-	highestSpecificity := theMatchingRanges
-		inject: 0
-		into: [ :specificity :range | specificity max: ( aSpecificityBlock value: range ) ].
-	^ theMatchingRanges anySatisfy: [ :range |
-		  ( aSpecificityBlock value: range ) = highestSpecificity and: [ range quality = 0 ] ]
-]
-
-{ #category : 'private - testing' }
-RESTfulControllerAcceptNegotiator >> isLanguageTag: aLanguageTag excludedBy: aQualifiedLanguageRangeCollection [
-
-	^ self
-		  isExcluded: ( aQualifiedLanguageRangeCollection select: [ :qualifiedLanguageRange |
-				    qualifiedLanguageRange range matches: aLanguageTag ] )
-		  consideringSpecificity: [ :qualifiedLanguageRange | qualifiedLanguageRange range specificity ]
-]
-
-{ #category : 'private - testing' }
-RESTfulControllerAcceptNegotiator >> isMediaType: anAvailableMediaType excludedBy: aMediaTypeCollection [
-
-	^ self
-		  isExcluded: ( aMediaTypeCollection select: [ :mediaType | self is: anAvailableMediaType acceptedBy: mediaType ] )
-		  consideringSpecificity: [ :mediaType | self precedenceFor: mediaType ]
 ]
 
 { #category : 'private - accessing' }
@@ -169,6 +137,41 @@ RESTfulControllerAcceptNegotiator >> precedenceFor: aMediaType [
 	versionParts doWithIndex: [ :part :index | precedence := precedence + (part asInteger * (2 raisedTo: 4 - index)) ].
 
 	^ precedence
+]
+
+{ #category : 'private - accessing' }
+RESTfulControllerAcceptNegotiator >> qualityGivenBy: theMatchingRanges consideringSpecificity: aSpecificityBlock [
+
+	"The most specific ranges matching an offer give it its quality (RFC 9110 §12.5.1),
+	and a quality of zero means not acceptable (RFC 9110 §12.4.2)"
+
+	| highestSpecificity qualities |
+
+	highestSpecificity := theMatchingRanges
+		inject: 0
+		into: [ :specificity :range | specificity max: ( aSpecificityBlock value: range ) ].
+	qualities := ( theMatchingRanges select: [ :range | ( aSpecificityBlock value: range ) = highestSpecificity ] )
+		collect: [ :range | range quality ].
+	^ ( qualities includes: 0 )
+		then: [ 0 ]
+		otherwise: [ qualities inject: 0 into: [ :highestQuality :quality | highestQuality max: quality ] ]
+]
+
+{ #category : 'private - accessing' }
+RESTfulControllerAcceptNegotiator >> qualityOfLanguageTag: aLanguageTag in: aQualifiedLanguageRangeCollection [
+
+	^ self
+		  qualityGivenBy: ( aQualifiedLanguageRangeCollection select: [ :qualifiedLanguageRange |
+				    qualifiedLanguageRange range matches: aLanguageTag ] )
+		  consideringSpecificity: [ :qualifiedLanguageRange | qualifiedLanguageRange range specificity ]
+]
+
+{ #category : 'private - accessing' }
+RESTfulControllerAcceptNegotiator >> qualityOfMediaType: anAvailableMediaType in: aMediaTypeCollection [
+
+	^ self
+		  qualityGivenBy: ( aMediaTypeCollection select: [ :mediaType | self is: anAvailableMediaType acceptedBy: mediaType ] )
+		  consideringSpecificity: [ :mediaType | self precedenceFor: mediaType ]
 ]
 
 { #category : 'private - accessing' }
@@ -227,7 +230,7 @@ RESTfulControllerAcceptNegotiator >> withAcceptableLanguageRangesIn: aQualifiedL
 		           qualifiedLanguageRange quality ].
 	"Iterate it by max to minimum quality and for each quality group"
 	grouped keys sorted reverse
-		do: [ :quality | ( grouped at: quality ) do: [ :qualifiedRange | aBlock value: qualifiedRange range ] ]
+		do: [ :quality | ( grouped at: quality ) do: aBlock ]
 ]
 
 { #category : 'private - accessing' }

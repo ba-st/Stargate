@@ -225,6 +225,17 @@ RESTfulControllerAcceptNegotiatorTest >> testMostSpecificLanguageRangeDecidesAcc
 		assertBestLanguageFor: 'es-AR;q=0, es' given: #( 'es-AR' 'es-MX' ) is: 'es-MX'
 ]
 
+{ #category : 'tests - languages' }
+RESTfulControllerAcceptNegotiatorTest >> testMostSpecificLanguageRangeDecidesQuality [
+
+	self
+		assertBestLanguageFor: 'en;q=0.9, en-us;q=0.1' given: #( 'en-us' 'en-gb' ) is: 'en-gb';
+		assertBestLanguageFor: 'en-us;q=0.1, en;q=0.9' given: #( 'en-us' 'en-gb' ) is: 'en-gb';
+		assertBestLanguageFor: '*;q=0.5, es;q=0.2' given: #( 'es' 'en' ) is: 'en';
+		assertBestLanguageFor: 'es;q=0.2, *;q=0.5' given: #( 'es' 'en' ) is: 'en';
+		assertBestLanguageFor: 'en;q=0.5, en-us;q=0.5' given: #( 'en-gb' 'en-us' ) is: 'en-gb'
+]
+
 { #category : 'tests' }
 RESTfulControllerAcceptNegotiatorTest >> testMostSpecificMediaRangeDecidesAcceptability [
 
@@ -238,6 +249,28 @@ RESTfulControllerAcceptNegotiatorTest >> testMostSpecificMediaRangeDecidesAccept
 		assertBestRepresentationFor: 'text/*;q=0, text/plain;q=0.5'
 			given: { 'text/html' asMediaType. 'text/plain' asMediaType }
 			is: 'text/plain' asMediaType
+]
+
+{ #category : 'tests' }
+RESTfulControllerAcceptNegotiatorTest >> testMostSpecificMediaRangeDecidesQuality [
+
+	self
+		assertBestRepresentationFor: 'text/*;q=0.9, text/html;q=0.1'
+			given: { 'text/html' asMediaType. 'text/plain' asMediaType }
+			is: 'text/plain' asMediaType;
+		assertBestRepresentationFor: 'text/*;q=0.9, text/html;q=0.1'
+			given: { 'text/plain' asMediaType. 'text/html' asMediaType }
+			is: 'text/plain' asMediaType;
+		assertBestRepresentationFor: '*/*;q=0.8, application/json;q=0.2'
+			given: { 'application/json' asMediaType. 'text/csv' asMediaType }
+			is: 'text/csv' asMediaType;
+		assertBestRepresentationFor:
+			'application/vnd.stargate.pet+json;q=0.9, application/vnd.stargate.pet+json;version=2;q=0.1'
+			given: apiMediaTypes
+			is: 'application/vnd.stargate.pet+json;version=1.1.0' asMediaType;
+		assertBestRepresentationFor: 'text/*;q=0.5, text/html;q=0.5'
+			given: { 'text/plain' asMediaType. 'text/html' asMediaType }
+			is: 'text/html' asMediaType
 ]
 
 { #category : 'tests - languages' }
