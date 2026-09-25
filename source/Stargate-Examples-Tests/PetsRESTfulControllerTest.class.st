@@ -329,6 +329,32 @@ PetsRESTfulControllerTest >> testGetNotModifiedWhenValidETag [
 ]
 
 { #category : 'tests - get individual' }
+PetsRESTfulControllerTest >> testGetPetsVaryByAcceptLanguageWithoutOfferingLanguages [
+
+  | pet pets |
+  self assert: ( resourceController
+        createPetBasedOn: ( self requestToCreatePetFrom: '{"name":"Firulais","type":"dog"}' )
+        within: self newHttpRequestContext ) isSuccess.
+
+  pet := resourceController
+           getPetBasedOn:
+           ( self requestToGETResourceIdentifiedBy: 1 accepting: self defaultPetMediaType )
+           within: self newHttpRequestContext.
+  pets := resourceController
+            getPetsBasedOn:
+            ( self requestToGetPetsAccepting: resourceController petSummaryVersion1dot0dot0MediaType )
+            within: self newHttpRequestContext.
+
+  { pet . pets } do: [ :response |
+      self
+        assert: response isSuccess;
+        assert: response contentLanguageTags isEmpty;
+        assert: response varyHeaderNames includes: 'Accept-Language';
+        assert: response varyHeaderNames includes: 'Accept'
+    ]
+]
+
+{ #category : 'tests - get individual' }
 PetsRESTfulControllerTest >> testGetPetJustCreated [
 
 	| response |

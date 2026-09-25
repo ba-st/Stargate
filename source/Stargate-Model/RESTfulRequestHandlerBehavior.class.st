@@ -250,8 +250,10 @@ RESTfulRequestHandlerBehavior >> from: httpRequest within: requestContext getCol
 
 { #category : 'private' }
 RESTfulRequestHandlerBehavior >> holdTargetLanguageFrom: httpRequest within: requestContext [
+  "A handler offering languages always negotiates one, taking the first when the request
+  has no preference. One offering none still rejects requests asking for a language"
 
-  httpRequest hasLanguageProrityList then: [
+  ( acceptNegotiator offersLanguages or: [ httpRequest hasLanguageProrityList ] ) then: [
       requestContext targetLanguageTag: ( acceptNegotiator bestLanguageFor: httpRequest ) ]
 ]
 
@@ -322,13 +324,11 @@ RESTfulRequestHandlerBehavior >> putEntityTagOf: resource in: response within: r
 
 { #category : 'private' }
 RESTfulRequestHandlerBehavior >> putLanguageContentTagIn: response within: requestContext [
+  "The response depends on Accept-Language even when no language was negotiated,
+  since asking for one is not acceptable then"
 
-	requestContext
-		withTargetLanguageTagDo: [ :languageTag | 
-			response
-				addContentLanguage: languageTag;
-				addToVary: 'Accept-Language'
-			]
+  response addToVary: 'Accept-Language'.
+  requestContext withTargetLanguageTagDo: [ :languageTag | response addContentLanguage: languageTag ]
 ]
 
 { #category : 'private' }

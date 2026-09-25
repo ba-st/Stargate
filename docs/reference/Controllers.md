@@ -311,7 +311,8 @@ builder
 
 As soon as a language is supported, Stargate will consider the
 `Accept-Language` header and make the negotiated language available in the
-request context.
+request context. When the request has no `Accept-Language` header, the first
+supported language is used.
 
 To access the negotiated language, send `targetLanguageTag` or
 `withTargetLanguageTagDo:` to the request context. API implementors can then use
@@ -319,3 +320,10 @@ it to produce a response in the corresponding language.
 
 Once language negotiation is enabled, the `Content-Language` header will
 contain the negotiated language in the response.
+
+Responses carrying a representation of a resource, and `304 Not Modified`
+ones, always include `Accept-Language` in the `Vary` header, so shared caches
+don't serve a representation to a client that asked for a different language.
+This includes handlers not supporting any language: they answer
+`406 Not Acceptable` to requests with an `Accept-Language` header, so their
+responses depend on it too.

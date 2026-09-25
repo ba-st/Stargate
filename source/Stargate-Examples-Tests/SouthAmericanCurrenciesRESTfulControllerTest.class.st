@@ -128,32 +128,32 @@ SouthAmericanCurrenciesRESTfulControllerTest >> testCantGetArgentinePesoAskingFo
 { #category : 'tests' }
 SouthAmericanCurrenciesRESTfulControllerTest >> testGetArgentinePeso [
 
-	| response |
+  | response |
+  response := resourceController
+                currencyBasedOn: ( self
+                      requestToGETResourceIdentifiedBy: 'ARS'
+                      accepting: resourceController currencyVersion1dot0dot0MediaType )
+                within: self newHttpRequestContext.
 
-	response := resourceController
-		            currencyBasedOn: ( self
-				              requestToGETResourceIdentifiedBy: 'ARS'
-				              accepting: resourceController currencyVersion1dot0dot0MediaType )
-		            within: self newHttpRequestContext.
+  self
+    assert: response isSuccess;
+    assert: response status equals: 200;
+    assert: response contentType asMediaType
+    equals: resourceController currencyVersion1dot0dot0MediaType;
+    withTheOnlyOneIn: response contentLanguageTags
+    do: [ :tag | self assert: tag equals: self unitedStatesEnglish ];
+    assert: response varyHeaderNames includes: 'Accept-Language';
+    assert: response varyHeaderNames includes: 'Accept';
+    assert: response entityTag equals: '"5dd07a40a75ea23fa44e641a92a6dd1ec7999a36"' asEntityTag;
+    assertCachingDirectivesFor: response with: #( 'immutable' 'public' ).
 
-	self
-		assert: response isSuccess;
-		assert: response status equals: 200;
-		assert: response contentType asMediaType
-		equals: resourceController currencyVersion1dot0dot0MediaType;
-		assert: response contentLanguageTags isEmpty;
-		deny: response varyHeaderNames includes: 'Accept-Language';
-		assert: response varyHeaderNames includes: 'Accept';
-		assert: response entityTag equals: '"5dd07a40a75ea23fa44e641a92a6dd1ec7999a36"' asEntityTag;
-		assertCachingDirectivesFor: response with: #( 'immutable' 'public' ).
-
-	self withJsonFromContentsIn: response do: [ :json | 
-		self
-			assert: json name equals: 'Argentine peso';
-			assert: json symbol equals: '$';
-			assert: json isoCode equals: 'ARS';
-			assertThereAreNoLinksIn: json
-		]
+  self withJsonFromContentsIn: response do: [ :json |
+      self
+        assert: json name equals: 'Argentine peso';
+        assert: json symbol equals: '$';
+        assert: json isoCode equals: 'ARS';
+        assertThereAreNoLinksIn: json
+    ]
 ]
 
 { #category : 'tests' }
@@ -312,31 +312,32 @@ SouthAmericanCurrenciesRESTfulControllerTest >> testGetArgentinePesoInSpanishBas
 { #category : 'tests' }
 SouthAmericanCurrenciesRESTfulControllerTest >> testGetBrazilianReal [
 
-	| response |
+  | response |
+  response := resourceController
+                currencyBasedOn: ( self
+                      requestToGETResourceIdentifiedBy: 'BRL'
+                      accepting: resourceController currencyVersion1dot0dot0MediaType )
+                within: self newHttpRequestContext.
 
-	response := resourceController
-		            currencyBasedOn: ( self
-				              requestToGETResourceIdentifiedBy: 'BRL'
-				              accepting: resourceController currencyVersion1dot0dot0MediaType )
-		            within: self newHttpRequestContext.
+  self
+    assert: response isSuccess;
+    assert: response status equals: 200;
+    assert: response contentType asMediaType
+    equals: resourceController currencyVersion1dot0dot0MediaType;
+    withTheOnlyOneIn: response contentLanguageTags
+    do: [ :tag | self assert: tag equals: self unitedStatesEnglish ];
+    assert: response varyHeaderNames includes: 'Accept-Language';
+    assert: response varyHeaderNames includes: 'Accept';
+    assert: response entityTag equals: '"13bd1a73c317563852cbb2858e39a0af77699f60"' asEntityTag;
+    assertCachingDirectivesFor: response with: #( 'immutable' ).
 
-	self
-		assert: response isSuccess;
-		assert: response status equals: 200;
-		assert: response contentType asMediaType
-		equals: resourceController currencyVersion1dot0dot0MediaType;
-		assert: response contentLanguageTags isEmpty;
-		assert: response varyHeaderNames includes: 'Accept';
-		assert: response entityTag equals: '"13bd1a73c317563852cbb2858e39a0af77699f60"' asEntityTag;
-		assertCachingDirectivesFor: response with: #( 'immutable' ).
-
-	self withJsonFromContentsIn: response do: [ :json | 
-		self
-			assert: json name equals: 'Brazilian real';
-			assert: json symbol equals: 'R$';
-			assert: json isoCode equals: 'BRL';
-			assertThereAreNoLinksIn: json
-		]
+  self withJsonFromContentsIn: response do: [ :json |
+      self
+        assert: json name equals: 'Brazilian real';
+        assert: json symbol equals: 'R$';
+        assert: json isoCode equals: 'BRL';
+        assertThereAreNoLinksIn: json
+    ]
 ]
 
 { #category : 'tests' }
@@ -407,31 +408,31 @@ SouthAmericanCurrenciesRESTfulControllerTest >> testGetBrazilianRealInSpanish [
 { #category : 'tests' }
 SouthAmericanCurrenciesRESTfulControllerTest >> testGetCurrencies [
 
-	| response |
+  | response |
+  response := resourceController
+                currenciesBasedOn: ( self
+                      requestToGET: self resourceUrl
+                      accepting: resourceController currencyVersion1dot0dot0MediaType )
+                within: self newHttpRequestContext.
 
-	response := resourceController
-		            currenciesBasedOn: ( self
-				              requestToGET: self resourceUrl
-				              accepting: resourceController currencyVersion1dot0dot0MediaType )
-		            within: self newHttpRequestContext.
+  self
+    assert: response isSuccess;
+    assert: response status equals: 200;
+    assert: response contentType asMediaType
+    equals: resourceController currencyVersion1dot0dot0MediaType;
+    withTheOnlyOneIn: response contentLanguageTags
+    do: [ :tag | self assert: tag equals: self unitedStatesEnglish ];
+    assert: response varyHeaderNames includes: 'Accept-Language';
+    assert: response varyHeaderNames includes: 'Accept'.
+  self assertCachingDirectivesFor: response with: #( 'immutable' 'Max-Age=86400' ).
 
-	self
-		assert: response isSuccess;
-		assert: response status equals: 200;
-		assert: response contentType asMediaType
-		equals: resourceController currencyVersion1dot0dot0MediaType;
-		assert: response contentLanguageTags isEmpty;
-		deny: response varyHeaderNames includes: 'Accept-Language';
-		assert: response varyHeaderNames includes: 'Accept'.
-	self assertCachingDirectivesFor: response with: #( 'immutable' 'Max-Age=86400' ).
-
-	self withJsonFromContentsIn: response do: [ :currencies |
-		self
-			assert: currencies size equals: 11;
-			assert: ( currencies collect: #isoCode )
-			hasTheSameElementsInTheSameOrderThat:
-				#( 'ARS' 'BOB' 'BRL' 'CLP' 'COP' 'GYD' 'PYG' 'PEN' 'SRD' 'UYU' 'VES' )
-		]
+  self withJsonFromContentsIn: response do: [ :currencies |
+      self
+        assert: currencies size equals: 11;
+        assert: ( currencies collect: #isoCode )
+        hasTheSameElementsInTheSameOrderThat:
+          #( 'ARS' 'BOB' 'BRL' 'CLP' 'COP' 'GYD' 'PYG' 'PEN' 'SRD' 'UYU' 'VES' )
+    ]
 ]
 
 { #category : 'tests' }
