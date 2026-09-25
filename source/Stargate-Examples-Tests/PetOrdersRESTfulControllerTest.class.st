@@ -73,23 +73,21 @@ PetOrdersRESTfulControllerTest >> createOverlyComplexOrder [
 { #category : 'private - support' }
 PetOrdersRESTfulControllerTest >> getFirstOrderAndWithJsonDo: aBlock [
 
-	| response |
+  | response |
+  response := resourceController
+                getOrderBasedOn: ( self
+                      requestToGETResourceIdentifiedBy: 1
+                      accepting: resourceController orderVersion1dot0dot0MediaType )
+                within: self newHttpRequestContext.
 
-	response := resourceController
-		getOrderBasedOn:
-			( self
-				requestToGETResourceIdentifiedBy: 1
-				accepting: resourceController orderVersion1dot0dot0MediaType )
-		within: self newHttpRequestContext.
-
-	self
-		assert: response isSuccess;
-		assert: response status equals: 200;
-		assert: response contentType asMediaType
-			equals: resourceController orderVersion1dot0dot0MediaType.
-	self assertExpiresHeaderFor: response with: 1 minute.
-	self assertCachingDirectivesFor: response with: #('public' 'Max-Age=60').
-	self withJsonFromContentsIn: response do: aBlock
+  self
+    assert: response isSuccess;
+    assert: response status equals: 200;
+    assert: response contentType asMediaType
+    equals: resourceController orderVersion1dot0dot0MediaType.
+  self assertExpiresHeaderFor: response with: 1 minute.
+  self assertCachingDirectivesFor: response with: #( 'public' 'max-age=60' ).
+  self withJsonFromContentsIn: response do: aBlock
 ]
 
 { #category : 'private - support' }
@@ -389,23 +387,20 @@ PetOrdersRESTfulControllerTest >> testGetComment [
 { #category : 'tests - comments' }
 PetOrdersRESTfulControllerTest >> testGetComments [
 
-	self
-		withJsonFromContentsIn: self createOrder
-		do: [ :order | 
-			| response |
+  self withJsonFromContentsIn: self createOrder do: [ :order |
+      | response |
+      self
+        createCommentFor: order identifiedBy: 1 withContent: 'Hey!';
+        createCommentFor: order identifiedBy: 1 withContent: 'Mr. DJ'.
 
-			self
-				createCommentFor: order identifiedBy: 1 withContent: 'Hey!';
-				createCommentFor: order identifiedBy: 1 withContent: 'Mr. DJ'.
+      response := self commentsRelatedTo: order.
 
-			response := self commentsRelatedTo: order.
-
-			self
-				assert: response isSuccess;
-				assert: response contentType equals: ZnMimeType textPlain;
-				assert: response contents equals: '- Hey!<n>- Mr. DJ' expandMacros.
-			self assertCachingDirectivesFor: response with: #('S-MaxAge=600' 'proxy-revalidate')
-			]
+      self
+        assert: response isSuccess;
+        assert: response contentType equals: ZnMimeType textPlain;
+        assert: response contents equals: '- Hey!<n>- Mr. DJ' expandMacros.
+      self assertCachingDirectivesFor: response with: #( 's-maxage=600' 'proxy-revalidate' )
+    ]
 ]
 
 { #category : 'tests - comments' }

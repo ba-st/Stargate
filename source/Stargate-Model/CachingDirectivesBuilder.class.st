@@ -81,7 +81,7 @@ CachingDirectivesBuilder >> bePublic [
 { #category : 'configuring' }
 CachingDirectivesBuilder >> beStaleAfter: aDuration [
 
-	self addCacheControlNamed: 'Max-Age' withToken: aDuration asSeconds
+  self addCacheControlNamed: 'max-age' withToken: aDuration asSeconds
 ]
 
 { #category : 'building' }
@@ -192,7 +192,7 @@ CachingDirectivesBuilder >> when: aResponseCondition apply: aDirectiveConfigurat
 { #category : 'configuring' }
 CachingDirectivesBuilder >> whenSharedBeStaleAfter: aDuration [
 
-	self addCacheControlNamed: 'S-MaxAge' withToken: aDuration asSeconds
+  self addCacheControlNamed: 's-maxage' withToken: aDuration asSeconds
 ]
 
 { #category : 'configuring' }

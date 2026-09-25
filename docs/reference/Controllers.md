@@ -255,6 +255,11 @@ Apart from all the response directives (see [here](https://developer.mozilla.org
 for a summary), there is also support for the extension directive `immutable`,
 and the `Expires` header.
 
+The freshness lifetime is set with `beStaleAfter: aDuration`, which emits
+`max-age`, and the one for shared caches with
+`whenSharedBeStaleAfter: aDuration`, which emits `s-maxage`. For example,
+`whenSharedBeStaleAfter: 10 minutes` emits `s-maxage=600`.
+
 To simplify some common caching scenarios, the builder can also receive:
 
 - `beAvailableFor: aDuration` which implies `public`, `max-age` and `expires`
