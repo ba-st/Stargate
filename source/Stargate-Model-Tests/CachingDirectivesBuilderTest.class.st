@@ -72,16 +72,15 @@ CachingDirectivesBuilderTest >> responseAffectedBy: directives within: aRequestC
 { #category : 'tests' }
 CachingDirectivesBuilderTest >> testBeAvailableFor [
 
-	| builder |
-
-	builder := CachingDirectivesBuilder new
-		configureUsing: [ :caching | caching beAvailableFor: 6 hours ];
-		yourself.
-	self
-		assertThereAre: 3
-		directivesFrom: builder
-		whichSetExpiresHeaderTo: 6 hours
-		andCacheControlHeaderTo: #('public' 'Max-Age=21600')
+  | builder |
+  builder := CachingDirectivesBuilder new
+               configureUsing: [ :caching | caching beAvailableFor: 6 hours ];
+               yourself.
+  self
+    assertThereAre: 3
+    directivesFrom: builder
+    whichSetExpiresHeaderTo: 6 hours
+    andCacheControlHeaderTo: #( 'public' 'max-age=21600' )
 ]
 
 { #category : 'tests' }
@@ -134,12 +133,11 @@ CachingDirectivesBuilderTest >> testBePublic [
 { #category : 'tests' }
 CachingDirectivesBuilderTest >> testBeStaleAfter [
 
-	| builder |
-
-	builder := CachingDirectivesBuilder new
-		configureUsing: [ :caching | caching beStaleAfter: 2 minutes ];
-		yourself.
-	self assertThereAre: 1 directivesFrom: builder whichSetCacheControlHeaderTo: #('Max-Age=120')
+  | builder |
+  builder := CachingDirectivesBuilder new
+               configureUsing: [ :caching | caching beStaleAfter: 2 minutes ];
+               yourself.
+  self assertThereAre: 1 directivesFrom: builder whichSetCacheControlHeaderTo: #( 'max-age=120' )
 ]
 
 { #category : 'tests' }
@@ -187,16 +185,15 @@ CachingDirectivesBuilderTest >> testDoNotCacheRestrictedTo [
 { #category : 'tests' }
 CachingDirectivesBuilderTest >> testDoNotExpire [
 
-	| builder |
-
-	builder := CachingDirectivesBuilder new
-		configureUsing: [ :caching | caching doNotExpire ];
-		yourself.
-	self
-		assertThereAre: 4
-		directivesFrom: builder
-		whichSetExpiresHeaderTo: 365000000 seconds
-		andCacheControlHeaderTo: #('immutable' 'public' 'Max-Age=365000000')
+  | builder |
+  builder := CachingDirectivesBuilder new
+               configureUsing: [ :caching | caching doNotExpire ];
+               yourself.
+  self
+    assertThereAre: 4
+    directivesFrom: builder
+    whichSetExpiresHeaderTo: 365000000 seconds
+    andCacheControlHeaderTo: #( 'immutable' 'public' 'max-age=365000000' )
 ]
 
 { #category : 'tests' }
@@ -250,15 +247,14 @@ CachingDirectivesBuilderTest >> testMustRevalidate [
 { #category : 'tests' }
 CachingDirectivesBuilderTest >> testRequireRevalidation [
 
-	| builder |
-
-	builder := CachingDirectivesBuilder new
-		configureUsing: [ :caching | caching requireRevalidation ];
-		yourself.
-	self
-		assertThereAre: 2
-		directivesFrom: builder
-		whichSetCacheControlHeaderTo: #('no-cache' 'Max-Age=0')
+  | builder |
+  builder := CachingDirectivesBuilder new
+               configureUsing: [ :caching | caching requireRevalidation ];
+               yourself.
+  self
+    assertThereAre: 2
+    directivesFrom: builder
+    whichSetCacheControlHeaderTo: #( 'no-cache' 'max-age=0' )
 ]
 
 { #category : 'tests' }
@@ -342,12 +338,11 @@ CachingDirectivesBuilderTest >> testWhenApplyWithConditionOnTheResponseAndResour
 { #category : 'tests' }
 CachingDirectivesBuilderTest >> testWhenSharedBeStaleAfter [
 
-	| builder |
-
-	builder := CachingDirectivesBuilder new
-		configureUsing: [ :caching | caching whenSharedBeStaleAfter: 15 minutes ];
-		yourself.
-	self assertThereAre: 1 directivesFrom: builder whichSetCacheControlHeaderTo: #('S-MaxAge=900')
+  | builder |
+  builder := CachingDirectivesBuilder new
+               configureUsing: [ :caching | caching whenSharedBeStaleAfter: 15 minutes ];
+               yourself.
+  self assertThereAre: 1 directivesFrom: builder whichSetCacheControlHeaderTo: #( 's-maxage=900' )
 ]
 
 { #category : 'tests' }
