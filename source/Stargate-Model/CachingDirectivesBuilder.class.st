@@ -36,6 +36,22 @@ CachingDirectivesBuilder >> addCacheControlNamed: aName withToken: aValue [
 	self addCacheControlNamed: ( '<1s>=<2p>' expandMacrosWith: aName with: aValue )
 ]
 
+{ #category : 'configuring' }
+CachingDirectivesBuilder >> allowStaleOnErrorFor: aDuration [
+  "Caches may serve the response once stale, for up to aDuration, when the origin
+  answers with an error or cannot be reached"
+
+  self addCacheControlNamed: 'stale-if-error' withToken: aDuration asSeconds
+]
+
+{ #category : 'configuring' }
+CachingDirectivesBuilder >> allowStaleWhileRevalidatingFor: aDuration [
+  "Caches may serve the response once stale, for up to aDuration, while they
+  revalidate it in the background"
+
+  self addCacheControlNamed: 'stale-while-revalidate' withToken: aDuration asSeconds
+]
+
 { #category : 'private' }
 CachingDirectivesBuilder >> alwaysApplyDirectives [
 

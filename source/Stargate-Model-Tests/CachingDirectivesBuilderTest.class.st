@@ -70,6 +70,32 @@ CachingDirectivesBuilderTest >> responseAffectedBy: directives within: aRequestC
 ]
 
 { #category : 'tests' }
+CachingDirectivesBuilderTest >> testAllowStaleOnErrorFor [
+
+  | builder |
+  builder := CachingDirectivesBuilder new
+               configureUsing: [ :caching | caching allowStaleOnErrorFor: 1 day ];
+               yourself.
+  self
+    assertThereAre: 1
+    directivesFrom: builder
+    whichSetCacheControlHeaderTo: #( 'stale-if-error=86400' )
+]
+
+{ #category : 'tests' }
+CachingDirectivesBuilderTest >> testAllowStaleWhileRevalidatingFor [
+
+  | builder |
+  builder := CachingDirectivesBuilder new
+               configureUsing: [ :caching | caching allowStaleWhileRevalidatingFor: 30 seconds ];
+               yourself.
+  self
+    assertThereAre: 1
+    directivesFrom: builder
+    whichSetCacheControlHeaderTo: #( 'stale-while-revalidate=30' )
+]
+
+{ #category : 'tests' }
 CachingDirectivesBuilderTest >> testBeAvailableFor [
 
   | builder |
