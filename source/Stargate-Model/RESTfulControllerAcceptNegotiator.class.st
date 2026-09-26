@@ -27,34 +27,40 @@ RESTfulControllerAcceptNegotiator class >> accepting: aMediaTypeCollection inAny
 
 { #category : 'private - accessing' }
 RESTfulControllerAcceptNegotiator >> acceptableMediaTypesIn: anHttpRequest [
+  "Repeated Accept headers are read as one comma-separated list, as RFC 9110 section 5.3 states.
+   ZnRequest>>#accept answers only the last of them, so the headers are read directly"
 
-	| acceptHeaderContent |
+  | acceptHeaderContent |
+  acceptHeaderContent := anHttpRequest headers at: 'Accept' ifAbsent: [ '*/*' ].
 
-	acceptHeaderContent :=  anHttpRequest accept .
-
-	^ acceptHeaderContent isArray
-		then: [ acceptHeaderContent
-				flatCollect: [ :acceptList | self splitMediaTypesIn: acceptList ]
-				as: OrderedCollection
-			]
-		otherwise: [ self splitMediaTypesIn: acceptHeaderContent ]
+  ^ acceptHeaderContent isArray
+      then: [
+          acceptHeaderContent inject: OrderedCollection new into: [ :acceptables :acceptList |
+              acceptables
+                addAll: ( self splitMediaTypesIn: acceptList );
+                yourself
+            ]
+        ]
+      otherwise: [ self splitMediaTypesIn: acceptHeaderContent ]
 ]
 
 { #category : 'private - accessing' }
 RESTfulControllerAcceptNegotiator >> acceptableQualifiedLanguageRangesIn: anHttpRequest [
 
-	| acceptHeaderContent |
+  | acceptHeaderContent |
+  acceptHeaderContent := [ anHttpRequest acceptLanguage ]
+                           on: KeyNotFound
+                           do: [ :signal | signal return: '*' ].
 
-	acceptHeaderContent := [ anHttpRequest acceptLanguage ]
-		on: KeyNotFound
-		do: [ :signal | signal return: '*' ].
-
-	^ acceptHeaderContent isArray
-		then: [ acceptHeaderContent
-				flatCollect: [ :acceptList | self splitQualifiedLanguageRangesIn: acceptList ]
-				as: OrderedCollection
-			]
-		otherwise: [ self splitQualifiedLanguageRangesIn: acceptHeaderContent ]
+  ^ acceptHeaderContent isArray
+      then: [
+          acceptHeaderContent inject: OrderedCollection new into: [ :acceptables :acceptList |
+              acceptables
+                addAll: ( self splitQualifiedLanguageRangesIn: acceptList );
+                yourself
+            ]
+        ]
+      otherwise: [ self splitQualifiedLanguageRangesIn: acceptHeaderContent ]
 ]
 
 { #category : 'querying' }
