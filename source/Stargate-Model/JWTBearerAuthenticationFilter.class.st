@@ -46,7 +46,7 @@ JWTBearerAuthenticationFilter class >> with: aKey forAlgorithmNamed: anAlgorithm
 { #category : 'accessing' }
 JWTBearerAuthenticationFilter >> authChallenge [
 
-  ^ 'Bearer realm=<1s>' expandMacrosWith: realm asString
+  ^ ( AuthenticationChallenge scheme: 'Bearer' realm: realm asString ) asString
 ]
 
 { #category : 'private' }

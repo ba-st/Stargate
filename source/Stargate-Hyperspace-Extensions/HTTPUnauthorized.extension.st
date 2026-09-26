@@ -3,7 +3,10 @@ Extension { #name : 'HTTPUnauthorized' }
 { #category : '*Stargate-Hyperspace-Extensions' }
 HTTPUnauthorized >> affectResponse: response [
 
-  response setWWWAuthenticate: self challenge
+  response setWWWAuthenticate: ( AuthenticationChallenge
+        extending: self challenge
+        withError: self errorCode
+        describedAs: self messageText ) asString
 ]
 
 { #category : '*Stargate-Hyperspace-Extensions' }

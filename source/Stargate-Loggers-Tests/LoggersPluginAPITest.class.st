@@ -111,7 +111,8 @@ LoggersPluginAPITest >> testGetLoggerMissingPermissions [
         self
           assert: response code equals: 403;
           assert: ( response headers at: 'WWW-Authenticate' )
-          equals: 'Bearer realm=api.operations.example.com';
+          equals:
+            'Bearer realm="api.operations.example.com", error="insufficient_scope", error_description="Missing permissions", scope="read:loggers"';
           withJsonFromContentsIn: response do: [ :payload |
               self
                 assert: payload message equals: 'Missing permissions';
@@ -176,7 +177,8 @@ LoggersPluginAPITest >> testGetLoggersMissingPermissions [
         self
           assert: response code equals: 403;
           assert: ( response headers at: 'WWW-Authenticate' )
-          equals: 'Bearer realm=api.operations.example.com';
+          equals:
+            'Bearer realm="api.operations.example.com", error="insufficient_scope", error_description="Missing permissions", scope="read:loggers"';
           withJsonFromContentsIn: response do: [ :payload |
               self
                 assert: payload message equals: 'Missing permissions';

@@ -314,7 +314,7 @@ AuthenticatedPetStoreAPITest >> testCreatePetUnauthorized [
         self
           assert: response code equals: 401;
           assert: ( response headers at: 'WWW-Authenticate' )
-          equals: 'Bearer realm=api.pets.example.com';
+          equals: 'Bearer realm="api.pets.example.com"';
           withJsonFromContentsIn: response do: [ :payload |
               self
                 assert: payload message equals: 'Unauthorized';
@@ -335,7 +335,7 @@ AuthenticatedPetStoreAPITest >> testGetOrdersUnauthorized [
         self
           assert: response code equals: 401;
           assert: ( response headers at: 'WWW-Authenticate' )
-          equals: 'Bearer realm=api.pets.example.com';
+          equals: 'Bearer realm="api.pets.example.com"';
           withJsonFromContentsIn: response do: [ :payload |
               self
                 assert: payload message equals: 'Unauthorized';
@@ -368,7 +368,7 @@ AuthenticatedPetStoreAPITest >> testGetPetsUnauthorized [
         self
           assert: response code equals: 401;
           assert: ( response headers at: 'WWW-Authenticate' )
-          equals: 'Bearer realm=api.pets.example.com';
+          equals: 'Bearer realm="api.pets.example.com"';
           withJsonFromContentsIn: response do: [ :payload |
               self
                 assert: payload message equals: 'Unauthorized';
@@ -433,7 +433,7 @@ AuthenticatedPetStoreAPITest >> testNotFoundEndpointUnauthorized [
         self
           assert: response code equals: 401;
           assert: ( response headers at: 'WWW-Authenticate' )
-          equals: 'Bearer realm=api.pets.example.com';
+          equals: 'Bearer realm="api.pets.example.com"';
           withJsonFromContentsIn: response do: [ :payload |
               self
                 assert: payload message equals: 'Unauthorized';
@@ -459,7 +459,7 @@ AuthenticatedPetStoreAPITest >> testNotPreflightOptionsUnauthorized [
         self
           assert: response code equals: 401;
           assert: ( response headers at: 'WWW-Authenticate' )
-          equals: 'Bearer realm=api.pets.example.com';
+          equals: 'Bearer realm="api.pets.example.com"';
           withJsonFromContentsIn: response do: [ :payload |
               self
                 assert: payload message equals: 'Unauthorized';

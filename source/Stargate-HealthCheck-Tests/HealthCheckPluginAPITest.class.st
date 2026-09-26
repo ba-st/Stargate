@@ -89,7 +89,7 @@ HealthCheckPluginAPITest >> testRunHealtCheckPluginAskingDetailsWithoutAuthentic
         self
           assert: response code equals: 401;
           assert: ( response headers at: 'WWW-Authenticate' )
-          equals: 'Bearer realm=api.operations.example.com';
+          equals: 'Bearer realm="api.operations.example.com"';
           withJsonFromContentsIn: response do: [ :payload |
               self
                 assert: payload message equals: 'Unauthorized';
@@ -116,7 +116,8 @@ HealthCheckPluginAPITest >> testRunHealtCheckPluginAskingDetailsWithoutPermissio
         self
           assert: response code equals: 403;
           assert: ( response headers at: 'WWW-Authenticate' )
-          equals: 'Bearer realm=api.operations.example.com';
+          equals:
+            'Bearer realm="api.operations.example.com", error="insufficient_scope", error_description="Missing permissions", scope="execute:health-check"';
           withJsonFromContentsIn: response do: [ :payload |
               self
                 assert: payload message equals: 'Missing permissions';
@@ -145,7 +146,7 @@ HealthCheckPluginAPITest >> testRunHealtCheckPluginAskingSummaryWithoutAuthentic
         self
           assert: response code equals: 401;
           assert: ( response headers at: 'WWW-Authenticate' )
-          equals: 'Bearer realm=api.operations.example.com';
+          equals: 'Bearer realm="api.operations.example.com"';
           withJsonFromContentsIn: response do: [ :payload |
               self
                 assert: payload message equals: 'Unauthorized';

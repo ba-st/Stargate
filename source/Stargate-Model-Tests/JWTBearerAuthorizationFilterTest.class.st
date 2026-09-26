@@ -37,7 +37,7 @@ JWTBearerAuthorizationFilterTest >> realm [
 { #category : 'tests' }
 JWTBearerAuthorizationFilterTest >> testAuthChallenge [
 
-  self assert: self newFilter authChallenge equals: 'Bearer realm=api.example.com'
+  self assert: self newFilter authChallenge equals: 'Bearer realm="api.example.com"'
 ]
 
 { #category : 'tests' }
