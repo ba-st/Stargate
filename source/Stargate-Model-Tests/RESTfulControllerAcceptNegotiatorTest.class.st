@@ -102,24 +102,6 @@ RESTfulControllerAcceptNegotiatorTest >> testAPIExactMatch [
 ]
 
 { #category : 'tests' }
-RESTfulControllerAcceptNegotiatorTest >> testAcceptHeaderContentIsAnArray [
-
-	"Fixes a bug discovered when using the Consul HTTP Check method and configuring an Accept header on the check"
-
-	| request |
-
-	request := ZnRequest
-		readFrom:
-			( 'GET /example HTTP/1.1<1s><2s>User-Agent: Consul Agent<1s><2s>Accept: */*<1s><2s>Accept: application/json<1s><2s>'
-				expandMacrosWith: Character cr asString
-				with: Character lf asString ) readStream.
-
-	self
-		assert: ( ( RESTfulControllerAcceptNegotiator accepting: apiMediaTypes ) bestRepresentationFor: request )
-		equals: 'application/vnd.stargate.pet+json;version=2.0.0' asMediaType
-]
-
-{ #category : 'tests' }
 RESTfulControllerAcceptNegotiatorTest >> testAcceptingAnything [
 
 	self
@@ -311,6 +293,37 @@ RESTfulControllerAcceptNegotiatorTest >> testRFC2616Sec14 [
 			{'application/xml' asMediaType.
 			'text/plain' asMediaType}
 			is: 'application/xml' asMediaType
+]
+
+{ #category : 'tests' }
+RESTfulControllerAcceptNegotiatorTest >> testRepeatedAcceptHeadersAreReadAsOneList [
+  "Found using the Consul HTTP Check method and configuring an Accept header on the check.
+   The last header alone would select version 2.0.0"
+
+  | request |
+  request := ZnRequest readFrom:
+               'GET /example HTTP/1.1<r><l>User-Agent: Consul Agent<r><l>Accept: application/vnd.stargate.pet+json;version=1.0.0<r><l>Accept: */*;q=0.1<r><l><r><l>'
+                 expandMacros readStream.
+
+  self
+    assert:
+    ( ( RESTfulControllerAcceptNegotiator accepting: apiMediaTypes ) bestRepresentationFor: request )
+    equals: 'application/vnd.stargate.pet+json;version=1.0.0' asMediaType
+]
+
+{ #category : 'tests - languages' }
+RESTfulControllerAcceptNegotiatorTest >> testRepeatedAcceptLanguageHeadersAreReadAsOneList [
+  "The last header alone would select en"
+
+  | request |
+  request := ZnRequest readFrom:
+               'GET /example HTTP/1.1<r><l>Accept-Language: es-AR<r><l>Accept-Language: en;q=0.5<r><l><r><l>'
+                 expandMacros readStream.
+
+  self
+    assert: ( ( RESTfulControllerAcceptNegotiator accepting: #(  ) inAnyOf: allowedLanguageTags )
+          bestLanguageFor: request )
+    equals: 'es-AR' asLanguageTag
 ]
 
 { #category : 'tests' }
