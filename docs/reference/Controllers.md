@@ -260,6 +260,24 @@ The freshness lifetime is set with `beStaleAfter: aDuration`, which emits
 `whenSharedBeStaleAfter: aDuration`, which emits `s-maxage`. For example,
 `whenSharedBeStaleAfter: 10 minutes` emits `s-maxage=600`.
 
+Once the response is stale, caches can be allowed to keep serving it for a
+while (see [RFC 5861](https://www.rfc-editor.org/rfc/rfc5861)):
+
+- `allowStaleWhileRevalidatingFor: aDuration` emits `stale-while-revalidate`,
+  letting caches serve it while they revalidate it in the background
+- `allowStaleOnErrorFor: aDuration` emits `stale-if-error`, letting caches serve
+  it when the origin answers with an error or cannot be reached
+
+For example, to keep serving a representation for a day while the API is down:
+
+```smalltalk
+builder directCachingWith: [ :caching |
+    caching
+      beAvailableFor: 1 hour;
+      allowStaleOnErrorFor: 1 day
+    ];
+```
+
 To simplify some common caching scenarios, the builder can also receive:
 
 - `beAvailableFor: aDuration` which implies `public`, `max-age` and `expires`
