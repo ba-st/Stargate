@@ -35,9 +35,11 @@ RESTfulControllerAcceptNegotiator >> acceptableMediaTypesIn: anHttpRequest [
 
   ^ acceptHeaderContent isArray
       then: [
-          acceptHeaderContent
-            flatCollect: [ :acceptList | self splitMediaTypesIn: acceptList ]
-            as: OrderedCollection
+          acceptHeaderContent inject: OrderedCollection new into: [ :acceptables :acceptList |
+              acceptables
+                addAll: ( self splitMediaTypesIn: acceptList );
+                yourself
+            ]
         ]
       otherwise: [ self splitMediaTypesIn: acceptHeaderContent ]
 ]
@@ -45,18 +47,20 @@ RESTfulControllerAcceptNegotiator >> acceptableMediaTypesIn: anHttpRequest [
 { #category : 'private - accessing' }
 RESTfulControllerAcceptNegotiator >> acceptableQualifiedLanguageRangesIn: anHttpRequest [
 
-	| acceptHeaderContent |
+  | acceptHeaderContent |
+  acceptHeaderContent := [ anHttpRequest acceptLanguage ]
+                           on: KeyNotFound
+                           do: [ :signal | signal return: '*' ].
 
-	acceptHeaderContent := [ anHttpRequest acceptLanguage ]
-		on: KeyNotFound
-		do: [ :signal | signal return: '*' ].
-
-	^ acceptHeaderContent isArray
-		then: [ acceptHeaderContent
-				flatCollect: [ :acceptList | self splitQualifiedLanguageRangesIn: acceptList ]
-				as: OrderedCollection
-			]
-		otherwise: [ self splitQualifiedLanguageRangesIn: acceptHeaderContent ]
+  ^ acceptHeaderContent isArray
+      then: [
+          acceptHeaderContent inject: OrderedCollection new into: [ :acceptables :acceptList |
+              acceptables
+                addAll: ( self splitQualifiedLanguageRangesIn: acceptList );
+                yourself
+            ]
+        ]
+      otherwise: [ self splitQualifiedLanguageRangesIn: acceptHeaderContent ]
 ]
 
 { #category : 'querying' }
