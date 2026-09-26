@@ -23,6 +23,38 @@ HyperspaceExtensionsTest >> testBadRequestAsJSON [
 ]
 
 { #category : 'tests' }
+HyperspaceExtensionsTest >> testForbiddenAffectResponse [
+
+  | error response |
+  error := HTTPForbidden messageText: 'Forbidden' with: 'Bearer realm="api.example.com"'.
+  self deny: error hasErrorCode.
+  response := ZnResponse statusCode: 403.
+
+  error affectResponse: response.
+
+  self assert: ( response headers at: 'WWW-Authenticate' ) equals: 'Bearer realm="api.example.com"'
+]
+
+{ #category : 'tests' }
+HyperspaceExtensionsTest >> testForbiddenAffectResponseBecauseScopeIsInsufficient [
+
+  | error response |
+  error := ( HTTPForbidden messageText: 'Missing permissions' with: 'Bearer realm="api.example.com"' )
+             errorCode: 'insufficient_scope';
+             requiredPermissions: #( 'read:pets' 'update:pets' );
+             yourself.
+  self assert: error hasErrorCode.
+  response := ZnResponse statusCode: 403.
+
+  error affectResponse: response.
+
+  self
+    assert: ( response headers at: 'WWW-Authenticate' )
+    equals:
+    'Bearer realm="api.example.com", error="insufficient_scope", error_description="Missing permissions", scope="read:pets update:pets"'
+]
+
+{ #category : 'tests' }
 HyperspaceExtensionsTest >> testNotAcceptableAsJSON [
 
 	| error json |
@@ -41,4 +73,35 @@ HyperspaceExtensionsTest >> testNotAcceptableAsJSON [
 		assert: json allowedLanguageTags size equals: 2;
 		assert: json allowedLanguageTags first equals: 'en-US';
 		assert: json allowedLanguageTags last equals: 'es-AR'
+]
+
+{ #category : 'tests' }
+HyperspaceExtensionsTest >> testUnauthorizedAffectResponse [
+
+  | error response |
+  error := HTTPUnauthorized messageText: 'Unauthorized' with: 'Bearer realm="api.example.com"'.
+  self deny: error hasErrorCode.
+  response := ZnResponse statusCode: 401.
+
+  error affectResponse: response.
+
+  self assert: ( response headers at: 'WWW-Authenticate' ) equals: 'Bearer realm="api.example.com"'
+]
+
+{ #category : 'tests' }
+HyperspaceExtensionsTest >> testUnauthorizedAffectResponseBecauseTokenIsInvalid [
+
+  | error response |
+  error := ( HTTPUnauthorized messageText: 'Invalid token' with: 'Bearer realm="api.example.com"' )
+             errorCode: 'invalid_token';
+             yourself.
+  self assert: error hasErrorCode.
+  response := ZnResponse statusCode: 401.
+
+  error affectResponse: response.
+
+  self
+    assert: ( response headers at: 'WWW-Authenticate' )
+    equals:
+    'Bearer realm="api.example.com", error="invalid_token", error_description="Invalid token"'
 ]

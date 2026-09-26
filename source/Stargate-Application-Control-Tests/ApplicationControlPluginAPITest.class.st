@@ -206,7 +206,7 @@ ApplicationControlPluginAPITest >> testRunCommandWithoutAuthentication [
         self
           assert: response code equals: 401;
           assert: ( response headers at: 'WWW-Authenticate' )
-          equals: 'Bearer realm=api.operations.example.com';
+          equals: 'Bearer realm="api.operations.example.com"';
           withJsonFromContentsIn: response do: [ :payload |
               self
                 assert: payload message equals: 'Unauthorized';
@@ -233,7 +233,8 @@ ApplicationControlPluginAPITest >> testRunCommandWithoutPermissions [
         self
           assert: response code equals: 403;
           assert: ( response headers at: 'WWW-Authenticate' )
-          equals: 'Bearer realm=api.operations.example.com';
+          equals:
+            'Bearer realm="api.operations.example.com", error="insufficient_scope", error_description="Missing permissions", scope="execute:application-control"';
           withJsonFromContentsIn: response do: [ :payload |
               self
                 assert: payload message equals: 'Missing permissions';

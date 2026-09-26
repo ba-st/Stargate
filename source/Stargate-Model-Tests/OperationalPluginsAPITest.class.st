@@ -63,7 +63,8 @@ OperationalPluginsAPITest >> testCannotDisableHealtCheckPluginWhenMissingPermiss
         self
           assert: response code equals: 403;
           assert: ( response headers at: 'WWW-Authenticate' )
-          equals: 'Bearer realm=api.operations.example.com';
+          equals:
+            'Bearer realm="api.operations.example.com", error="insufficient_scope", error_description="Missing permissions", scope="update:operations"';
           withJsonFromContentsIn: response do: [ :payload |
               self
                 assert: payload message equals: 'Missing permissions';
@@ -188,7 +189,8 @@ OperationalPluginsAPITest >> testGetHealtCheckPluginForbidden [
         self
           assert: response code equals: 403;
           assert: ( response headers at: 'WWW-Authenticate' )
-          equals: 'Bearer realm=api.operations.example.com';
+          equals:
+            'Bearer realm="api.operations.example.com", error="insufficient_scope", error_description="Missing permissions", scope="read:operations"';
           withJsonFromContentsIn: response do: [ :payload |
               self
                 assert: payload message equals: 'Missing permissions';
@@ -211,7 +213,7 @@ OperationalPluginsAPITest >> testGetHealtCheckPluginUnauthorized [
         self
           assert: response code equals: 401;
           assert: ( response headers at: 'WWW-Authenticate' )
-          equals: 'Bearer realm=api.operations.example.com';
+          equals: 'Bearer realm="api.operations.example.com"';
           withJsonFromContentsIn: response do: [ :payload |
               self
                 assert: payload message equals: 'Unauthorized';
@@ -272,7 +274,8 @@ OperationalPluginsAPITest >> testGetOperationalPluginsForbidden [
         self
           assert: response code equals: 403;
           assert: ( response headers at: 'WWW-Authenticate' )
-          equals: 'Bearer realm=api.operations.example.com';
+          equals:
+            'Bearer realm="api.operations.example.com", error="insufficient_scope", error_description="Missing permissions", scope="read:operations"';
           withJsonFromContentsIn: response do: [ :payload |
               self
                 assert: payload message equals: 'Missing permissions';
@@ -295,11 +298,39 @@ OperationalPluginsAPITest >> testGetOperationalPluginsUnauthorized [
         self
           assert: response code equals: 401;
           assert: ( response headers at: 'WWW-Authenticate' )
-          equals: 'Bearer realm=api.operations.example.com';
+          equals: 'Bearer realm="api.operations.example.com"';
           withJsonFromContentsIn: response do: [ :payload |
               self
                 assert: payload message equals: 'Unauthorized';
                 assert: payload code equals: 401
+            ]
+      ]
+]
+
+{ #category : 'tests' }
+OperationalPluginsAPITest >> testGetOperationalPluginsWithInvalidToken [
+
+  self
+    should: [
+        | client |
+        client := self newClient.
+        client request setAuthorization: 'Bearer invalid'.
+        client get: self operationsPluginsUrl
+      ]
+    raise: ZnHttpUnsuccessful
+    withExceptionDo: [ :error |
+        | response |
+        response := error response.
+        self
+          assert: response code equals: 401;
+          assert: ( response headers at: 'WWW-Authenticate' )
+          equals:
+            'Bearer realm="api.operations.example.com", error="invalid_token", error_description="Invalid token"';
+          withJsonFromContentsIn: response do: [ :payload |
+              self
+                assert: payload message equals: 'Invalid token';
+                assert: payload code equals: 401;
+                assert: payload errorCode equals: 'invalid_token'
             ]
       ]
 ]
