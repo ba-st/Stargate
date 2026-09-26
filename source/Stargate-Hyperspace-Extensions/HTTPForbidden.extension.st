@@ -3,17 +3,32 @@ Extension { #name : 'HTTPForbidden' }
 { #category : '*Stargate-Hyperspace-Extensions' }
 HTTPForbidden >> affectResponse: response [
 
-  | challenge |
-  challenge := AuthenticationChallenge
-                 extending: self challenge
-                 withError: self errorCode
-                 describedAs: self messageText.
+  response setWWWAuthenticate:
+    ( self hasErrorCode
+        then: [ self challengeDescribingError asString ]
+        otherwise: [ self challenge ] )
+]
+
+{ #category : '*Stargate-Hyperspace-Extensions' }
+HTTPForbidden >> challengeDescribingError [
+
+  | describedChallenge |
+  describedChallenge := AuthenticationChallenge
+                          extending: self challenge
+                          withError: self errorCode
+                          describedAs: self messageText.
   self withRequiredPermissionsDo: [ :permissions |
-      challenge
+      describedChallenge
         addParameterNamed: 'scope'
         quotingIfRepresentable: ( Character space asString join: permissions )
     ].
-  response setWWWAuthenticate: challenge asString
+  ^ describedChallenge
+]
+
+{ #category : '*Stargate-Hyperspace-Extensions' }
+HTTPForbidden >> hasErrorCode [
+
+  ^ self errorCode notNil
 ]
 
 { #category : '*Stargate-Hyperspace-Extensions' }

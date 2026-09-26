@@ -27,18 +27,11 @@ AuthenticationChallenge class >> extending: aChallenge [
 
 { #category : 'instance creation' }
 AuthenticationChallenge class >> extending: aChallenge withError: anErrorCode describedAs: aDescription [
-  "The error and error_description attributes are only included when the request was refused
-   for a reason worth an error code. A request lacking any authentication information gets
-   the challenge alone."
 
-  | describedChallenge |
-  describedChallenge := self extending: aChallenge.
-  anErrorCode ifNotNil: [
-      describedChallenge
-        addParameterNamed: 'error' quoting: anErrorCode;
-        addParameterNamed: 'error_description' quotingIfRepresentable: aDescription
-    ].
-  ^ describedChallenge
+  ^ ( self extending: aChallenge )
+      addParameterNamed: 'error' quoting: anErrorCode;
+      addParameterNamed: 'error_description' quotingIfRepresentable: aDescription;
+      yourself
 ]
 
 { #category : 'instance creation' }

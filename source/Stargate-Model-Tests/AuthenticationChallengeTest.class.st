@@ -20,6 +20,14 @@ AuthenticationChallengeTest >> testExtendingChallengeWithoutParameters [
 ]
 
 { #category : 'tests' }
+AuthenticationChallengeTest >> testExtendingKeepsChallenge [
+
+  self
+    assert: ( AuthenticationChallenge extending: 'Bearer realm="api.example.com"' ) asString
+    equals: 'Bearer realm="api.example.com"'
+]
+
+{ #category : 'tests' }
 AuthenticationChallengeTest >> testExtendingWithError [
 
   | challenge |
@@ -46,17 +54,6 @@ AuthenticationChallengeTest >> testExtendingWithErrorDescribedWithUnrepresentabl
               describedAs: description ) asString
         equals: 'Bearer realm="api.example.com", error="invalid_token"'
     ]
-]
-
-{ #category : 'tests' }
-AuthenticationChallengeTest >> testExtendingWithoutError [
-
-  self
-    assert: ( AuthenticationChallenge
-          extending: 'Bearer realm="api.example.com"'
-          withError: nil
-          describedAs: 'Unauthorized' ) asString
-    equals: 'Bearer realm="api.example.com"'
 ]
 
 { #category : 'tests' }

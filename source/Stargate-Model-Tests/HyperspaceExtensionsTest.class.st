@@ -27,6 +27,7 @@ HyperspaceExtensionsTest >> testForbiddenAffectResponse [
 
   | error response |
   error := HTTPForbidden messageText: 'Forbidden' with: 'Bearer realm="api.example.com"'.
+  self deny: error hasErrorCode.
   response := ZnResponse statusCode: 403.
 
   error affectResponse: response.
@@ -42,6 +43,7 @@ HyperspaceExtensionsTest >> testForbiddenAffectResponseBecauseScopeIsInsufficien
              errorCode: 'insufficient_scope';
              requiredPermissions: #( 'read:pets' 'update:pets' );
              yourself.
+  self assert: error hasErrorCode.
   response := ZnResponse statusCode: 403.
 
   error affectResponse: response.
@@ -78,6 +80,7 @@ HyperspaceExtensionsTest >> testUnauthorizedAffectResponse [
 
   | error response |
   error := HTTPUnauthorized messageText: 'Unauthorized' with: 'Bearer realm="api.example.com"'.
+  self deny: error hasErrorCode.
   response := ZnResponse statusCode: 401.
 
   error affectResponse: response.
@@ -92,6 +95,7 @@ HyperspaceExtensionsTest >> testUnauthorizedAffectResponseBecauseTokenIsInvalid 
   error := ( HTTPUnauthorized messageText: 'Invalid token' with: 'Bearer realm="api.example.com"' )
              errorCode: 'invalid_token';
              yourself.
+  self assert: error hasErrorCode.
   response := ZnResponse statusCode: 401.
 
   error affectResponse: response.
