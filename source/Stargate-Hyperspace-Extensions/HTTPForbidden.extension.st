@@ -17,11 +17,8 @@ HTTPForbidden >> challengeDescribingError [
                           extending: self challenge
                           withError: self errorCode
                           describedAs: self messageText.
-  self withRequiredPermissionsDo: [ :permissions |
-      describedChallenge
-        addParameterNamed: 'scope'
-        quotingIfRepresentable: ( Character space asString join: permissions )
-    ].
+  self withScopeDo: [ :scope |
+      describedChallenge addParameterNamed: 'scope' quotingIfRepresentable: scope ].
   ^ describedChallenge
 ]
 
@@ -39,7 +36,14 @@ HTTPForbidden >> neoJsonOn: neoJSONWriter [
         writeKey: #code value: self code;
         writeKey: #message value: self messageText;
         writeKey: #errorCode value: self errorCode.
-      self withRequiredPermissionsDo: [ :permissions |
-          jsonMapWriter writeKey: #scope value: ( Character space asString join: permissions ) ]
+      self withScopeDo: [ :scope | jsonMapWriter writeKey: #scope value: scope ]
     ]
+]
+
+{ #category : '*Stargate-Hyperspace-Extensions' }
+HTTPForbidden >> withScopeDo: aBlock [
+  "The scope is the space-delimited list of the required permissions"
+
+  self withRequiredPermissionsDo: [ :permissions |
+      aBlock value: ( Character space asString join: permissions ) ]
 ]
