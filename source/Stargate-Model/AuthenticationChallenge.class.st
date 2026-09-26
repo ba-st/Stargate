@@ -57,6 +57,12 @@ AuthenticationChallenge >> addParameterNamed: aName quotingIfRepresentable: aVal
   ( self isRepresentable: aValue ) then: [ self addParameterNamed: aName quoting: aValue ]
 ]
 
+{ #category : 'printing' }
+AuthenticationChallenge >> asString [
+
+  ^ self printString
+]
+
 { #category : 'initialization' }
 AuthenticationChallenge >> initializeExtending: aChallenge [
 
