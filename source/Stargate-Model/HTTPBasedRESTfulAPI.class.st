@@ -8,6 +8,7 @@ Class {
 		'teapotServer',
 		'controllers',
 		'errorHandlers',
+		'clientErrorHandler',
 		'enabledOperationalPlugins',
 		'operationsConfiguration',
 		'disabledOperationalPlugins',
@@ -49,10 +50,11 @@ HTTPBasedRESTfulAPI >> allowCrossOriginSharingApplying: aConfigurationBlock [
 { #category : 'private - configuring' }
 HTTPBasedRESTfulAPI >> applyCrossSharingResourceConfigurationTo: response accordingTo: request [
 
-	optionalCORSHandler withContentDo: [ :handler |
-		( request headers includesKey: 'Origin' ) then: [
-			handler teaEvalActionOnRequest: request response: response ]
-		]
+  optionalCORSHandler withContentDo: [ :handler |
+      ( ( request headers includesKey: 'Origin' ) and: [
+            ( response headers includesKey: 'Access-Control-Allow-Origin' ) not ] ) then: [
+          handler teaEvalActionOnRequest: request response: response ]
+    ]
 ]
 
 { #category : 'configuring' }
@@ -66,7 +68,13 @@ HTTPBasedRESTfulAPI >> authenticatedBy: anAuthorizationFilter [
 { #category : 'private - configuring' }
 HTTPBasedRESTfulAPI >> configureErrorHandlers [
 
-	errorHandlers do: [ :errorHandler | teapotServer exception: errorHandler ]
+  teapotServer exception: HTTPClientError
+    -> ( self errorHandlerApplyingCrossSharingResourceConfigurationAfter: [ :clientError :request |
+            clientErrorHandler teaEvalActionOnException: clientError request: request ] ).
+  errorHandlers do: [ :errorHandler |
+      teapotServer exception: errorHandler key
+        -> ( self errorHandlerApplyingCrossSharingResourceConfigurationAfter: errorHandler value )
+    ]
 ]
 
 { #category : 'private - configuring' }
@@ -137,6 +145,24 @@ HTTPBasedRESTfulAPI >> enable: anOperationalPluginEndpoint configuredBy: configu
 	pluginToEnable includeControllersIn: self
 ]
 
+{ #category : 'private - configuring' }
+HTTPBasedRESTfulAPI >> errorHandlerApplyingCrossSharingResourceConfigurationAfter: anErrorHandler [
+
+  ^ [ :error :request |
+      | response |
+      response := anErrorHandler teaEvalActionOnException: error request: request.
+      ( response isA: ZnResponse ) then: [
+          self applyCrossSharingResourceConfigurationTo: response accordingTo: request ].
+      response
+    ]
+]
+
+{ #category : 'configuring' }
+HTTPBasedRESTfulAPI >> handleClientErrorsWith: aDyadicBlock [
+
+  clientErrorHandler := aDyadicBlock
+]
+
 { #category : 'initialization' }
 HTTPBasedRESTfulAPI >> initializeConfiguredBy: configuration installing: aRESTfulControllerCollection [
 
@@ -179,13 +205,12 @@ HTTPBasedRESTfulAPI >> initializeEnabledOperationalPlugins [
 HTTPBasedRESTfulAPI >> initializeErrorHandlers [
 
   errorHandlers := OrderedCollection new.
-  self on: HTTPClientError addErrorHandler: [ :clientError :request |
+  self handleClientErrorsWith: [ :clientError :request |
       | json response |
       json := NeoJSONWriter toStringPretty: clientError.
       response := ZnResponse statusCode: clientError code.
       response entity: ( ZnEntity json: json ).
       clientError affectResponse: response.
-      self applyCrossSharingResourceConfigurationTo: response accordingTo: request.
       response
     ]
 ]

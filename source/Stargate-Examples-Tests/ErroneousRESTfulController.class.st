@@ -10,6 +10,15 @@ Class {
 }
 
 { #category : 'routes' }
+ErroneousRESTfulController >> declareGetConflictingRoute [
+
+  ^ RouteSpecification
+      handling: #GET
+      at: self identifierTemplate , '/conflict'
+      evaluating: [ :httpRequest :requestContext | HTTPClientError conflict signal: 'Client error' ]
+]
+
+{ #category : 'routes' }
 ErroneousRESTfulController >> declareGetErroneousRoute [
 
 	^ RouteSpecification

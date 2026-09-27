@@ -153,6 +153,49 @@ ErroneousAPITest >> testCORSAllowingMoreThanOneOrigin [
 ]
 
 { #category : 'tests' }
+ErroneousAPITest >> testCORSAppliedOnceToErrorResponses [
+
+  | response |
+  api allowCrossOriginSharingApplying: [ :cors |
+      cors
+        allowOnlyFrom: { self baseUrl . 'http://google.com/' asUrl };
+        expose: #( 'X-Custom' )
+    ].
+
+  response := self newClient
+                url: self baseUrl / 'errors' / '1' asUrl;
+                headerAt: 'Origin' put: self baseUrl printString;
+                enforceHttpSuccess: false;
+                get;
+                response.
+
+  self
+    assert: response code equals: 500;
+    assert: ( response varyHeaderNames occurrencesOf: 'Origin' ) equals: 1;
+    assert: ( response headers at: 'Access-Control-Expose-Headers' ) equals: 'X-Custom';
+    assert: response canBeSharedWithRequestsFrom: self baseUrl
+]
+
+{ #category : 'tests' }
+ErroneousAPITest >> testCORSAppliedToReplacedClientErrorHandlerResponse [
+
+  | response |
+  api allowCrossOriginSharingApplying: [ :cors | cors allowAnyOrigin ].
+  api handleClientErrorsWith: [ :clientError :request | ZnResponse statusCode: clientError code ].
+
+  response := self newClient
+                url: self baseUrl / 'errors' / '1' / 'conflict' asUrl;
+                headerAt: 'Origin' put: self baseUrl printString;
+                enforceHttpSuccess: false;
+                get;
+                response.
+
+  self
+    assert: response code equals: 409;
+    assert: ( response headers at: 'Access-Control-Allow-Origin' ) equals: '*'
+]
+
+{ #category : 'tests' }
 ErroneousAPITest >> testCORSOptionalHeaders [
 
 	| response |
@@ -233,4 +276,41 @@ ErroneousAPITest >> testCORSRespondWithEmptyHeadersIfOriginNotAllowed [
 		assert: response code equals: 500;
 		assert: response varyHeaderNames isEmpty;
 		should: [ response headers at: 'Access-Control-Allow-Origin' ] raise: KeyNotFound
+]
+
+{ #category : 'tests' }
+ErroneousAPITest >> testClientErrorsAreHandledBeforeOtherErrors [
+
+  | response |
+  response := self newClient
+                url: self baseUrl / 'errors' / '1' / 'conflict' asUrl;
+                enforceHttpSuccess: false;
+                get;
+                response.
+
+  self
+    assert: response code equals: 409;
+    assert: response contentType equals: ZnMimeType applicationJson
+]
+
+{ #category : 'tests' }
+ErroneousAPITest >> testReplacingClientErrorHandler [
+
+  | response |
+  api handleClientErrorsWith: [ :clientError :request |
+      ( ZnResponse statusCode: clientError code )
+        entity: ( ZnEntity with: '{"status":409}' ofType: 'application/problem+json' asMediaType );
+        yourself
+    ].
+
+  response := self newClient
+                url: self baseUrl / 'errors' / '1' / 'conflict' asUrl;
+                enforceHttpSuccess: false;
+                get;
+                response.
+
+  self
+    assert: response code equals: 409;
+    assert: response contentType equals: 'application/problem+json' asMediaType;
+    assert: response contents equals: '{"status":409}'
 ]

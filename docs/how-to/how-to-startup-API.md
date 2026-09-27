@@ -47,3 +47,39 @@ generated properly. For example `#serverUrl -> 'http://api.example.com'`.
 It's a good idea to get these configuration options from a command line or
 environment variable, so the same code can be deployed locally for testing and
 in production with the real values.
+
+## Handle errors
+
+When a route signals an `HTTPClientError`, the API answers with its status code
+and a JSON body describing it. To answer client errors differently, for
+example with an [RFC 9457](https://www.rfc-editor.org/rfc/rfc9457) problem
+document, replace that handler:
+
+```smalltalk
+api handleClientErrorsWith: [ :clientError :request |
+  ( ZnResponse statusCode: clientError code )
+    entity: ( ZnEntity
+      with: ( NeoJSONWriter toString: ( Dictionary new
+        at: #status put: clientError code;
+        at: #title put: clientError messageText;
+        yourself ) )
+      ofType: 'application/problem+json' asMediaType );
+    yourself
+  ]
+```
+
+To handle other errors, add a handler for them before installing the API:
+
+```smalltalk
+api on: Error addErrorHandler: [ :error :request |
+  ZnResponse serverError: error messageText ]
+```
+
+The client error handler always runs first, and added handlers run in the order
+they were added, so add specific handlers before generic ones. A handler added
+for `HTTPClientError`, or for any of its subclasses, is never reached: use
+`handleClientErrorsWith:` instead.
+
+If [cross-origin resource sharing](../reference/CrossOriginResourceSharing.md)
+is enabled, the API applies its configuration to the responses error handlers
+answer, so handlers don't need to.

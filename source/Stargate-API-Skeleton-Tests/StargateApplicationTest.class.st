@@ -129,6 +129,17 @@ StargateApplicationTest >> startConcurrentConnectionsApp [
 ]
 
 { #category : 'private' }
+StargateApplicationTest >> startCustomErrorResponsesApp [
+
+  self
+    start: CustomErrorResponsesTestApplication
+    withAll: { '--stargate.public-url=http://localhost:<1p>' expandMacrosWith: port .
+        '--stargate.port=<1p>' expandMacrosWith: port .
+        '--stargate.operations-secret=<1s>' expandMacrosWith: self secret }.
+  baseUrl := runningApplication configuration stargate publicURL
+]
+
+{ #category : 'private' }
 StargateApplicationTest >> startPetStore [
 
   self
@@ -230,6 +241,38 @@ StargateApplicationTest >> testConflict [
 ]
 
 { #category : 'tests - api' }
+StargateApplicationTest >> testConflictWithCustomClientErrorHandler [
+
+  | json |
+  self startCustomErrorResponsesApp.
+  self newClient
+    url: self baseUrl / 'orders' asUrl;
+    entity: ( ZnEntity
+          with: '{"date":"2018-10-24T18:05:46.418Z","pet":"https://api.example.com/pets/1"}'
+          ofType: self orderVersion1dot0dot0MediaType );
+    post.
+
+  self newClient
+    url: self baseUrl / 'orders/1/cancel' asUrl;
+    post.
+
+  self
+    should: [
+        self newClient
+          url: self baseUrl / 'orders/1/complete' asUrl;
+          post
+      ]
+    raise: ZnHttpUnsuccessful
+    withExceptionDo: [ :error |
+        self
+          assert: error response code equals: 409;
+          assert: error response contentType equals: 'application/problem+json' asMediaType.
+        json := NeoJSONObject fromString: error response contents.
+        self assert: json status equals: 409
+      ]
+]
+
+{ #category : 'tests - api' }
 StargateApplicationTest >> testCreatePet [
 
 	| response json |
@@ -255,6 +298,23 @@ StargateApplicationTest >> testCreatePet [
 		assert: json name equals: 'Firulais';
 		assert: json type equals: 'dog';
 		assert: json selfLocation equals: response location
+]
+
+{ #category : 'tests - application' }
+StargateApplicationTest >> testCustomResponseForUnexpectedError [
+
+  | response json |
+  response := CustomErrorResponsesTestApplication new
+                responseForUnexpectedError: ( Error new messageText: 'Unexpected' )
+                request: ( ZnRequest get: '/' ).
+
+  self
+    assert: response code equals: 500;
+    assert: response contentType equals: 'application/problem+json' asMediaType.
+  json := NeoJSONObject fromString: response contents.
+  self
+    assert: json status equals: 500;
+    assert: json title equals: 'Internal Server Error'
 ]
 
 { #category : 'tests - application' }
@@ -455,6 +515,21 @@ StargateApplicationTest >> testProjectName [
 	self
 		assert: PetStoreApplication projectName equals: 'Stargate';
 		assert: SouthAmericanCurrenciesApplication projectName equals: 'Stargate'
+]
+
+{ #category : 'tests - application' }
+StargateApplicationTest >> testResponseForUnexpectedError [
+
+  | response |
+  response := PetStoreApplication new
+                responseForUnexpectedError: ( Error new messageText: 'Unexpected' )
+                request: ( ZnRequest get: '/' ).
+
+  self
+    assert: response isError;
+    assert: response code equals: 500;
+    assert: response contentType equals: ZnMimeType textPlain;
+    assert: response contents trimBoth equals: 'Unexpected'
 ]
 
 { #category : 'tests - api' }
