@@ -1,5 +1,30 @@
 # Migration Guide
 
+## Migration from v12 to v13
+
+- `TeaResponse class >> noContent`, an extension in
+  `Stargate-Teapot-Extensions`, is removed. Use `ZnResponse noContent`
+  instead, for example when aborting a request with `abort:`.
+- Error handlers must answer a `ZnResponse`. The API now applies the
+  cross-origin resource sharing configuration to the response of every error
+  handler, which fails for any other object.
+- Error handlers no longer need to call
+  `applyCrossSharingResourceConfigurationTo:accordingTo:` themselves. Calls
+  left in place still work, and don't repeat any header.
+- A handler added with `on: HTTPClientError addErrorHandler:` was never
+  reached, because the API's own client error handler runs first. To answer
+  client errors differently, add a `#clientErrorHandler` to the API's
+  configuration instead. In a `StargateApplication`, re-implement
+  `apiConfiguration` and add it to the result of the super send.
+- `StargateApplication` has two new hooks:
+  - `responseForUnexpectedError:request:` builds the response to unexpected
+    errors. It defaults to the `500/Internal Server Error` answered before.
+  - `configureAPI:` receives the API before the global error handler is added,
+    so error handlers added there take precedence over it.
+
+  See [how to start up an API](how-to/how-to-startup-API.md#handle-errors) and
+  [the API skeleton](reference/Skeleton.md#error-responses).
+
 ## Migration from v7/8 to v9
 
 - Pharo 8 and 9 support is deprecated, use Pharo 10 or 11.
