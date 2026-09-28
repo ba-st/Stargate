@@ -27,6 +27,15 @@ ErroneousRESTfulController >> declareGetErroneousRoute [
 		  evaluating: [ :httpRequest :requestContext | Error signal: 'Server error' ]
 ]
 
+{ #category : 'routes' }
+ErroneousRESTfulController >> declareGetObjectNotFoundRoute [
+
+  ^ RouteSpecification
+      handling: #GET
+      at: self identifierTemplate , '/not-found'
+      evaluating: [ :httpRequest :requestContext | ObjectNotFound signal: 'Not found' ]
+]
+
 { #category : 'initialization' }
 ErroneousRESTfulController >> initialize [
 

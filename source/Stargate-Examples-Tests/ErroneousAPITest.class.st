@@ -17,6 +17,17 @@ ErroneousAPITest >> assert: aResponse canBeSharedWithRequestsFrom: anOriginLocat
 		equals: anOriginLocation asWebOrigin asString
 ]
 
+{ #category : 'running' }
+ErroneousAPITest >> configureErrorHandlers [
+
+  api on: ObjectNotFound addErrorHandler: [ :clientError :request |
+      ( ZnResponse statusCode: 409 )
+        entity: ( ZnEntity with: '{"status":409}' ofType: 'application/problem+json' asMediaType );
+        yourself
+    ].
+  super configureErrorHandlers
+]
+
 { #category : 'private' }
 ErroneousAPITest >> controllersToInstall [
 
@@ -181,7 +192,6 @@ ErroneousAPITest >> testCORSAppliedToReplacedClientErrorHandlerResponse [
 
   | response |
   api allowCrossOriginSharingApplying: [ :cors | cors allowAnyOrigin ].
-  api handleClientErrorsWith: [ :clientError :request | ZnResponse statusCode: clientError code ].
 
   response := self newClient
                 url: self baseUrl / 'errors' / '1' / 'conflict' asUrl;
@@ -294,17 +304,11 @@ ErroneousAPITest >> testClientErrorsAreHandledBeforeOtherErrors [
 ]
 
 { #category : 'tests' }
-ErroneousAPITest >> testReplacingClientErrorHandler [
+ErroneousAPITest >> testSpecificErrorHandler [
 
   | response |
-  api handleClientErrorsWith: [ :clientError :request |
-      ( ZnResponse statusCode: clientError code )
-        entity: ( ZnEntity with: '{"status":409}' ofType: 'application/problem+json' asMediaType );
-        yourself
-    ].
-
   response := self newClient
-                url: self baseUrl / 'errors' / '1' / 'conflict' asUrl;
+                url: self baseUrl / 'errors' / '1' / 'not-found' asUrl;
                 enforceHttpSuccess: false;
                 get;
                 response.

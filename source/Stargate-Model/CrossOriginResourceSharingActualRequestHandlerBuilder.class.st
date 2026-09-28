@@ -36,7 +36,9 @@ CrossOriginResourceSharingActualRequestHandlerBuilder >> allowOnlyFrom: origins 
 { #category : 'building' }
 CrossOriginResourceSharingActualRequestHandlerBuilder >> build [
 
-	^ CrossOriginResourceSharingActualRequestHandler allowing: allowOriginPolicyBinding content applying: addHeaderCommands
+  ^ CrossOriginResourceSharingActualRequestHandler
+      allowing: allowOriginPolicyBinding content
+      applying: addHeaderCommands
 ]
 
 { #category : 'configuring' }
@@ -46,8 +48,8 @@ CrossOriginResourceSharingActualRequestHandlerBuilder >> expose: exposedHeaders 
       | headerName |
       headerName := headerNames >> #accessControlExposeHeaders.
       exposedHeaders do: [ :exposedHeader |
-          ( ( ( headers at: headerName ifAbsent: [ '' ] ) substrings: ', ' ) includes: exposedHeader )
-            ifFalse: [ headers at: headerName addSeparatedWithComma: exposedHeader ]
+          [ headers at: headerName addSeparatedWithComma: exposedHeader ] unless:
+            ( self is: exposedHeader alreadyIncludedAt: headerName in: headers )
         ]
     ]
 ]
@@ -58,4 +60,10 @@ CrossOriginResourceSharingActualRequestHandlerBuilder >> initialize [
 	super initialize.
 	allowOriginPolicyBinding := Binding undefinedExplainedBy: 'You must choose an allow origin policy'.
 	addHeaderCommands := OrderedCollection new
+]
+
+{ #category : 'private' }
+CrossOriginResourceSharingActualRequestHandlerBuilder >> is: exposedHeader alreadyIncludedAt: headerName in: headers [
+
+  ^ ( headers at: headerName ifAbsent: [ '' ] ) includesSubstring: exposedHeader
 ]

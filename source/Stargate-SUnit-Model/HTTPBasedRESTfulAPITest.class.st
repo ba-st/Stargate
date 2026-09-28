@@ -36,6 +36,12 @@ HTTPBasedRESTfulAPITest >> claimSet [
 	^ JWTClaimsSet new
 ]
 
+{ #category : 'running' }
+HTTPBasedRESTfulAPITest >> configureErrorHandlers [
+
+  api on: Error addErrorHandler: self globalErrorHandler
+]
+
 { #category : 'private' }
 HTTPBasedRESTfulAPITest >> controllersToInstall [
 
@@ -121,14 +127,12 @@ HTTPBasedRESTfulAPITest >> setUp [
 { #category : 'running' }
 HTTPBasedRESTfulAPITest >> setUpAPI [
 
-	api := HTTPBasedRESTfulAPI
-		       configuredBy: {
-				       ( #port -> self port ).
-				       ( #serverUrl -> self baseUrl ).
-				       ( #operations -> self operationsConfiguration ) }
-		       installing: self controllersToInstall.
-
-	api on: Error addErrorHandler: self globalErrorHandler
+  api := HTTPBasedRESTfulAPI
+           configuredBy:
+           { #port -> self port . #serverUrl -> self baseUrl . #operations
+             -> self operationsConfiguration }
+           installing: self controllersToInstall.
+  self configureErrorHandlers
 ]
 
 { #category : 'running' }

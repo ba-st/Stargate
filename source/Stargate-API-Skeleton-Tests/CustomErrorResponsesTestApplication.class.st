@@ -33,11 +33,19 @@ CustomErrorResponsesTestApplication class >> projectName [
   ^ 'Stargate'
 ]
 
+{ #category : 'private - accessing' }
+CustomErrorResponsesTestApplication >> apiConfiguration [
+
+  ^ super apiConfiguration , { #clientErrorHandler -> [ :clientError :request |
+        self problemDetailsWithStatus: clientError code titled: clientError messageText ] }
+]
+
 { #category : 'configuring' }
 CustomErrorResponsesTestApplication >> configureAPI: anAPI [
 
-  anAPI handleClientErrorsWith: [ :clientError :request |
-      self problemDetailsWithStatus: clientError code titled: clientError messageText ]
+  anAPI
+    on: ObjectNotFound
+    addErrorHandler: [ :notFound :request | self problemDetailsWithStatus: 404 titled: 'Not found' ]
 ]
 
 { #category : 'private - accessing' }

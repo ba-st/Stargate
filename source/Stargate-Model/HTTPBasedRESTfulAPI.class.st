@@ -8,7 +8,6 @@ Class {
 		'teapotServer',
 		'controllers',
 		'errorHandlers',
-		'clientErrorHandler',
 		'enabledOperationalPlugins',
 		'operationsConfiguration',
 		'disabledOperationalPlugins',
@@ -38,13 +37,12 @@ HTTPBasedRESTfulAPI >> addController: aRESTfulController [
 { #category : 'configuring' }
 HTTPBasedRESTfulAPI >> allowCrossOriginSharingApplying: aConfigurationBlock [
 
-	| builder |
-
-	builder := aConfigurationBlock value:
-		           ( CrossOriginResourceSharingFilterBuilder using: controllers ).
-	builder buildPreflightFilter applyOn: teapotServer.
-	builder buildActualRequestFilter applyOn: teapotServer.
-	optionalCORSHandler := Optional containing: builder actualRequestHandler
+  | builder |
+  builder := aConfigurationBlock value:
+               ( CrossOriginResourceSharingFilterBuilder using: controllers ).
+  builder buildPreflightFilter applyOn: teapotServer.
+  builder buildActualRequestFilter applyOn: teapotServer.
+  optionalCORSHandler := Optional containing: builder actualRequestHandler
 ]
 
 { #category : 'private - configuring' }
@@ -65,9 +63,6 @@ HTTPBasedRESTfulAPI >> authenticatedBy: anAuthorizationFilter [
 { #category : 'private - configuring' }
 HTTPBasedRESTfulAPI >> configureErrorHandlers [
 
-  teapotServer exception: HTTPClientError
-    -> ( self errorHandlerApplyingCrossSharingResourceConfigurationAfter: [ :clientError :request |
-            clientErrorHandler teaEvalActionOnException: clientError request: request ] ).
   errorHandlers do: [ :errorHandler |
       teapotServer exception: errorHandler key
         -> ( self errorHandlerApplyingCrossSharingResourceConfigurationAfter: errorHandler value )
@@ -154,25 +149,17 @@ HTTPBasedRESTfulAPI >> errorHandlerApplyingCrossSharingResourceConfigurationAfte
     ]
 ]
 
-{ #category : 'configuring' }
-HTTPBasedRESTfulAPI >> handleClientErrorsWith: aDyadicBlock [
-
-  clientErrorHandler := aDyadicBlock
-]
-
 { #category : 'initialization' }
 HTTPBasedRESTfulAPI >> initializeConfiguredBy: configuration installing: aRESTfulControllerCollection [
 
-	optionalCORSHandler := Optional unusedBecause: 'CORS not configured'.
-	teapotServer := Teapot configure: configuration
-		                ,
-		                { (#notFoundHandlerClass
-		                 -> Tea405AwareNotFoundHandler) }.
-	operationsConfiguration := configuration asDictionary at: #operations.
-	self
-		initializeControllersWithAll: aRESTfulControllerCollection;
-		initializeErrorHandlers;
-		initializeEnabledOperationalPlugins
+  optionalCORSHandler := Optional unusedBecause: 'CORS not configured'.
+  teapotServer := Teapot configure:
+                    configuration , { #notFoundHandlerClass -> Tea405AwareNotFoundHandler }.
+  operationsConfiguration := configuration asDictionary at: #operations.
+  self
+    initializeControllersWithAll: aRESTfulControllerCollection;
+    initializeErrorHandlersConfiguredBy: configuration asDictionary;
+    initializeEnabledOperationalPlugins
 ]
 
 { #category : 'initialization' }
@@ -199,17 +186,22 @@ HTTPBasedRESTfulAPI >> initializeEnabledOperationalPlugins [
 ]
 
 { #category : 'initialization' }
-HTTPBasedRESTfulAPI >> initializeErrorHandlers [
+HTTPBasedRESTfulAPI >> initializeErrorHandlersConfiguredBy: configuration [
 
   errorHandlers := OrderedCollection new.
-  self handleClientErrorsWith: [ :clientError :request |
-      | json response |
-      json := NeoJSONWriter toStringPretty: clientError.
-      response := ZnResponse statusCode: clientError code.
-      response entity: ( ZnEntity json: json ).
-      clientError affectResponse: response.
-      response
-    ]
+  configuration
+    at: #clientErrorHandler
+    ifPresent: [ :errorHandler | self on: HTTPClientError addErrorHandler: errorHandler ]
+    ifAbsent: [
+        self on: HTTPClientError addErrorHandler: [ :clientError :request |
+            | json response |
+            json := NeoJSONWriter toStringPretty: clientError.
+            response := ZnResponse statusCode: clientError code.
+            response entity: ( ZnEntity json: json ).
+            clientError affectResponse: response.
+            response
+          ]
+      ]
 ]
 
 { #category : 'actions' }

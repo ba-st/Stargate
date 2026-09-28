@@ -31,11 +31,11 @@ CrossOriginResourceSharingFilter class >> handleActualRequestByEvaluating: aHand
 { #category : 'instance creation' }
 CrossOriginResourceSharingFilter class >> handlePreflightByEvaluating: aHandler [
 
-	^ self applying: [ :teapotServer | 
-		  teapotServer
-			  before: '/*' -> aHandler;
-			  when: [ :request | self isForPreflight: request ]
-		  ]
+  ^ self applying: [ :teapotServer |
+        teapotServer
+          before: '/*' -> aHandler;
+          when: [ :request | self isForPreflight: request ]
+      ]
 ]
 
 { #category : 'testing' }
