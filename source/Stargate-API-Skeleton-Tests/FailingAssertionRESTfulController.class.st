@@ -1,8 +1,8 @@
 "
-I'm a RESTful controller whose only route signals a ZeroDivide, used to check the error handlers an application adds.
+I'm a RESTful controller whose only route fails an assertion, used to check the error handlers an application adds.
 "
 Class {
-	#name : 'ZeroDivisionRESTfulController',
+	#name : 'FailingAssertionRESTfulController',
 	#superclass : 'SingleResourceRESTfulController',
 	#instVars : [
 		'requestHandler'
@@ -12,32 +12,32 @@ Class {
 }
 
 { #category : 'routes' }
-ZeroDivisionRESTfulController >> declareDivideRoute [
+FailingAssertionRESTfulController >> declareFailAssertionRoute [
 
   ^ RouteSpecification
       handling: #GET
       at: self endpoint
-      evaluating: [ :httpRequest :requestContext | 1 / 0 ]
+      evaluating: [ :httpRequest :requestContext | AssertionFailed signal: 'The assertion failed' ]
 ]
 
 { #category : 'initialization' }
-ZeroDivisionRESTfulController >> initialize [
+FailingAssertionRESTfulController >> initialize [
 
   super initialize.
   requestHandler := RESTfulRequestHandlerBuilder new
-                      handling: 'divisions';
+                      handling: 'assertions';
                       createEntityTagHashingEncodedResource;
                       build
 ]
 
 { #category : 'private' }
-ZeroDivisionRESTfulController >> requestHandler [
+FailingAssertionRESTfulController >> requestHandler [
 
   ^ requestHandler
 ]
 
 { #category : 'private' }
-ZeroDivisionRESTfulController >> typeIdConstraint [
+FailingAssertionRESTfulController >> typeIdConstraint [
 
   ^ IsObject
 ]

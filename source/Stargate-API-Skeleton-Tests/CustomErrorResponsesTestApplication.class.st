@@ -43,10 +43,8 @@ CustomErrorResponsesTestApplication >> apiConfiguration [
 { #category : 'configuring' }
 CustomErrorResponsesTestApplication >> configureAPI: anAPI [
 
-  anAPI
-    on: ZeroDivide
-    addErrorHandler: [ :zeroDivide :request |
-      self problemDetailsWithStatus: 500 titled: 'Division by zero' ]
+  anAPI on: AssertionFailed addErrorHandler: [ :assertionFailed :request |
+      self problemDetailsWithStatus: 422 titled: assertionFailed messageText ]
 ]
 
 { #category : 'private - accessing' }
@@ -55,7 +53,7 @@ CustomErrorResponsesTestApplication >> controllersToInstall [
   ^ Array
       with: PetsRESTfulController new
       with: PetOrdersRESTfulController new
-      with: ZeroDivisionRESTfulController new
+      with: FailingAssertionRESTfulController new
 ]
 
 { #category : 'private' }

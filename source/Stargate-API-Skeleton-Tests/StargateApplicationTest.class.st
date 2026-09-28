@@ -324,14 +324,14 @@ StargateApplicationTest >> testErrorHandlerAddedWhenConfiguringAPI [
   self startCustomErrorResponsesApp.
 
   self
-    should: [ self newClient get: self baseUrl / 'divisions' asUrl ]
+    should: [ self newClient get: self baseUrl / 'assertions' asUrl ]
     raise: ZnHttpUnsuccessful
     withExceptionDo: [ :error |
         self
-          assert: error response code equals: 500;
+          assert: error response code equals: 422;
           assert: error response contentType equals: 'application/problem+json' asMediaType.
         json := NeoJSONObject fromString: error response contents.
-        self assert: json title equals: 'Division by zero'
+        self assert: json title equals: 'The assertion failed'
       ]
 ]
 

@@ -86,7 +86,7 @@ added, so the handlers added there take precedence over it:
 ```smalltalk
 YourApplication>>configureAPI: anAPI
 
-  anAPI on: ZeroDivide addErrorHandler: [ :zeroDivide :request |
+  anAPI on: AssertionFailed addErrorHandler: [ :assertionFailed :request |
     ... build the response ... ]
 ```
 
