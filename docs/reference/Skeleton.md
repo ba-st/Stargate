@@ -68,15 +68,25 @@ Error` whose body is the error's message text. To answer them differently,
 re-implement the `responseForUnexpectedError:request:` instance method. The
 error is still logged and its stack trace dumped.
 
-To configure the API before it is installed, re-implement the `configureAPI:`
-instance method. It receives the `HTTPBasedRESTfulAPI`, before the global error
-handler is added, so error handlers added there take precedence over it. For
-example, to answer client errors with problem documents:
+To answer client errors differently, for example with problem documents,
+re-implement the `apiConfiguration` instance method to add a
+`#clientErrorHandler`. Don't forget the super send:
+
+```smalltalk
+YourApplication>>apiConfiguration
+
+  ^ super apiConfiguration , { #clientErrorHandler -> [ :clientError :request |
+      ... build the response ... ] }
+```
+
+To add error handlers of your own, re-implement the `configureAPI:` instance
+method. It receives the `HTTPBasedRESTfulAPI` before the global error handler is
+added, so the handlers added there take precedence over it:
 
 ```smalltalk
 YourApplication>>configureAPI: anAPI
 
-  anAPI handleClientErrorsWith: [ :clientError :request |
+  anAPI on: ZeroDivide addErrorHandler: [ :zeroDivide :request |
     ... build the response ... ]
 ```
 

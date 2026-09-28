@@ -53,19 +53,26 @@ in production with the real values.
 When a route signals an `HTTPClientError`, the API answers with its status code
 and a JSON body describing it. To answer client errors differently, for
 example with an [RFC 9457](https://www.rfc-editor.org/rfc/rfc9457) problem
-document, replace that handler:
+document, give the API a `#clientErrorHandler` in its configuration:
 
 ```smalltalk
-api handleClientErrorsWith: [ :clientError :request |
-  ( ZnResponse statusCode: clientError code )
-    entity: ( ZnEntity
-      with: ( NeoJSONWriter toString: ( Dictionary new
-        at: #status put: clientError code;
-        at: #title put: clientError messageText;
-        yourself ) )
-      ofType: 'application/problem+json' asMediaType );
-    yourself
-  ]
+api := HTTPBasedRESTfulAPI
+  configuredBy: {
+    #port -> 9999.
+    #serverUrl -> ('http://localhost' asUrl port: 9999).
+    #operations -> operationsConfiguration.
+    #clientErrorHandler -> [ :clientError :request |
+      ( ZnResponse statusCode: clientError code )
+        entity: ( ZnEntity
+          with: ( NeoJSONWriter toString: ( Dictionary new
+            at: #status put: clientError code;
+            at: #title put: clientError messageText;
+            yourself ) )
+          ofType: 'application/problem+json' asMediaType );
+        yourself
+      ]
+    }
+  installing: controllers
 ```
 
 To handle other errors, add a handler for them before installing the API:
@@ -78,7 +85,7 @@ api on: Error addErrorHandler: [ :error :request |
 The client error handler always runs first, and added handlers run in the order
 they were added, so add specific handlers before generic ones. A handler added
 for `HTTPClientError`, or for any of its subclasses, is never reached: use
-`handleClientErrorsWith:` instead.
+`#clientErrorHandler` instead.
 
 If [cross-origin resource sharing](../reference/CrossOriginResourceSharing.md)
 is enabled, the API applies its configuration to the responses error handlers

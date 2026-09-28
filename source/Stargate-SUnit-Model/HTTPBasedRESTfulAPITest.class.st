@@ -24,6 +24,12 @@ HTTPBasedRESTfulAPITest >> algorithmName [
 	^ 'HS256'
 ]
 
+{ #category : 'running' }
+HTTPBasedRESTfulAPITest >> apiConfiguration [
+
+  ^ { #port -> self port . #serverUrl -> self baseUrl . #operations -> self operationsConfiguration }
+]
+
 { #category : 'private' }
 HTTPBasedRESTfulAPITest >> baseUrl [
 
@@ -128,9 +134,7 @@ HTTPBasedRESTfulAPITest >> setUp [
 HTTPBasedRESTfulAPITest >> setUpAPI [
 
   api := HTTPBasedRESTfulAPI
-           configuredBy:
-           { #port -> self port . #serverUrl -> self baseUrl . #operations
-             -> self operationsConfiguration }
+           configuredBy: self apiConfiguration
            installing: self controllersToInstall.
   self configureErrorHandlers
 ]

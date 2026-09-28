@@ -317,6 +317,24 @@ StargateApplicationTest >> testCustomResponseForUnexpectedError [
     assert: json title equals: 'Internal Server Error'
 ]
 
+{ #category : 'tests - api' }
+StargateApplicationTest >> testErrorHandlerAddedWhenConfiguringAPI [
+
+  | json |
+  self startCustomErrorResponsesApp.
+
+  self
+    should: [ self newClient get: self baseUrl / 'divisions' asUrl ]
+    raise: ZnHttpUnsuccessful
+    withExceptionDo: [ :error |
+        self
+          assert: error response code equals: 500;
+          assert: error response contentType equals: 'application/problem+json' asMediaType.
+        json := NeoJSONObject fromString: error response contents.
+        self assert: json title equals: 'Division by zero'
+      ]
+]
+
 { #category : 'tests - application' }
 StargateApplicationTest >> testFileReferenceToDumpStackTrace [
 

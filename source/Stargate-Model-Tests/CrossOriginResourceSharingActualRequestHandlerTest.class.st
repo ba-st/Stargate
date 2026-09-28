@@ -182,6 +182,23 @@ CrossOriginResourceSharingActualRequestHandlerTest >> testExposeHeaders [
 ]
 
 { #category : 'tests' }
+CrossOriginResourceSharingActualRequestHandlerTest >> testExposeHeadersEndingWithAnotherExposedHeader [
+
+  self
+    assert: [ :handler |
+        handler
+          allowAnyOrigin;
+          expose: #( 'X-Authorization' 'Authorization' )
+      ]
+    handles: ( self postRequestOriginatedAt: self websiteLocation )
+    byResponding: [ :response |
+        self
+          assert: ( response headers at: 'Access-Control-Expose-Headers' )
+          equals: 'X-Authorization, Authorization'
+      ]
+]
+
+{ #category : 'tests' }
 CrossOriginResourceSharingActualRequestHandlerTest >> testIgnoreRequestsWithoutOrigin [
 
   self

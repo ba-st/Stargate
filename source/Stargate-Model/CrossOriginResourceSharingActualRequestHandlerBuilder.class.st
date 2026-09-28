@@ -65,5 +65,6 @@ CrossOriginResourceSharingActualRequestHandlerBuilder >> initialize [
 { #category : 'private' }
 CrossOriginResourceSharingActualRequestHandlerBuilder >> is: exposedHeader alreadyIncludedAt: headerName in: headers [
 
-  ^ ( headers at: headerName ifAbsent: [ '' ] ) includesSubstring: exposedHeader
+  ^ ( ( ',' split: ( headers at: headerName ifAbsent: [ '' ] ) ) collect: [ :name | name trimBoth ] )
+      includes: exposedHeader
 ]

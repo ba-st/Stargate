@@ -20,9 +20,9 @@ ErroneousAPITest >> assert: aResponse canBeSharedWithRequestsFrom: anOriginLocat
 { #category : 'running' }
 ErroneousAPITest >> configureErrorHandlers [
 
-  api on: ObjectNotFound addErrorHandler: [ :clientError :request |
-      ( ZnResponse statusCode: 409 )
-        entity: ( ZnEntity with: '{"status":409}' ofType: 'application/problem+json' asMediaType );
+  api on: ObjectNotFound addErrorHandler: [ :notFound :request |
+      ( ZnResponse statusCode: 404 )
+        entity: ( ZnEntity with: '{"status":404}' ofType: 'application/problem+json' asMediaType );
         yourself
     ].
   super configureErrorHandlers
@@ -188,7 +188,7 @@ ErroneousAPITest >> testCORSAppliedOnceToErrorResponses [
 ]
 
 { #category : 'tests' }
-ErroneousAPITest >> testCORSAppliedToReplacedClientErrorHandlerResponse [
+ErroneousAPITest >> testCORSAppliedToClientErrorResponses [
 
   | response |
   api allowCrossOriginSharingApplying: [ :cors | cors allowAnyOrigin ].
@@ -314,7 +314,7 @@ ErroneousAPITest >> testSpecificErrorHandler [
                 response.
 
   self
-    assert: response code equals: 409;
+    assert: response code equals: 404;
     assert: response contentType equals: 'application/problem+json' asMediaType;
-    assert: response contents equals: '{"status":409}'
+    assert: response contents equals: '{"status":404}'
 ]

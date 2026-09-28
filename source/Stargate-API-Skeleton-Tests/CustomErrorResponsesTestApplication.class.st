@@ -44,14 +44,18 @@ CustomErrorResponsesTestApplication >> apiConfiguration [
 CustomErrorResponsesTestApplication >> configureAPI: anAPI [
 
   anAPI
-    on: ObjectNotFound
-    addErrorHandler: [ :notFound :request | self problemDetailsWithStatus: 404 titled: 'Not found' ]
+    on: ZeroDivide
+    addErrorHandler: [ :zeroDivide :request |
+      self problemDetailsWithStatus: 500 titled: 'Division by zero' ]
 ]
 
 { #category : 'private - accessing' }
 CustomErrorResponsesTestApplication >> controllersToInstall [
 
-  ^ Array with: PetsRESTfulController new with: PetOrdersRESTfulController new
+  ^ Array
+      with: PetsRESTfulController new
+      with: PetOrdersRESTfulController new
+      with: ZeroDivisionRESTfulController new
 ]
 
 { #category : 'private' }
