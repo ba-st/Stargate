@@ -221,26 +221,25 @@ CrossOriginResourceSharingActualRequestHandlerTest >> testIgnoreRequestsWithoutO
 { #category : 'tests' }
 CrossOriginResourceSharingActualRequestHandlerTest >> testRespondWithEmptyHeadersIfOriginNotAllowed [
 
-	| request handler |
+  | request handler |
+  request := self postRequestOriginatedAt: 'http://www.google.com' asUrl.
 
-	request := self postRequestOriginatedAt: 'http://www.google.com' asUrl.
 
+  handler := CrossOriginResourceSharingActualRequestHandlerBuilder new
+               allowOnlyFrom: { self websiteLocation };
+               build.
 
-	handler := CrossOriginResourceSharingActualRequestHandlerBuilder new
-		allowOnlyFrom: {self websiteLocation};
-		build.
-
-	self
-		should: [ handler teaEvalActionOnRequest: request response: TeaResponse noContent ]
-		raise: TeaAbort
-		withExceptionDo: [ :signal | 
-			| response |
-
-			response := signal response.
-			self
-				assert: response code equals: 204;
-				assert: response headers isEmpty
-			]
+  self
+    should: [ handler teaEvalActionOnRequest: request response: ZnResponse noContent ]
+    raise: TeaAbort
+    withExceptionDo: [ :signal |
+        | response |
+        response := signal response.
+        self
+          assert: response code equals: 204;
+          deny: ( response headers includesKey: 'Access-Control-Allow-Origin' );
+          deny: ( response headers includesKey: 'Vary' )
+      ]
 ]
 
 { #category : 'accessing' }

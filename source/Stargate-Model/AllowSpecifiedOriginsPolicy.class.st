@@ -32,7 +32,7 @@ AllowSpecifiedOriginsPolicy >> applyOn: aResponse for: aRequest using: aHandler 
               ( aResponse varyHeaderNames includes: aHandler headerNames >> #origin ) not ] ) then: [
             aResponse addToVary: aHandler headerNames >> #origin ]
       ]
-    ifNone: [ aRequest abort: TeaResponse noContent ]
+    ifNone: [ aRequest abort: ZnResponse noContent ]
 ]
 
 { #category : 'initialization' }

@@ -143,8 +143,7 @@ HTTPBasedRESTfulAPI >> errorHandlerApplyingCrossSharingResourceConfigurationAfte
   ^ [ :error :request |
       | response |
       response := anErrorHandler teaEvalActionOnException: error request: request.
-      ( response isA: ZnResponse ) then: [
-          self applyCrossSharingResourceConfigurationTo: response accordingTo: request ].
+      self applyCrossSharingResourceConfigurationTo: response accordingTo: request.
       response
     ]
 ]

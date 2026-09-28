@@ -82,10 +82,10 @@ api on: Error addErrorHandler: [ :error :request |
   ZnResponse serverError: error messageText ]
 ```
 
-The client error handler always runs first, and added handlers run in the order
-they were added, so add specific handlers before generic ones. A handler added
-for `HTTPClientError`, or for any of its subclasses, is never reached: use
-`#clientErrorHandler` instead.
+Error handlers must answer a `ZnResponse`. The client error handler always runs
+first, and added handlers run in the order they were added, so add specific
+handlers before generic ones. A handler added for `HTTPClientError`, or for any
+of its subclasses, is never reached: use `#clientErrorHandler` instead.
 
 If [cross-origin resource sharing](../reference/CrossOriginResourceSharing.md)
 is enabled, the API applies its configuration to the responses error handlers
