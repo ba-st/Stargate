@@ -21,17 +21,18 @@ AllowSpecifiedOriginsPolicy class >> onlyFrom: anUrlCollection [
 { #category : 'configuring headers' }
 AllowSpecifiedOriginsPolicy >> applyOn: aResponse for: aRequest using: aHandler [
 
-	| requestOrigin |
+  | requestOrigin |
+  requestOrigin := ( aRequest headers at: aHandler headerNames >> #origin ) asWebOrigin.
 
-	requestOrigin := ( aRequest headers at: aHandler headerNames >> #origin ) asWebOrigin.
-
-	allowedOrigins
-		detect: [ :origin | origin = requestOrigin ]
-		ifFound: [ :allowedOrigin |
-			aHandler set: allowedOrigin asAllowOriginOn: aResponse.
-			allowedOrigins size > 1 ifTrue: [ aResponse addToVary: aHandler headerNames >> #origin ]
-			]
-		ifNone: [ aRequest abort: TeaResponse noContent ]
+  allowedOrigins
+    detect: [ :origin | origin = requestOrigin ]
+    ifFound: [ :allowedOrigin |
+        aHandler set: allowedOrigin asAllowOriginOn: aResponse.
+        ( allowedOrigins size > 1 and: [
+              ( aResponse varyHeaderNames includes: aHandler headerNames >> #origin ) not ] ) then: [
+            aResponse addToVary: aHandler headerNames >> #origin ]
+      ]
+    ifNone: [ aRequest abort: TeaResponse noContent ]
 ]
 
 { #category : 'initialization' }

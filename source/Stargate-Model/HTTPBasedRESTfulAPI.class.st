@@ -51,10 +51,7 @@ HTTPBasedRESTfulAPI >> allowCrossOriginSharingApplying: aConfigurationBlock [
 HTTPBasedRESTfulAPI >> applyCrossSharingResourceConfigurationTo: response accordingTo: request [
 
   optionalCORSHandler withContentDo: [ :handler |
-      ( ( request headers includesKey: 'Origin' ) and: [
-            ( response headers includesKey: 'Access-Control-Allow-Origin' ) not ] ) then: [
-          handler teaEvalActionOnRequest: request response: response ]
-    ]
+      handler teaEvalActionOnRequest: request response: response ]
 ]
 
 { #category : 'configuring' }

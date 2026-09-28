@@ -41,8 +41,9 @@ CrossOriginResourceSharingActualRequestHandler >> setOptionalHeadersOn: aRespons
 { #category : 'evaluating' }
 CrossOriginResourceSharingActualRequestHandler >> teaEvalActionOnRequest: aRequest response: aResponse [
 
-	self setAllowedOriginOn: aResponse from: aRequest.
-	self setOptionalHeadersOn: aResponse.
-	
-	^ aResponse
+  ( CrossOriginResourceSharingFilter isCrossOrigin: aRequest ) then: [
+      self setAllowedOriginOn: aResponse from: aRequest.
+      self setOptionalHeadersOn: aResponse
+    ].
+  ^ aResponse
 ]

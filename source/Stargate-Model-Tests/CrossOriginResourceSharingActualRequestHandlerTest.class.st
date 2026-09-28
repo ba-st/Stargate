@@ -136,6 +136,29 @@ CrossOriginResourceSharingActualRequestHandlerTest >> testAllowMoreThanOneOrigin
 ]
 
 { #category : 'tests' }
+CrossOriginResourceSharingActualRequestHandlerTest >> testApplyingTwiceDoesNotRepeatHeaders [
+
+  | handler request response |
+  handler := self crossOriginResourceSharingActualRequestHandlerBuilderApplying: [ :builder |
+                 builder
+                   allowOnlyFrom: { self websiteLocation . 'http://google.com/' asUrl };
+                   expose: #( 'Authorization' 'X-Custom' )
+               ].
+  request := self postRequestOriginatedAt: self websiteLocation.
+  response := ZnResponse created: self serverLocation asUrl / 'devices' / '1'.
+
+  handler
+    teaEvalActionOnRequest: request response: response;
+    teaEvalActionOnRequest: request response: response.
+
+  self
+    assert: response canBeSharedWithRequestsFrom: self websiteLocation;
+    assert: ( response headers at: 'Vary' ) equals: 'Origin';
+    assert: ( response headers at: 'Access-Control-Expose-Headers' )
+    equals: 'Authorization, X-Custom'
+]
+
+{ #category : 'tests' }
 CrossOriginResourceSharingActualRequestHandlerTest >> testExposeHeaders [
 
 	| request |
@@ -156,6 +179,26 @@ CrossOriginResourceSharingActualRequestHandlerTest >> testExposeHeaders [
 				assert: ( response headers at: 'Access-Control-Expose-Headers' )
 					equals: 'Authorization, X-Custom'
 			]
+]
+
+{ #category : 'tests' }
+CrossOriginResourceSharingActualRequestHandlerTest >> testIgnoreRequestsWithoutOrigin [
+
+  self
+    assert: [ :handler |
+        handler
+          allowAnyOrigin;
+          allowCredentials;
+          expose: #( 'Authorization' )
+      ]
+    handles: ( TeaRequest fromZnRequest: ( ZnRequest post: self serverLocation / 'devices' asUrl ) )
+    byResponding: [ :response |
+        self
+          assert: response isCreated;
+          should: [ response headers at: 'Access-Control-Allow-Origin' ] raise: KeyNotFound;
+          should: [ response headers at: 'Access-Control-Allow-Credentials' ] raise: KeyNotFound;
+          should: [ response headers at: 'Access-Control-Expose-Headers' ] raise: KeyNotFound
+      ]
 ]
 
 { #category : 'tests' }

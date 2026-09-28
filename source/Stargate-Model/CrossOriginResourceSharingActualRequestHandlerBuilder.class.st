@@ -42,12 +42,14 @@ CrossOriginResourceSharingActualRequestHandlerBuilder >> build [
 { #category : 'configuring' }
 CrossOriginResourceSharingActualRequestHandlerBuilder >> expose: exposedHeaders [
 
-	addHeaderCommands
-		add: [ :headers :headerNames | 
-			exposedHeaders
-				do:
-					[ :exposedHeader | headers at: headerNames >> #accessControlExposeHeaders addSeparatedWithComma: exposedHeader ]
-			]
+  addHeaderCommands add: [ :headers :headerNames |
+      | headerName |
+      headerName := headerNames >> #accessControlExposeHeaders.
+      exposedHeaders do: [ :exposedHeader |
+          ( ( ( headers at: headerName ifAbsent: [ '' ] ) substrings: ', ' ) includes: exposedHeader )
+            ifFalse: [ headers at: headerName addSeparatedWithComma: exposedHeader ]
+        ]
+    ]
 ]
 
 { #category : 'initialization' }
