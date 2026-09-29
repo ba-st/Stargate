@@ -56,111 +56,105 @@ ErroneousAPITest >> setUpAPI [
 { #category : 'tests' }
 ErroneousAPITest >> testCORSAllowingAnyOrigin [
 
-	| response |
+  | response |
+  api allowCrossOriginSharingApplying: [ :cors | cors allowAnyOrigin ].
 
-	api allowCrossOriginSharingApplying: [ :cors | cors allowAnyOrigin ].
-
-	response := self newClient
-		            url: self baseUrl / 'errors' / '1' asUrl;
-		            headerAt: 'Origin' put: self baseUrl printString;
-		            headerAt: 'Access-Control-Request-Headers' put: 'Content-Type';
-		            options;
-		            response.
-	self
-		assert: response isNoContent;
-		assert: ( response headers at: 'Access-Control-Allow-Origin' ) equals: '*';
-		assert: ( response headers at: 'Access-Control-Allow-Headers' ) equals: 'Content-Type';
-		assert: response varyHeaderNames includes: 'Access-Control-Allow-Headers';
-		assert: ( response headers at: 'Access-Control-Allow-Methods' ) equals: 'GET'.
+  response := self newClient
+                url: self baseUrl / 'errors' / '1' asUrl;
+                headerAt: 'Origin' put: self baseUrl printString;
+                headerAt: 'Access-Control-Request-Headers' put: 'Content-Type';
+                options;
+                response.
+  self
+    assert: response isNoContent;
+    assert: ( response headers at: 'Access-Control-Allow-Origin' ) equals: '*';
+    assert: ( response headers at: 'Access-Control-Allow-Headers' ) equals: 'Content-Type';
+    assert: response varyHeaderNames includes: 'Access-Control-Request-Headers';
+    assert: ( response headers at: 'Access-Control-Allow-Methods' ) equals: 'GET'.
 
 
-	response := self newClient
-		            url: self baseUrl / 'errors' / '1' asUrl;
-		            headerAt: 'Origin' put: self baseUrl printString;
-		            enforceHttpSuccess: false;
-		            get;
-		            response.
+  response := self newClient
+                url: self baseUrl / 'errors' / '1' asUrl;
+                headerAt: 'Origin' put: self baseUrl printString;
+                enforceHttpSuccess: false;
+                get;
+                response.
 
-	self
-		assert: response code equals: 500;
-		deny: response varyHeaderNames includes: 'Access-Control-Allow-Headers';
-		assert: ( response headers at: 'Access-Control-Allow-Origin' ) equals: '*'
+  self
+    assert: response code equals: 500;
+    deny: response varyHeaderNames includes: 'Access-Control-Request-Headers';
+    assert: ( response headers at: 'Access-Control-Allow-Origin' ) equals: '*'
 ]
 
 { #category : 'tests' }
 ErroneousAPITest >> testCORSAllowingExactlyOneOrigin [
 
-	| response |
+  | response |
+  api allowCrossOriginSharingApplying: [ :cors | cors allowOnlyFrom: { self baseUrl } ].
 
-	api allowCrossOriginSharingApplying: [ :cors | cors allowOnlyFrom: { self baseUrl } ].
+  response := self newClient
+                url: self baseUrl / 'errors' / '1' asUrl;
+                headerAt: 'Origin' put: self baseUrl printString;
+                headerAt: 'Access-Control-Request-Headers' put: 'Content-Type';
+                options;
+                response.
 
-	response := self newClient
-		            url: self baseUrl / 'errors' / '1' asUrl;
-		            headerAt: 'Origin' put: self baseUrl printString;
-		            headerAt: 'Access-Control-Request-Headers' put: 'Content-Type';
-		            options;
-		            response.
+  self
+    assert: response isNoContent;
+    assert: response canBeSharedWithRequestsFrom: self baseUrl;
+    assert: ( response headers at: 'Access-Control-Allow-Headers' ) equals: 'Content-Type';
+    assert: response varyHeaderNames includes: 'Access-Control-Request-Headers';
+    assert: response varyHeaderNames includes: 'Origin';
+    assert: ( response headers at: 'Access-Control-Allow-Methods' ) equals: 'GET'.
 
-	self
-		assert: response isNoContent;
-		assert: response canBeSharedWithRequestsFrom: self baseUrl;
-		assert: ( response headers at: 'Access-Control-Allow-Headers' ) equals: 'Content-Type';
-		assert: response varyHeaderNames includes: 'Access-Control-Allow-Headers';
-		deny: response varyHeaderNames includes: 'Access-Control-Allow-Origin';
-		assert: ( response headers at: 'Access-Control-Allow-Methods' ) equals: 'GET'.
+  response := self newClient
+                url: self baseUrl / 'errors' / '1' asUrl;
+                headerAt: 'Origin' put: self baseUrl printString;
+                enforceHttpSuccess: false;
+                get;
+                response.
 
-	response := self newClient
-		            url: self baseUrl / 'errors' / '1' asUrl;
-		            headerAt: 'Origin' put: self baseUrl printString;
-		            enforceHttpSuccess: false;
-		            get;
-		            response.
-
-	self
-		assert: response code equals: 500;
-		deny: response varyHeaderNames includes: 'Access-Control-Allow-Headers';
-		deny: response varyHeaderNames includes: 'Access-Control-Allow-Origin';
-		assert: response canBeSharedWithRequestsFrom: self baseUrl
+  self
+    assert: response code equals: 500;
+    deny: response varyHeaderNames includes: 'Access-Control-Request-Headers';
+    assert: response varyHeaderNames includes: 'Origin';
+    assert: response canBeSharedWithRequestsFrom: self baseUrl
 ]
 
 { #category : 'tests' }
 ErroneousAPITest >> testCORSAllowingMoreThanOneOrigin [
 
-	| response |
+  | response |
+  api allowCrossOriginSharingApplying: [ :cors |
+      cors allowOnlyFrom: { self baseUrl . 'http://google.com/' asUrl } ].
 
-	api allowCrossOriginSharingApplying: [ :cors |
-		cors allowOnlyFrom: {
-				self baseUrl.
-				'http://google.com/' asUrl }
-		].
+  response := self newClient
+                url: self baseUrl / 'errors' / '1' asUrl;
+                headerAt: 'Origin' put: self baseUrl printString;
+                headerAt: 'Access-Control-Request-Headers' put: 'Content-Type';
+                options;
+                response.
 
-	response := self newClient
-		            url: self baseUrl / 'errors' / '1' asUrl;
-		            headerAt: 'Origin' put: self baseUrl printString;
-		            headerAt: 'Access-Control-Request-Headers' put: 'Content-Type';
-		            options;
-		            response.
+  self
+    assert: response isNoContent;
+    assert: response canBeSharedWithRequestsFrom: self baseUrl;
+    assert: ( response headers at: 'Access-Control-Allow-Headers' ) equals: 'Content-Type';
+    assert: response varyHeaderNames includes: 'Origin';
+    assert: response varyHeaderNames includes: 'Access-Control-Request-Headers';
+    assert: ( response headers at: 'Access-Control-Allow-Methods' ) equals: 'GET'.
 
-	self
-		assert: response isNoContent;
-		assert: response canBeSharedWithRequestsFrom: self baseUrl;
-		assert: ( response headers at: 'Access-Control-Allow-Headers' ) equals: 'Content-Type';
-		assert: response varyHeaderNames includes: 'Origin';
-		assert: response varyHeaderNames includes: 'Access-Control-Allow-Headers';
-		assert: ( response headers at: 'Access-Control-Allow-Methods' ) equals: 'GET'.
+  response := self newClient
+                url: self baseUrl / 'errors' / '1' asUrl;
+                headerAt: 'Origin' put: self baseUrl printString;
+                enforceHttpSuccess: false;
+                get;
+                response.
 
-	response := self newClient
-		            url: self baseUrl / 'errors' / '1' asUrl;
-		            headerAt: 'Origin' put: self baseUrl printString;
-		            enforceHttpSuccess: false;
-		            get;
-		            response.
-
-	self
-		assert: response code equals: 500;
-		assert: response varyHeaderNames includes: 'Origin';
-		deny: response varyHeaderNames includes: 'Access-Control-Allow-Headers';
-		assert: response canBeSharedWithRequestsFrom: self baseUrl
+  self
+    assert: response code equals: 500;
+    assert: response varyHeaderNames includes: 'Origin';
+    deny: response varyHeaderNames includes: 'Access-Control-Request-Headers';
+    assert: response canBeSharedWithRequestsFrom: self baseUrl
 ]
 
 { #category : 'tests' }
@@ -208,51 +202,50 @@ ErroneousAPITest >> testCORSAppliedToClientErrorResponses [
 { #category : 'tests' }
 ErroneousAPITest >> testCORSOptionalHeaders [
 
-	| response |
+  | response |
+  api allowCrossOriginSharingApplying: [ :cors |
+      cors
+        allowAnyOrigin;
+        allowCredentials;
+        expireIn: 600 seconds;
+        expose: #( 'Authorization' 'X-Custom' )
+    ].
 
-	api allowCrossOriginSharingApplying: [ :cors |
-		cors
-			allowAnyOrigin;
-			allowCredentials;
-			expireIn: 600 seconds;
-			expose: #( 'Authorization' 'X-Custom' )
-		].
+  response := self newClient
+                url: self baseUrl / 'errors' / '1' asUrl;
+                headerAt: 'Origin' put: self baseUrl printString;
+                headerAt: 'Access-Control-Request-Headers' put: 'Content-Type';
+                options;
+                response.
 
-	response := self newClient
-		            url: self baseUrl / 'errors' / '1' asUrl;
-		            headerAt: 'Origin' put: self baseUrl printString;
-		            headerAt: 'Access-Control-Request-Headers' put: 'Content-Type';
-		            options;
-		            response.
+  self
+    assert: response isNoContent;
+    assert: ( response headers at: 'Access-Control-Allow-Origin' ) equals: '*';
+    assert: ( response headers at: 'Access-Control-Allow-Headers' ) equals: 'Content-Type';
+    assert: ( response headers at: 'Access-Control-Allow-Methods' ) equals: 'GET';
+    assert: ( response headers at: 'Access-Control-Expose-Headers' )
+    equals: 'Authorization, X-Custom';
+    assert: ( response headers at: 'Access-Control-Allow-Credentials' ) equals: 'true';
+    assert: ( response headers at: 'Access-Control-Max-Age' ) equals: '600';
+    assert: response varyHeaderNames includes: 'Access-Control-Request-Headers'.
 
-	self
-		assert: response isNoContent;
-		assert: ( response headers at: 'Access-Control-Allow-Origin' ) equals: '*';
-		assert: ( response headers at: 'Access-Control-Allow-Headers' ) equals: 'Content-Type';
-		assert: ( response headers at: 'Access-Control-Allow-Methods' ) equals: 'GET';
-		assert: ( response headers at: 'Access-Control-Expose-Headers' )
-		equals: 'Authorization, X-Custom';
-		assert: ( response headers at: 'Access-Control-Allow-Credentials' ) equals: 'true';
-		assert: ( response headers at: 'Access-Control-Max-Age' ) equals: '600';
-		assert: response varyHeaderNames includes: 'Access-Control-Allow-Headers'.
+  response := self newClient
+                url: self baseUrl / 'errors' / '1' asUrl;
+                headerAt: 'Origin' put: self baseUrl printString;
+                enforceHttpSuccess: false;
+                get;
+                response.
 
-	response := self newClient
-		            url: self baseUrl / 'errors' / '1' asUrl;
-		            headerAt: 'Origin' put: self baseUrl printString;
-		            enforceHttpSuccess: false;
-		            get;
-		            response.
-
-	self
-		assert: response code equals: 500;
-		assert: ( response headers at: 'Access-Control-Allow-Origin' ) equals: '*';
-		should: [ response headers at: 'Access-Control-Allow-Headers' ] raise: KeyNotFound;
-		should: [ response headers at: 'Access-Control-Allow-Methods' ] raise: KeyNotFound;
-		assert: ( response headers at: 'Access-Control-Expose-Headers' )
-		equals: 'Authorization, X-Custom';
-		assert: ( response headers at: 'Access-Control-Allow-Credentials' ) equals: 'true';
-		should: [ response headers at: 'Access-Control-Max-Age' ] raise: KeyNotFound;
-		deny: response varyHeaderNames includes: 'Access-Control-Allow-Headers'
+  self
+    assert: response code equals: 500;
+    assert: ( response headers at: 'Access-Control-Allow-Origin' ) equals: '*';
+    should: [ response headers at: 'Access-Control-Allow-Headers' ] raise: KeyNotFound;
+    should: [ response headers at: 'Access-Control-Allow-Methods' ] raise: KeyNotFound;
+    assert: ( response headers at: 'Access-Control-Expose-Headers' )
+    equals: 'Authorization, X-Custom';
+    assert: ( response headers at: 'Access-Control-Allow-Credentials' ) equals: 'true';
+    should: [ response headers at: 'Access-Control-Max-Age' ] raise: KeyNotFound;
+    deny: response varyHeaderNames includes: 'Access-Control-Request-Headers'
 ]
 
 { #category : 'tests' }
@@ -286,6 +279,26 @@ ErroneousAPITest >> testCORSRespondWithEmptyHeadersIfOriginNotAllowed [
 		assert: response code equals: 500;
 		assert: response varyHeaderNames isEmpty;
 		should: [ response headers at: 'Access-Control-Allow-Origin' ] raise: KeyNotFound
+]
+
+{ #category : 'tests' }
+ErroneousAPITest >> testCORSVaryByOriginOnErrorResponsesToRequestsWithoutOrigin [
+
+  | response |
+  api allowCrossOriginSharingApplying: [ :cors | cors allowOnlyFrom: { self baseUrl } ].
+
+  #( '1' '1/conflict' '1/not-found' ) do: [ :path |
+      response := self newClient
+                    url: self baseUrl / 'errors' / path asUrl;
+                    enforceHttpSuccess: false;
+                    get;
+                    response.
+
+      self
+        deny: response isSuccess;
+        assert: ( response varyHeaderNames occurrencesOf: 'Origin' ) equals: 1;
+        deny: ( response headers includesKey: 'Access-Control-Allow-Origin' )
+    ]
 ]
 
 { #category : 'tests' }

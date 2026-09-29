@@ -19,6 +19,14 @@ AllowSpecifiedOriginsPolicy class >> onlyFrom: anUrlCollection [
 ]
 
 { #category : 'configuring headers' }
+AllowSpecifiedOriginsPolicy >> addToVaryOn: aResponse using: aHandler [
+
+  | origin |
+  origin := aHandler headerNames >> #origin.
+  [ aResponse addToVary: origin ] unless: ( aResponse varyHeaderNames includes: origin )
+]
+
+{ #category : 'configuring headers' }
 AllowSpecifiedOriginsPolicy >> applyOn: aResponse for: aRequest using: aHandler [
 
   | requestOrigin |
@@ -26,13 +34,13 @@ AllowSpecifiedOriginsPolicy >> applyOn: aResponse for: aRequest using: aHandler 
 
   allowedOrigins
     detect: [ :origin | origin = requestOrigin ]
-    ifFound: [ :allowedOrigin |
-        aHandler set: allowedOrigin asAllowOriginOn: aResponse.
-        ( allowedOrigins size > 1 and: [
-              ( aResponse varyHeaderNames includes: aHandler headerNames >> #origin ) not ] ) then: [
-            aResponse addToVary: aHandler headerNames >> #origin ]
+    ifFound: [ :allowedOrigin | aHandler set: allowedOrigin asAllowOriginOn: aResponse ]
+    ifNone: [
+        | response |
+        response := ZnResponse noContent.
+        self addToVaryOn: response using: aHandler.
+        aRequest abort: response
       ]
-    ifNone: [ aRequest abort: ZnResponse noContent ]
 ]
 
 { #category : 'initialization' }

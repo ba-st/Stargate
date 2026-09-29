@@ -61,6 +61,13 @@ api allowCrossOriginSharingApplying:
 Take into account that an origin differs from another if you change the domain,
 port, or protocol.
 
+With a restricted list of origins, whether a response includes
+`Access-Control-Allow-Origin` depends on the request's `Origin` header. So,
+[as the Fetch standard requires](https://fetch.spec.whatwg.org/#cors-protocol-and-http-caches),
+every response of the API includes `Origin` in its `Vary` header, even the ones
+to requests without `Origin`. This way shared caches don't serve a response to
+an origin it wasn't meant for. When allowing any origin, `Vary` is left alone.
+
 ### Requests with credentials
 
 Optionally, to allow credentials in the server, like cookies or basic HTTP

@@ -21,11 +21,7 @@ CrossOriginResourceSharingFilter class >> applying: aFilter [
 { #category : 'instance creation' }
 CrossOriginResourceSharingFilter class >> handleActualRequestByEvaluating: aHandler [
 
-  ^ self applying: [ :teapotServer |
-        teapotServer
-          after: '/*' -> aHandler;
-          when: [ :request | self isCrossOrigin: request ]
-      ]
+  ^ self applying: [ :teapotServer | teapotServer after: '/*' -> aHandler ]
 ]
 
 { #category : 'instance creation' }

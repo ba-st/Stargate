@@ -11,3 +11,9 @@ AllowOriginPolicy >> applyOn: aResponse for: aRequest using: aHandler [
 
 	self subclassResponsibility 
 ]
+
+{ #category : 'configuring headers' }
+AllowOriginPolicy >> addToVaryOn: aResponse using: aHandler [
+
+  self subclassResponsibility
+]
