@@ -7,9 +7,9 @@ Class {
 }
 
 { #category : 'configuring headers' }
-AllowOriginPolicy >> applyOn: aResponse for: aRequest using: aHandler [ 
+AllowOriginPolicy >> applyOn: aResponse for: aRequest using: aHandler ifNotAllowed: aBlock [
 
-	self subclassResponsibility 
+  self subclassResponsibility
 ]
 
 { #category : 'configuring headers' }

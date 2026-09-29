@@ -17,7 +17,7 @@ AllowAnyOriginPolicy >> addToVaryOn: aResponse using: aHandler [
 ]
 
 { #category : 'configuring headers' }
-AllowAnyOriginPolicy >> applyOn: aResponse for: aRequest using: aHandler [
+AllowAnyOriginPolicy >> applyOn: aResponse for: aRequest using: aHandler ifNotAllowed: aBlock [
 
-	aHandler setAnyOriginAllowedOn: aResponse
+  aHandler setAnyOriginAllowedOn: aResponse
 ]

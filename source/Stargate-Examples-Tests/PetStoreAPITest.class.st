@@ -311,7 +311,8 @@ PetStoreAPITest >> testCORSRespondWithEmptyHeadersIfOriginNotAllowed [
                 response.
 
   self
-    assert: ( response headers at: 'Vary' ) equals: 'Origin';
+    assert: response code equals: 200;
+    assert: response varyHeaderNames includes: 'Origin';
     should: [ response headers at: 'Access-Control-Allow-Origin' ] raise: KeyNotFound
 ]
 

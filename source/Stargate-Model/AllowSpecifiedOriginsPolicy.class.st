@@ -27,7 +27,7 @@ AllowSpecifiedOriginsPolicy >> addToVaryOn: aResponse using: aHandler [
 ]
 
 { #category : 'configuring headers' }
-AllowSpecifiedOriginsPolicy >> applyOn: aResponse for: aRequest using: aHandler [
+AllowSpecifiedOriginsPolicy >> applyOn: aResponse for: aRequest using: aHandler ifNotAllowed: aBlock [
 
   | requestOrigin |
   requestOrigin := ( aRequest headers at: aHandler headerNames >> #origin ) asWebOrigin.
@@ -35,12 +35,7 @@ AllowSpecifiedOriginsPolicy >> applyOn: aResponse for: aRequest using: aHandler 
   allowedOrigins
     detect: [ :origin | origin = requestOrigin ]
     ifFound: [ :allowedOrigin | aHandler set: allowedOrigin asAllowOriginOn: aResponse ]
-    ifNone: [
-        | response |
-        response := ZnResponse noContent.
-        self addToVaryOn: response using: aHandler.
-        aRequest abort: response
-      ]
+    ifNone: aBlock
 ]
 
 { #category : 'initialization' }

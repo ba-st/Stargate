@@ -251,34 +251,36 @@ ErroneousAPITest >> testCORSOptionalHeaders [
 { #category : 'tests' }
 ErroneousAPITest >> testCORSRespondWithEmptyHeadersIfOriginNotAllowed [
 
-	| response |
+  | response |
+  api allowCrossOriginSharingApplying: [ :cors | cors allowOnlyFrom: { 'https://google.com' asUrl } ].
 
-	api allowCrossOriginSharingApplying: [ :cors | cors allowOnlyFrom: { 'https://google.com' asUrl } ].
+  response := self newClient
+                url: self baseUrl / 'errors' / '1' asUrl;
+                headerAt: 'Origin' put: self baseUrl printString;
+                headerAt: 'Access-Control-Request-Headers' put: 'Content-Type';
+                options;
+                response.
 
-	response := self newClient
-		            url: self baseUrl / 'errors' / '1' asUrl;
-		            headerAt: 'Origin' put: self baseUrl printString;
-		            headerAt: 'Access-Control-Request-Headers' put: 'Content-Type';
-		            options;
-		            response.
+  self
+    assert: response isNoContent;
+    assert: ( response headers at: 'Vary' ) equals: 'Origin';
+    should: [ response headers at: 'Access-Control-Allow-Origin' ] raise: KeyNotFound;
+    should: [ response headers at: 'Access-Control-Allow-Headers' ] raise: KeyNotFound;
+    should: [ response headers at: 'Access-Control-Allow-Methods' ] raise: KeyNotFound.
 
-	self
-		assert: response isNoContent;
-		should: [ response headers at: 'Access-Control-Allow-Origin' ] raise: KeyNotFound;
-		should: [ response headers at: 'Access-Control-Allow-Headers' ] raise: KeyNotFound;
-		should: [ response headers at: 'Access-Control-Allow-Methods' ] raise: KeyNotFound.
+  { '1' -> 500 . '1/conflict' -> 409 . '1/not-found' -> 404 } do: [ :pathAndCode |
+      response := self newClient
+                    url: self baseUrl / 'errors' / pathAndCode key asUrl;
+                    headerAt: 'Origin' put: self baseUrl printString;
+                    enforceHttpSuccess: false;
+                    get;
+                    response.
 
-	response := self newClient
-		            url: self baseUrl / 'errors' / '1' asUrl;
-		            headerAt: 'Origin' put: self baseUrl printString;
-		            enforceHttpSuccess: false;
-		            get;
-		            response.
-
-	self
-		assert: response code equals: 500;
-		assert: response varyHeaderNames isEmpty;
-		should: [ response headers at: 'Access-Control-Allow-Origin' ] raise: KeyNotFound
+      self
+        assert: response code equals: pathAndCode value;
+        assert: ( response headers at: 'Vary' ) equals: 'Origin';
+        should: [ response headers at: 'Access-Control-Allow-Origin' ] raise: KeyNotFound
+    ]
 ]
 
 { #category : 'tests' }

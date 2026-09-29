@@ -61,6 +61,11 @@ api allowCrossOriginSharingApplying:
 Take into account that an origin differs from another if you change the domain,
 port, or protocol.
 
+A request from an origin that isn't in the list gets the same response it would
+get without CORS: the API leaves the CORS headers out, and the browser blocks
+the response. A preflight request from such an origin is answered with an empty
+`204 No Content`.
+
 With a restricted list of origins, whether a response includes
 `Access-Control-Allow-Origin` depends on the request's `Origin` header. So,
 [as the Fetch standard requires](https://fetch.spec.whatwg.org/#cors-protocol-and-http-caches),

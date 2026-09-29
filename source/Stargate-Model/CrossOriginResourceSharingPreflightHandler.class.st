@@ -52,9 +52,13 @@ CrossOriginResourceSharingPreflightHandler >> setAllowedMethodsOn: aResponse fro
 ]
 
 { #category : 'private - evaluating' }
-CrossOriginResourceSharingPreflightHandler >> setAllowedOriginOn: aResponse from: aRequest [ 
-	
-	allowOriginPolicy applyOn: aResponse for: aRequest using: self
+CrossOriginResourceSharingPreflightHandler >> setAllowedOriginOn: aResponse from: aRequest ifNotAllowed: aBlock [
+
+  allowOriginPolicy
+    applyOn: aResponse
+    for: aRequest
+    using: self
+    ifNotAllowed: aBlock
 ]
 
 { #category : 'private - evaluating' }
@@ -70,7 +74,7 @@ CrossOriginResourceSharingPreflightHandler >> teaEvalActionOnRequest: aRequest [
   self withAllowedMethodsFor: aRequest url do: [ :allowedMethods |
       response := ZnResponse noContent.
       allowOriginPolicy addToVaryOn: response using: self.
-      self setAllowedOriginOn: response from: aRequest.
+      self setAllowedOriginOn: response from: aRequest ifNotAllowed: [ aRequest abort: response ].
       self setAllowedMethodsOn: response from: allowedMethods.
       self setAllowedHeadersOn: response from: aRequest.
       self setOptionalHeadersOn: response.
