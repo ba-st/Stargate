@@ -37,22 +37,19 @@ HTTPBasedRESTfulAPI >> addController: aRESTfulController [
 { #category : 'configuring' }
 HTTPBasedRESTfulAPI >> allowCrossOriginSharingApplying: aConfigurationBlock [
 
-	| builder |
-
-	builder := aConfigurationBlock value:
-		           ( CrossOriginResourceSharingFilterBuilder using: controllers ).
-	builder buildPreflightFilter applyOn: teapotServer.
-	builder buildActualRequestFilter applyOn: teapotServer.
-	optionalCORSHandler := Optional containing: builder actualRequestHandler
+  | builder |
+  builder := aConfigurationBlock value:
+               ( CrossOriginResourceSharingFilterBuilder using: controllers ).
+  builder buildPreflightFilter applyOn: teapotServer.
+  builder buildActualRequestFilter applyOn: teapotServer.
+  optionalCORSHandler := Optional containing: builder actualRequestHandler
 ]
 
 { #category : 'private - configuring' }
 HTTPBasedRESTfulAPI >> applyCrossSharingResourceConfigurationTo: response accordingTo: request [
 
-	optionalCORSHandler withContentDo: [ :handler |
-		( request headers includesKey: 'Origin' ) then: [
-			handler teaEvalActionOnRequest: request response: response ]
-		]
+  optionalCORSHandler withContentDo: [ :handler |
+      handler teaEvalActionOnRequest: request response: response ]
 ]
 
 { #category : 'configuring' }
@@ -66,7 +63,10 @@ HTTPBasedRESTfulAPI >> authenticatedBy: anAuthorizationFilter [
 { #category : 'private - configuring' }
 HTTPBasedRESTfulAPI >> configureErrorHandlers [
 
-	errorHandlers do: [ :errorHandler | teapotServer exception: errorHandler ]
+  errorHandlers do: [ :errorHandler |
+      teapotServer exception: errorHandler key
+        -> ( self errorHandlerApplyingCrossSharingResourceConfigurationAfter: errorHandler value )
+    ]
 ]
 
 { #category : 'private - configuring' }
@@ -137,19 +137,28 @@ HTTPBasedRESTfulAPI >> enable: anOperationalPluginEndpoint configuredBy: configu
 	pluginToEnable includeControllersIn: self
 ]
 
+{ #category : 'private - configuring' }
+HTTPBasedRESTfulAPI >> errorHandlerApplyingCrossSharingResourceConfigurationAfter: anErrorHandler [
+
+  ^ [ :error :request |
+      | response |
+      response := anErrorHandler teaEvalActionOnException: error request: request.
+      self applyCrossSharingResourceConfigurationTo: response accordingTo: request.
+      response
+    ]
+]
+
 { #category : 'initialization' }
 HTTPBasedRESTfulAPI >> initializeConfiguredBy: configuration installing: aRESTfulControllerCollection [
 
-	optionalCORSHandler := Optional unusedBecause: 'CORS not configured'.
-	teapotServer := Teapot configure: configuration
-		                ,
-		                { (#notFoundHandlerClass
-		                 -> Tea405AwareNotFoundHandler) }.
-	operationsConfiguration := configuration asDictionary at: #operations.
-	self
-		initializeControllersWithAll: aRESTfulControllerCollection;
-		initializeErrorHandlers;
-		initializeEnabledOperationalPlugins
+  optionalCORSHandler := Optional unusedBecause: 'CORS not configured'.
+  teapotServer := Teapot configure:
+                    configuration , { #notFoundHandlerClass -> Tea405AwareNotFoundHandler }.
+  operationsConfiguration := configuration asDictionary at: #operations.
+  self
+    initializeControllersWithAll: aRESTfulControllerCollection;
+    initializeErrorHandlersConfiguredBy: configuration asDictionary;
+    initializeEnabledOperationalPlugins
 ]
 
 { #category : 'initialization' }
@@ -176,18 +185,22 @@ HTTPBasedRESTfulAPI >> initializeEnabledOperationalPlugins [
 ]
 
 { #category : 'initialization' }
-HTTPBasedRESTfulAPI >> initializeErrorHandlers [
+HTTPBasedRESTfulAPI >> initializeErrorHandlersConfiguredBy: configuration [
 
   errorHandlers := OrderedCollection new.
-  self on: HTTPClientError addErrorHandler: [ :clientError :request |
-      | json response |
-      json := NeoJSONWriter toStringPretty: clientError.
-      response := ZnResponse statusCode: clientError code.
-      response entity: ( ZnEntity json: json ).
-      clientError affectResponse: response.
-      self applyCrossSharingResourceConfigurationTo: response accordingTo: request.
-      response
-    ]
+  configuration
+    at: #clientErrorHandler
+    ifPresent: [ :errorHandler | self on: HTTPClientError addErrorHandler: errorHandler ]
+    ifAbsent: [
+        self on: HTTPClientError addErrorHandler: [ :clientError :request |
+            | json response |
+            json := NeoJSONWriter toStringPretty: clientError.
+            response := ZnResponse statusCode: clientError code.
+            response entity: ( ZnEntity json: json ).
+            clientError affectResponse: response.
+            response
+          ]
+      ]
 ]
 
 { #category : 'actions' }

@@ -205,6 +205,14 @@ StargateApplication >> concurrentConnectionsThreshold [
   ^ self stargateConfiguration concurrentConnectionsThreshold
 ]
 
+{ #category : 'configuring' }
+StargateApplication >> configureAPI: anAPI [
+  "Subclasses can configure the API here, before the global error handler is added.
+  Error handlers added here take precedence over it."
+
+  
+]
+
 { #category : 'private - activation/deactivation' }
 StargateApplication >> configureAPIGlobalErrorHandler [
 
@@ -213,13 +221,10 @@ StargateApplication >> configureAPIGlobalErrorHandler [
         self withAPIDo: [ :api |
             api
               on: Error addErrorHandler: [ :error :request |
-                  | response |
                   LogRecord emitError:
                       ( 'Unexpected error: "<1s>"' expandMacrosWith: error messageText ).
                   self stackTraceDumper dumpStackTraceFor: error.
-                  response := ZnResponse serverError: error messageText.
-                  api applyCrossSharingResourceConfigurationTo: response accordingTo: request.
-                  response
+                  self responseForUnexpectedError: error request: request
                 ];
               on: Exit addErrorHandler: [ :exit |
                   exit isSuccess then: [ self stop ].
@@ -260,7 +265,8 @@ StargateApplication >> createAPI [
                        ( HTTPBasedRESTfulAPI
                            configuredBy: self apiConfiguration
                            installing: self controllersToInstall )
-    ]
+    ].
+  self withAPIDo: [ :api | self configureAPI: api ]
 ]
 
 { #category : 'initialization' }
@@ -351,6 +357,12 @@ StargateApplication >> operationsSecret [
 StargateApplication >> publicURL [
 
   ^ self stargateConfiguration publicURL
+]
+
+{ #category : 'error handling' }
+StargateApplication >> responseForUnexpectedError: anError request: aRequest [
+
+  ^ ZnResponse serverError: anError messageText
 ]
 
 { #category : 'error handling' }

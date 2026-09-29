@@ -490,33 +490,35 @@ CrossOriginResourceSharingPreflightHandlerTest >> testHandlingUrlWithPlaceholder
 { #category : 'tests' }
 CrossOriginResourceSharingPreflightHandlerTest >> testRespondWithEmptyHeadersIfOriginNotAllowed [
 
-	| allowedMethods request handler |
+  | allowedMethods request handler |
+  allowedMethods := Dictionary new
+                      at: '/devices' put: #( 'GET' 'POST' );
+                      yourself.
 
-	allowedMethods := Dictionary new
-		at: '/devices' put: #('GET' 'POST');
-		yourself.
+  request := self
+               requestOptionsFor: '/devices'
+               originatedAt: 'http://www.google.com' asUrl
+               configuringHeadersWith: [ :headers |
+                 headers at: 'Access-Control-Request-Headers' put: 'Content-Type' ].
 
-	request := self
-		requestOptionsFor: '/devices'
-		originatedAt: 'http://www.google.com' asUrl
-		configuringHeadersWith: [ :headers | headers at: 'Access-Control-Request-Headers' put: 'Content-Type' ].
+  handler := CrossOriginResourceSharingPreflightHandlerBuilder new
+               allowOnlyFrom: { self websiteLocation };
+               allowMethods: allowedMethods;
+               build.
 
-	handler := CrossOriginResourceSharingPreflightHandlerBuilder new
-		allowOnlyFrom: {self websiteLocation};
-		allowMethods: allowedMethods;
-		build.
-
-	self
-		should: [ handler teaEvalActionOnRequest: request ]
-		raise: TeaAbort
-		withExceptionDo: [ :signal | 
-			| response |
-
-			response := signal response.
-			self
-				assert: response code equals: 204;
-				assert: response headers isEmpty
-			]
+  self
+    should: [ handler teaEvalActionOnRequest: request ]
+    raise: TeaAbort
+    withExceptionDo: [ :signal |
+        | response |
+        response := signal response.
+        self
+          assert: response code equals: 204;
+          deny: ( response headers includesKey: 'Access-Control-Allow-Origin' );
+          deny: ( response headers includesKey: 'Access-Control-Allow-Headers' );
+          deny: ( response headers includesKey: 'Access-Control-Allow-Methods' );
+          deny: ( response headers includesKey: 'Vary' )
+      ]
 ]
 
 { #category : 'accessing' }

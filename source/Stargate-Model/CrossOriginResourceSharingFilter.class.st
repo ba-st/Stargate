@@ -21,28 +21,33 @@ CrossOriginResourceSharingFilter class >> applying: aFilter [
 { #category : 'instance creation' }
 CrossOriginResourceSharingFilter class >> handleActualRequestByEvaluating: aHandler [
 
-	^ self
-		applying: [ :teapotServer | 
-			teapotServer
-				after: '/*' -> aHandler;
-				when: [ :request | request headers includesKey: 'Origin' ]
-			]
+  ^ self applying: [ :teapotServer |
+        teapotServer
+          after: '/*' -> aHandler;
+          when: [ :request | self isCrossOrigin: request ]
+      ]
 ]
 
 { #category : 'instance creation' }
 CrossOriginResourceSharingFilter class >> handlePreflightByEvaluating: aHandler [
 
-	^ self applying: [ :teapotServer | 
-		  teapotServer
-			  before: '/*' -> aHandler;
-			  when: [ :request | self isForPreflight: request ]
-		  ]
+  ^ self applying: [ :teapotServer |
+        teapotServer
+          before: '/*' -> aHandler;
+          when: [ :request | self isForPreflight: request ]
+      ]
+]
+
+{ #category : 'testing' }
+CrossOriginResourceSharingFilter class >> isCrossOrigin: request [
+
+  ^ request headers includesKey: 'Origin'
 ]
 
 { #category : 'testing' }
 CrossOriginResourceSharingFilter class >> isForPreflight: request [
 
-	^ ( request headers includesKey: 'Origin' ) and: [ request method = #OPTIONS ]
+  ^ ( self isCrossOrigin: request ) and: [ request method = #OPTIONS ]
 ]
 
 { #category : 'applying' }

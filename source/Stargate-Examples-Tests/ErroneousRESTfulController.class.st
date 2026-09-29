@@ -10,12 +10,30 @@ Class {
 }
 
 { #category : 'routes' }
+ErroneousRESTfulController >> declareGetConflictingRoute [
+
+  ^ RouteSpecification
+      handling: #GET
+      at: self identifierTemplate , '/conflict'
+      evaluating: [ :httpRequest :requestContext | HTTPClientError conflict signal: 'Client error' ]
+]
+
+{ #category : 'routes' }
 ErroneousRESTfulController >> declareGetErroneousRoute [
 
 	^ RouteSpecification
 		  handling: #GET
 		  at: self identifierTemplate
 		  evaluating: [ :httpRequest :requestContext | Error signal: 'Server error' ]
+]
+
+{ #category : 'routes' }
+ErroneousRESTfulController >> declareGetObjectNotFoundRoute [
+
+  ^ RouteSpecification
+      handling: #GET
+      at: self identifierTemplate , '/not-found'
+      evaluating: [ :httpRequest :requestContext | ObjectNotFound signal: 'Not found' ]
 ]
 
 { #category : 'initialization' }

@@ -61,6 +61,38 @@ the image's working directory in a filename whose name is `app-name-YYYY-MM-DD_H
   `stackTraceDumpExtension` class method
 - To change the dump format, re-implement `stackTraceDumper` instance method
 
+### Error responses
+
+Outside debug mode, unexpected errors are answered with a `500/Internal Server
+Error` whose body is the error's message text. To answer them differently,
+re-implement the `responseForUnexpectedError:request:` instance method. The
+error is still logged and its stack trace dumped.
+
+To answer client errors differently, for example with problem documents,
+re-implement the `apiConfiguration` instance method to add a
+`#clientErrorHandler`. Don't forget the super send:
+
+```smalltalk
+YourApplication>>apiConfiguration
+
+  ^ super apiConfiguration , { #clientErrorHandler -> [ :clientError :request |
+      ... build the response ... ] }
+```
+
+To add error handlers of your own, re-implement the `configureAPI:` instance
+method. It receives the `HTTPBasedRESTfulAPI` before the global error handler is
+added, so the handlers added there take precedence over it:
+
+```smalltalk
+YourApplication>>configureAPI: anAPI
+
+  anAPI on: AssertionFailed addErrorHandler: [ :assertionFailed :request |
+    ... build the response ... ]
+```
+
+See [how to start up an API](../how-to/how-to-startup-API.md#handle-errors) for
+more on error handlers.
+
 ### Additional configuration parameters
 
 If you need additional configuration parameters, re-implement `configurationParameters`
