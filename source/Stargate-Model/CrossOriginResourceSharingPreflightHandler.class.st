@@ -31,16 +31,16 @@ CrossOriginResourceSharingPreflightHandler >> initializeAllowing: anAllowOriginP
 { #category : 'private - evaluating' }
 CrossOriginResourceSharingPreflightHandler >> setAllowedHeadersOn: aResponse from: aRequest [
 
-	aRequest headers
-		at: self headerNames >> #accessControlRequestHeaders
-		ifPresent: [ :requestedHeaders |
-			$, split: requestedHeaders do: [ :header |
-				aResponse headers
-					at: self headerNames >> #accessControlAllowHeaders
-					addSeparatedWithComma: header trimBoth
-				].
-			aResponse addToVary: self headerNames >> #accessControlAllowHeaders
-			]
+  aResponse addToVary: self headerNames >> #accessControlRequestHeaders.
+  aRequest headers
+    at: self headerNames >> #accessControlRequestHeaders
+    ifPresent: [ :requestedHeaders |
+        $, split: requestedHeaders do: [ :header |
+            aResponse headers
+              at: self headerNames >> #accessControlAllowHeaders
+              addSeparatedWithComma: header trimBoth
+          ]
+      ]
 ]
 
 { #category : 'private - evaluating' }
@@ -52,9 +52,13 @@ CrossOriginResourceSharingPreflightHandler >> setAllowedMethodsOn: aResponse fro
 ]
 
 { #category : 'private - evaluating' }
-CrossOriginResourceSharingPreflightHandler >> setAllowedOriginOn: aResponse from: aRequest [ 
-	
-	allowOriginPolicy applyOn: aResponse for: aRequest using: self
+CrossOriginResourceSharingPreflightHandler >> setAllowedOriginOn: aResponse from: aRequest ifNotAllowed: aBlock [
+
+  allowOriginPolicy
+    applyOn: aResponse
+    for: aRequest
+    using: self
+    ifNotAllowed: aBlock
 ]
 
 { #category : 'private - evaluating' }
@@ -66,18 +70,16 @@ CrossOriginResourceSharingPreflightHandler >> setOptionalHeadersOn: aResponse [
 { #category : 'evaluating' }
 CrossOriginResourceSharingPreflightHandler >> teaEvalActionOnRequest: aRequest [
 
-	| response |
-
-	self
-		withAllowedMethodsFor: aRequest url
-		do: [ :allowedMethods | 
-			response := ZnResponse noContent.
-			self setAllowedOriginOn: response from: aRequest.
-			self setAllowedMethodsOn: response from: allowedMethods.
-			self setAllowedHeadersOn: response from: aRequest.
-			self setOptionalHeadersOn: response.
-			aRequest abort: response
-			]
+  | response |
+  self withAllowedMethodsFor: aRequest url do: [ :allowedMethods |
+      response := ZnResponse noContent.
+      allowOriginPolicy addToVaryOn: response using: self.
+      self setAllowedOriginOn: response from: aRequest ifNotAllowed: [ aRequest abort: response ].
+      self setAllowedMethodsOn: response from: allowedMethods.
+      self setAllowedHeadersOn: response from: aRequest.
+      self setOptionalHeadersOn: response.
+      aRequest abort: response
+    ]
 ]
 
 { #category : 'evaluating' }

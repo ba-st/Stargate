@@ -97,19 +97,18 @@ CrossOriginResourceSharingActualRequestHandlerTest >> testAllowCredentials [
 { #category : 'tests' }
 CrossOriginResourceSharingActualRequestHandlerTest >> testAllowExactlyOneOrigin [
 
-	| request |
+  | request |
+  request := self postRequestOriginatedAt: self websiteLocation.
 
-	request := self postRequestOriginatedAt: self websiteLocation.
-
-	self
-		assert: [ :handler | handler allowOnlyFrom: {self websiteLocation} ]
-		handles: request
-		byResponding: [ :response | 
-			self
-				assert: response isCreated;
-				assert: response canBeSharedWithRequestsFrom: self websiteLocation;
-				should: [ response headers at: 'Vary' ] raise: KeyNotFound
-			]
+  self
+    assert: [ :handler | handler allowOnlyFrom: { self websiteLocation } ]
+    handles: request
+    byResponding: [ :response |
+        self
+          assert: response isCreated;
+          assert: response canBeSharedWithRequestsFrom: self websiteLocation;
+          assert: ( response headers at: 'Vary' ) equals: 'Origin'
+      ]
 ]
 
 { #category : 'tests' }
@@ -214,32 +213,78 @@ CrossOriginResourceSharingActualRequestHandlerTest >> testIgnoreRequestsWithoutO
           assert: response isCreated;
           should: [ response headers at: 'Access-Control-Allow-Origin' ] raise: KeyNotFound;
           should: [ response headers at: 'Access-Control-Allow-Credentials' ] raise: KeyNotFound;
-          should: [ response headers at: 'Access-Control-Expose-Headers' ] raise: KeyNotFound
+          should: [ response headers at: 'Access-Control-Expose-Headers' ] raise: KeyNotFound;
+          should: [ response headers at: 'Vary' ] raise: KeyNotFound
       ]
 ]
 
 { #category : 'tests' }
-CrossOriginResourceSharingActualRequestHandlerTest >> testRespondWithEmptyHeadersIfOriginNotAllowed [
-
-  | request handler |
-  request := self postRequestOriginatedAt: 'http://www.google.com' asUrl.
-
-
-  handler := CrossOriginResourceSharingActualRequestHandlerBuilder new
-               allowOnlyFrom: { self websiteLocation };
-               build.
+CrossOriginResourceSharingActualRequestHandlerTest >> testOmitCORSHeadersIfOriginNotAllowed [
 
   self
-    should: [ handler teaEvalActionOnRequest: request response: ZnResponse noContent ]
-    raise: TeaAbort
-    withExceptionDo: [ :signal |
-        | response |
-        response := signal response.
-        self
-          assert: response code equals: 204;
-          deny: ( response headers includesKey: 'Access-Control-Allow-Origin' );
-          deny: ( response headers includesKey: 'Vary' )
+    assert: [ :handler |
+        handler
+          allowOnlyFrom: { self websiteLocation };
+          allowCredentials;
+          expose: #( 'Authorization' )
       ]
+    handles: ( self postRequestOriginatedAt: 'http://www.google.com' asUrl )
+    byResponding: [ :response |
+        self
+          assert: response isCreated;
+          deny: ( response headers includesKey: 'Access-Control-Allow-Origin' );
+          deny: ( response headers includesKey: 'Access-Control-Allow-Credentials' );
+          deny: ( response headers includesKey: 'Access-Control-Expose-Headers' );
+          assert: ( response headers at: 'Vary' ) equals: 'Origin'
+      ]
+]
+
+{ #category : 'tests' }
+CrossOriginResourceSharingActualRequestHandlerTest >> testVaryByOriginOnRequestsWithoutOriginWhenAllowingExactlyOneOrigin [
+
+  self
+    assert: [ :handler | handler allowOnlyFrom: { self websiteLocation } ]
+    handles: ( TeaRequest fromZnRequest: ( ZnRequest post: self serverLocation / 'devices' asUrl ) )
+    byResponding: [ :response |
+        self
+          assert: response isCreated;
+          deny: ( response headers includesKey: 'Access-Control-Allow-Origin' );
+          assert: ( response headers at: 'Vary' ) equals: 'Origin'
+      ]
+]
+
+{ #category : 'tests' }
+CrossOriginResourceSharingActualRequestHandlerTest >> testVaryByOriginOnRequestsWithoutOriginWhenAllowingMoreThanOneOrigin [
+
+  self
+    assert: [ :handler |
+      handler allowOnlyFrom: { self websiteLocation . 'http://google.com/' asUrl } ]
+    handles: ( TeaRequest fromZnRequest: ( ZnRequest post: self serverLocation / 'devices' asUrl ) )
+    byResponding: [ :response |
+        self
+          assert: response isCreated;
+          deny: ( response headers includesKey: 'Access-Control-Allow-Origin' );
+          assert: ( response headers at: 'Vary' ) equals: 'Origin'
+      ]
+]
+
+{ #category : 'tests' }
+CrossOriginResourceSharingActualRequestHandlerTest >> testVaryByOriginKeepsOtherVaryHeaders [
+
+  | handler response |
+  handler := self crossOriginResourceSharingActualRequestHandlerBuilderApplying: [ :builder |
+                 builder allowOnlyFrom: { self websiteLocation } ].
+  response := ZnResponse created: self serverLocation asUrl / 'devices' / '1'.
+  response addToVary: 'Accept'.
+
+  handler
+    teaEvalActionOnRequest: ( self postRequestOriginatedAt: self websiteLocation )
+    response: response;
+    teaEvalActionOnRequest:
+      ( TeaRequest fromZnRequest: ( ZnRequest post: self serverLocation / 'devices' asUrl ) )
+    response: response.
+
+  self assert: response varyHeaderNames equals: #( 'Accept' 'Origin' )
 ]
 
 { #category : 'accessing' }

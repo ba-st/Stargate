@@ -65,313 +65,308 @@ CrossOriginResourceSharingPreflightHandlerTest >> requestOptionsFor: aLocation o
 { #category : 'tests' }
 CrossOriginResourceSharingPreflightHandlerTest >> testAllowAnyOrigin [
 
-	| allowedMethods request |
+  | allowedMethods request |
+  allowedMethods := Dictionary new
+                      at: '/devices' put: #( 'GET' 'POST' );
+                      yourself.
 
-	allowedMethods := Dictionary new
-		at: '/devices' put: #('GET' 'POST');
-		yourself.
+  request := self
+               requestOptionsFor: '/devices'
+               originatedAt: self websiteLocation
+               configuringHeadersWith: [ :headers |
+                 headers at: 'Access-Control-Request-Headers' put: 'Content-Type' ].
 
-	request := self
-		requestOptionsFor: '/devices'
-		originatedAt: self websiteLocation
-		configuringHeadersWith: [ :headers | headers at: 'Access-Control-Request-Headers' put: 'Content-Type' ].
-
-	self
-		assert: [ :handler | 
-			handler
-				allowAnyOrigin;
-				allowMethods: allowedMethods
-			]
-		handles: request
-		byResponding: [ :response | 
-			self
-				assert: ( response headers at: 'Access-Control-Allow-Origin' ) equals: '*';
-				assert: ( response headers at: 'Access-Control-Allow-Headers' ) equals: 'Content-Type';
-				assert: ( response headers at: 'Vary' ) equals: 'Access-Control-Allow-Headers';
-				assert: ( response headers at: 'Access-Control-Allow-Methods' ) equals: 'GET, POST'
-			]
+  self
+    assert: [ :handler |
+        handler
+          allowAnyOrigin;
+          allowMethods: allowedMethods
+      ]
+    handles: request
+    byResponding: [ :response |
+        self
+          assert: ( response headers at: 'Access-Control-Allow-Origin' ) equals: '*';
+          assert: ( response headers at: 'Access-Control-Allow-Headers' ) equals: 'Content-Type';
+          assert: ( response headers at: 'Vary' ) equals: 'Access-Control-Request-Headers';
+          assert: ( response headers at: 'Access-Control-Allow-Methods' ) equals: 'GET, POST'
+      ]
 ]
 
 { #category : 'tests' }
 CrossOriginResourceSharingPreflightHandlerTest >> testAllowCredentials [
 
-	| allowedMethods request |
+  | allowedMethods request |
+  allowedMethods := Dictionary new
+                      at: '/devices' put: #( 'GET' 'POST' );
+                      yourself.
 
-	allowedMethods := Dictionary new
-		at: '/devices' put: #('GET' 'POST');
-		yourself.
+  request := self
+               requestOptionsFor: '/devices'
+               originatedAt: self websiteLocation
+               configuringHeadersWith: [ :headers |
+                 headers at: 'Access-Control-Request-Headers' put: 'Content-Type' ].
 
-	request := self
-		requestOptionsFor: '/devices'
-		originatedAt: self websiteLocation
-		configuringHeadersWith: [ :headers | headers at: 'Access-Control-Request-Headers' put: 'Content-Type' ].
-
-	self
-		assert: [ :handler | 
-			handler
-				allowAnyOrigin;
-				allowMethods: allowedMethods;
-				allowCredentials
-			]
-		handles: request
-		byResponding: [ :response | 
-			self
-				assert: ( response headers at: 'Access-Control-Allow-Origin' ) equals: '*';
-				assert: ( response headers at: 'Access-Control-Allow-Headers' ) equals: 'Content-Type';
-				assert: ( response headers at: 'Vary' ) equals: 'Access-Control-Allow-Headers';
-				assert: ( response headers at: 'Access-Control-Allow-Methods' ) equals: 'GET, POST';
-				assert: ( response headers at: 'Access-Control-Allow-Credentials' ) equals: 'true'
-			]
+  self
+    assert: [ :handler |
+        handler
+          allowAnyOrigin;
+          allowMethods: allowedMethods;
+          allowCredentials
+      ]
+    handles: request
+    byResponding: [ :response |
+        self
+          assert: ( response headers at: 'Access-Control-Allow-Origin' ) equals: '*';
+          assert: ( response headers at: 'Access-Control-Allow-Headers' ) equals: 'Content-Type';
+          assert: ( response headers at: 'Vary' ) equals: 'Access-Control-Request-Headers';
+          assert: ( response headers at: 'Access-Control-Allow-Methods' ) equals: 'GET, POST';
+          assert: ( response headers at: 'Access-Control-Allow-Credentials' ) equals: 'true'
+      ]
 ]
 
 { #category : 'tests' }
 CrossOriginResourceSharingPreflightHandlerTest >> testAllowExactlyOneOrigin [
 
-	| allowedMethods request |
+  | allowedMethods request |
+  allowedMethods := Dictionary new
+                      at: '/devices' put: #( 'GET' 'POST' );
+                      yourself.
 
-	allowedMethods := Dictionary new
-		at: '/devices' put: #('GET' 'POST');
-		yourself.
+  request := self
+               requestOptionsFor: '/devices'
+               originatedAt: self websiteLocation
+               configuringHeadersWith: [ :headers |
+                 headers at: 'Access-Control-Request-Headers' put: 'Content-Type' ].
 
-	request := self
-		requestOptionsFor: '/devices'
-		originatedAt: self websiteLocation
-		configuringHeadersWith: [ :headers | headers at: 'Access-Control-Request-Headers' put: 'Content-Type' ].
-
-	self
-		assert: [ :handler | 
-			handler
-				allowOnlyFrom: {self websiteLocation};
-				allowMethods: allowedMethods
-			]
-		handles: request
-		byResponding: [ :response | 
-			self
-				assert: response canBeSharedWithRequestsFrom: self websiteLocation;
-				assert: ( response headers at: 'Access-Control-Allow-Headers' ) equals: 'Content-Type';
-				assert: ( response headers at: 'Vary' ) equals: 'Access-Control-Allow-Headers';
-				assert: ( response headers at: 'Access-Control-Allow-Methods' ) equals: 'GET, POST'
-			]
+  self
+    assert: [ :handler |
+        handler
+          allowOnlyFrom: { self websiteLocation };
+          allowMethods: allowedMethods
+      ]
+    handles: request
+    byResponding: [ :response |
+        self
+          assert: response canBeSharedWithRequestsFrom: self websiteLocation;
+          assert: ( response headers at: 'Access-Control-Allow-Headers' ) equals: 'Content-Type';
+          assert: response varyHeaderNames equals: #( 'Origin' 'Access-Control-Request-Headers' );
+          assert: ( response headers at: 'Access-Control-Allow-Methods' ) equals: 'GET, POST'
+      ]
 ]
 
 { #category : 'tests' }
 CrossOriginResourceSharingPreflightHandlerTest >> testAllowHeadersMatchRequestHeaders [
 
-	| allowedMethods request |
+  | allowedMethods request |
+  allowedMethods := Dictionary new
+                      at: '/devices' put: #( 'GET' 'POST' );
+                      yourself.
 
-	allowedMethods := Dictionary new
-		at: '/devices' put: #('GET' 'POST');
-		yourself.
+  request := self
+               requestOptionsFor: '/devices'
+               originatedAt: self websiteLocation
+               configuringHeadersWith: [ :headers |
+                 headers at: 'Access-Control-Request-Headers' put: 'Content-Type, Authorization' ].
 
-	request := self
-		requestOptionsFor: '/devices'
-		originatedAt: self websiteLocation
-		configuringHeadersWith: [ :headers | headers at: 'Access-Control-Request-Headers' put: 'Content-Type, Authorization' ].
-
-	self
-		assert: [ :handler | 
-			handler
-				allowOnlyFrom: {self websiteLocation};
-				allowMethods: allowedMethods
-			]
-		handles: request
-		byResponding: [ :response | 
-			self
-				assert: response canBeSharedWithRequestsFrom: self websiteLocation;
-				assert: ( response headers at: 'Access-Control-Allow-Methods' ) equals: 'GET, POST';
-				assert: ( response headers at: 'Access-Control-Allow-Headers' )
-					equals: 'Content-Type, Authorization';
-				assert: ( response headers at: 'Vary' ) equals: 'Access-Control-Allow-Headers'
-			]
+  self
+    assert: [ :handler |
+        handler
+          allowOnlyFrom: { self websiteLocation };
+          allowMethods: allowedMethods
+      ]
+    handles: request
+    byResponding: [ :response |
+        self
+          assert: response canBeSharedWithRequestsFrom: self websiteLocation;
+          assert: ( response headers at: 'Access-Control-Allow-Methods' ) equals: 'GET, POST';
+          assert: ( response headers at: 'Access-Control-Allow-Headers' )
+          equals: 'Content-Type, Authorization';
+          assert: response varyHeaderNames equals: #( 'Origin' 'Access-Control-Request-Headers' )
+      ]
 ]
 
 { #category : 'tests' }
 CrossOriginResourceSharingPreflightHandlerTest >> testAllowHeadersWithEmptyRequestHeaders [
 
-	| request allowedMethods |
+  | request allowedMethods |
+  allowedMethods := Dictionary new
+                      at: '/devices' put: #( 'GET' 'POST' );
+                      yourself.
 
-	allowedMethods := Dictionary new
-		at: '/devices' put: #('GET' 'POST');
-		yourself.
+  request := self
+               requestOptionsFor: '/devices'
+               originatedAt: self websiteLocation
+               configuringHeadersWith: [ :headers |  ].
 
-	request := self
-		requestOptionsFor: '/devices'
-		originatedAt: self websiteLocation
-		configuringHeadersWith: [ :headers |  ].
-
-	self
-		assert: [ :handler | 
-			handler
-				allowOnlyFrom: {self websiteLocation};
-				allowMethods: allowedMethods
-			]
-		handles: request
-		byResponding: [ :response | 
-			self
-				assert: response canBeSharedWithRequestsFrom: self websiteLocation;
-				assert: ( response headers at: 'Access-Control-Allow-Methods' ) equals: 'GET, POST';
-				should: [ response headers at: 'Access-Control-Allow-Headers' ] raise: NotFound;
-				should: [ response headers at: 'Vary' ] raise: KeyNotFound
-			]
+  self
+    assert: [ :handler |
+        handler
+          allowOnlyFrom: { self websiteLocation };
+          allowMethods: allowedMethods
+      ]
+    handles: request
+    byResponding: [ :response |
+        self
+          assert: response canBeSharedWithRequestsFrom: self websiteLocation;
+          assert: ( response headers at: 'Access-Control-Allow-Methods' ) equals: 'GET, POST';
+          should: [ response headers at: 'Access-Control-Allow-Headers' ] raise: NotFound;
+          assert: response varyHeaderNames equals: #( 'Origin' 'Access-Control-Request-Headers' )
+      ]
 ]
 
 { #category : 'tests' }
 CrossOriginResourceSharingPreflightHandlerTest >> testAllowMoreThanOneOrigin [
 
-	| allowedMethods request |
+  | allowedMethods request |
+  allowedMethods := Dictionary new
+                      at: '/devices' put: #( 'GET' 'POST' );
+                      yourself.
 
-	allowedMethods := Dictionary new
-		at: '/devices' put: #('GET' 'POST');
-		yourself.
+  request := self
+               requestOptionsFor: '/devices'
+               originatedAt: self websiteLocation
+               configuringHeadersWith: [ :headers |
+                 headers at: 'Access-Control-Request-Headers' put: 'Content-Type' ].
 
-	request := self
-		requestOptionsFor: '/devices'
-		originatedAt: self websiteLocation
-		configuringHeadersWith: [ :headers | headers at: 'Access-Control-Request-Headers' put: 'Content-Type' ].
-
-	self
-		assert: [ :handler | 
-			handler
-				allowOnlyFrom:
-					{self websiteLocation.
-					'http://google.com/ asUrl' asUrl};
-				allowMethods: allowedMethods
-			]
-		handles: request
-		byResponding: [ :response | 
-			self
-				assert: response canBeSharedWithRequestsFrom: self websiteLocation;
-				assert: ( response headers at: 'Access-Control-Allow-Headers' ) equals: 'Content-Type';
-				assert: response varyHeaderNames equals: #('Origin' 'Access-Control-Allow-Headers');
-				assert: ( response headers at: 'Access-Control-Allow-Methods' ) equals: 'GET, POST'
-			]
+  self
+    assert: [ :handler |
+        handler
+          allowOnlyFrom: { self websiteLocation . 'http://google.com/ asUrl' asUrl };
+          allowMethods: allowedMethods
+      ]
+    handles: request
+    byResponding: [ :response |
+        self
+          assert: response canBeSharedWithRequestsFrom: self websiteLocation;
+          assert: ( response headers at: 'Access-Control-Allow-Headers' ) equals: 'Content-Type';
+          assert: response varyHeaderNames equals: #( 'Origin' 'Access-Control-Request-Headers' );
+          assert: ( response headers at: 'Access-Control-Allow-Methods' ) equals: 'GET, POST'
+      ]
 ]
 
 { #category : 'tests' }
 CrossOriginResourceSharingPreflightHandlerTest >> testAllowedMethodsReflectsDefinedByRoutes [
 
-	| allowedMethods request |
+  | allowedMethods request |
+  allowedMethods := Dictionary new
+                      at: '/devices' put: #( 'GET' );
+                      at: '/users' put: #( 'GET' 'POST' 'PUT' );
+                      yourself.
 
-	allowedMethods := Dictionary new
-		at: '/devices' put: #('GET');
-		at: '/users' put: #('GET' 'POST' 'PUT');
-		yourself.
+  request := self
+               requestOptionsFor: '/devices'
+               originatedAt: self websiteLocation
+               configuringHeadersWith: [ :headers |
+                   headers
+                     at: 'Access-Control-Request-Headers' put: 'Content-Type';
+                     at: 'Access-Control-Request-Method' put: 'GET';
+                     yourself
+                 ].
 
-	request := self
-		requestOptionsFor: '/devices'
-		originatedAt: self websiteLocation
-		configuringHeadersWith: [ :headers | 
-			headers
-				at: 'Access-Control-Request-Headers' put: 'Content-Type';
-				at: 'Access-Control-Request-Method' put: 'GET';
-				yourself
-			].
+  self
+    assert: [ :handler |
+        handler
+          allowOnlyFrom: { self websiteLocation };
+          allowMethods: allowedMethods
+      ]
+    handles: request
+    byResponding: [ :response |
+        self
+          assert: response canBeSharedWithRequestsFrom: self websiteLocation;
+          assert: ( response headers at: 'Access-Control-Allow-Headers' ) equals: 'Content-Type';
+          assert: response varyHeaderNames equals: #( 'Origin' 'Access-Control-Request-Headers' );
+          assert: ( response headers at: 'Access-Control-Allow-Methods' ) equals: 'GET'
+      ].
 
-	self
-		assert: [ :handler | 
-			handler
-				allowOnlyFrom: {self websiteLocation};
-				allowMethods: allowedMethods
-			]
-		handles: request
-		byResponding: [ :response | 
-			self
-				assert: response canBeSharedWithRequestsFrom: self websiteLocation;
-				assert: ( response headers at: 'Access-Control-Allow-Headers' ) equals: 'Content-Type';
-				assert: ( response headers at: 'Vary' ) equals: 'Access-Control-Allow-Headers';
-				assert: ( response headers at: 'Access-Control-Allow-Methods' ) equals: 'GET'
-			].
+  request := self
+               requestOptionsFor: '/users'
+               originatedAt: self websiteLocation
+               configuringHeadersWith: [ :headers |
+                   headers
+                     at: 'Access-Control-Request-Headers' put: 'Content-Type';
+                     at: 'Access-Control-Request-Method' put: 'POST';
+                     yourself
+                 ].
 
-	request := self
-		requestOptionsFor: '/users'
-		originatedAt: self websiteLocation
-		configuringHeadersWith: [ :headers | 
-			headers
-				at: 'Access-Control-Request-Headers' put: 'Content-Type';
-				at: 'Access-Control-Request-Method' put: 'POST';
-				yourself
-			].
-
-	self
-		assert: [ :handler | 
-			handler
-				allowOnlyFrom: {self websiteLocation};
-				allowMethods: allowedMethods
-			]
-		handles: request
-		byResponding: [ :response | 
-			self
-				assert:  response canBeSharedWithRequestsFrom: self websiteLocation;
-				assert: ( response headers at: 'Access-Control-Allow-Headers' ) equals: 'Content-Type';
-				assert: ( response headers at: 'Vary' ) equals: 'Access-Control-Allow-Headers';
-				assert: ( response headers at: 'Access-Control-Allow-Methods' ) equals: 'GET, POST, PUT'
-			]
+  self
+    assert: [ :handler |
+        handler
+          allowOnlyFrom: { self websiteLocation };
+          allowMethods: allowedMethods
+      ]
+    handles: request
+    byResponding: [ :response |
+        self
+          assert: response canBeSharedWithRequestsFrom: self websiteLocation;
+          assert: ( response headers at: 'Access-Control-Allow-Headers' ) equals: 'Content-Type';
+          assert: response varyHeaderNames equals: #( 'Origin' 'Access-Control-Request-Headers' );
+          assert: ( response headers at: 'Access-Control-Allow-Methods' ) equals: 'GET, POST, PUT'
+      ]
 ]
 
 { #category : 'tests' }
 CrossOriginResourceSharingPreflightHandlerTest >> testAllowedMethodsReflectsDefinedByRoutesIgnoringRequested [
 
-	| allowedMethods request |
+  | allowedMethods request |
+  allowedMethods := Dictionary new
+                      at: '/devices' put: #( 'GET' 'POST' );
+                      yourself.
 
-	allowedMethods := Dictionary new
-		at: '/devices' put: #('GET' 'POST');
-		yourself.
+  request := self
+               requestOptionsFor: '/devices'
+               originatedAt: self websiteLocation
+               configuringHeadersWith: [ :headers |
+                   headers
+                     at: 'Access-Control-Request-Headers' put: 'Content-Type';
+                     at: 'Access-Control-Request-Method' put: 'PUT'
+                 ].
 
-	request := self
-		requestOptionsFor: '/devices'
-		originatedAt: self websiteLocation
-		configuringHeadersWith: [ :headers | 
-			headers
-				at: 'Access-Control-Request-Headers' put: 'Content-Type';
-				at: 'Access-Control-Request-Method' put: 'PUT'
-			].
-
-	self
-		assert: [ :handler | 
-			handler
-				allowOnlyFrom: {self websiteLocation};
-				allowMethods: allowedMethods
-			]
-		handles: request
-		byResponding: [ :response | 
-			self
-				assert: response canBeSharedWithRequestsFrom: self websiteLocation;
-				assert: ( response headers at: 'Access-Control-Allow-Headers' ) equals: 'Content-Type';
-				assert: ( response headers at: 'Vary' ) equals: 'Access-Control-Allow-Headers';
-				assert: ( response headers at: 'Access-Control-Allow-Methods' ) equals: 'GET, POST'
-			]
+  self
+    assert: [ :handler |
+        handler
+          allowOnlyFrom: { self websiteLocation };
+          allowMethods: allowedMethods
+      ]
+    handles: request
+    byResponding: [ :response |
+        self
+          assert: response canBeSharedWithRequestsFrom: self websiteLocation;
+          assert: ( response headers at: 'Access-Control-Allow-Headers' ) equals: 'Content-Type';
+          assert: response varyHeaderNames equals: #( 'Origin' 'Access-Control-Request-Headers' );
+          assert: ( response headers at: 'Access-Control-Allow-Methods' ) equals: 'GET, POST'
+      ]
 ]
 
 { #category : 'tests' }
 CrossOriginResourceSharingPreflightHandlerTest >> testDisableCache [
 
-	| allowedMethods request |
+  | allowedMethods request |
+  allowedMethods := Dictionary new
+                      at: '/devices' put: #( 'GET' 'POST' );
+                      yourself.
 
-	allowedMethods := Dictionary new
-		at: '/devices' put: #('GET' 'POST');
-		yourself.
+  request := self
+               requestOptionsFor: '/devices'
+               originatedAt: self websiteLocation
+               configuringHeadersWith: [ :headers |
+                 headers at: 'Access-Control-Request-Headers' put: 'Content-Type' ].
 
-	request := self
-		requestOptionsFor: '/devices'
-		originatedAt: self websiteLocation
-		configuringHeadersWith: [ :headers | headers at: 'Access-Control-Request-Headers' put: 'Content-Type' ].
-
-	self
-		assert: [ :handler | 
-			handler
-				allowAnyOrigin;
-				allowMethods: allowedMethods;
-				doNotCache
-			]
-		handles: request
-		byResponding: [ :response | 
-			self
-				assert: ( response headers at: 'Access-Control-Allow-Origin' ) equals: '*';
-				assert: ( response headers at: 'Access-Control-Allow-Headers' ) equals: 'Content-Type';
-				assert: ( response headers at: 'Vary' ) equals: 'Access-Control-Allow-Headers';
-				assert: ( response headers at: 'Access-Control-Allow-Methods' ) equals: 'GET, POST';
-				assert: ( response headers at: 'Access-Control-Max-Age' ) equals: '-1'
-			]
+  self
+    assert: [ :handler |
+        handler
+          allowAnyOrigin;
+          allowMethods: allowedMethods;
+          doNotCache
+      ]
+    handles: request
+    byResponding: [ :response |
+        self
+          assert: ( response headers at: 'Access-Control-Allow-Origin' ) equals: '*';
+          assert: ( response headers at: 'Access-Control-Allow-Headers' ) equals: 'Content-Type';
+          assert: ( response headers at: 'Vary' ) equals: 'Access-Control-Request-Headers';
+          assert: ( response headers at: 'Access-Control-Allow-Methods' ) equals: 'GET, POST';
+          assert: ( response headers at: 'Access-Control-Max-Age' ) equals: '-1'
+      ]
 ]
 
 { #category : 'tests' }
@@ -400,66 +395,66 @@ CrossOriginResourceSharingPreflightHandlerTest >> testDontHandleIfRouteDoesNotMa
 { #category : 'tests' }
 CrossOriginResourceSharingPreflightHandlerTest >> testExpireIn [
 
-	| allowedMethods request |
+  | allowedMethods request |
+  allowedMethods := Dictionary new
+                      at: '/devices' put: #( 'GET' 'POST' );
+                      yourself.
 
-	allowedMethods := Dictionary new
-		at: '/devices' put: #('GET' 'POST');
-		yourself.
+  request := self
+               requestOptionsFor: '/devices'
+               originatedAt: self websiteLocation
+               configuringHeadersWith: [ :headers |
+                 headers at: 'Access-Control-Request-Headers' put: 'Content-Type' ].
 
-	request := self
-		requestOptionsFor: '/devices'
-		originatedAt: self websiteLocation
-		configuringHeadersWith: [ :headers | headers at: 'Access-Control-Request-Headers' put: 'Content-Type' ].
-
-	self
-		assert: [ :handler | 
-			handler
-				allowAnyOrigin;
-				allowMethods: allowedMethods;
-				expireIn: 600 seconds
-			]
-		handles: request
-		byResponding: [ :response | 
-			self
-				assert: ( response headers at: 'Access-Control-Allow-Origin' ) equals: '*';
-				assert: ( response headers at: 'Access-Control-Allow-Headers' ) equals: 'Content-Type';
-				assert: ( response headers at: 'Vary' ) equals: 'Access-Control-Allow-Headers';
-				assert: ( response headers at: 'Access-Control-Allow-Methods' ) equals: 'GET, POST';
-				assert: ( response headers at: 'Access-Control-Max-Age' ) equals: '600'
-			]
+  self
+    assert: [ :handler |
+        handler
+          allowAnyOrigin;
+          allowMethods: allowedMethods;
+          expireIn: 600 seconds
+      ]
+    handles: request
+    byResponding: [ :response |
+        self
+          assert: ( response headers at: 'Access-Control-Allow-Origin' ) equals: '*';
+          assert: ( response headers at: 'Access-Control-Allow-Headers' ) equals: 'Content-Type';
+          assert: ( response headers at: 'Vary' ) equals: 'Access-Control-Request-Headers';
+          assert: ( response headers at: 'Access-Control-Allow-Methods' ) equals: 'GET, POST';
+          assert: ( response headers at: 'Access-Control-Max-Age' ) equals: '600'
+      ]
 ]
 
 { #category : 'tests' }
 CrossOriginResourceSharingPreflightHandlerTest >> testExposeHeaders [
 
-	| allowedMethods request |
+  | allowedMethods request |
+  allowedMethods := Dictionary new
+                      at: '/devices' put: #( 'GET' 'POST' );
+                      yourself.
 
-	allowedMethods := Dictionary new
-		at: '/devices' put: #('GET' 'POST');
-		yourself.
+  request := self
+               requestOptionsFor: '/devices'
+               originatedAt: self websiteLocation
+               configuringHeadersWith: [ :headers |
+                 headers at: 'Access-Control-Request-Headers' put: 'Content-Type' ].
 
-	request := self
-		requestOptionsFor: '/devices'
-		originatedAt: self websiteLocation
-		configuringHeadersWith: [ :headers | headers at: 'Access-Control-Request-Headers' put: 'Content-Type' ].
-
-	self
-		assert: [ :handler | 
-			handler
-				allowAnyOrigin;
-				allowMethods: allowedMethods;
-				expose: #('Authorization' 'X-Custom')
-			]
-		handles: request
-		byResponding: [ :response | 
-			self
-				assert: ( response headers at: 'Access-Control-Allow-Origin' ) equals: '*';
-				assert: ( response headers at: 'Access-Control-Allow-Headers' ) equals: 'Content-Type';
-				assert: ( response headers at: 'Vary' ) equals: 'Access-Control-Allow-Headers';
-				assert: ( response headers at: 'Access-Control-Allow-Methods' ) equals: 'GET, POST';
-				assert: ( response headers at: 'Access-Control-Expose-Headers' )
-					equals: 'Authorization, X-Custom'
-			]
+  self
+    assert: [ :handler |
+        handler
+          allowAnyOrigin;
+          allowMethods: allowedMethods;
+          expose: #( 'Authorization' 'X-Custom' )
+      ]
+    handles: request
+    byResponding: [ :response |
+        self
+          assert: ( response headers at: 'Access-Control-Allow-Origin' ) equals: '*';
+          assert: ( response headers at: 'Access-Control-Allow-Headers' ) equals: 'Content-Type';
+          assert: ( response headers at: 'Vary' ) equals: 'Access-Control-Request-Headers';
+          assert: ( response headers at: 'Access-Control-Allow-Methods' ) equals: 'GET, POST';
+          assert: ( response headers at: 'Access-Control-Expose-Headers' )
+          equals: 'Authorization, X-Custom'
+      ]
 ]
 
 { #category : 'tests' }
@@ -517,7 +512,7 @@ CrossOriginResourceSharingPreflightHandlerTest >> testRespondWithEmptyHeadersIfO
           deny: ( response headers includesKey: 'Access-Control-Allow-Origin' );
           deny: ( response headers includesKey: 'Access-Control-Allow-Headers' );
           deny: ( response headers includesKey: 'Access-Control-Allow-Methods' );
-          deny: ( response headers includesKey: 'Vary' )
+          assert: ( response headers at: 'Vary' ) equals: 'Origin'
       ]
 ]
 

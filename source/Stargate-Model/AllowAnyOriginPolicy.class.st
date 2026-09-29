@@ -10,7 +10,14 @@ Class {
 }
 
 { #category : 'configuring headers' }
-AllowAnyOriginPolicy >> applyOn: aResponse for: aRequest using: aHandler [
+AllowAnyOriginPolicy >> addToVaryOn: aResponse using: aHandler [
+  "Access-Control-Allow-Origin: * doesn't depend on the request, so there's nothing to add"
 
-	aHandler setAnyOriginAllowedOn: aResponse
+  
+]
+
+{ #category : 'configuring headers' }
+AllowAnyOriginPolicy >> applyOn: aResponse for: aRequest using: aHandler ifNotAllowed: aBlock [
+
+  aHandler setAnyOriginAllowedOn: aResponse
 ]

@@ -27,9 +27,13 @@ CrossOriginResourceSharingActualRequestHandler >> initializeAllowing: anAllowOri
 ]
 
 { #category : 'private - evaluating' }
-CrossOriginResourceSharingActualRequestHandler >> setAllowedOriginOn: aResponse from: aRequest [ 
+CrossOriginResourceSharingActualRequestHandler >> setAllowedOriginOn: aResponse from: aRequest ifNotAllowed: aBlock [
 
-	allowOriginPolicy applyOn: aResponse for: aRequest using: self
+  allowOriginPolicy
+    applyOn: aResponse
+    for: aRequest
+    using: self
+    ifNotAllowed: aBlock
 ]
 
 { #category : 'private - evaluating' }
@@ -41,8 +45,9 @@ CrossOriginResourceSharingActualRequestHandler >> setOptionalHeadersOn: aRespons
 { #category : 'evaluating' }
 CrossOriginResourceSharingActualRequestHandler >> teaEvalActionOnRequest: aRequest response: aResponse [
 
+  allowOriginPolicy addToVaryOn: aResponse using: self.
   ( CrossOriginResourceSharingFilter isCrossOrigin: aRequest ) then: [
-      self setAllowedOriginOn: aResponse from: aRequest.
+      self setAllowedOriginOn: aResponse from: aRequest ifNotAllowed: [ ^ aResponse ].
       self setOptionalHeadersOn: aResponse
     ].
   ^ aResponse

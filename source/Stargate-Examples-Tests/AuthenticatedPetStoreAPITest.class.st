@@ -55,187 +55,178 @@ AuthenticatedPetStoreAPITest >> testBadRequest [
 { #category : 'tests - CORS' }
 AuthenticatedPetStoreAPITest >> testCORSAllowingAnyOrigin [
 
-	| response |
+  | response |
+  api allowCrossOriginSharingApplying: [ :cors | cors allowAnyOrigin ].
 
-	api allowCrossOriginSharingApplying: [ :cors | cors allowAnyOrigin ].
+  response := self newClient
+                url: self baseUrl / 'pets' asUrl;
+                headerAt: 'Origin' put: self baseUrl printString;
+                headerAt: 'Access-Control-Request-Headers' put: 'Content-Type';
+                options;
+                response.
 
-	response := self newClient
-		url: self baseUrl / 'pets' asUrl;
-		headerAt: 'Origin' put: self baseUrl printString;
-		headerAt: 'Access-Control-Request-Headers' put: 'Content-Type';
-		options;
-		response.
+  self
+    assert: response isNoContent;
+    assert: ( response headers at: 'Access-Control-Allow-Origin' ) equals: '*';
+    assert: ( response headers at: 'Access-Control-Allow-Headers' ) equals: 'Content-Type';
+    assert: response varyHeaderNames includes: 'Access-Control-Request-Headers';
+    assert: ( response headers at: 'Access-Control-Allow-Methods' ) equals: 'POST, GET'.
 
-	self
-		assert: response isNoContent;
-		assert: ( response headers at: 'Access-Control-Allow-Origin' ) equals: '*';
-		assert: ( response headers at: 'Access-Control-Allow-Headers' ) equals: 'Content-Type';
-		assert: response varyHeaderNames includes: 'Access-Control-Allow-Headers';
-		assert: ( response headers at: 'Access-Control-Allow-Methods' ) equals: 'POST, GET'.
+  response := self newJWTAuthorizedClient
+                url: self baseUrl / 'pets' asUrl;
+                headerAt: 'Origin' put: self baseUrl printString;
+                get;
+                response.
 
-	response := self newJWTAuthorizedClient
-		url: self baseUrl / 'pets' asUrl;
-		headerAt: 'Origin' put: self baseUrl printString;
-		get;
-		response.
-
-	self
-		deny: response varyHeaderNames includes: 'Access-Control-Allow-Headers';
-		assert: ( response headers at: 'Access-Control-Allow-Origin' ) equals: '*'
+  self
+    deny: response varyHeaderNames includes: 'Access-Control-Request-Headers';
+    assert: ( response headers at: 'Access-Control-Allow-Origin' ) equals: '*'
 ]
 
 { #category : 'tests - CORS' }
 AuthenticatedPetStoreAPITest >> testCORSAllowingExactlyOneOrigin [
 
-	| response |
+  | response |
+  api allowCrossOriginSharingApplying: [ :cors | cors allowOnlyFrom: { self baseUrl } ].
 
-	api allowCrossOriginSharingApplying: [ :cors | cors allowOnlyFrom: {self baseUrl} ].
+  response := self newClient
+                url: self baseUrl / 'pets' asUrl;
+                headerAt: 'Origin' put: self baseUrl printString;
+                headerAt: 'Access-Control-Request-Headers' put: 'Content-Type';
+                options;
+                response.
 
-	response := self newClient
-		url: self baseUrl / 'pets' asUrl;
-		headerAt: 'Origin' put: self baseUrl printString;
-		headerAt: 'Access-Control-Request-Headers' put: 'Content-Type';
-		options;
-		response.
+  self
+    assert: response isNoContent;
+    assert: response canBeSharedWithRequestsFrom: self baseUrl;
+    assert: ( response headers at: 'Access-Control-Allow-Headers' ) equals: 'Content-Type';
+    assert: response varyHeaderNames includes: 'Access-Control-Request-Headers';
+    assert: response varyHeaderNames includes: 'Origin';
+    assert: ( response headers at: 'Access-Control-Allow-Methods' ) equals: 'POST, GET'.
 
-	self
-		assert: response isNoContent;
-		assert: response canBeSharedWithRequestsFrom: self baseUrl;
-		assert: ( response headers at: 'Access-Control-Allow-Headers' ) equals: 'Content-Type';
-		assert: response varyHeaderNames includes: 'Access-Control-Allow-Headers';
-		deny: response varyHeaderNames includes: 'Access-Control-Allow-Origin';
-		assert: ( response headers at: 'Access-Control-Allow-Methods' ) equals: 'POST, GET'.
+  response := self newJWTAuthorizedClient
+                url: self baseUrl / 'pets' asUrl;
+                headerAt: 'Origin' put: self baseUrl printString;
+                get;
+                response.
 
-	response := self newJWTAuthorizedClient
-		url: self baseUrl / 'pets' asUrl;
-		headerAt: 'Origin' put: self baseUrl printString;
-		get;
-		response.
-
-	self
-		deny: response varyHeaderNames includes: 'Access-Control-Allow-Headers';
-		deny: response varyHeaderNames includes: 'Access-Control-Allow-Origin';
-		assert: response canBeSharedWithRequestsFrom: self baseUrl
+  self
+    deny: response varyHeaderNames includes: 'Access-Control-Request-Headers';
+    assert: response varyHeaderNames includes: 'Origin';
+    assert: response canBeSharedWithRequestsFrom: self baseUrl
 ]
 
 { #category : 'tests - CORS' }
 AuthenticatedPetStoreAPITest >> testCORSAllowingMoreThanOneOrigin [
 
-	| response |
+  | response |
+  api allowCrossOriginSharingApplying: [ :cors |
+      cors allowOnlyFrom: { self baseUrl . 'http://google.com/' asUrl } ].
 
-	api
-		allowCrossOriginSharingApplying: [ :cors | 
-			cors
-				allowOnlyFrom:
-					{self baseUrl.
-					'http://google.com/' asUrl}
-			].
+  response := self newClient
+                url: self baseUrl / 'pets' asUrl;
+                headerAt: 'Origin' put: self baseUrl printString;
+                headerAt: 'Access-Control-Request-Headers' put: 'Content-Type';
+                options;
+                response.
 
-	response := self newClient
-		url: self baseUrl / 'pets' asUrl;
-		headerAt: 'Origin' put: self baseUrl printString;
-		headerAt: 'Access-Control-Request-Headers' put: 'Content-Type';
-		options;
-		response.
+  self
+    assert: response isNoContent;
+    assert: response canBeSharedWithRequestsFrom: self baseUrl;
+    assert: ( response headers at: 'Access-Control-Allow-Headers' ) equals: 'Content-Type';
+    assert: response varyHeaderNames includes: 'Origin';
+    assert: response varyHeaderNames includes: 'Access-Control-Request-Headers';
+    assert: ( response headers at: 'Access-Control-Allow-Methods' ) equals: 'POST, GET'.
 
-	self
-		assert: response isNoContent;
-		assert: response canBeSharedWithRequestsFrom: self baseUrl;
-		assert: ( response headers at: 'Access-Control-Allow-Headers' ) equals: 'Content-Type';
-		assert: response varyHeaderNames includes: 'Origin';
-		assert: response varyHeaderNames includes: 'Access-Control-Allow-Headers';
-		assert: ( response headers at: 'Access-Control-Allow-Methods' ) equals: 'POST, GET'.
+  response := self newJWTAuthorizedClient
+                url: self baseUrl / 'pets' asUrl;
+                headerAt: 'Origin' put: self baseUrl printString;
+                get;
+                response.
 
-	response := self newJWTAuthorizedClient
-		url: self baseUrl / 'pets' asUrl;
-		headerAt: 'Origin' put: self baseUrl printString;
-		get;
-		response.
-
-	self
-		assert: response varyHeaderNames includes: 'Origin';
-		deny: response varyHeaderNames includes: 'Access-Control-Allow-Headers';
-		assert: response canBeSharedWithRequestsFrom:  self baseUrl
+  self
+    assert: response varyHeaderNames includes: 'Origin';
+    deny: response varyHeaderNames includes: 'Access-Control-Request-Headers';
+    assert: response canBeSharedWithRequestsFrom: self baseUrl
 ]
 
 { #category : 'tests - CORS' }
 AuthenticatedPetStoreAPITest >> testCORSOptionalHeaders [
 
-	| response |
+  | response |
+  api allowCrossOriginSharingApplying: [ :cors |
+      cors
+        allowAnyOrigin;
+        allowCredentials;
+        expireIn: 600 seconds;
+        expose: #( 'Authorization' 'X-Custom' )
+    ].
 
-	api
-		allowCrossOriginSharingApplying: [ :cors | 
-			cors
-				allowAnyOrigin;
-				allowCredentials;
-				expireIn: 600 seconds;
-				expose: #('Authorization' 'X-Custom')
-			].
+  response := self newClient
+                url: self baseUrl / 'pets' asUrl;
+                headerAt: 'Origin' put: self baseUrl printString;
+                headerAt: 'Access-Control-Request-Headers' put: 'Content-Type';
+                options;
+                response.
 
-	response := self newClient
-		url: self baseUrl / 'pets' asUrl;
-		headerAt: 'Origin' put: self baseUrl printString;
-		headerAt: 'Access-Control-Request-Headers' put: 'Content-Type';
-		options;
-		response.
+  self
+    assert: response isNoContent;
+    assert: ( response headers at: 'Access-Control-Allow-Origin' ) equals: '*';
+    assert: ( response headers at: 'Access-Control-Allow-Headers' ) equals: 'Content-Type';
+    assert: ( response headers at: 'Access-Control-Allow-Methods' ) equals: 'POST, GET';
+    assert: ( response headers at: 'Access-Control-Expose-Headers' )
+    equals: 'Authorization, X-Custom';
+    assert: ( response headers at: 'Access-Control-Allow-Credentials' ) equals: 'true';
+    assert: ( response headers at: 'Access-Control-Max-Age' ) equals: '600';
+    assert: response varyHeaderNames includes: 'Access-Control-Request-Headers'.
 
-	self
-		assert: response isNoContent;
-		assert: ( response headers at: 'Access-Control-Allow-Origin' ) equals: '*';
-		assert: ( response headers at: 'Access-Control-Allow-Headers' ) equals: 'Content-Type';
-		assert: ( response headers at: 'Access-Control-Allow-Methods' ) equals: 'POST, GET';
-		assert: ( response headers at: 'Access-Control-Expose-Headers' )
-			equals: 'Authorization, X-Custom';
-		assert: ( response headers at: 'Access-Control-Allow-Credentials' ) equals: 'true';
-		assert: ( response headers at: 'Access-Control-Max-Age' ) equals: '600';
-		assert: response varyHeaderNames includes: 'Access-Control-Allow-Headers'.
+  response := self newJWTAuthorizedClient
+                url: self baseUrl / 'pets' asUrl;
+                headerAt: 'Origin' put: self baseUrl printString;
+                get;
+                response.
 
-	response := self newJWTAuthorizedClient
-		url: self baseUrl / 'pets' asUrl;
-		headerAt: 'Origin' put: self baseUrl printString;
-		get;
-		response.
-
-	self
-		assert: ( response headers at: 'Access-Control-Allow-Origin' ) equals: '*';
-		should: [ response headers at: 'Access-Control-Allow-Headers' ] raise: KeyNotFound;
-		should: [ response headers at: 'Access-Control-Allow-Methods' ] raise: KeyNotFound;
-		assert: ( response headers at: 'Access-Control-Expose-Headers' )
-			equals: 'Authorization, X-Custom';
-		assert: ( response headers at: 'Access-Control-Allow-Credentials' ) equals: 'true';
-		should: [ response headers at: 'Access-Control-Max-Age' ] raise: KeyNotFound;
-		deny: response varyHeaderNames includes: 'Access-Control-Allow-Headers'
+  self
+    assert: ( response headers at: 'Access-Control-Allow-Origin' ) equals: '*';
+    should: [ response headers at: 'Access-Control-Allow-Headers' ] raise: KeyNotFound;
+    should: [ response headers at: 'Access-Control-Allow-Methods' ] raise: KeyNotFound;
+    assert: ( response headers at: 'Access-Control-Expose-Headers' )
+    equals: 'Authorization, X-Custom';
+    assert: ( response headers at: 'Access-Control-Allow-Credentials' ) equals: 'true';
+    should: [ response headers at: 'Access-Control-Max-Age' ] raise: KeyNotFound;
+    deny: response varyHeaderNames includes: 'Access-Control-Request-Headers'
 ]
 
 { #category : 'tests - CORS' }
 AuthenticatedPetStoreAPITest >> testCORSRespondWithEmptyHeadersIfOriginNotAllowed [
 
-	| response |
+  | response |
+  api allowCrossOriginSharingApplying: [ :cors | cors allowOnlyFrom: { 'https://google.com' asUrl } ].
 
-	api allowCrossOriginSharingApplying: [ :cors | cors allowOnlyFrom: {'https://google.com' asUrl} ].
+  response := self newClient
+                url: self baseUrl / 'pets' asUrl;
+                headerAt: 'Origin' put: self baseUrl printString;
+                headerAt: 'Access-Control-Request-Headers' put: 'Content-Type';
+                options;
+                response.
 
-	response := self newClient
-		url: self baseUrl / 'pets' asUrl;
-		headerAt: 'Origin' put: self baseUrl printString;
-		headerAt: 'Access-Control-Request-Headers' put: 'Content-Type';
-		options;
-		response.
+  self
+    assert: response isNoContent;
+    assert: ( response headers at: 'Vary' ) equals: 'Origin';
+    should: [ response headers at: 'Access-Control-Allow-Origin' ] raise: KeyNotFound;
+    should: [ response headers at: 'Access-Control-Allow-Headers' ] raise: KeyNotFound;
+    should: [ response headers at: 'Access-Control-Allow-Methods' ] raise: KeyNotFound.
 
-	self
-		assert: response isNoContent;
-		should: [ response headers at: 'Access-Control-Allow-Origin' ] raise: KeyNotFound;
-		should: [ response headers at: 'Access-Control-Allow-Headers' ] raise: KeyNotFound;
-		should: [ response headers at: 'Access-Control-Allow-Methods' ] raise: KeyNotFound.
+  response := self newJWTAuthorizedClient
+                url: self baseUrl / 'pets' asUrl;
+                headerAt: 'Origin' put: self baseUrl printString;
+                get;
+                response.
 
-	response := self newJWTAuthorizedClient
-		url: self baseUrl / 'pets' asUrl;
-		headerAt: 'Origin' put: self baseUrl printString;
-		get;
-		response.
-
-	self
-		assert: response varyHeaderNames isEmpty;
-		should: [ response headers at: 'Access-Control-Allow-Origin' ] raise: KeyNotFound
+  self
+    assert: response code equals: 200;
+    assert: response varyHeaderNames includes: 'Origin';
+    should: [ response headers at: 'Access-Control-Allow-Origin' ] raise: KeyNotFound
 ]
 
 { #category : 'tests - client errors' }
