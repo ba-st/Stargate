@@ -39,7 +39,7 @@ RESTfulRequestHandlerBehavior >> applyCachingDirectivesFor: aResource to: respon
 ]
 
 { #category : 'private' }
-RESTfulRequestHandlerBehavior >> assert: etag matchesEntityTagOf: entity encodedAs: httpRequest within: requestContext [
+RESTfulRequestHandlerBehavior >> assert: entityTags matchesEntityTagOf: entity encodedAs: httpRequest within: requestContext [
 
   | calculatedEtag entityTagCalculation |
   entityTagCalculation := [
@@ -56,7 +56,8 @@ RESTfulRequestHandlerBehavior >> assert: etag matchesEntityTagOf: entity encoded
                       ifNotEmpty: [ :languages |
                         CurrentLocale use: languages first during: entityTagCalculation ].
 
-  etag = calculatedEtag ifFalse: [ HTTPClientError preconditionFailed signal ]
+  ( entityTags matchesStrongly: calculatedEtag ) ifFalse: [
+      HTTPClientError preconditionFailed signal ]
 ]
 
 { #category : 'decoding/encoding' }
@@ -130,9 +131,9 @@ RESTfulRequestHandlerBehavior >> entityTagOf: resource encodedAs: mediaType with
 ]
 
 { #category : 'private' }
-RESTfulRequestHandlerBehavior >> entityTagToMatchBasedOn: httpRequest [
+RESTfulRequestHandlerBehavior >> entityTagsToMatchBasedOn: httpRequest [
 
-  ^ self parseEntityTag: ( httpRequest headers
+  ^ self parseEntityTags: ( httpRequest headers
           at: 'If-Match'
           ifAbsent: [ HTTPClientError preconditionRequired signal: 'Missing If-Match header.' ] )
 ]
@@ -158,16 +159,16 @@ RESTfulRequestHandlerBehavior >> from: httpRequest within: requestContext get: a
         resource := resourceLocator
                       lookupResourceIdentifiedBy: httpRequest
                       evaluating: aQueryEvaluationBlock.
-        self ifNoneMatchHeaderPresentIn: httpRequest do: [ :etag |
+        self ifNoneMatchHeaderPresentIn: httpRequest do: [ :entityTags |
             | calculatedEtag |
             calculatedEtag := self
                                 entityTagOf: resource
                                 encodedAs: requestContext targetMediaType
                                 within: requestContext.
-            etag = calculatedEtag ifTrue: [
+            ( entityTags matchesWeakly: calculatedEtag ) ifTrue: [
                 response := ZnResponse notModified.
                 response
-                  setEntityTag: etag;
+                  setEntityTag: calculatedEtag;
                   addToVary: 'Accept'.
                 self
                   applyCachingDirectivesFor: resource to: response within: requestContext;
@@ -202,16 +203,14 @@ RESTfulRequestHandlerBehavior >> from: httpRequest within: requestContext get: a
 { #category : 'API' }
 RESTfulRequestHandlerBehavior >> from: httpRequest within: requestContext get: findBlock thenUpdateWith: updateBlock [
 
-  | etag |
-
-  etag := self entityTagToMatchBasedOn: httpRequest.
+  | entityTags |
+  entityTags := self entityTagsToMatchBasedOn: httpRequest.
 
   ^ self from: httpRequest within: requestContext get: [ :id |
         | resourceToUpdate updatedResource |
-
         resourceToUpdate := findBlock cull: id.
         self
-          assert: etag
+          assert: entityTags
           matchesEntityTagOf: resourceToUpdate
           encodedAs: httpRequest
           within: requestContext.
@@ -271,7 +270,7 @@ RESTfulRequestHandlerBehavior >> ifNoneMatchHeaderPresentIn: httpRequest do: aMo
   httpRequest headers
     at: 'If-None-Match'
     ifPresent: [ :ifNoneMatchHeader |
-      aMonadycBlock value: ( self parseEntityTag: ifNoneMatchHeader ) ]
+      aMonadycBlock value: ( self parseEntityTags: ifNoneMatchHeader ) ]
 ]
 
 { #category : 'initialization' }
@@ -307,9 +306,10 @@ RESTfulRequestHandlerBehavior >> paginationPolicy [
 ]
 
 { #category : 'private' }
-RESTfulRequestHandlerBehavior >> parseEntityTag: string [
+RESTfulRequestHandlerBehavior >> parseEntityTags: fieldValue [
+  "fieldValue is a String, or an Array when the header field is repeated"
 
-  ^ [ string asEntityTag ]
+  ^ [ fieldValue asEntityTagList ]
       on: InstanceCreationFailed
       do: [ :error | HTTPClientError badRequest signal: error messageText ]
 ]
