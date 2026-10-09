@@ -39,7 +39,9 @@ RESTfulRequestHandlerBehavior >> applyCachingDirectivesFor: aResource to: respon
 ]
 
 { #category : 'private' }
-RESTfulRequestHandlerBehavior >> assert: entityTags matchesEntityTagOf: entity encodedAs: httpRequest within: requestContext [
+RESTfulRequestHandlerBehavior >> assertPreconditionsOf: httpRequest matching: entityTags holdFor: entity within: requestContext [
+  "RFC 9110 §13.2.2: If-Match is evaluated first, then If-None-Match, and either one failing
+  answers 412 on a method other than GET or HEAD, before the request is applied"
 
   | calculatedEtag entityTagCalculation |
   entityTagCalculation := [
@@ -57,7 +59,11 @@ RESTfulRequestHandlerBehavior >> assert: entityTags matchesEntityTagOf: entity e
                         CurrentLocale use: languages first during: entityTagCalculation ].
 
   ( entityTags matchesStrongly: calculatedEtag ) ifFalse: [
-      HTTPClientError preconditionFailed signal ]
+      HTTPClientError preconditionFailed signal ].
+  self ifNoneMatchHeaderPresentIn: httpRequest do: [ :entityTagsNotToMatch |
+      ( entityTagsNotToMatch matchesWeakly: calculatedEtag ) ifTrue: [
+          HTTPClientError preconditionFailed signal ]
+    ]
 ]
 
 { #category : 'decoding/encoding' }
@@ -176,12 +182,7 @@ RESTfulRequestHandlerBehavior >> from: httpRequest within: requestContext get: a
                 ^ response
               ]
           ].
-        response := ZnResponse ok: ( self encodeResource: resource within: requestContext ).
-        self putEntityTagOf: resource in: response within: requestContext.
-        self
-          applyCachingDirectivesFor: resource to: response within: requestContext;
-          putLanguageContentTagIn: response within: requestContext.
-        response
+        self responseRepresenting: resource within: requestContext
       ]
 ]
 
@@ -206,20 +207,25 @@ RESTfulRequestHandlerBehavior >> from: httpRequest within: requestContext get: f
   | entityTags |
   entityTags := self entityTagsToMatchBasedOn: httpRequest.
 
-  ^ self from: httpRequest within: requestContext get: [ :id |
-        | resourceToUpdate updatedResource |
-        resourceToUpdate := findBlock cull: id.
-        self
-          assert: entityTags
-          matchesEntityTagOf: resourceToUpdate
-          encodedAs: httpRequest
-          within: requestContext.
+  self holdTargetMediaTypeAndLanguageFrom: httpRequest within: requestContext.
+  ^ self useTargetLanguageTagIn: requestContext asCurrentLocaleDuring: [
+        | resource |
+        resource := resourceLocator lookupResourceIdentifiedBy: httpRequest evaluating: [ :id |
+                        | resourceToUpdate updatedResource |
+                        resourceToUpdate := findBlock cull: id.
+                        self
+                          assertPreconditionsOf: httpRequest
+                          matching: entityTags
+                          holdFor: resourceToUpdate
+                          within: requestContext.
 
-        updatedResource := self decode: httpRequest within: requestContext.
-        self exceptionHandler handleConflictsDuring: [
-            self exceptionHandler handleDecodingFailedDuring: [
-                updateBlock value: resourceToUpdate value: updatedResource ]
-          ]
+                        updatedResource := self decode: httpRequest within: requestContext.
+                        self exceptionHandler handleConflictsDuring: [
+                            self exceptionHandler handleDecodingFailedDuring: [
+                                updateBlock value: resourceToUpdate value: updatedResource ]
+                          ]
+                      ].
+        self responseRepresenting: resource within: requestContext
       ]
 ]
 
@@ -346,6 +352,18 @@ RESTfulRequestHandlerBehavior >> resourceCreationPolicyBasedOn: httpRequest with
 RESTfulRequestHandlerBehavior >> resourceLocator [
 
 	^ resourceLocator
+]
+
+{ #category : 'private' }
+RESTfulRequestHandlerBehavior >> responseRepresenting: resource within: requestContext [
+
+  | response |
+  response := ZnResponse ok: ( self encodeResource: resource within: requestContext ).
+  self putEntityTagOf: resource in: response within: requestContext.
+  self
+    applyCachingDirectivesFor: resource to: response within: requestContext;
+    putLanguageContentTagIn: response within: requestContext.
+  ^ response
 ]
 
 { #category : 'accessing' }
