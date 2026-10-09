@@ -63,6 +63,12 @@ HttpRequestContext >> collectionLink: url [
   ^ self hold: url under: #collectionLink
 ]
 
+{ #category : 'testing' }
+HttpRequestContext >> hasTargetLanguageTag [
+
+  ^ knownObjects includesKey: #targetLanguageTag
+]
+
 { #category : 'accessing' }
 HttpRequestContext >> hold: anObject under: aConcept [
 

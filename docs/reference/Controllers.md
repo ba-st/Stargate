@@ -198,7 +198,15 @@ the builder with one of the following methods:
   `hasher`, the resource, and the request context. One must include objects to be
   considered in the hash by sending `include:` to the `hasher` instance. The
   `hasher` will then produce an ETag value applying a Hash function to all the
-  included objects.
+  included objects. The media type and, when the handler negotiates languages,
+  the language of the representation are always included. The block must
+  include everything else the representation depends on, since the ETag is
+  strong: two representations with different content must not share it. A
+  change in how a resource is encoded needs a new version of its media type, or
+  its old ETags would still match.
+- `createEntityTagHashingEncodedResource` hashes the encoded resource itself, so
+  it covers everything the representation depends on without listing it, at the
+  cost of encoding the resource to calculate the ETag.
 
 The calculated ETag is sent in the `ETag` header of every response carrying a
 representation of a resource, and request handlers evaluate the conditional

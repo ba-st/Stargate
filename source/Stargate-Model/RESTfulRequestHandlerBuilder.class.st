@@ -71,16 +71,17 @@ RESTfulRequestHandlerBuilder >> build [
 
 { #category : 'configuring' }
 RESTfulRequestHandlerBuilder >> createEntityTagHashing: aBlockClosure [
+  "When a language was negotiated, the representation is in the current locale: the negotiated
+  language, or the Content-Language of an update checking its If-Match"
 
-	self
-		createEntityTagWith: [ :resource :mediaType :requestContext :requestHandler | 
-			| hasher |
-			hasher := EntityTagHasher new.
-			aBlockClosure cull: hasher cull: resource cull: requestContext.
-			hasher
-				include: mediaType;
-				calculateHash
-			]
+  self createEntityTagWith: [ :resource :mediaType :requestContext :requestHandler |
+      | hasher |
+      hasher := EntityTagHasher new.
+      aBlockClosure cull: hasher cull: resource cull: requestContext.
+      hasher include: mediaType.
+      requestContext hasTargetLanguageTag then: [ hasher include: CurrentLocale value ].
+      hasher calculateHash
+    ]
 ]
 
 { #category : 'configuring' }
