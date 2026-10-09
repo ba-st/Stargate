@@ -200,6 +200,25 @@ the builder with one of the following methods:
   `hasher` will then produce an ETag value applying a Hash function to all the
   included objects.
 
+The calculated ETag is sent in the `ETag` header of every response carrying a
+representation of a resource, and request handlers evaluate the conditional
+request headers against it, as
+[RFC 9110](https://www.rfc-editor.org/rfc/rfc9110#section-13.1) defines them:
+
+- `If-None-Match` on a `GET` of a single resource answers `304 Not Modified`
+  when any ETag in it matches the calculated one using the weak comparison,
+  or when it is `*`. The `304` carries the calculated ETag.
+- `If-Match` is required on updates: without it the handler answers
+  `428 Precondition Required`. The update only proceeds if any ETag in it
+  matches the calculated one using the strong comparison, or if it is `*`;
+  otherwise the handler answers `412 Precondition Failed`. A weak ETag never
+  matches, since ETags calculated by Stargate are strong.
+
+Both headers accept a comma-separated list of ETags, or `*`, and may appear more
+than once. A value that is not a valid list answers `400 Bad Request`. A request
+on a resource that does not exist answers `404 Not Found` regardless of these
+headers.
+
 ## Collection Pagination
 
 By default, GET requests over collections will not be paginated. To get

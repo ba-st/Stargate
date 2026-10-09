@@ -97,6 +97,21 @@ PetsRESTfulControllerTest >> requestToUpdatePetIdentifiedBy: anIdentifier nameTo
 ]
 
 { #category : 'private - support' }
+PetsRESTfulControllerTest >> requestToUpdatePetIdentifiedBy: anIdentifier nameTo: aName repeatingIfMatchWith: fieldValues [
+
+  | request |
+  request := ( ZnRequest patch: ( self urlForResourceIdentifiedBy: anIdentifier ) )
+               setAccept: self defaultPetMediaType;
+               entity:
+                 ( ZnEntity
+                     with: ( '{"name":"<1s>"}' expandMacrosWith: aName )
+                     type: self defaultPetMediaType );
+               yourself.
+  fieldValues do: [ :fieldValue | request headers at: 'If-Match' add: fieldValue ].
+  ^ TeaRequest fromZnRequest: request pathParams: ( self parametersWith: anIdentifier )
+]
+
+{ #category : 'private - support' }
 PetsRESTfulControllerTest >> requestToUpdatePetIdentifiedBy: anIdentifier nameTo: aName using: anETag [
 
 	^ self
@@ -227,6 +242,49 @@ PetsRESTfulControllerTest >> testCantUpdatePetWhenETagDoesNotMatch [
 			withExceptionDo: [ :error | self assert: error code equals: 412 ]
 ]
 
+{ #category : 'tests - update' }
+PetsRESTfulControllerTest >> testCantUpdatePetWhenETagIsWeak [
+
+  | entityTag |
+  self createPet.
+  entityTag := self entityTagOfPetIdentifiedBy: 1.
+
+  self
+    should: [
+        resourceController
+          updatePetBasedOn: ( self
+                requestToUpdatePetIdentifiedBy: 1
+                nameTo: 'Mendieta'
+                using: ( EntityTag weakWith: entityTag value ) )
+          within: self newHttpRequestContext
+      ]
+    raise: HTTPClientError
+    withExceptionDo: [ :error | self assert: error code equals: 412 ].
+  self assert: petRepository findAll first name equals: 'Firulais'
+]
+
+{ #category : 'tests - update' }
+PetsRESTfulControllerTest >> testCantUpdatePetWhenNoETagInTheListMatches [
+
+  | entityTag |
+  self createPet.
+  entityTag := self entityTagOfPetIdentifiedBy: 1.
+
+  self
+    should: [
+        resourceController
+          updatePetBasedOn: ( self
+                requestToUpdatePetIdentifiedBy: 1
+                nameTo: 'Mendieta'
+                using:
+                ( EntityTagList withAll: { '"Frula"' . EntityTag weakWith: entityTag value } ) )
+          within: self newHttpRequestContext
+      ]
+    raise: HTTPClientError
+    withExceptionDo: [ :error | self assert: error code equals: 412 ].
+  self assert: petRepository findAll first name equals: 'Firulais'
+]
+
 { #category : 'tests - get collection' }
 PetsRESTfulControllerTest >> testComplexPagination [
 
@@ -301,6 +359,64 @@ PetsRESTfulControllerTest >> testDeletePet [
 ]
 
 { #category : 'tests - get individual' }
+PetsRESTfulControllerTest >> testGetNotModifiedWhenAnyETagInTheListMatches [
+
+  | response |
+  self createPet.
+
+  response := resourceController
+                getPetBasedOn: ( self
+                      requestToGETResourceIdentifiedBy: 1
+                      accepting: self defaultPetMediaType
+                      conditionalTo:
+                      ( EntityTagList fromString:
+                          '"Frula", W/"c051344b8c92c5ed8a2bd0752070c35ed3de3bab"' ) )
+                within: self newHttpRequestContext.
+
+  self
+    assert: response code equals: 304;
+    assert: ( response headers at: 'ETag' ) equals: '"c051344b8c92c5ed8a2bd0752070c35ed3de3bab"'
+]
+
+{ #category : 'tests - get individual' }
+PetsRESTfulControllerTest >> testGetNotModifiedWhenIfNoneMatchIsRepeated [
+
+  | response |
+  self createPet.
+
+  response := resourceController
+                getPetBasedOn: ( self requestToGETResourceIdentifiedBy: 1 applying: [ :request |
+                        request setAccept: self defaultPetMediaType.
+                        request headers
+                          at: 'If-None-Match' add: '"Frula"';
+                          at: 'If-None-Match' add: '"c051344b8c92c5ed8a2bd0752070c35ed3de3bab"'
+                      ] )
+                within: self newHttpRequestContext.
+
+  self
+    assert: response code equals: 304;
+    assert: ( response headers at: 'ETag' ) equals: '"c051344b8c92c5ed8a2bd0752070c35ed3de3bab"'
+]
+
+{ #category : 'tests - get individual' }
+PetsRESTfulControllerTest >> testGetNotModifiedWhenIfNoneMatchIsWildcard [
+
+  | response |
+  self createPet.
+
+  response := resourceController
+                getPetBasedOn: ( self
+                      requestToGETResourceIdentifiedBy: 1
+                      accepting: self defaultPetMediaType
+                      conditionalTo: EntityTagList wildcard )
+                within: self newHttpRequestContext.
+
+  self
+    assert: response code equals: 304;
+    assert: ( response headers at: 'ETag' ) equals: '"c051344b8c92c5ed8a2bd0752070c35ed3de3bab"'
+]
+
+{ #category : 'tests - get individual' }
 PetsRESTfulControllerTest >> testGetNotModifiedWhenValidETag [
 
 	| response |
@@ -326,6 +442,25 @@ PetsRESTfulControllerTest >> testGetNotModifiedWhenValidETag [
 	self
 		assert: response code equals: 304;
 		assert: response entityTag equals: '"c051344b8c92c5ed8a2bd0752070c35ed3de3bab"' asEntityTag
+]
+
+{ #category : 'tests - get individual' }
+PetsRESTfulControllerTest >> testGetNotModifiedWhenWeakETagMatches [
+
+  | response |
+  self createPet.
+
+  response := resourceController
+                getPetBasedOn: ( self
+                      requestToGETResourceIdentifiedBy: 1
+                      accepting: self defaultPetMediaType
+                      conditionalTo:
+                      ( EntityTag weakWith: 'c051344b8c92c5ed8a2bd0752070c35ed3de3bab' ) )
+                within: self newHttpRequestContext.
+
+  self
+    assert: response code equals: 304;
+    assert: ( response headers at: 'ETag' ) equals: '"c051344b8c92c5ed8a2bd0752070c35ed3de3bab"'
 ]
 
 { #category : 'tests - get individual' }
@@ -442,6 +577,24 @@ PetsRESTfulControllerTest >> testGetPetSummaryJustCreated [
 			assert: json type isNil;
 			assert: json status isNil
 		]
+]
+
+{ #category : 'tests - get individual' }
+PetsRESTfulControllerTest >> testGetPetWhenNoETagInTheListMatches [
+
+  | response |
+  self createPet.
+
+  response := resourceController
+                getPetBasedOn: ( self
+                      requestToGETResourceIdentifiedBy: 1
+                      accepting: self defaultPetMediaType
+                      conditionalTo: ( EntityTagList fromString: '"Frula", "Firulais"' ) )
+                within: self newHttpRequestContext.
+
+  self
+    assert: response status equals: 200;
+    assert: response hasEntity
 ]
 
 { #category : 'tests - get collection' }
@@ -644,6 +797,36 @@ PetsRESTfulControllerTest >> testInvalidETagFormatMustRaiseBadRequest [
     raise: HTTPClientError badRequest
 ]
 
+{ #category : 'tests - update' }
+PetsRESTfulControllerTest >> testInvalidETagListMustRaiseBadRequest [
+
+  self
+    createPet;
+    should: [
+        resourceController
+          updatePetBasedOn:
+            ( self requestToUpdatePetIdentifiedBy: 1 nameTo: 'Mendieta' using: '*, "Frula"' )
+          within: self newHttpRequestContext
+      ]
+    raise: HTTPClientError badRequest
+]
+
+{ #category : 'tests - get individual' }
+PetsRESTfulControllerTest >> testInvalidIfNoneMatchMustRaiseBadRequest [
+
+  self
+    createPet;
+    should: [
+        resourceController
+          getPetBasedOn: ( self
+                requestToGETResourceIdentifiedBy: 1
+                accepting: self defaultPetMediaType
+                conditionalTo: '"Frula" "Firulais"' )
+          within: self newHttpRequestContext
+      ]
+    raise: HTTPClientError badRequest
+]
+
 { #category : 'tests - get collection' }
 PetsRESTfulControllerTest >> testPaginationLinksUseServerlUrl [
 
@@ -807,4 +990,57 @@ PetsRESTfulControllerTest >> testUpdatePetStatus [
 				assert: json type equals: 'dog';
 				assert: json status equals: 'gone';
 				assertUrl: json selfLocation equals: 'https://pets.example.com/pets/1' ]
+]
+{ #category : 'tests - update' }
+PetsRESTfulControllerTest >> testUpdatePetWhenAnyETagInTheListMatches [
+
+  | entityTag response |
+  self createPet.
+  entityTag := self entityTagOfPetIdentifiedBy: 1.
+
+  response := resourceController
+                updatePetBasedOn: ( self
+                      requestToUpdatePetIdentifiedBy: 1
+                      nameTo: 'Mendieta'
+                      using: ( EntityTagList withAll: { '"Frula"' . entityTag } ) )
+                within: self newHttpRequestContext.
+
+  self
+    assert: response status equals: 200;
+    assert: petRepository findAll first name equals: 'Mendieta'
+]
+
+{ #category : 'tests - update' }
+PetsRESTfulControllerTest >> testUpdatePetWhenIfMatchIsRepeated [
+
+  | entityTag response |
+  self createPet.
+  entityTag := self entityTagOfPetIdentifiedBy: 1.
+
+  response := resourceController
+                updatePetBasedOn: ( self
+                      requestToUpdatePetIdentifiedBy: 1
+                      nameTo: 'Mendieta'
+                      repeatingIfMatchWith: { '"Frula"' . entityTag asString } )
+                within: self newHttpRequestContext.
+
+  self
+    assert: response status equals: 200;
+    assert: petRepository findAll first name equals: 'Mendieta'
+]
+
+{ #category : 'tests - update' }
+PetsRESTfulControllerTest >> testUpdatePetWhenIfMatchIsWildcard [
+
+  | response |
+  self createPet.
+
+  response := resourceController
+                updatePetBasedOn:
+                ( self requestToUpdatePetIdentifiedBy: 1 nameTo: 'Mendieta' using: '*' )
+                within: self newHttpRequestContext.
+
+  self
+    assert: response status equals: 200;
+    assert: petRepository findAll first name equals: 'Mendieta'
 ]
