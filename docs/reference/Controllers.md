@@ -213,6 +213,10 @@ request headers against it, as
   matches the calculated one using the strong comparison, or if it is `*`;
   otherwise the handler answers `412 Precondition Failed`. A weak ETag never
   matches, since ETags calculated by Stargate are strong.
+- `If-None-Match` on an update is evaluated after `If-Match`, also before the
+  update is applied: if any ETag in it matches the calculated one using the
+  weak comparison, or if it is `*`, the handler answers
+  `412 Precondition Failed` and leaves the resource unchanged.
 
 Both headers accept a comma-separated list of ETags, or `*`, and may appear more
 than once. A value that is not a valid list answers `400 Bad Request`. A request
