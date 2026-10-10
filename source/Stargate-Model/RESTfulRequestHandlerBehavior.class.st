@@ -35,8 +35,27 @@ RESTfulRequestHandlerBehavior class >> encode: resource toJsonUsing: writer with
 { #category : 'private' }
 RESTfulRequestHandlerBehavior >> applyCachingDirectivesFor: aResource to: response within: requestContext [
 
-	cachingDirectives
-		do: [ :directive | directive cull: response cull: requestContext cull: aResource ]
+  response isNotModified
+    ifTrue: [
+      self applyCachingDirectivesFor: aResource toNotModified: response within: requestContext ]
+    ifFalse: [ self evaluateCachingDirectivesFor: aResource on: response within: requestContext ]
+]
+
+{ #category : 'private' }
+RESTfulRequestHandlerBehavior >> applyCachingDirectivesFor: aResource toNotModified: response within: requestContext [
+  "RFC 9110 §15.4.5: a 304 carries the Cache-Control and Expires fields its 200 would have.
+  The directives are evaluated on a response standing for that 200, since their conditions
+  can select on its content type, and only those fields are copied, so the 304 sends no Content-Type"
+
+  | okResponse |
+  okResponse := ZnResponse statusLine: ZnStatusLine ok.
+  okResponse headers contentType: requestContext targetMediaType.
+  self evaluateCachingDirectivesFor: aResource on: okResponse within: requestContext.
+  #( 'Cache-Control' 'Expires' ) do: [ :fieldName |
+      okResponse headers
+        at: fieldName
+        ifPresent: [ :fieldValue | response headers at: fieldName put: fieldValue ]
+    ]
 ]
 
 { #category : 'private' }
@@ -155,6 +174,13 @@ RESTfulRequestHandlerBehavior >> evaluateCollectionQuery: aQueryEvaluationBlock 
 RESTfulRequestHandlerBehavior >> exceptionHandler [
 
 	^ resourceLocator exceptionHandler
+]
+
+{ #category : 'private' }
+RESTfulRequestHandlerBehavior >> evaluateCachingDirectivesFor: aResource on: response within: requestContext [
+
+  cachingDirectives do: [ :directive |
+      directive cull: response cull: requestContext cull: aResource ]
 ]
 
 { #category : 'API' }

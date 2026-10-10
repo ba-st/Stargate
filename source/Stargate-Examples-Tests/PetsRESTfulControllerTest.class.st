@@ -462,6 +462,33 @@ PetsRESTfulControllerTest >> testDeletePet [
 ]
 
 { #category : 'tests - get individual' }
+PetsRESTfulControllerTest >> testGetNotModifiedKeepsCachingFields [
+
+  | response notModifiedResponse |
+  self createPet.
+  response := resourceController
+                getPetBasedOn:
+                ( self requestToGETResourceIdentifiedBy: 1 accepting: self defaultPetMediaType )
+                within: self newHttpRequestContext.
+
+  notModifiedResponse := resourceController
+                           getPetBasedOn: ( self
+                                 requestToGETResourceIdentifiedBy: 1
+                                 accepting: self defaultPetMediaType
+                                 conditionalTo: response entityTag )
+                           within: self newHttpRequestContext.
+
+  self
+    assert: notModifiedResponse code equals: 304;
+    deny: notModifiedResponse headers hasContentType;
+    assert: notModifiedResponse cachingDirectives equals: response cachingDirectives.
+  self
+    assertCachingDirectivesFor: notModifiedResponse
+    with: #( 'public' 'no-transform' 'must-revalidate' ).
+  self assertExpiresHeaderFor: notModifiedResponse with: 4 hours
+]
+
+{ #category : 'tests - get individual' }
 PetsRESTfulControllerTest >> testGetNotModifiedWhenAnyETagInTheListMatches [
 
   | response |
@@ -844,6 +871,25 @@ PetsRESTfulControllerTest >> testGetPetsNotEmptyAcceptingCompleteMediaType [
 						assert: dogSummary type equals: 'dog'.
 					]
 			]
+]
+
+{ #category : 'tests - get collection' }
+PetsRESTfulControllerTest >> testGetPetsNotModifiedKeepsCachingFields [
+
+  | response notModifiedResponse |
+  self createSixPets.
+  response := self getPetsAt: 'https://pets.example.com/pets?start=3&limit=2'.
+
+  notModifiedResponse := self
+                           getPetsAt: 'https://pets.example.com/pets?start=3&limit=2'
+                           conditionalTo: response entityTag.
+
+  self
+    assert: notModifiedResponse code equals: 304;
+    deny: notModifiedResponse headers hasContentType;
+    assert: notModifiedResponse cachingDirectives equals: response cachingDirectives.
+  self assertCachingDirectivesFor: notModifiedResponse with: #( 'public' ).
+  self assertExpiresHeaderFor: notModifiedResponse with: 4 hours
 ]
 
 { #category : 'tests - get collection' }
