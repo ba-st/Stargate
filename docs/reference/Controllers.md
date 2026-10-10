@@ -231,6 +231,24 @@ than once. A value that is not a valid list answers `400 Bad Request`. A request
 on a resource that does not exist answers `404 Not Found` regardless of these
 headers.
 
+### Collection ETags
+
+By default, a `GET` over a collection answers no ETag and ignores
+`If-None-Match`. To answer collections with one, configure the builder with:
+
+- `createEntityTagHashingEncodedCollection`, which hashes the encoded
+  collection. It covers everything the representation depends on without
+  listing it: the media type, the language, the query, the page and, in a
+  hypermedia-driven handler, the controls of every item. The collection is
+  still encoded to answer a `304`.
+
+The ETag is sent on the `200 OK`, and `If-None-Match` is then evaluated as for a
+single resource: when any ETag in it matches using the weak comparison, or it is
+`*`, the handler answers `304 Not Modified`. The `304` carries the ETag and the
+same `Vary`, pagination `Link`, caching and `Content-Language` headers the
+`200 OK` would have carried, without a body. The query is always evaluated,
+since the pagination links come from it.
+
 ## Collection Pagination
 
 By default, GET requests over collections will not be paginated. To get

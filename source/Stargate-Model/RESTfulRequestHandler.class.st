@@ -23,15 +23,16 @@ RESTfulRequestHandler class >> encode: resource toJsonUsing: writer within: requ
 ]
 
 { #category : 'instance creation' }
-RESTfulRequestHandler class >> resourceLocator: aResouceLocator paginationPolicy: aPaginationPolicy decodingRules: theDecodingRules encodingRules: theEncodingRules calculateEntityTagsWith: entityTagCalculator cachingDirectives: theCachingDirectives allowedLanguageTags: allowedLanguageTags handleErrorsWith: anExceptionHandler [
+RESTfulRequestHandler class >> resourceLocator: aResouceLocator paginationPolicy: aPaginationPolicy collectionValidationPolicy: aCollectionValidationPolicy decodingRules: theDecodingRules encodingRules: theEncodingRules calculateEntityTagsWith: entityTagCalculator cachingDirectives: theCachingDirectives allowedLanguageTags: allowedLanguageTags handleErrorsWith: anExceptionHandler [
 
-	^ self new
-		initializeResourceLocator: aResouceLocator
-		paginationPolicy: aPaginationPolicy
-		decodingRules: theDecodingRules
-		encodingRules: theEncodingRules
-		calculateEntityTagsWith: entityTagCalculator
-		cachingDirectives: theCachingDirectives
-		allowedLanguageTags: allowedLanguageTags
-		handleErrorsWith: anExceptionHandler
+  ^ self new
+      initializeResourceLocator: aResouceLocator
+      paginationPolicy: aPaginationPolicy
+      collectionValidationPolicy: aCollectionValidationPolicy
+      decodingRules: theDecodingRules
+      encodingRules: theEncodingRules
+      calculateEntityTagsWith: entityTagCalculator
+      cachingDirectives: theCachingDirectives
+      allowedLanguageTags: allowedLanguageTags
+      handleErrorsWith: anExceptionHandler
 ]

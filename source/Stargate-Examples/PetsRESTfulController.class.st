@@ -171,39 +171,46 @@ PetsRESTfulController >> initializePersistingTo: aPetRepository [
 { #category : 'initialization' }
 PetsRESTfulController >> initializeRequestHandler [
 
-	requestHandler := RESTfulRequestHandlerBuilder new
-		handling: 'pets'
-			locatingResourcesWith: [ :pet :requestContext | petsRepository identifierOf: pet ]
-			extractingIdentifierWith: [ :httpRequest | self identifierIn: httpRequest ];
-		beHypermediaDriven;
-		paginateCollectionsWithDefaultLimit: 5;
-		decodeToNeoJSONObjectWhenAccepting: self petVersion1dot0dot0MediaType;
-		whenResponding: self petVersion1dot0dot0MediaType
-			encodeToJsonApplying: [ :resource :requestContext :writer | self configurePetEncodingOn: writer within: requestContext ];
-		whenResponding: self petSummaryVersion1dot0dot0MediaType
-			encodeToJsonApplying:
-				[ :resource :requestContext :writer | self configurePetSummaryEncodingOn: writer within: requestContext ];
-		createEntityTagHashing: [ :hasher :pet :requestContext | 
-			hasher
-				include: ( petsRepository identifierOf: pet );
-				include: ( petsRepository lastModificationOf: pet )
-			];
-		directCachingWith: [ :caching | 
-			caching
-				when: [ :response | response contentType = self petVersion1dot0dot0MediaType ]
-					apply: [ caching
-						expireIn: 4 hours;
-						bePublic;
-						doNotTransform;
-						mustRevalidate
-					];
-				when: [ :response | response contentType = self petSummaryVersion1dot0dot0MediaType ]
-					apply: [ caching
-						expireIn: 4 hours;
-						bePublic
-					]
-			];
-		build
+  requestHandler := RESTfulRequestHandlerBuilder new
+                      handling: 'pets'
+                      locatingResourcesWith: [ :pet :requestContext |
+                          petsRepository identifierOf: pet ]
+                      extractingIdentifierWith: [ :httpRequest | self identifierIn: httpRequest ];
+                      beHypermediaDriven;
+                      paginateCollectionsWithDefaultLimit: 5;
+                      decodeToNeoJSONObjectWhenAccepting: self petVersion1dot0dot0MediaType;
+                      whenResponding: self petVersion1dot0dot0MediaType
+                      encodeToJsonApplying: [ :resource :requestContext :writer |
+                          self configurePetEncodingOn: writer within: requestContext ];
+                      whenResponding: self petSummaryVersion1dot0dot0MediaType
+                      encodeToJsonApplying: [ :resource :requestContext :writer |
+                          self configurePetSummaryEncodingOn: writer within: requestContext ];
+                      createEntityTagHashing: [ :hasher :pet :requestContext |
+                          hasher
+                            include: ( petsRepository identifierOf: pet );
+                            include: ( petsRepository lastModificationOf: pet )
+                        ];
+                      createEntityTagHashingEncodedCollection;
+                      directCachingWith: [ :caching |
+                          caching
+                            when: [ :response |
+                                response contentType = self petVersion1dot0dot0MediaType ]
+                            apply: [
+                                caching
+                                  expireIn: 4 hours;
+                                  bePublic;
+                                  doNotTransform;
+                                  mustRevalidate
+                              ];
+                            when: [ :response |
+                              response contentType = self petSummaryVersion1dot0dot0MediaType ]
+                            apply: [
+                                caching
+                                  expireIn: 4 hours;
+                                  bePublic
+                              ]
+                        ];
+                      build
 ]
 
 { #category : 'accessing - media types' }

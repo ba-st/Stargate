@@ -8,6 +8,7 @@ Class {
 		'decodingRules',
 		'encodingRules',
 		'paginationPolicyFactory',
+		'collectionValidationPolicyFactory',
 		'entityTagFactoryBinding',
 		'resourceLocator',
 		'exceptionHandler',
@@ -45,6 +46,7 @@ RESTfulRequestHandlerBuilder >> beHypermediaDrivenBy: aMediaControlsFactoryBlock
                              requestHandlerClass
                                resourceLocator: resourceLocator
                                paginationPolicy: paginationPolicyFactory
+                               collectionValidationPolicy: collectionValidationPolicyFactory
                                decodingRules: decodingRules
                                encodingRules: encodingRules
                                calculateEntityTagsWith: entityTagFactoryBinding content
@@ -82,6 +84,14 @@ RESTfulRequestHandlerBuilder >> createEntityTagHashing: aBlockClosure [
       requestContext hasTargetLanguageTag then: [ hasher include: CurrentLocale value ].
       hasher calculateHash
     ]
+]
+
+{ #category : 'configuring' }
+RESTfulRequestHandlerBuilder >> createEntityTagHashingEncodedCollection [
+
+  collectionValidationPolicyFactory := [ :requestHandler |
+                                         RESTfulControllerHashEncodedCollectionsPolicy for:
+                                           requestHandler ]
 ]
 
 { #category : 'configuring' }
@@ -172,12 +182,16 @@ RESTfulRequestHandlerBuilder >> initialize [
   allowedLanguageTags := OrderedCollection new.
   paginationPolicyFactory := [ :requestHandler |
                                RESTfulControllerDoNotPaginateCollectionsPolicy for: requestHandler ].
+  collectionValidationPolicyFactory := [ :requestHandler |
+                                         RESTfulControllerDoNotValidateCollectionsPolicy for:
+                                           requestHandler ].
   exceptionHandler := RESTfulRequestExceptionHandler new.
   requestHandlerClass := RESTfulRequestHandler.
   requestHandlerFactory := [
                              requestHandlerClass
                                resourceLocator: resourceLocator
                                paginationPolicy: paginationPolicyFactory
+                               collectionValidationPolicy: collectionValidationPolicyFactory
                                decodingRules: decodingRules
                                encodingRules: encodingRules
                                calculateEntityTagsWith: entityTagFactoryBinding content

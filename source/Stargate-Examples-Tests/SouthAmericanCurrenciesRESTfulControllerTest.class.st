@@ -429,6 +429,27 @@ SouthAmericanCurrenciesRESTfulControllerTest >> testGetCurrencies [
 ]
 
 { #category : 'tests' }
+SouthAmericanCurrenciesRESTfulControllerTest >> testGetCurrenciesEntityTagsDifferPerLanguage [
+
+  | englishEntityTag spanishEntityTag |
+  englishEntityTag := ( resourceController
+                          currenciesBasedOn: ( self
+                                requestToGET: self resourceUrl
+                                accepting: resourceController currencyVersion1dot0dot0MediaType )
+                          within: self newHttpRequestContext ) entityTag.
+  spanishEntityTag := ( resourceController
+                          currenciesBasedOn:
+                            ( self requestToGET: self resourceUrl applying: [ :request |
+                                  request
+                                    setAccept: resourceController currencyVersion1dot0dot0MediaType;
+                                    setAcceptLanguage: self spanish
+                                ] )
+                          within: self newHttpRequestContext ) entityTag.
+
+  self deny: ( englishEntityTag matchesWeakly: spanishEntityTag )
+]
+
+{ #category : 'tests' }
 SouthAmericanCurrenciesRESTfulControllerTest >> testGetCurrenciesInSpanish [
 
   | response request |
@@ -459,6 +480,35 @@ SouthAmericanCurrenciesRESTfulControllerTest >> testGetCurrenciesInSpanish [
           #( 'ARS' 'BOB' 'BRL' 'CLP' 'COP' 'GYD' 'PYG' 'PEN' 'SRD' 'UYU' 'VES' );
         assert: ( currencies anySatisfy: [ :currency | currency name = 'Real brasileño' ] )
     ]
+]
+
+{ #category : 'tests' }
+SouthAmericanCurrenciesRESTfulControllerTest >> testGetCurrenciesNotModifiedWhenETagMatches [
+
+  | response notModifiedResponse |
+  response := resourceController
+                currenciesBasedOn: ( self
+                      requestToGET: self resourceUrl
+                      accepting: resourceController currencyVersion1dot0dot0MediaType )
+                within: self newHttpRequestContext.
+
+  notModifiedResponse := resourceController
+                           currenciesBasedOn:
+                             ( self requestToGET: self resourceUrl applying: [ :request |
+                                   request
+                                     setAccept: resourceController currencyVersion1dot0dot0MediaType;
+                                     setIfNoneMatchTo: response entityTag
+                                 ] )
+                           within: self newHttpRequestContext.
+
+  self
+    assert: notModifiedResponse code equals: 304;
+    deny: notModifiedResponse hasEntity;
+    assert: notModifiedResponse entityTag equals: response entityTag;
+    deny: response cachingDirectives isEmpty;
+    assert: notModifiedResponse cachingDirectives equals: response cachingDirectives;
+    assert: notModifiedResponse contentLanguageTags equals: response contentLanguageTags;
+    assert: notModifiedResponse varyHeaderNames equals: response varyHeaderNames
 ]
 
 { #category : 'tests' }

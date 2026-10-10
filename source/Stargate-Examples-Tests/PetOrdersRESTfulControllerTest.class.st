@@ -403,6 +403,21 @@ PetOrdersRESTfulControllerTest >> testGetComments [
     ]
 ]
 
+{ #category : 'tests' }
+PetOrdersRESTfulControllerTest >> testGetCommentsAnswerNoEntityTag [
+
+  self withJsonFromContentsIn: self createOrder do: [ :order |
+      | response |
+      self createCommentFor: order identifiedBy: 1 withContent: 'Hey!'.
+
+      response := self commentsRelatedTo: order.
+
+      self
+        assert: response isSuccess;
+        deny: ( response headers includesKey: 'ETag' )
+    ]
+]
+
 { #category : 'tests - comments' }
 PetOrdersRESTfulControllerTest >> testGetCommentsForJustCreatedOrder [
 
