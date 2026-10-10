@@ -241,6 +241,21 @@ By default, a `GET` over a collection answers no ETag and ignores
   listing it: the media type, the language, the query, the page and, in a
   hypermedia-driven handler, the controls of every item. The collection is
   still encoded to answer a `304`.
+- `createCollectionEntityTagHashing:` receives a block evaluated with a
+  `hasher`, the collection, and the request context, as
+  `createEntityTagHashing:` does for resources: the media type and, when the
+  handler negotiates languages, the language are always included, and the block
+  must include everything else the representation depends on, such as what
+  identifies the query and the page.
+- `createCollectionEntityTagWith:` receives a block evaluated with the
+  collection, the media type, the request context, and the request handler. It
+  answers an `EntityTag`, which keeps its strength, or a string, used as the
+  value of a strong ETag.
+
+The ETag from the last two is calculated before encoding, so a `304` never
+encodes the collection: an ETag derived from domain state, such as a count and
+the latest modification, saves the encoding, which in a hypermedia-driven
+handler includes building the controls of every item.
 
 The ETag is sent on the `200 OK`, and `If-None-Match` is then evaluated as for a
 single resource: when any ETag in it matches using the weak comparison, or it is

@@ -5,3 +5,9 @@ CharacterCollection >> asWebOrigin [
 
 	^ self asUrl asWebOrigin 
 ]
+
+{ #category : #'*Stargate-GS64-Extensions' }
+CharacterCollection >> asOpaqueEntityTag [
+
+  ^ EntityTag with: self
+]
