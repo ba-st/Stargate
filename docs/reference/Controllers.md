@@ -215,7 +215,8 @@ request headers against it, as
 
 - `If-None-Match` on a `GET` of a single resource answers `304 Not Modified`
   when any ETag in it matches the calculated one using the weak comparison,
-  or when it is `*`. The `304` carries the calculated ETag.
+  or when it is `*`. The `304` carries the calculated ETag, and the
+  `Cache-Control` and `Expires` headers the `200 OK` would have carried.
 - `If-Match` is required on updates: without it the handler answers
   `428 Precondition Required`. The update only proceeds if any ETag in it
   matches the calculated one using the strong comparison, or if it is `*`;
@@ -369,6 +370,14 @@ builder directCachingWith: [ :caching |
       apply: [ caching beAvailableFor: 1 hour ]
     ];
 ```
+
+A `304 Not Modified` carries the `Cache-Control` and `Expires` headers the
+`200 OK` it stands for would have carried, as
+[RFC 9110](https://www.rfc-editor.org/rfc/rfc9110#section-15.4.5) requires. To
+compute them, the directives are applied to a `200 OK` without a body and with
+the content type of the negotiated representation, so conditions on the
+response's content type select the same directives. Only those two headers are
+then copied to the `304`.
 
 For specific examples on all the different options offered by Stargate, check the
 example classes and their respective tests:
