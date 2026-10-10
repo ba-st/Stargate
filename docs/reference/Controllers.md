@@ -231,6 +231,39 @@ than once. A value that is not a valid list answers `400 Bad Request`. A request
 on a resource that does not exist answers `404 Not Found` regardless of these
 headers.
 
+### Collection ETags
+
+By default, a `GET` over a collection answers no ETag and ignores
+`If-None-Match`. To answer collections with one, configure the builder with:
+
+- `createEntityTagHashingEncodedCollection`, which hashes the encoded
+  collection. It covers everything the representation depends on without
+  listing it: the media type, the language, the query, the page and, in a
+  hypermedia-driven handler, the controls of every item. The collection is
+  still encoded to answer a `304`.
+- `createCollectionEntityTagHashing:` receives a block evaluated with a
+  `hasher`, the collection, and the request context, as
+  `createEntityTagHashing:` does for resources: the media type and, when the
+  handler negotiates languages, the language are always included, and the block
+  must include everything else the representation depends on, such as what
+  identifies the query and the page.
+- `createCollectionEntityTagWith:` receives a block evaluated with the
+  collection, the media type, the request context, and the request handler. It
+  answers an `EntityTag`, which keeps its strength, or a string, used as the
+  value of a strong ETag.
+
+The ETag from the last two is calculated before encoding, so a `304` never
+encodes the collection: an ETag derived from domain state, such as a count and
+the latest modification, saves the encoding, which in a hypermedia-driven
+handler includes building the controls of every item.
+
+The ETag is sent on the `200 OK`, and `If-None-Match` is then evaluated as for a
+single resource: when any ETag in it matches using the weak comparison, or it is
+`*`, the handler answers `304 Not Modified`. The `304` carries the ETag and the
+same `Vary`, pagination `Link`, caching and `Content-Language` headers the
+`200 OK` would have carried, without a body. The query is always evaluated,
+since the pagination links come from it.
+
 ## Collection Pagination
 
 By default, GET requests over collections will not be paginated. To get

@@ -67,6 +67,27 @@ PetsRESTfulControllerTest >> entityTagOfPetIdentifiedBy: anIdentifier [
 ]
 
 { #category : 'private - support' }
+PetsRESTfulControllerTest >> getPetsAt: aUrl [
+
+  ^ resourceController
+      getPetsBasedOn:
+      ( self requestToGET: aUrl accepting: resourceController petSummaryVersion1dot0dot0MediaType )
+      within: self newHttpRequestContext
+]
+
+{ #category : 'private - support' }
+PetsRESTfulControllerTest >> getPetsAt: aUrl conditionalTo: theEntityTagsNotToMatch [
+
+  ^ resourceController
+      getPetsBasedOn: ( self requestToGET: aUrl applying: [ :request |
+              request
+                setAccept: resourceController petSummaryVersion1dot0dot0MediaType;
+                setIfNoneMatchTo: theEntityTagsNotToMatch
+            ] )
+      within: self newHttpRequestContext
+]
+
+{ #category : 'private - support' }
 PetsRESTfulControllerTest >> requestMissingIfMatchHeaderToUpdatePetIdentifiedBy: anIdentifier nameTo: aName [
 
 	^ TeaRequest
@@ -706,6 +727,48 @@ PetsRESTfulControllerTest >> testGetPets [
 ]
 
 { #category : 'tests - get collection' }
+PetsRESTfulControllerTest >> testGetPetsAnswersEntityTag [
+
+  | response |
+  self createSixPets.
+
+  response := self getPetsAt: 'https://pets.example.com/pets'.
+
+  self
+    assert: response status equals: 200;
+    assert: response entityTag isStrong
+]
+
+{ #category : 'tests - get collection' }
+PetsRESTfulControllerTest >> testGetPetsEntityTagChangesWithTheCollection [
+
+  | entityTag |
+  self createPet.
+  entityTag := ( self getPetsAt: 'https://pets.example.com/pets' ) entityTag.
+
+  resourceController
+    createPetBasedOn: ( self requestToCreatePetFrom: '{"name":"Mendieta","type":"dog"}' )
+    within: self newHttpRequestContext.
+
+  self deny:
+    ( ( self getPetsAt: 'https://pets.example.com/pets' ) entityTag matchesWeakly: entityTag )
+]
+
+{ #category : 'tests - get collection' }
+PetsRESTfulControllerTest >> testGetPetsEntityTagChangesWithThePage [
+
+  | firstPageEntityTag secondPageEntityTag |
+  self createSixPets.
+
+  firstPageEntityTag := ( self getPetsAt: 'https://pets.example.com/pets?start=1&limit=2' )
+                          entityTag.
+  secondPageEntityTag := ( self getPetsAt: 'https://pets.example.com/pets?start=3&limit=2' )
+                           entityTag.
+
+  self deny: ( firstPageEntityTag matchesWeakly: secondPageEntityTag )
+]
+
+{ #category : 'tests - get collection' }
 PetsRESTfulControllerTest >> testGetPetsNotEmpty [
 
 	| response |
@@ -783,6 +846,56 @@ PetsRESTfulControllerTest >> testGetPetsNotEmptyAcceptingCompleteMediaType [
 			]
 ]
 
+{ #category : 'tests - get collection' }
+PetsRESTfulControllerTest >> testGetPetsNotModifiedWhenETagMatches [
+
+  | response notModifiedResponse |
+  self createSixPets.
+  response := self getPetsAt: 'https://pets.example.com/pets?limit=2'.
+
+  notModifiedResponse := self
+                           getPetsAt: 'https://pets.example.com/pets?limit=2'
+                           conditionalTo: response entityTag.
+
+  self
+    assert: notModifiedResponse code equals: 304;
+    deny: notModifiedResponse hasEntity;
+    assert: notModifiedResponse entityTag equals: response entityTag;
+    assert: notModifiedResponse varyHeaderNames equals: response varyHeaderNames;
+    assert: notModifiedResponse links size equals: 2;
+    assert: ( notModifiedResponse links collect: [ :link | link asString ] )
+    equals: ( response links collect: [ :link | link asString ] )
+]
+
+{ #category : 'tests - get collection' }
+PetsRESTfulControllerTest >> testGetPetsNotModifiedWhenIfNoneMatchIsWildcard [
+
+  | response |
+  self createSixPets.
+
+  response := self getPetsAt: 'https://pets.example.com/pets' conditionalTo: EntityTagList wildcard.
+
+  self
+    assert: response code equals: 304;
+    assert: response entityTag isStrong
+]
+
+{ #category : 'tests - get collection' }
+PetsRESTfulControllerTest >> testGetPetsNotModifiedWhenWeakETagMatches [
+
+  | entityTag response |
+  self createSixPets.
+  entityTag := ( self getPetsAt: 'https://pets.example.com/pets' ) entityTag.
+
+  response := self
+                getPetsAt: 'https://pets.example.com/pets'
+                conditionalTo: ( EntityTag weakWith: entityTag value ).
+
+  self
+    assert: response code equals: 304;
+    assert: response entityTag equals: entityTag
+]
+
 { #category : 'tests - get individual' }
 PetsRESTfulControllerTest >> testGetPetsVaryByAcceptLanguageWithoutOfferingLanguages [
 
@@ -807,6 +920,20 @@ PetsRESTfulControllerTest >> testGetPetsVaryByAcceptLanguageWithoutOfferingLangu
         assert: response varyHeaderNames includes: 'Accept-Language';
         assert: response varyHeaderNames includes: 'Accept'
     ]
+]
+
+{ #category : 'tests - get collection' }
+PetsRESTfulControllerTest >> testGetPetsWhenETagDoesNotMatch [
+
+  | response |
+  self createSixPets.
+
+  response := self getPetsAt: 'https://pets.example.com/pets' conditionalTo: '"Frula"'.
+
+  self
+    assert: response status equals: 200;
+    assert: response hasEntity;
+    assert: response entityTag isStrong
 ]
 
 { #category : 'tests - get collection' }
@@ -906,6 +1033,15 @@ PetsRESTfulControllerTest >> testInvalidIfNoneMatchMustRaiseBadRequest [
                 conditionalTo: '"Frula" "Firulais"' )
           within: self newHttpRequestContext
       ]
+    raise: HTTPClientError badRequest
+]
+
+{ #category : 'tests - get collection' }
+PetsRESTfulControllerTest >> testInvalidIfNoneMatchOnCollectionMustRaiseBadRequest [
+
+  self
+    createSixPets;
+    should: [ self getPetsAt: 'https://pets.example.com/pets' conditionalTo: '"Frula" "Firulais"' ]
     raise: HTTPClientError badRequest
 ]
 
@@ -1094,6 +1230,7 @@ PetsRESTfulControllerTest >> testUpdatePetStatus [
 				assert: json status equals: 'gone';
 				assertUrl: json selfLocation equals: 'https://pets.example.com/pets/1' ]
 ]
+
 { #category : 'tests - update' }
 PetsRESTfulControllerTest >> testUpdatePetWhenAnyETagInTheListMatches [
 
@@ -1147,6 +1284,7 @@ PetsRESTfulControllerTest >> testUpdatePetWhenIfMatchIsWildcard [
     assert: response status equals: 200;
     assert: petRepository findAll first name equals: 'Mendieta'
 ]
+
 { #category : 'tests - update' }
 PetsRESTfulControllerTest >> testUpdatePetWhenIfNoneMatchDoesNotMatch [
 

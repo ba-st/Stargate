@@ -5,3 +5,9 @@ String >> asWebOrigin [
 
 	^ self asUrl asWebOrigin 
 ]
+
+{ #category : #'*Stargate-Extensions' }
+String >> asOpaqueEntityTag [
+
+  ^ EntityTag with: self
+]

@@ -180,6 +180,7 @@ SouthAmericanCurrenciesRESTfulController >> initializeCurrenciesRequestHandler [
                                       include: currency symbol;
                                       include: currency isoCode
                                   ];
+                                createEntityTagHashingEncodedCollection;
                                 handleExceptionsApplying: [ :handler |
                                   handler addAsNotFoundError: NotFound ];
                                 directCachingWith: [ :caching |

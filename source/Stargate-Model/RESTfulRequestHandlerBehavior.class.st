@@ -7,6 +7,7 @@ Class {
 	#superclass : 'Object',
 	#instVars : [
 		'paginationPolicy',
+		'collectionValidationPolicy',
 		'decodingRules',
 		'encodingRules',
 		'entityTagCalculator',
@@ -234,16 +235,20 @@ RESTfulRequestHandlerBehavior >> from: httpRequest within: requestContext getCol
 
   self holdTargetMediaTypeAndLanguageFrom: httpRequest within: requestContext.
   ^ self useTargetLanguageTagIn: requestContext asCurrentLocaleDuring: [
-        | resourceCollection encodedResourceCollection response |
+        | resourceCollection response |
         resourceCollection := paginationPolicy
                                 evaluateQuery: aQueryEvaluationBlock
                                 basedOn: httpRequest
                                 within: requestContext.
-        encodedResourceCollection := self
-                                       encodeResourceCollection: resourceCollection
-                                       basedOn: httpRequest
-                                       within: requestContext.
-        response := ZnResponse ok: encodedResourceCollection.
+        response := collectionValidationPolicy
+                      responseFor: resourceCollection
+                      encodedBy: [
+                        self
+                          encodeResourceCollection: resourceCollection
+                          basedOn: httpRequest
+                          within: requestContext ]
+                      basedOn: httpRequest
+                      within: requestContext.
         response addToVary: 'Accept'.
         self paginationPolicy affect: response within: requestContext.
         self
@@ -279,24 +284,30 @@ RESTfulRequestHandlerBehavior >> ifNoneMatchHeaderPresentIn: httpRequest do: aMo
       aMonadycBlock value: ( self parseEntityTags: ifNoneMatchHeader ) ]
 ]
 
-{ #category : 'initialization' }
-RESTfulRequestHandlerBehavior >> initializeResourceLocator: aResouceLocator
-	paginationPolicy: aPaginationPolicy
-	decodingRules: theDecodingRules
-	encodingRules: theEncodingRules
-	calculateEntityTagsWith: anEntityTagCalculator
-	cachingDirectives: theCachingDirectives
-	allowedLanguageTags: allowedLanguageTags
-	handleErrorsWith: anExceptionHandler [
+{ #category : 'private' }
+RESTfulRequestHandlerBehavior >> ifNoneMatchIn: httpRequest matchesWeakly: anEntityTag [
+  "Answers false when there is no If-None-Match"
 
-	resourceLocator := aResouceLocator.
-	resourceLocator handleExceptionsWith: anExceptionHandler.
-	paginationPolicy := aPaginationPolicy cull: self.
-	decodingRules := theDecodingRules.
-	encodingRules := theEncodingRules.
-	acceptNegotiator := RESTfulControllerAcceptNegotiator accepting: encodingRules keys inAnyOf: allowedLanguageTags.
-	entityTagCalculator := anEntityTagCalculator.
-	cachingDirectives := theCachingDirectives
+  self
+    ifNoneMatchHeaderPresentIn: httpRequest
+    do: [ :entityTags | ^ entityTags matchesWeakly: anEntityTag ].
+  ^ false
+]
+
+{ #category : 'initialization' }
+RESTfulRequestHandlerBehavior >> initializeResourceLocator: aResouceLocator paginationPolicy: aPaginationPolicy collectionValidationPolicy: aCollectionValidationPolicy decodingRules: theDecodingRules encodingRules: theEncodingRules calculateEntityTagsWith: anEntityTagCalculator cachingDirectives: theCachingDirectives allowedLanguageTags: allowedLanguageTags handleErrorsWith: anExceptionHandler [
+
+  resourceLocator := aResouceLocator.
+  resourceLocator handleExceptionsWith: anExceptionHandler.
+  paginationPolicy := aPaginationPolicy cull: self.
+  collectionValidationPolicy := aCollectionValidationPolicy cull: self.
+  decodingRules := theDecodingRules.
+  encodingRules := theEncodingRules.
+  acceptNegotiator := RESTfulControllerAcceptNegotiator
+                        accepting: encodingRules keys
+                        inAnyOf: allowedLanguageTags.
+  entityTagCalculator := anEntityTagCalculator.
+  cachingDirectives := theCachingDirectives
 ]
 
 { #category : 'private' }
