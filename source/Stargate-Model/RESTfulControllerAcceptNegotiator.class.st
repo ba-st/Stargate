@@ -67,17 +67,21 @@ RESTfulControllerAcceptNegotiator >> acceptableQualifiedLanguageRangesIn: anHttp
 RESTfulControllerAcceptNegotiator >> bestLanguageFor: anHttpRequest [
   "This method returns the best suited language tag for the given request"
 
+  ^ self bestLanguageFor: anHttpRequest choosingAmong: [ :languageTags | languageTags first ]
+]
+
+{ #category : 'private - querying' }
+RESTfulControllerAcceptNegotiator >> bestLanguageFor: anHttpRequest choosingAmong: aChoiceBlock [
+
   | qualifiedLanguageRanges |
   qualifiedLanguageRanges := self acceptableQualifiedLanguageRangesIn: anHttpRequest.
   self withAcceptableLanguageRangesIn: qualifiedLanguageRanges do: [ :qualifiedLanguageRange |
-      availableLanguageTags
-        detect: [ :languageTag |
+      ( availableLanguageTags select: [ :languageTag |
             ( qualifiedLanguageRange matches: languageTag ) and: [
                 ( self qualityOfLanguageTag: languageTag in: qualifiedLanguageRanges )
                 = qualifiedLanguageRange quality
               ]
-          ]
-        ifFound: [ :languageTag | ^ languageTag ]
+          ] ) ifNotEmpty: [ :languageTags | ^ aChoiceBlock value: languageTags ]
     ].
   HTTPNotAcceptable
     signal: 'Cannot generate a response entity with acceptable characteristics.'
@@ -86,19 +90,51 @@ RESTfulControllerAcceptNegotiator >> bestLanguageFor: anHttpRequest [
 ]
 
 { #category : 'querying' }
+RESTfulControllerAcceptNegotiator >> bestLanguageFor: anHttpRequest preferring: aLanguageTag [
+  "This method returns the best suited language tag for the given request, choosing aLanguageTag
+  when the request finds it as acceptable as any other"
+
+  ^ self bestLanguageFor: anHttpRequest choosingAmong: [ :languageTags |
+        languageTags
+          detect: [ :languageTag | languageTag = aLanguageTag ]
+          ifNone: [ languageTags first ] ]
+]
+
+{ #category : 'querying' }
 RESTfulControllerAcceptNegotiator >> bestRepresentationFor: anHttpRequest [
   "This method returns the best suited representation for the given request"
+
+  ^ self bestRepresentationFor: anHttpRequest choosingAmong: [ :mediaTypes | mediaTypes first ]
+]
+
+{ #category : 'private - querying' }
+RESTfulControllerAcceptNegotiator >> bestRepresentationFor: anHttpRequest choosingAmong: aChoiceBlock [
 
   | acceptableMediaTypes |
   acceptableMediaTypes := self acceptableMediaTypesIn: anHttpRequest.
   self withAcceptableMediaTypesIn: acceptableMediaTypes do: [ :mediaType |
       ( self sortByPrecedence: ( ( self mediaTypesAvailableFor: mediaType ) select: [ :available |
                 ( self qualityOfMediaType: available in: acceptableMediaTypes ) = mediaType quality ] ) )
-        ifNotEmpty: [ :availableTypes | ^ availableTypes first ]
+        ifNotEmpty: [ :availableTypes | ^ aChoiceBlock value: availableTypes ]
     ].
   HTTPNotAcceptable
     signal: 'Cannot generate a response entity with acceptable characteristics.'
     accepting: availableMediaTypes
+]
+
+{ #category : 'querying' }
+RESTfulControllerAcceptNegotiator >> bestRepresentationFor: anHttpRequest preferring: aMediaType [
+  "This method returns the best suited representation for the given request, choosing the one
+  in aMediaType when the request finds it as acceptable as any other. Its parameters other than
+  the version, such as the charset, are not considered"
+
+  ^ self bestRepresentationFor: anHttpRequest choosingAmong: [ :availableTypes |
+        availableTypes
+          detect: [ :available |
+              ( available matches: aMediaType ) and: [
+                  self versionIn: aMediaType canBeHandledBy: available ] ]
+          ifNone: [ availableTypes first ]
+      ]
 ]
 
 { #category : 'initialize - release' }

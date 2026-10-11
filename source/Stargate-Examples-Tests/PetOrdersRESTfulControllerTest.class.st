@@ -43,10 +43,20 @@ PetOrdersRESTfulControllerTest >> commentsRelatedTo: order [
 { #category : 'private - support' }
 PetOrdersRESTfulControllerTest >> createCommentFor: order identifiedBy: anId withContent: aComment [
 
+  ^ self
+      createCommentFor: order
+      identifiedBy: anId
+      withContent: aComment
+      accepting: ZnMimeType textPlain
+]
+
+{ #category : 'private - support' }
+PetOrdersRESTfulControllerTest >> createCommentFor: order identifiedBy: anId withContent: aComment accepting: aMediaType [
+
   | request |
   request := self requestToPOST: order links comments asUrl identifiedBy: anId.
   request entity: ( ZnEntity with: aComment type: ZnMimeType textPlain ).
-  request setAccept: ZnMimeType textPlain.
+  request setAccept: aMediaType.
 
   ^ resourceController createCommentBasedOn: request within: self newHttpRequestContext
 ]
@@ -698,44 +708,70 @@ PetOrdersRESTfulControllerTest >> testUpdateComment [
 
 { #category : 'tests - comments' }
 PetOrdersRESTfulControllerTest >> testUpdateCommentAcceptingADifferentMediaType [
+  "Test for https://github.com/ba-st/Stargate/issues/164"
 
-	"Test for https://github.com/ba-st/Stargate/issues/164"
+  self withJsonFromContentsIn: self createOrder do: [ :order |
+      | response knownETag updateRequest |
+      knownETag := ( self
+                       createCommentFor: order
+                       identifiedBy: 1
+                       withContent: 'Hey!'
+                       accepting: ZnMimeType applicationJson ) entityTag.
+      self createCommentFor: order identifiedBy: 1 withContent: 'Mr. DJ'.
+      updateRequest := self
+                         requestToPUTComment: 'Hola!'
+                         on: order links comments
+                         at: 1
+                         forOrder: 1
+                         conditionalTo: knownETag.
+      updateRequest setAccept: ZnMimeType applicationJson.
 
-	self withJsonFromContentsIn: self createOrder do: [ :order | 
-		| response knownETag updateRequest |
-		knownETag := (self
-			              createCommentFor: order
-			              identifiedBy: 1
-			              withContent: 'Hey!') entityTag.
-		self createCommentFor: order identifiedBy: 1 withContent: 'Mr. DJ'.
-		updateRequest := self
-			                 requestToPUTComment: 'Hola!'
-			                 on: order links comments
-			                 at: 1
-			                 forOrder: 1
-			                 conditionalTo: knownETag.
-		updateRequest setAccept: ZnMimeType applicationJson.
+      response := resourceController
+                    updateOrderCommentBasedOn: updateRequest
+                    within: self newHttpRequestContext.
 
-		response := resourceController
-			            updateOrderCommentBasedOn: updateRequest
-			            within: self newHttpRequestContext.
+      self
+        assert: response isSuccess;
+        deny: response entityTag equals: knownETag;
+        withJsonFromContentsIn: response do: [ :json | self assert: json equals: 'Hola!' ].
 
-		self
-			assert: response isSuccess;
-			deny: response entityTag equals: knownETag;
-			withJsonFromContentsIn: response
-			do: [ :json | self assert: json equals: 'Hola!' ].
+      response := resourceController
+                    orderCommentsBasedOn: ( self
+                          requestToGETSubresource: order links comments
+                          identifiedBy: 1
+                          accepting: ZnMimeType applicationJson )
+                    within: self newHttpRequestContext.
 
-		response := resourceController
-			            orderCommentsBasedOn: (self
-					             requestToGETSubresource: order links comments
-					             identifiedBy: 1
-					             accepting: ZnMimeType applicationJson)
-			            within: self newHttpRequestContext.
+      self
+        assert: response isSuccess;
+        assert: response contentType equals: ZnMimeType applicationJson;
+        withJsonFromContentsIn: response
+        do: [ :json | self assert: json hasTheSameElementsInTheSameOrderThat: #( 'Hola!' 'Mr. DJ' ) ]
+    ]
+]
 
-		self
-			assert: response isSuccess;
-			assert: response contentType equals: ZnMimeType applicationJson;
-			withJsonFromContentsIn: response
-			do: [ :json | self assert: json hasTheSameElementsInTheSameOrderThat: #( 'Hola!' 'Mr. DJ' ) ] ]
+{ #category : 'tests - comments' }
+PetOrdersRESTfulControllerTest >> testUpdateCommentWithoutAcceptIsAnsweredInItsMediaType [
+  "Test for https://github.com/ba-st/Stargate/issues/247"
+
+  self withJsonFromContentsIn: self createOrder do: [ :order |
+      | response knownETag updateRequest |
+      knownETag := ( self createCommentFor: order identifiedBy: 1 withContent: 'Hey!' ) entityTag.
+      updateRequest := self
+                         requestToPUTComment: 'Hola!'
+                         on: order links comments
+                         at: 1
+                         forOrder: 1
+                         conditionalTo: knownETag.
+      updateRequest headers removeKey: 'Accept'.
+
+      response := resourceController
+                    updateOrderCommentBasedOn: updateRequest
+                    within: self newHttpRequestContext.
+
+      self
+        assert: response isSuccess;
+        assert: response contentType equals: ZnMimeType textPlain;
+        assert: response contents equals: 'Hola!'
+    ]
 ]

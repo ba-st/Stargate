@@ -282,6 +282,75 @@ RESTfulControllerAcceptNegotiatorTest >> testNoLanguageIsAcceptable [
 ]
 
 { #category : 'tests' }
+RESTfulControllerAcceptNegotiatorTest >> testPreferredLanguageIsChosenAmongEquallyAcceptableOnes [
+
+  | negotiator |
+  negotiator := RESTfulControllerAcceptNegotiator
+                  accepting: #(  )
+                  inAnyOf: ( #( 'en' 'es' ) collect: #asLanguageTag ).
+
+  self
+    assert:
+      ( negotiator bestLanguageFor: ( ZnRequest get: '/example' ) preferring: 'es' asLanguageTag )
+    equals: 'es' asLanguageTag;
+    assert:
+      ( negotiator bestLanguageFor: ( ZnRequest get: '/example' ) preferring: 'fr' asLanguageTag )
+    equals: 'en' asLanguageTag;
+    assert: ( negotiator
+          bestLanguageFor: ( ( ZnRequest get: '/example' )
+                setAcceptLanguage: 'en, es';
+                yourself )
+          preferring: 'es' asLanguageTag )
+    equals: 'en' asLanguageTag;
+    assert: ( negotiator
+          bestLanguageFor: ( ( ZnRequest get: '/example' )
+                setAcceptLanguage: 'es;q=0.5, *';
+                yourself )
+          preferring: 'es' asLanguageTag )
+    equals: 'en' asLanguageTag
+]
+
+{ #category : 'tests' }
+RESTfulControllerAcceptNegotiatorTest >> testPreferredRepresentationIsChosenAmongEquallyAcceptableOnes [
+
+  | version1 version2 negotiator |
+  version1 := 'application/vnd.stargate.pet+json;version=1.0.0' asMediaType.
+  version2 := 'application/vnd.stargate.pet+json;version=2.0.0' asMediaType.
+  negotiator := RESTfulControllerAcceptNegotiator accepting:
+                  { version1 . version2 . ZnMimeType textPlain }.
+
+  self
+    assert: ( negotiator bestRepresentationFor: ( ZnRequest get: '/example' ) preferring: version1 )
+    equals: version1;
+    assert: ( negotiator
+          bestRepresentationFor: ( ZnRequest get: '/example' )
+          preferring: 'text/plain' asMediaType )
+    equals: ZnMimeType textPlain;
+    assert: ( negotiator
+          bestRepresentationFor: ( ZnRequest get: '/example' )
+          preferring: ZnMimeType applicationJson )
+    equals: version2;
+    assert: ( negotiator
+          bestRepresentationFor: ( ( ZnRequest get: '/example' )
+                setAccept: 'application/vnd.stargate.pet+json';
+                yourself )
+          preferring: version1 )
+    equals: version1;
+    assert: ( negotiator
+          bestRepresentationFor: ( ( ZnRequest get: '/example' )
+                setAccept: version2;
+                yourself )
+          preferring: version1 )
+    equals: version2;
+    assert: ( negotiator
+          bestRepresentationFor: ( ( ZnRequest get: '/example' )
+                setAccept: 'text/plain;q=0.5, */*';
+                yourself )
+          preferring: ZnMimeType textPlain )
+    equals: version2
+]
+
+{ #category : 'tests' }
 RESTfulControllerAcceptNegotiatorTest >> testRFC2616Sec14 [
 
 	self

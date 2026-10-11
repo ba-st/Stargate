@@ -122,19 +122,61 @@ EntityTagHashingTest >> testSwitchingLanguageIsNotAnsweredNotModified [
 
 { #category : 'tests' }
 EntityTagHashingTest >> testUpdateIsComparedInItsContentLanguage [
-  "The update is in Spanish and has no Accept-Language, so the negotiated language is English"
+  "The update is in Spanish and has no Accept-Language, so Spanish is negotiated since it is offered"
 
   self
-    assert: ( self updateInSpanishConditionalTo: ( self entityTagAcceptingLanguage: 'es' ) ) code
-    equals: 200.
+    assert:
+    ( self updateInSpanishConditionalTo: ( self entityTagAcceptingLanguage: 'es' ) )
+      contentLanguageTags
+    equals: { 'es' asLanguageTag }.
   self
     should: [ self updateInSpanishConditionalTo: ( self entityTagAcceptingLanguage: 'en' ) ]
     raise: HTTPClientError
     withExceptionDo: [ :error | self assert: error code equals: 412 ]
 ]
 
+{ #category : 'tests' }
+EntityTagHashingTest >> testUpdateIsComparedInTheLanguageItAccepts [
+
+  self
+    assert:
+      ( self updateInSpanishAcceptingEnglishConditionalTo: ( self entityTagAcceptingLanguage: 'en' ) )
+        contentLanguageTags
+    equals: { 'en' asLanguageTag }.
+  self
+    should: [
+      self updateInSpanishAcceptingEnglishConditionalTo: ( self entityTagAcceptingLanguage: 'es' ) ]
+    raise: HTTPClientError
+    withExceptionDo: [ :error | self assert: error code equals: 412 ]
+]
+
+{ #category : 'private' }
+EntityTagHashingTest >> update: aRequest [
+
+  ^ requestHandler
+      from: ( TeaRequest fromZnRequest: aRequest pathParams: Dictionary new )
+      within: HttpRequestContext new
+      get: [ :identifier | 'thing' ]
+      thenUpdateWith: [ :resource :update | update ]
+]
+
+{ #category : 'private' }
+EntityTagHashingTest >> updateInSpanishAcceptingEnglishConditionalTo: anEntityTag [
+
+  | request |
+  request := self updateInSpanishRequestConditionalTo: anEntityTag.
+  request headers at: 'Accept-Language' put: 'en'.
+  ^ self update: request
+]
+
 { #category : 'private' }
 EntityTagHashingTest >> updateInSpanishConditionalTo: anEntityTag [
+
+  ^ self update: ( self updateInSpanishRequestConditionalTo: anEntityTag )
+]
+
+{ #category : 'private' }
+EntityTagHashingTest >> updateInSpanishRequestConditionalTo: anEntityTag [
 
   | request |
   request := ( ZnRequest patch: 'https://api.example.com/things/1' )
@@ -143,10 +185,5 @@ EntityTagHashingTest >> updateInSpanishConditionalTo: anEntityTag [
                entity: ( ZnEntity with: '"cosa"' type: ZnMimeType applicationJson );
                yourself.
   request headers at: 'Content-Language' put: 'es'.
-
-  ^ requestHandler
-      from: ( TeaRequest fromZnRequest: request pathParams: Dictionary new )
-      within: HttpRequestContext new
-      get: [ :identifier | 'thing' ]
-      thenUpdateWith: [ :resource :update | update ]
+  ^ request
 ]

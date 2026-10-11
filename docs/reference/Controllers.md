@@ -227,6 +227,16 @@ request headers against it, as
   weak comparison, or if it is `*`, the handler answers
   `412 Precondition Failed` and leaves the resource unchanged.
 
+Both are evaluated against the representation the update negotiates, the one
+its response carries, and not against its content: the ETag in `If-Match` must
+be one read with the same `Accept` and `Accept-Language`, even when the update's
+`Content-Type` or `Content-Language` differ. When an update leaves the choice to
+the handler, with no `Accept` or `Accept-Language` header or with ranges finding
+several representations equally acceptable, the media type and language of its
+content are chosen among them if the handler offers them. So a client sending
+back the representation it read compares it, and is answered, in that
+representation without asking for it again.
+
 Both headers accept a comma-separated list of ETags, or `*`, and may appear more
 than once. A value that is not a valid list answers `400 Bad Request`. A request
 on a resource that does not exist answers `404 Not Found` regardless of these
@@ -408,7 +418,8 @@ builder
 As soon as a language is supported, Stargate will consider the
 `Accept-Language` header and make the negotiated language available in the
 request context. When the request has no `Accept-Language` header, the first
-supported language is used.
+supported language is used, except on updates in a supported language, as
+[ETags](#etags) describes.
 
 To access the negotiated language, send `targetLanguageTag` or
 `withTargetLanguageTagDo:` to the request context. API implementors can then use

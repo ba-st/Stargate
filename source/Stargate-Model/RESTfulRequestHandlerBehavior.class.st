@@ -61,23 +61,15 @@ RESTfulRequestHandlerBehavior >> applyCachingDirectivesFor: aResource toNotModif
 { #category : 'private' }
 RESTfulRequestHandlerBehavior >> assertPreconditionsOf: httpRequest matching: entityTags holdFor: entity within: requestContext [
   "RFC 9110 §13.2.2: If-Match is evaluated first, then If-None-Match, and either one failing
-  answers 412 on a method other than GET or HEAD, before the request is applied"
+  answers 412 on a method other than GET or HEAD, before the request is applied.
+  Both are evaluated against the selected representation (RFC 9110 §13.1.1): the negotiated
+  media type and language, the latter being the current locale while they are evaluated"
 
-  | calculatedEtag entityTagCalculation |
-  entityTagCalculation := [
-                            self
-                              entityTagOf: entity
-                              encodedAs: httpRequest contentType
-                              within: requestContext ].
-
-  "The request content can be in another language that the one requested
-	in the Accept header, so in that case we need to calculated the etag
-	of the entity with this language as the current one"
-  calculatedEtag := httpRequest contentLanguageTags
-                      ifEmpty: entityTagCalculation
-                      ifNotEmpty: [ :languages |
-                        CurrentLocale use: languages first during: entityTagCalculation ].
-
+  | calculatedEtag |
+  calculatedEtag := self
+                      entityTagOf: entity
+                      encodedAs: requestContext targetMediaType
+                      within: requestContext.
   ( entityTags matchesStrongly: calculatedEtag ) ifFalse: [
       HTTPClientError preconditionFailed signal ].
   self ifNoneMatchHeaderPresentIn: httpRequest do: [ :entityTagsNotToMatch |
@@ -234,7 +226,7 @@ RESTfulRequestHandlerBehavior >> from: httpRequest within: requestContext get: f
   | entityTags |
   entityTags := self entityTagsToMatchBasedOn: httpRequest.
 
-  self holdTargetMediaTypeAndLanguageFrom: httpRequest within: requestContext.
+  self holdTargetMediaTypeAndLanguageOfUpdate: httpRequest within: requestContext.
   ^ self useTargetLanguageTagIn: requestContext asCurrentLocaleDuring: [
         | resource |
         resource := resourceLocator lookupResourceIdentifiedBy: httpRequest evaluating: [ :id |
@@ -286,11 +278,20 @@ RESTfulRequestHandlerBehavior >> from: httpRequest within: requestContext getCol
 
 { #category : 'private' }
 RESTfulRequestHandlerBehavior >> holdTargetLanguageFrom: httpRequest within: requestContext [
+
+  self
+    holdTargetLanguageNegotiatedBy: [ acceptNegotiator bestLanguageFor: httpRequest ]
+    for: httpRequest
+    within: requestContext
+]
+
+{ #category : 'private' }
+RESTfulRequestHandlerBehavior >> holdTargetLanguageNegotiatedBy: aNegotiationBlock for: httpRequest within: requestContext [
   "A handler offering languages always negotiates one, taking the first when the request
   has no preference. One offering none still rejects requests asking for a language"
 
   ( acceptNegotiator offersLanguages or: [ httpRequest hasLanguageProrityList ] ) then: [
-      requestContext targetLanguageTag: ( acceptNegotiator bestLanguageFor: httpRequest ) ]
+      requestContext targetLanguageTag: aNegotiationBlock value ]
 ]
 
 { #category : 'private' }
@@ -299,6 +300,27 @@ RESTfulRequestHandlerBehavior >> holdTargetMediaTypeAndLanguageFrom: httpRequest
   self holdTargetLanguageFrom: httpRequest within: requestContext.
 
   ^ requestContext targetMediaType: ( acceptNegotiator bestRepresentationFor: httpRequest )
+]
+
+{ #category : 'private' }
+RESTfulRequestHandlerBehavior >> holdTargetMediaTypeAndLanguageOfUpdate: httpRequest within: requestContext [
+  "When the request leaves the choice to the server (RFC 9110 §12.5.1), an update is answered,
+  and its preconditions evaluated, in the media type and language of its content if offered"
+
+  self
+    holdTargetLanguageNegotiatedBy: [
+        httpRequest contentLanguageTags
+          ifEmpty: [ acceptNegotiator bestLanguageFor: httpRequest ]
+          ifNotEmpty: [ :languageTags |
+            acceptNegotiator bestLanguageFor: httpRequest preferring: languageTags first ]
+      ]
+    for: httpRequest
+    within: requestContext.
+
+  ^ requestContext targetMediaType: ( httpRequest hasEntity
+          then: [
+            acceptNegotiator bestRepresentationFor: httpRequest preferring: httpRequest contentType ]
+          otherwise: [ acceptNegotiator bestRepresentationFor: httpRequest ] )
 ]
 
 { #category : 'private' }
