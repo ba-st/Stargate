@@ -133,8 +133,7 @@ RESTfulRequestHandlerBuilder >> directCachingWith: aBlock [
 
 { #category : 'private' }
 RESTfulRequestHandlerBuilder >> entityTagCalculatorHashing: aBlockClosure [
-  "When a language was negotiated, the representation is in the current locale: the negotiated
-  language, or the Content-Language of an update checking its If-Match"
+  "When a language was negotiated, the representation is in the current locale: the negotiated language"
 
   ^ [ :resource :mediaType :requestContext :requestHandler |
       | hasher |
