@@ -67,12 +67,10 @@ CrossOriginResourceSharingPreflightHandlerBuilder >> expireIn: aDuration [
 { #category : 'configuring' }
 CrossOriginResourceSharingPreflightHandlerBuilder >> expose: exposedHeaders [
 
-	addHeaderCommands
-		add: [ :handler :headerNames | 
-			exposedHeaders
-				do:
-					[ :exposedHeader | handler at: headerNames >> #accessControlExposeHeaders addSeparatedWithComma: exposedHeader ]
-			]
+  addHeaderCommands add: [ :handler :headerNames |
+      exposedHeaders do: [ :exposedHeader |
+          handler at: headerNames >> #accessControlExposeHeaders addToList: exposedHeader ]
+    ]
 ]
 
 { #category : 'initialization' }
