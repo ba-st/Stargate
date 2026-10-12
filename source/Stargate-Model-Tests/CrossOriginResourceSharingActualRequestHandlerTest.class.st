@@ -181,6 +181,29 @@ CrossOriginResourceSharingActualRequestHandlerTest >> testExposeHeaders [
 ]
 
 { #category : 'tests' }
+CrossOriginResourceSharingActualRequestHandlerTest >> testExposeHeadersAlreadyExposedInSeveralFieldLines [
+
+  | handler response |
+  handler := self crossOriginResourceSharingActualRequestHandlerBuilderApplying: [ :builder |
+                 builder
+                   allowAnyOrigin;
+                   expose: #( 'Authorization' 'X-Custom' )
+               ].
+  response := ZnResponse created: self serverLocation asUrl / 'devices' / '1'.
+  response headers
+    at: 'Access-Control-Expose-Headers' add: 'Authorization';
+    at: 'Access-Control-Expose-Headers' add: 'X-Request-Id'.
+
+  handler
+    teaEvalActionOnRequest: ( self postRequestOriginatedAt: self websiteLocation )
+    response: response.
+
+  self
+    assert: ( response headers at: 'Access-Control-Expose-Headers' )
+    equals: 'Authorization, X-Request-Id, X-Custom'
+]
+
+{ #category : 'tests' }
 CrossOriginResourceSharingActualRequestHandlerTest >> testExposeHeadersEndingWithAnotherExposedHeader [
 
   self

@@ -48,7 +48,7 @@ CrossOriginResourceSharingActualRequestHandlerBuilder >> expose: exposedHeaders 
       | headerName |
       headerName := headerNames >> #accessControlExposeHeaders.
       exposedHeaders do: [ :exposedHeader |
-          [ headers at: headerName addSeparatedWithComma: exposedHeader ] unless:
+          [ headers at: headerName addToList: exposedHeader ] unless:
             ( self is: exposedHeader alreadyIncludedAt: headerName in: headers )
         ]
     ]
@@ -65,6 +65,6 @@ CrossOriginResourceSharingActualRequestHandlerBuilder >> initialize [
 { #category : 'private' }
 CrossOriginResourceSharingActualRequestHandlerBuilder >> is: exposedHeader alreadyIncludedAt: headerName in: headers [
 
-  ^ ( ( ',' split: ( headers at: headerName ifAbsent: [ '' ] ) ) collect: [ :name | name trimBoth ] )
-      includes: exposedHeader
+  ^ ( headers fieldLinesAt: headerName ) anySatisfy: [ :fieldLine |
+        ( ( $, split: fieldLine ) collect: [ :name | name trimBoth ] ) includes: exposedHeader ]
 ]

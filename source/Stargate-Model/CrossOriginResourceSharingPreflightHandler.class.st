@@ -38,17 +38,15 @@ CrossOriginResourceSharingPreflightHandler >> setAllowedHeadersOn: aResponse fro
         $, split: requestedHeaders do: [ :header |
             aResponse headers
               at: self headerNames >> #accessControlAllowHeaders
-              addSeparatedWithComma: header trimBoth
-          ]
+              addToList: header trimBoth ]
       ]
 ]
 
 { #category : 'private - evaluating' }
 CrossOriginResourceSharingPreflightHandler >> setAllowedMethodsOn: aResponse from: allowedMethods [
 
-	allowedMethods
-		do:
-			[ :method | aResponse headers at: self headerNames >> #accessControlAllowMethods addSeparatedWithComma: method ]
+  allowedMethods do: [ :method |
+      aResponse headers at: self headerNames >> #accessControlAllowMethods addToList: method ]
 ]
 
 { #category : 'private - evaluating' }
