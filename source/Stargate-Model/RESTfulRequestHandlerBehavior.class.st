@@ -390,10 +390,13 @@ RESTfulRequestHandlerBehavior >> putEntityTagOf: resource in: response within: r
 { #category : 'private' }
 RESTfulRequestHandlerBehavior >> putLanguageContentTagIn: response within: requestContext [
   "The response depends on Accept-Language even when no language was negotiated,
-  since asking for one is not acceptable then"
+  since asking for one is not acceptable then. Content-Language describes content,
+  so a response without any, such as a 304, carries none (RFC 9110 §15.4.5)"
 
   response addToVary: 'Accept-Language'.
-  requestContext withTargetLanguageTagDo: [ :languageTag | response addContentLanguage: languageTag ]
+  response hasEntity ifTrue: [
+      requestContext withTargetLanguageTagDo: [ :languageTag |
+          response addContentLanguage: languageTag ] ]
 ]
 
 { #category : 'private' }
