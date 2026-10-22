@@ -530,7 +530,7 @@ SouthAmericanCurrenciesRESTfulControllerTest >> testGetCurrenciesNotModifiedWhen
     assert: notModifiedResponse entityTag equals: response entityTag;
     deny: response cachingDirectives isEmpty;
     assert: notModifiedResponse cachingDirectives equals: response cachingDirectives;
-    assert: notModifiedResponse contentLanguageTags equals: response contentLanguageTags;
+    assert: notModifiedResponse contentLanguageTags isEmpty;
     assert: notModifiedResponse varyHeaderNames equals: response varyHeaderNames
 ]
 
@@ -603,6 +603,8 @@ SouthAmericanCurrenciesRESTfulControllerTest >> testGetNotModifiedWhenValidETag 
   self
     assert: response isSuccess;
     assert: response entityTag equals: '"49551e242ac072f7a6c899d8add32a9eded83edd"' asEntityTag;
+    withTheOnlyOneIn: response contentLanguageTags
+    do: [ :tag | self assert: tag equals: self unitedStatesEnglish ];
     assert: response cachingDirectives size equals: 2;
     assert: response cachingDirectives includes: 'immutable';
     assert: response cachingDirectives includes: 'public'.
@@ -618,6 +620,8 @@ SouthAmericanCurrenciesRESTfulControllerTest >> testGetNotModifiedWhenValidETag 
     assert: response code equals: 304;
     assert: response entityTag equals: '"49551e242ac072f7a6c899d8add32a9eded83edd"' asEntityTag;
     assert: response varyHeaderNames includes: 'Accept';
+    assert: response varyHeaderNames includes: 'Accept-Language';
+    assert: response contentLanguageTags isEmpty;
     assert: response cachingDirectives size equals: 2;
     assert: response cachingDirectives includes: 'immutable';
     assert: response cachingDirectives includes: 'public'

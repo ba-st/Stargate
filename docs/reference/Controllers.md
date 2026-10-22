@@ -271,8 +271,8 @@ handler includes building the controls of every item.
 The ETag is sent on the `200 OK`, and `If-None-Match` is then evaluated as for a
 single resource: when any ETag in it matches using the weak comparison, or it is
 `*`, the handler answers `304 Not Modified`. The `304` carries the ETag and the
-same `Vary`, pagination `Link`, caching and `Content-Language` headers the
-`200 OK` would have carried, without a body. The query is always evaluated,
+same `Vary`, pagination `Link` and caching headers the `200 OK` would have
+carried, without a body. The query is always evaluated,
 since the pagination links come from it.
 
 ## Collection Pagination
@@ -426,7 +426,9 @@ To access the negotiated language, send `targetLanguageTag` or
 it to produce a response in the corresponding language.
 
 Once language negotiation is enabled, the `Content-Language` header will
-contain the negotiated language in the response.
+contain the negotiated language in responses with content. A `304 Not Modified`
+has none, so it doesn't carry `Content-Language`, as
+[RFC 9110](https://www.rfc-editor.org/rfc/rfc9110#section-15.4.5) recommends.
 
 Responses carrying a representation of a resource, and `304 Not Modified`
 ones, always include `Accept-Language` in the `Vary` header, so shared caches
