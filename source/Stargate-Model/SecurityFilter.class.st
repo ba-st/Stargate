@@ -13,6 +13,14 @@ SecurityFilter class >> isAbstract [
   ^ self = SecurityFilter
 ]
 
+{ #category : 'configuring headers' }
+SecurityFilter >> affectResponse: aResponse [
+  "The response depends on the credentials I read, so a cache has to key it by them"
+
+  [ aResponse addToVary: 'Authorization' ] unless:
+    ( aResponse varyHeaderNames includes: 'Authorization' )
+]
+
 { #category : 'private' }
 SecurityFilter >> checkCredentials: authorization for: httpRequest within: requestContext [
 
@@ -39,4 +47,10 @@ SecurityFilter >> signalMissingAuthorizationHeader [
 SecurityFilter >> teaEvalActionOnRequest: httpRequest [
 
 	self evaluateActionOnRequest: httpRequest within: HttpRequestContext new
+]
+
+{ #category : 'evaluating' }
+SecurityFilter >> teaEvalActionOnRequest: httpRequest response: httpResponse [
+
+  self affectResponse: httpResponse
 ]

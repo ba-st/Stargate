@@ -31,13 +31,13 @@ RouteSpecification >> asRequestMatcher [
 { #category : 'configuring' }
 RouteSpecification >> authenticatedBy: anAuthorizationFilter [
 
-	^ self class
-		handling: httpMethod
-		at: urlTemplate
-		evaluating: [ :httpRequest :requestContext | 
-			anAuthorizationFilter evaluateActionOnRequest: httpRequest within: requestContext.
-			handler value: httpRequest value: requestContext
-			]
+  ^ self class handling: httpMethod at: urlTemplate evaluating: [ :httpRequest :requestContext |
+        | response |
+        anAuthorizationFilter evaluateActionOnRequest: httpRequest within: requestContext.
+        response := handler value: httpRequest value: requestContext.
+        anAuthorizationFilter affectResponse: response.
+        response
+      ]
 ]
 
 { #category : 'configuring' }

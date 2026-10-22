@@ -29,6 +29,18 @@ To authenticate the whole API send `authenticatedBy:` with the authentication
 filter instance to the `HTTPBasedRESTfulAPI` instance. This configuration takes
 into account CORS preflight requests because they cannot be authenticated.
 
+## Caching authenticated responses
+
+The response to an authenticated request depends on its credentials: the filter
+refuses the ones it doesn't accept, and a controller can answer differently
+depending on the permissions they grant. So both ways of authenticating add
+`Authorization` to the `Vary` header of every response the route or the API
+answers, keeping a shared cache from reusing it for requests with other
+credentials, or none.
+
+Responses answered by an error handler, such as the `401/Unauthorized` the
+filter answers itself, don't get it, because they don't go through the filter.
+
 ## Using with a plain Teapot server
 
 Authentication filters can be used as handlers for any of the routing methods

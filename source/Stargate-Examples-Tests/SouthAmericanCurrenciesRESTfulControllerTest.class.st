@@ -33,6 +33,16 @@ SouthAmericanCurrenciesRESTfulControllerTest >> english [
 	^ 'en' asLanguageTag 
 ]
 
+{ #category : 'private' }
+SouthAmericanCurrenciesRESTfulControllerTest >> evaluate: aRouteSpecification authenticatedOn: anHttpRequest [
+
+  anHttpRequest setBasicAuthenticationUsername: 'admin' password: 'secret'.
+  ^ ( aRouteSpecification authenticatedBy:
+        ( ZnAuthenticationFilter username: 'admin' password: 'secret' ) ) handler
+      value: anHttpRequest
+      value: self newHttpRequestContext
+]
+
 { #category : 'private - language ranges' }
 SouthAmericanCurrenciesRESTfulControllerTest >> languageRange [
 
@@ -305,6 +315,19 @@ SouthAmericanCurrenciesRESTfulControllerTest >> testGetArgentinePesoInSpanishBas
 ]
 
 { #category : 'tests' }
+SouthAmericanCurrenciesRESTfulControllerTest >> testGetArgentinePesoThroughAnAuthenticatedRoute [
+
+  | response |
+  response := self evaluate: resourceController declareGetCurrencyRoute authenticatedOn: ( self
+                    requestToGETResourceIdentifiedBy: 'ARS'
+                    accepting: resourceController currencyVersion1dot0dot0MediaType ).
+
+  self
+    assert: response status equals: 200;
+    assert: response varyHeaderNames equals: #( 'Accept' 'Accept-Language' 'Authorization' )
+]
+
+{ #category : 'tests' }
 SouthAmericanCurrenciesRESTfulControllerTest >> testGetBrazilianReal [
 
   | response |
@@ -544,6 +567,27 @@ SouthAmericanCurrenciesRESTfulControllerTest >> testGetCurrencyNotFoundShouldFai
           assert: error code equals: 404;
           assert: error messageText equals: 'No se encontró ZZZ en el sistema'
       ]
+]
+
+{ #category : 'tests' }
+SouthAmericanCurrenciesRESTfulControllerTest >> testGetNotModifiedThroughAnAuthenticatedRoute [
+
+  | response notModifiedResponse |
+  response := self evaluate: resourceController declareGetCurrencyRoute authenticatedOn: ( self
+                    requestToGETResourceIdentifiedBy: 'ARS'
+                    accepting: resourceController currencyVersion1dot0dot0MediaType ).
+
+  notModifiedResponse := self
+                           evaluate: resourceController declareGetCurrencyRoute
+                           authenticatedOn: ( self
+                                 requestToGETResourceIdentifiedBy: 'ARS'
+                                 accepting: resourceController currencyVersion1dot0dot0MediaType
+                                 conditionalTo: response entityTag ).
+
+  self
+    assert: notModifiedResponse code equals: 304;
+    assert: notModifiedResponse varyHeaderNames
+    equals: #( 'Accept' 'Accept-Language' 'Authorization' )
 ]
 
 { #category : 'tests' }
