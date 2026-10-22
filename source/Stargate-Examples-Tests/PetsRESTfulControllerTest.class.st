@@ -67,6 +67,16 @@ PetsRESTfulControllerTest >> entityTagOfPetIdentifiedBy: anIdentifier [
 ]
 
 { #category : 'private - support' }
+PetsRESTfulControllerTest >> evaluate: aRouteSpecification authenticatedOn: anHttpRequest [
+
+  anHttpRequest setBasicAuthenticationUsername: 'admin' password: 'secret'.
+  ^ ( aRouteSpecification authenticatedBy:
+        ( ZnAuthenticationFilter username: 'admin' password: 'secret' ) ) handler
+      value: anHttpRequest
+      value: self newHttpRequestContext
+]
+
+{ #category : 'private - support' }
 PetsRESTfulControllerTest >> getPetsAt: aUrl [
 
   ^ resourceController
@@ -459,6 +469,21 @@ PetsRESTfulControllerTest >> testDeletePet [
 		assert: response isSuccess;
 		assert: response status equals: 204;
 		deny: response hasEntity
+]
+
+{ #category : 'tests - delete' }
+PetsRESTfulControllerTest >> testDeletePetThroughAnAuthenticatedRoute [
+
+  | response |
+  self createPet.
+
+  response := self
+                evaluate: resourceController declareDeletePetRoute
+                authenticatedOn: ( self requestToDELETEResourceIdentifiedBy: 1 ).
+
+  self
+    assert: response status equals: 204;
+    assert: response varyHeaderNames equals: #( 'Authorization' )
 ]
 
 { #category : 'tests - get individual' }

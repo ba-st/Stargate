@@ -368,6 +368,20 @@ AuthenticatedPetStoreAPITest >> testGetPetsUnauthorized [
       ]
 ]
 
+{ #category : 'tests - authentication' }
+AuthenticatedPetStoreAPITest >> testGetPetsVariesOnAuthorization [
+
+  | response |
+  response := self newJWTAuthorizedClient
+                url: self baseUrl / 'pets' asUrl;
+                get;
+                response.
+
+  self
+    assert: response isSuccess;
+    assert: response varyHeaderNames equals: #( 'Accept' 'Accept-Language' 'Authorization' )
+]
+
 { #category : 'tests - client errors' }
 AuthenticatedPetStoreAPITest >> testMethodNotAllowed [
 

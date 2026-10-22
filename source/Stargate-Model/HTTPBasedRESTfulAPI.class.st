@@ -54,10 +54,15 @@ HTTPBasedRESTfulAPI >> applyCrossSharingResourceConfigurationTo: response accord
 
 { #category : 'configuring' }
 HTTPBasedRESTfulAPI >> authenticatedBy: anAuthorizationFilter [
+  "Preflight requests carry no credentials, so they are neither checked nor varied on them"
 
-	teapotServer
-		before: '/*' -> anAuthorizationFilter;
-		when: [ :request | ( CrossOriginResourceSharingFilter isForPreflight: request ) not ]
+  | isNotPreflight |
+  isNotPreflight := [ :request | ( CrossOriginResourceSharingFilter isForPreflight: request ) not ].
+  teapotServer
+    before: '/*' -> anAuthorizationFilter;
+    when: isNotPreflight;
+    after: '/*' -> anAuthorizationFilter;
+    when: isNotPreflight
 ]
 
 { #category : 'private - configuring' }

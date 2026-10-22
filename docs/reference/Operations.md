@@ -140,7 +140,7 @@ If-Match: "0a651615d7dfa0d9d289eea848cd746fcb178848"
 HTTP/1.1 200 OK
 Content-Type: application/vnd.stargate.operational-plugin+json;version=1.0.0
 Etag: "ac64ae1c7f6f4a4dc2165833b5f6218fd8b07545"
-Vary: Accept
+Vary: Accept, Accept-Language, Authorization
 
 {
   "name":"Health Check",
@@ -171,7 +171,7 @@ If-Match: "0a651615d7dfa0d9d289eea848cd746fcb178848"
 HTTP/1.1 200 OK
 Content-Type: application/vnd.stargate.operational-plugin+json;version=1.0.0
 Etag: "d41da10c1c8f0d00ad70128b0f682cbc"
-Vary: Accept
+Vary: Accept, Accept-Language, Authorization
 
 {
   "name":"Health Check",
