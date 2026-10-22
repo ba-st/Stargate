@@ -2,6 +2,8 @@
 
 ## Migration from v12 to v13
 
+### Code changes
+
 - `TeaResponse class >> noContent`, an extension in
   `Stargate-Teapot-Extensions`, is removed. Use `ZnResponse noContent`
   instead, for example when aborting a request with `abort:`.
@@ -24,6 +26,55 @@
 
   See [how to start up an API](how-to/how-to-startup-API.md#handle-errors) and
   [the API skeleton](reference/Skeleton.md#error-responses).
+- `ZnHeaders >> at:addSeparatedWithComma:`, an extension in
+  `Stargate-Zinc-Extensions`, is removed. Send Hyperspace's `at:addToList:`
+  instead, which also combines a field already stored as several lines.
+- The class-side constructors of `RESTfulRequestHandler` and
+  `HypermediaDrivenRESTfulRequestHandler` take a new
+  `collectionValidationPolicy:` argument, after `paginationPolicy:`. Only code
+  calling them directly, instead of through `RESTfulRequestHandlerBuilder`,
+  has to change. To keep answering collections without ETags, pass:
+
+  ```smalltalk
+  [ :requestHandler |
+    RESTfulControllerDoNotValidateCollectionsPolicy for: requestHandler ]
+  ```
+
+- `AllowOriginPolicy >> applyOn:for:using:` is replaced by
+  `applyOn:for:using:ifNotAllowed:`, and subclasses must implement
+  `addToVaryOn:using:`. This only affects code subclassing `AllowOriginPolicy`.
+
+### Response changes
+
+These don't need code changes, but clients, and tests asserting exact headers
+or status codes, can notice them:
+
+- Conditional requests follow
+  [RFC 9110](https://www.rfc-editor.org/rfc/rfc9110#section-13.1) more
+  closely:
+  - `If-Match` uses the strong comparison, so a weak tag in it is answered
+    `412 Precondition Failed`. Some proxies weaken ETags, for example nginx
+    when it compresses a response.
+  - `If-None-Match` on an update is evaluated before applying it, so a tag
+    matching the current representation, or `*`, is answered `412` instead of
+    applying the change.
+  - Update preconditions are evaluated against the representation the
+    response would carry. An update sending an `Accept` or `Accept-Language`
+    other than the one its `If-Match` tag was read with is answered `412`:
+    send the same negotiation headers used to read it. Updates without them
+    are compared in the media type and language of their content.
+- ETags from handlers that negotiate languages include the language, so they
+  all change once on upgrade: clients get a full `200 OK` instead of a `304`
+  once, and an update in flight with an old tag gets a `412` once.
+- `Vary` names more headers: `Origin` on every response when cross-origin
+  requests are allowed only from specific origins, and `Authorization` on every
+  response of a route or API authenticated with `authenticatedBy:`, except
+  those answered by an error handler.
+- A request whose `Origin` isn't allowed gets the response without CORS
+  headers, instead of an empty `204 No Content`. Browsers still refuse it,
+  since it doesn't allow their origin.
+- A `304 Not Modified` carries the `Cache-Control` and `Expires` its `200 OK`
+  would have, and no longer carries `Content-Language`.
 
 ## Migration from v7/8 to v9
 
