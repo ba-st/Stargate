@@ -442,7 +442,7 @@ StargateApplicationTest >> testLogRequestsDuringUnsucessfulPost [
     assert: logRecord request method equals: 'POST';
     assert: logRecord request uri equals: ( 'http://localhost:<1p>/pets' expandMacrosWith: port );
     assert: logRecord response code equals: 415;
-    assert: logRecord response totalSize equals: 72
+    assert: logRecord response totalSize equals: 176
 ]
 
 { #category : 'tests - api' }

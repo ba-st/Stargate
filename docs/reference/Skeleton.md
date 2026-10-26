@@ -68,6 +68,13 @@ Error` whose body is the error's message text. To answer them differently,
 re-implement the `responseForUnexpectedError:request:` instance method. The
 error is still logged and its stack trace dumped.
 
+Client errors are answered with a JSON body holding the status `code`, the
+error's `message`, and whatever data the error carries: the fields of
+Hyperspace's error subclasses, such as `allowedMediaTypes` on a `406`, and any
+data attached with `additionalDataAt:put:`. Media types and language tags are
+written as strings. A `403` writes its required permissions as `scope`, the
+space-delimited list also sent in `WWW-Authenticate`.
+
 To answer client errors differently, for example with problem documents,
 re-implement the `apiConfiguration` instance method to add a
 `#clientErrorHandler`. Don't forget the super send:

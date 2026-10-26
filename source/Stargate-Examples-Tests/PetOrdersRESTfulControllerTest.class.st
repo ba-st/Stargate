@@ -562,6 +562,46 @@ PetOrdersRESTfulControllerTest >> testOrderCreationWhenDecodingFailsDueToMissing
 ]
 
 { #category : 'tests - orders' }
+PetOrdersRESTfulControllerTest >> testOrderCreationWhenMediaTypeIsMissing [
+
+  self
+    should: [
+        resourceController
+          createOrderBasedOn:
+          ( TeaRequest fromZnRequest: ( ZnRequest post: self baseUrl / 'orders' ) )
+          within: self newHttpRequestContext
+      ]
+    raise: HTTPClientError unsupportedMediaType
+    withExceptionDo: [ :error |
+        self
+          assert: error messageText equals: 'The request body has no media type.';
+          assert: ( error additionalDataAt: #acceptedMediaTypes )
+          equals: { resourceController orderVersion1dot0dot0MediaType .
+              resourceController overlyComplexOrderVersion1dot0dot0MediaType }
+      ]
+]
+
+{ #category : 'tests - orders' }
+PetOrdersRESTfulControllerTest >> testOrderCreationWhenMediaTypeIsNotSupported [
+
+  self
+    should: [
+        resourceController
+          createOrderBasedOn: ( self requestToPOST: '{}' as: ZnMimeType applicationJson )
+          within: self newHttpRequestContext
+      ]
+    raise: HTTPClientError unsupportedMediaType
+    withExceptionDo: [ :error |
+        self
+          assert: error messageText
+          equals: 'Cannot decode a request body of media type application/json.';
+          assert: ( error additionalDataAt: #acceptedMediaTypes )
+          equals: { resourceController orderVersion1dot0dot0MediaType .
+              resourceController overlyComplexOrderVersion1dot0dot0MediaType }
+      ]
+]
+
+{ #category : 'tests - orders' }
 PetOrdersRESTfulControllerTest >> testOverlyComplexOrderCreation [
 
 	| response order |

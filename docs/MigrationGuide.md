@@ -75,6 +75,18 @@ or status codes, can notice them:
   since it doesn't allow their origin.
 - A `304 Not Modified` carries the `Cache-Control` and `Expires` its `200 OK`
   would have, and no longer carries `Content-Language`.
+- Client error bodies include the data attached to the error with
+  Hyperspace's `additionalDataAt:put:`, and omit fields with no value:
+  - A `401` or `403` without an error code has no `errorCode`, instead of
+    `"errorCode": null`.
+  - A `406` with no languages to offer has no `allowedLanguageTags`, and one
+    with no media types has no `allowedMediaTypes`.
+- A `415 Unsupported Media Type` answered because no decoding rule matches
+  the request lists the media types that have one in `acceptedMediaTypes`, and
+  its message changes from `Decoder not found for given media type` to
+  `Cannot decode a request body of media type <type>.`, or
+  `The request body has no media type.` when the request has no
+  `Content-Type`. A `415` from a JSON-RPC endpoint lists `application/json`.
 
 ## Migration from v7/8 to v9
 

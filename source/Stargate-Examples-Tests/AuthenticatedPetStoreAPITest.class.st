@@ -476,14 +476,24 @@ AuthenticatedPetStoreAPITest >> testNotPreflightOptionsUnauthorized [
 { #category : 'tests - client errors' }
 AuthenticatedPetStoreAPITest >> testUnsupportedMediaType [
 
-	self
-		should: [ self newJWTAuthorizedClient 
-				url: self baseUrl / 'pets' asUrl;
-				entity: (ZnEntity json: '{"name":"Firulais","type":"dog"}');
-				post ]
-		raise: ZnHttpUnsuccessful
-		withExceptionDo: [ :error | 
-			self
-				assert: error response isError;
-				assert: error response code equals: 415 ]
+  self
+    should: [
+        self newJWTAuthorizedClient
+          url: self baseUrl / 'pets' asUrl;
+          entity: ( ZnEntity json: '{"name":"Firulais","type":"dog"}' );
+          post
+      ]
+    raise: ZnHttpUnsuccessful
+    withExceptionDo: [ :error |
+        self
+          assert: error response code equals: 415;
+          withJsonFromContentsIn: error response do: [ :json |
+              self
+                assert: json code equals: 415;
+                assert: json message
+                equals: 'Cannot decode a request body of media type application/json.';
+                assert: json acceptedMediaTypes asArray
+                equals: #( 'application/vnd.stargate.pet+json;version=1.0.0' )
+            ]
+      ]
 ]

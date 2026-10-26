@@ -216,3 +216,26 @@ JsonRPCControllerTest >> testRunSubtractionProcedureWithMoreParameters [
 
 	self assert: errors size equals: 1
 ]
+
+{ #category : #tests }
+JsonRPCControllerTest >> testUnsupportedMediaType [
+
+  self
+    should: [
+        self newClient
+          url: self baseUrl / 'calc';
+          entity: ( ZnEntity text: '{"jsonrpc":"2.0","id":1,"method":"add","params":[1,2]}' );
+          post
+      ]
+    raise: ZnHttpUnsuccessful
+    withExceptionDo: [ :error |
+        self
+          assert: error response code equals: 415;
+          withJsonFromContentsIn: error response do: [ :json |
+              self
+                assert: json code equals: 415;
+                assert: json message equals: 'The request Content-Type must be application/json';
+                assert: json acceptedMediaTypes asArray equals: #( 'application/json' )
+            ]
+      ]
+]
