@@ -156,6 +156,20 @@ the builder by using any of:
   to be configured.
 - `decodeToNeoJSONObjectWhenAccepting:` will produce an instance of `NeoJSONObject`
 
+A request whose `Content-Type` has no decoding rule, or that has no
+`Content-Type` at all, is answered `415 Unsupported Media Type`. The body lists
+the media types that have one, sorted, in `acceptedMediaTypes`:
+
+```json
+{
+  "code" : 415,
+  "message" : "Cannot decode a request body of media type text/plain.",
+  "acceptedMediaTypes" : [
+    "application/vnd.stargate.pet+json;version=1.0.0"
+  ]
+}
+```
+
 ## Representation Encoding
 
 Controllers needing to include a body in the response will need to take a

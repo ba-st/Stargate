@@ -23,6 +23,21 @@ HyperspaceExtensionsTest >> testBadRequestAsJSON [
 ]
 
 { #category : 'tests' }
+HyperspaceExtensionsTest >> testBadRequestWithAdditionalDataAsJSON [
+
+  | error |
+  error := HTTPClientError badRequest messageText: 'Ouch!'.
+  error
+    additionalDataAt: #mediaTypes put: { ZnMimeType applicationJson };
+    additionalDataAt: #languageTags put: { 'es-AR' asLanguageTag }.
+
+  self
+    assert: ( NeoJSONWriter toString: error )
+    equals:
+    '{"code":400,"message":"Ouch!","mediaTypes":["application/json"],"languageTags":["es-AR"]}'
+]
+
+{ #category : 'tests' }
 HyperspaceExtensionsTest >> testForbiddenAffectResponse [
 
   | error response |
@@ -55,6 +70,48 @@ HyperspaceExtensionsTest >> testForbiddenAffectResponseBecauseScopeIsInsufficien
 ]
 
 { #category : 'tests' }
+HyperspaceExtensionsTest >> testForbiddenAsJSON [
+
+  | error |
+  error := HTTPForbidden messageText: 'Forbidden' with: 'Bearer realm="api.example.com"'.
+
+  self assert: ( NeoJSONWriter toString: error ) equals: '{"code":403,"message":"Forbidden"}'
+]
+
+{ #category : 'tests' }
+HyperspaceExtensionsTest >> testForbiddenBecauseScopeIsInsufficientAsJSON [
+
+  | error |
+  error := ( HTTPForbidden messageText: 'Missing permissions' with: 'Bearer realm="api.example.com"' )
+             errorCode: 'insufficient_scope';
+             requiredPermissions: #( 'read:pets' 'update:pets' );
+             yourself.
+
+  self
+    assert: ( NeoJSONWriter toString: error )
+    equals:
+    '{"code":403,"message":"Missing permissions","errorCode":"insufficient_scope","scope":"read:pets update:pets"}'
+]
+
+{ #category : 'tests' }
+HyperspaceExtensionsTest >> testForbiddenWithAdditionalDataAsJSON [
+
+  | error |
+  error := ( HTTPForbidden messageText: 'Missing permissions' with: 'Bearer realm="api.example.com"' )
+             errorCode: 'insufficient_scope';
+             requiredPermissions: #( 'read:pets' );
+             yourself.
+  error
+    additionalDataAt: #requiredPermissions put: #( 'read:pets' 'update:pets' );
+    additionalDataAt: #resource put: 'pets'.
+
+  self
+    assert: ( NeoJSONWriter toString: error )
+    equals:
+    '{"code":403,"message":"Missing permissions","errorCode":"insufficient_scope","scope":"read:pets update:pets","resource":"pets"}'
+]
+
+{ #category : 'tests' }
 HyperspaceExtensionsTest >> testNotAcceptableAsJSON [
 
 	| error json |
@@ -73,6 +130,20 @@ HyperspaceExtensionsTest >> testNotAcceptableAsJSON [
 		assert: json allowedLanguageTags size equals: 2;
 		assert: json allowedLanguageTags first equals: 'en-US';
 		assert: json allowedLanguageTags last equals: 'es-AR'
+]
+
+{ #category : 'tests' }
+HyperspaceExtensionsTest >> testNotAcceptableWithoutLanguageTagsAsJSON [
+
+  | error |
+  error := HTTPNotAcceptable
+             messageText: 'Ouch!'
+             accepting: { 'application/xml' asMediaType }
+             inAnyOf: #(  ).
+
+  self
+    assert: ( NeoJSONWriter toString: error )
+    equals: '{"code":406,"message":"Ouch!","allowedMediaTypes":["application/xml"]}'
 ]
 
 { #category : 'tests' }
@@ -104,4 +175,40 @@ HyperspaceExtensionsTest >> testUnauthorizedAffectResponseBecauseTokenIsInvalid 
     assert: ( response headers at: 'WWW-Authenticate' )
     equals:
     'Bearer realm="api.example.com", error="invalid_token", error_description="Invalid token"'
+]
+
+{ #category : 'tests' }
+HyperspaceExtensionsTest >> testUnauthorizedAsJSON [
+
+  | error |
+  error := HTTPUnauthorized messageText: 'Unauthorized' with: 'Bearer realm="api.example.com"'.
+
+  self assert: ( NeoJSONWriter toString: error ) equals: '{"code":401,"message":"Unauthorized"}'
+]
+
+{ #category : 'tests' }
+HyperspaceExtensionsTest >> testUnauthorizedBecauseTokenIsInvalidAsJSON [
+
+  | error |
+  error := ( HTTPUnauthorized messageText: 'Invalid token' with: 'Bearer realm="api.example.com"' )
+             errorCode: 'invalid_token';
+             yourself.
+
+  self
+    assert: ( NeoJSONWriter toString: error )
+    equals: '{"code":401,"message":"Invalid token","errorCode":"invalid_token"}'
+]
+
+{ #category : 'tests' }
+HyperspaceExtensionsTest >> testUnauthorizedWithAdditionalDataOverridingErrorCodeAsJSON [
+
+  | error |
+  error := ( HTTPUnauthorized messageText: 'Invalid token' with: 'Bearer realm="api.example.com"' )
+             errorCode: 'invalid_token';
+             yourself.
+  error additionalDataAt: #errorCode put: 'expired_token'.
+
+  self
+    assert: ( NeoJSONWriter toString: error )
+    equals: '{"code":401,"message":"Invalid token","errorCode":"expired_token"}'
 ]

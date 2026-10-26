@@ -459,14 +459,47 @@ PetStoreAPITest >> testNotFound [
 { #category : 'tests - client errors' }
 PetStoreAPITest >> testUnsupportedMediaType [
 
-	self
-		should: [ self newClient 
-				url: self baseUrl / 'pets' asUrl;
-				entity: (ZnEntity json: '{"name":"Firulais","type":"dog"}');
-				post ]
-		raise: ZnHttpUnsuccessful
-		withExceptionDo: [ :error | 
-			self
-				assert: error response isError;
-				assert: error response code equals: 415 ]
+  self
+    should: [
+        self newClient
+          url: self baseUrl / 'pets' asUrl;
+          entity: ( ZnEntity json: '{"name":"Firulais","type":"dog"}' );
+          post
+      ]
+    raise: ZnHttpUnsuccessful
+    withExceptionDo: [ :error |
+        self
+          assert: error response code equals: 415;
+          withJsonFromContentsIn: error response do: [ :json |
+              self
+                assert: json code equals: 415;
+                assert: json message
+                equals: 'Cannot decode a request body of media type application/json.';
+                assert: json acceptedMediaTypes asArray
+                equals: #( 'application/vnd.stargate.pet+json;version=1.0.0' )
+            ]
+      ]
+]
+
+{ #category : 'tests - client errors' }
+PetStoreAPITest >> testUnsupportedMediaTypeWhenMissing [
+
+  self
+    should: [
+        self newClient
+          url: self baseUrl / 'pets' asUrl;
+          post
+      ]
+    raise: ZnHttpUnsuccessful
+    withExceptionDo: [ :error |
+        self
+          assert: error response code equals: 415;
+          withJsonFromContentsIn: error response do: [ :json |
+              self
+                assert: json code equals: 415;
+                assert: json message equals: 'The request body has no media type.';
+                assert: json acceptedMediaTypes asArray
+                equals: #( 'application/vnd.stargate.pet+json;version=1.0.0' )
+            ]
+      ]
 ]

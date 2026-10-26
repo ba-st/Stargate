@@ -29,21 +29,20 @@ HTTPForbidden >> hasErrorCode [
 ]
 
 { #category : '*Stargate-Hyperspace-Extensions' }
-HTTPForbidden >> neoJsonOn: neoJSONWriter [
-
-  neoJSONWriter writeMapStreamingDo: [ :jsonMapWriter |
-      jsonMapWriter
-        writeKey: #code value: self code;
-        writeKey: #message value: self messageText;
-        writeKey: #errorCode value: self errorCode.
-      self withScopeDo: [ :scope | jsonMapWriter writeKey: #scope value: scope ]
-    ]
-]
-
-{ #category : '*Stargate-Hyperspace-Extensions' }
 HTTPForbidden >> withScopeDo: aBlock [
   "The scope is the space-delimited list of the required permissions"
 
   self withRequiredPermissionsDo: [ :permissions |
       aBlock value: ( Character space asString join: permissions ) ]
+]
+
+{ #category : '*Stargate-Hyperspace-Extensions' }
+HTTPForbidden >> writeAdditionalDataOn: jsonMapWriter [
+  "The required permissions are written as the scope, the space-delimited list used in the challenge"
+
+  self additionalDataKeysAndValuesDo: [ :key :value |
+      key = 'requiredPermissions'
+        ifTrue: [ jsonMapWriter writeKey: #scope value: ( Character space asString join: value ) ]
+        ifFalse: [ jsonMapWriter writeKey: key value: value ]
+    ]
 ]

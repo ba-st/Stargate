@@ -33,6 +33,13 @@ RESTfulRequestHandlerBehavior class >> encode: resource toJsonUsing: writer with
 ]
 
 { #category : 'private' }
+RESTfulRequestHandlerBehavior >> acceptedMediaTypes [
+
+  ^ decodingRules keys sorted: [ :mediaType :anotherMediaType |
+        mediaType printString <= anotherMediaType printString ]
+]
+
+{ #category : 'private' }
 RESTfulRequestHandlerBehavior >> applyCachingDirectivesFor: aResource to: response within: requestContext [
 
   response isNotModified
@@ -81,14 +88,16 @@ RESTfulRequestHandlerBehavior >> assertPreconditionsOf: httpRequest matching: en
 { #category : 'decoding/encoding' }
 RESTfulRequestHandlerBehavior >> decode: httpRequest within: requestContext [
 
-	| decodingRule |
+  | decodingRule |
+  decodingRule := httpRequest contentType
+                    ifNil: [ self signalMissingMediaType ]
+                    ifNotNil: [ :mediaType |
+                      decodingRules
+                        at: mediaType
+                        ifAbsent: [ self signalUnsupportedMediaType: mediaType ] ].
 
-	decodingRule := decodingRules
-		at: httpRequest contentType
-		ifAbsent: [ HTTPClientError unsupportedMediaType signal: 'Decoder not found for given media type' ].
-
-	^ self exceptionHandler
-		handleDecodingFailedDuring: [ decodingRule cull: httpRequest contents cull: requestContext ]
+  ^ self exceptionHandler handleDecodingFailedDuring: [
+        decodingRule cull: httpRequest contents cull: requestContext ]
 ]
 
 { #category : 'decoding/encoding' }
@@ -432,6 +441,27 @@ RESTfulRequestHandlerBehavior >> responseRepresenting: resource within: requestC
 RESTfulRequestHandlerBehavior >> serverUrl: aServerUrl [
 
 	resourceLocator baseUrl: aServerUrl
+]
+
+{ #category : 'private' }
+RESTfulRequestHandlerBehavior >> signalMissingMediaType [
+
+  ^ self signalUnsupportedMediaTypeDescribedAs: 'The request body has no media type.'
+]
+
+{ #category : 'private' }
+RESTfulRequestHandlerBehavior >> signalUnsupportedMediaType: mediaType [
+
+  ^ self signalUnsupportedMediaTypeDescribedAs:
+      ( 'Cannot decode a request body of media type <1p>.' expandMacrosWith: mediaType )
+]
+
+{ #category : 'private' }
+RESTfulRequestHandlerBehavior >> signalUnsupportedMediaTypeDescribedAs: aMessageText [
+
+  ^ HTTPClientError unsupportedMediaType
+      additionalDataAt: #acceptedMediaTypes put: self acceptedMediaTypes;
+      signal: aMessageText
 ]
 
 { #category : 'private' }

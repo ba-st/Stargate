@@ -70,16 +70,17 @@ JsonRPCRequestHandler >> initializeResolvingLocationWith: aResourceLocator [
 { #category : 'API' }
 JsonRPCRequestHandler >> process: httpRequest within: requestContext [
 
-	AssertionChecker
-		enforce: [ httpRequest contentType = ZnMimeType applicationJson ]
-		because: 'The request Content-Type must be application/json'
-		raising: HTTPClientError unsupportedMediaType.
-	acceptNegotiator bestRepresentationFor: httpRequest.
+  AssertionChecker
+    enforce: [ httpRequest contentType = ZnMimeType applicationJson ]
+    because: 'The request Content-Type must be application/json'
+    raising: ( HTTPClientError unsupportedMediaType
+          additionalDataAt: #acceptedMediaTypes put: { ZnMimeType applicationJson };
+          yourself ).
+  acceptNegotiator bestRepresentationFor: httpRequest.
 
-	^ (messageProcessor handleJSON: httpRequest contents)
-		  ifEmpty: [ ZnResponse accepted ]
-		  ifNotEmpty: [ :rpcResponse |
-		  ZnResponse ok: (ZnEntity json: rpcResponse) ]
+  ^ ( messageProcessor handleJSON: httpRequest contents )
+      ifEmpty: [ ZnResponse accepted ]
+      ifNotEmpty: [ :rpcResponse | ZnResponse ok: ( ZnEntity json: rpcResponse ) ]
 ]
 
 { #category : 'configuring' }
