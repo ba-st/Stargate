@@ -44,12 +44,30 @@ HypermediaDrivenRESTfulRequestHandler class >> encode: resource toJsonUsing: wri
 { #category : 'instance creation' }
 HypermediaDrivenRESTfulRequestHandler class >> resourceLocator: aResouceLocator paginationPolicy: aPaginationPolicy collectionValidationPolicy: aCollectionValidationPolicy decodingRules: theDecodingRules encodingRules: theEncodingRules calculateEntityTagsWith: entityTagCalculator cachingDirectives: theCachingDirectives allowedLanguageTags: allowedLanguageTags drivenBy: aMediaControlsFactory handleErrorsWith: anExceptionHandler [
 
+  ^ self
+      resourceLocator: aResouceLocator
+      paginationPolicy: aPaginationPolicy
+      collectionValidationPolicy: aCollectionValidationPolicy
+      decodingRules: theDecodingRules
+      resourceEncodingRules: theEncodingRules
+      collectionEncodingRules: theEncodingRules
+      calculateEntityTagsWith: entityTagCalculator
+      cachingDirectives: theCachingDirectives
+      allowedLanguageTags: allowedLanguageTags
+      drivenBy: aMediaControlsFactory
+      handleErrorsWith: anExceptionHandler
+]
+
+{ #category : 'instance creation' }
+HypermediaDrivenRESTfulRequestHandler class >> resourceLocator: aResouceLocator paginationPolicy: aPaginationPolicy collectionValidationPolicy: aCollectionValidationPolicy decodingRules: theDecodingRules resourceEncodingRules: theResourceEncodingRules collectionEncodingRules: theCollectionEncodingRules calculateEntityTagsWith: entityTagCalculator cachingDirectives: theCachingDirectives allowedLanguageTags: allowedLanguageTags drivenBy: aMediaControlsFactory handleErrorsWith: anExceptionHandler [
+
   ^ self new
       initializeResourceLocator: aResouceLocator
       paginationPolicy: aPaginationPolicy
       collectionValidationPolicy: aCollectionValidationPolicy
       decodingRules: theDecodingRules
-      encodingRules: theEncodingRules
+      resourceEncodingRules: theResourceEncodingRules
+      collectionEncodingRules: theCollectionEncodingRules
       calculateEntityTagsWith: entityTagCalculator
       cachingDirectives: theCachingDirectives
       allowedLanguageTags: allowedLanguageTags
@@ -97,14 +115,15 @@ HypermediaDrivenRESTfulRequestHandler >> holdResource: resource controlsWithin: 
 ]
 
 { #category : 'initialization' }
-HypermediaDrivenRESTfulRequestHandler >> initializeResourceLocator: aResouceLocator paginationPolicy: aPaginationPolicy collectionValidationPolicy: aCollectionValidationPolicy decodingRules: theDecodingRules encodingRules: theEncodingRules calculateEntityTagsWith: anEntityTagCalculator cachingDirectives: theCachingDirectives allowedLanguageTags: allowedLanguageTags drivenBy: aMediaControlsFactory handleErrorsWith: anExceptionHandler [
+HypermediaDrivenRESTfulRequestHandler >> initializeResourceLocator: aResouceLocator paginationPolicy: aPaginationPolicy collectionValidationPolicy: aCollectionValidationPolicy decodingRules: theDecodingRules resourceEncodingRules: theResourceEncodingRules collectionEncodingRules: theCollectionEncodingRules calculateEntityTagsWith: anEntityTagCalculator cachingDirectives: theCachingDirectives allowedLanguageTags: allowedLanguageTags drivenBy: aMediaControlsFactory handleErrorsWith: anExceptionHandler [
 
   self
     initializeResourceLocator: aResouceLocator
     paginationPolicy: aPaginationPolicy
     collectionValidationPolicy: aCollectionValidationPolicy
     decodingRules: theDecodingRules
-    encodingRules: theEncodingRules
+    resourceEncodingRules: theResourceEncodingRules
+    collectionEncodingRules: theCollectionEncodingRules
     calculateEntityTagsWith: anEntityTagCalculator
     cachingDirectives: theCachingDirectives
     allowedLanguageTags: allowedLanguageTags

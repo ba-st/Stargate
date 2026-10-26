@@ -6,7 +6,8 @@ Class {
 	#superclass : 'Object',
 	#instVars : [
 		'decodingRules',
-		'encodingRules',
+		'resourceEncodingRules',
+		'collectionEncodingRules',
 		'paginationPolicyFactory',
 		'collectionValidationPolicyFactory',
 		'entityTagFactoryBinding',
@@ -39,7 +40,7 @@ RESTfulRequestHandlerBuilder >> beHypermediaDrivenBy: aMediaControlsFactoryBlock
 
   AssertionChecker
     enforce: [ resourceLocator canLookupResources ] because: 'Missing location resolution.';
-    enforce: [ encodingRules isEmpty ]
+    enforce: [ resourceEncodingRules isEmpty and: [ collectionEncodingRules isEmpty ] ]
     because: 'Encoding rules needs to be configured after hypermedia'.
   requestHandlerClass := HypermediaDrivenRESTfulRequestHandler.
   requestHandlerFactory := [
@@ -48,7 +49,8 @@ RESTfulRequestHandlerBuilder >> beHypermediaDrivenBy: aMediaControlsFactoryBlock
                                paginationPolicy: paginationPolicyFactory
                                collectionValidationPolicy: collectionValidationPolicyFactory
                                decodingRules: decodingRules
-                               encodingRules: encodingRules
+                               resourceEncodingRules: resourceEncodingRules
+                               collectionEncodingRules: collectionEncodingRules
                                calculateEntityTagsWith: entityTagFactoryBinding content
                                cachingDirectives: cachingDirectives
                                allowedLanguageTags: allowedLanguageTags
@@ -196,7 +198,8 @@ RESTfulRequestHandlerBuilder >> initialize [
 
   super initialize.
   decodingRules := Dictionary new.
-  encodingRules := Dictionary new.
+  resourceEncodingRules := Dictionary new.
+  collectionEncodingRules := Dictionary new.
   entityTagFactoryBinding := Binding undefinedExplainedBy: 'Missing ETag calculation'.
   cachingDirectives := #(  ).
   allowedLanguageTags := OrderedCollection new.
@@ -213,7 +216,8 @@ RESTfulRequestHandlerBuilder >> initialize [
                                paginationPolicy: paginationPolicyFactory
                                collectionValidationPolicy: collectionValidationPolicyFactory
                                decodingRules: decodingRules
-                               encodingRules: encodingRules
+                               resourceEncodingRules: resourceEncodingRules
+                               collectionEncodingRules: collectionEncodingRules
                                calculateEntityTagsWith: entityTagFactoryBinding content
                                cachingDirectives: cachingDirectives
                                allowedLanguageTags: allowedLanguageTags
@@ -238,6 +242,37 @@ RESTfulRequestHandlerBuilder >> paginateCollectionsWithDefaultLimit: anInteger [
 	paginationPolicyFactory := [ :processor | RESTfulControllerPaginateCollectionsPolicy for: processor with: anInteger ]
 ]
 
+{ #category : 'private' }
+RESTfulRequestHandlerBuilder >> toJsonApplying: aBlock [
+
+  ^ [ :resource :requestContext |
+      self
+        jsonFor: resource
+        within: requestContext
+        applying: aBlock
+        writingResourceWith: [ :writer |
+          requestHandlerClass encode: resource toJsonUsing: writer within: requestContext ]
+    ]
+]
+
+{ #category : 'private' }
+RESTfulRequestHandlerBuilder >> toJsonApplying: aBlock as: schema [
+
+  ^ [ :resource :requestContext |
+      self
+        jsonFor: resource
+        within: requestContext
+        applying: aBlock
+        writingResourceWith: [ :writer |
+            requestHandlerClass
+              encode: resource
+              toJsonUsing: writer
+              as: schema
+              within: requestContext
+          ]
+    ]
+]
+
 { #category : 'decoding' }
 RESTfulRequestHandlerBuilder >> whenAccepting: aMediaType decodeApplying: aDecodingBlock [
 
@@ -260,39 +295,71 @@ RESTfulRequestHandlerBuilder >> whenAccepting: aMediaType decodeFromJsonApplying
 { #category : 'encoding' }
 RESTfulRequestHandlerBuilder >> whenResponding: aMediaType encodeApplying: anEncodingBlock [
 
-	encodingRules
-		at: aMediaType
-		ifPresent: [ self error: 'Encoding rule for media type already configured' ]
-		ifAbsentPut: [ ResourceEncodingRule encoding: aMediaType using: anEncodingBlock ]
+  self
+    whenResponding: aMediaType
+    encodeApplying: anEncodingBlock
+    into: { resourceEncodingRules . collectionEncodingRules }
+]
+
+{ #category : 'private' }
+RESTfulRequestHandlerBuilder >> whenResponding: aMediaType encodeApplying: anEncodingBlock into: theEncodingRuleSets [
+
+  | encodingRule |
+  theEncodingRuleSets do: [ :encodingRules |
+      AssertionChecker
+        refuse: [ encodingRules includesKey: aMediaType ]
+        because: 'Encoding rule for media type already configured'
+    ].
+  encodingRule := ResourceEncodingRule encoding: aMediaType using: anEncodingBlock.
+  theEncodingRuleSets do: [ :encodingRules | encodingRules at: aMediaType put: encodingRule ]
+]
+
+{ #category : 'encoding' }
+RESTfulRequestHandlerBuilder >> whenResponding: aMediaType encodeCollectionApplying: anEncodingBlock [
+
+  self whenResponding: aMediaType encodeApplying: anEncodingBlock into: { collectionEncodingRules }
+]
+
+{ #category : 'encoding' }
+RESTfulRequestHandlerBuilder >> whenResponding: aMediaType encodeCollectionToJsonApplying: aBlock [
+
+  self whenResponding: aMediaType encodeCollectionApplying: ( self toJsonApplying: aBlock )
+]
+
+{ #category : 'encoding' }
+RESTfulRequestHandlerBuilder >> whenResponding: aMediaType encodeCollectionToJsonApplying: aBlock as: schema [
+
+  self
+    whenResponding: aMediaType
+    encodeCollectionApplying: ( self toJsonApplying: aBlock as: schema )
+]
+
+{ #category : 'encoding' }
+RESTfulRequestHandlerBuilder >> whenResponding: aMediaType encodeResourceApplying: anEncodingBlock [
+
+  self whenResponding: aMediaType encodeApplying: anEncodingBlock into: { resourceEncodingRules }
+]
+
+{ #category : 'encoding' }
+RESTfulRequestHandlerBuilder >> whenResponding: aMediaType encodeResourceToJsonApplying: aBlock [
+
+  self whenResponding: aMediaType encodeResourceApplying: ( self toJsonApplying: aBlock )
+]
+
+{ #category : 'encoding' }
+RESTfulRequestHandlerBuilder >> whenResponding: aMediaType encodeResourceToJsonApplying: aBlock as: schema [
+
+  self whenResponding: aMediaType encodeResourceApplying: ( self toJsonApplying: aBlock as: schema )
 ]
 
 { #category : 'encoding' }
 RESTfulRequestHandlerBuilder >> whenResponding: aMediaType encodeToJsonApplying: aBlock [
 
-  self whenResponding: aMediaType encodeApplying: [ :resource :requestContext |
-      self
-        jsonFor: resource
-        within: requestContext
-        applying: aBlock
-        writingResourceWith: [ :writer |
-          requestHandlerClass encode: resource toJsonUsing: writer within: requestContext ]
-    ]
+  self whenResponding: aMediaType encodeApplying: ( self toJsonApplying: aBlock )
 ]
 
 { #category : 'encoding' }
 RESTfulRequestHandlerBuilder >> whenResponding: aMediaType encodeToJsonApplying: aBlock as: schema [
 
-  self whenResponding: aMediaType encodeApplying: [ :resource :requestContext |
-      self
-        jsonFor: resource
-        within: requestContext
-        applying: aBlock
-        writingResourceWith: [ :writer |
-            requestHandlerClass
-              encode: resource
-              toJsonUsing: writer
-              as: schema
-              within: requestContext
-          ]
-    ]
+  self whenResponding: aMediaType encodeApplying: ( self toJsonApplying: aBlock as: schema )
 ]

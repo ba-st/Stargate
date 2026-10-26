@@ -25,12 +25,29 @@ RESTfulRequestHandler class >> encode: resource toJsonUsing: writer within: requ
 { #category : 'instance creation' }
 RESTfulRequestHandler class >> resourceLocator: aResouceLocator paginationPolicy: aPaginationPolicy collectionValidationPolicy: aCollectionValidationPolicy decodingRules: theDecodingRules encodingRules: theEncodingRules calculateEntityTagsWith: entityTagCalculator cachingDirectives: theCachingDirectives allowedLanguageTags: allowedLanguageTags handleErrorsWith: anExceptionHandler [
 
+  ^ self
+      resourceLocator: aResouceLocator
+      paginationPolicy: aPaginationPolicy
+      collectionValidationPolicy: aCollectionValidationPolicy
+      decodingRules: theDecodingRules
+      resourceEncodingRules: theEncodingRules
+      collectionEncodingRules: theEncodingRules
+      calculateEntityTagsWith: entityTagCalculator
+      cachingDirectives: theCachingDirectives
+      allowedLanguageTags: allowedLanguageTags
+      handleErrorsWith: anExceptionHandler
+]
+
+{ #category : 'instance creation' }
+RESTfulRequestHandler class >> resourceLocator: aResouceLocator paginationPolicy: aPaginationPolicy collectionValidationPolicy: aCollectionValidationPolicy decodingRules: theDecodingRules resourceEncodingRules: theResourceEncodingRules collectionEncodingRules: theCollectionEncodingRules calculateEntityTagsWith: entityTagCalculator cachingDirectives: theCachingDirectives allowedLanguageTags: allowedLanguageTags handleErrorsWith: anExceptionHandler [
+
   ^ self new
       initializeResourceLocator: aResouceLocator
       paginationPolicy: aPaginationPolicy
       collectionValidationPolicy: aCollectionValidationPolicy
       decodingRules: theDecodingRules
-      encodingRules: theEncodingRules
+      resourceEncodingRules: theResourceEncodingRules
+      collectionEncodingRules: theCollectionEncodingRules
       calculateEntityTagsWith: entityTagCalculator
       cachingDirectives: theCachingDirectives
       allowedLanguageTags: allowedLanguageTags
