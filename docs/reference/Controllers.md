@@ -156,6 +156,8 @@ the builder by using any of:
   to be configured.
 - `decodeToNeoJSONObjectWhenAccepting:` will produce an instance of `NeoJSONObject`
 
+Configuring a decoding rule for a media type that already has one fails.
+
 A request whose `Content-Type` has no decoding rule, or that has no
 `Content-Type` at all, is answered `415 Unsupported Media Type`. The body lists
 the media types that have one, sorted, in `acceptedMediaTypes`:
