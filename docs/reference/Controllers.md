@@ -69,7 +69,11 @@ must support.
   `from:within:get:thenDo:`. The first block will receive the resource id parsed
   from the URL and must look up for a resource instance. The second block will
   receive this resource instance to perform the action we want. This message
-  will always produce a `204/No Content` response if successful.
+  will always produce a `204/No Content` response if successful. When the
+  action must not apply to a resource changed since the client read it, send
+  `from:within:get:thenConditionallyDo:` instead, with the same blocks: it
+  requires `If-Match` and evaluates the preconditions before the action, as an
+  update does (see [ETags](#etags)).
 - `PUT` or `PATCH` operations over an individual resource must send
   `from:within:get:thenUpdateWith:`. The first block will receive the resource
   id and must look up a resource instance. The second block will receive both
@@ -277,10 +281,18 @@ request headers against it, as
   weak comparison, or if it is `*`, the handler answers
   `412 Precondition Failed` and leaves the resource unchanged.
 
+Actions sent with `from:within:get:thenConditionallyDo:` evaluate both headers
+the same way, before the action, even though they have no content and their
+`204 No Content` carries no representation. A representation the handler
+cannot provide answers `406 Not Acceptable`, also before the action.
+
 Both are evaluated against the representation the update negotiates, the one
 its response carries, and not against its content: the ETag in `If-Match` must
 be one read with the same `Accept` and `Accept-Language`, even when the update's
-`Content-Type` or `Content-Language` differ. When an update leaves the choice to
+`Content-Type` or `Content-Language` differ. An action has no content, so its
+`If-Match` must be one read with the same `Accept` and `Accept-Language` it
+sends: without them, it is compared in the handler's default media type and
+language, not in the ones the client read. When an update leaves the choice to
 the handler, with no `Accept` or `Accept-Language` header or with ranges finding
 several representations equally acceptable, the media type and language of its
 content are chosen among them if the handler offers them. So a client sending
