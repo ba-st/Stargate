@@ -334,6 +334,31 @@ ResourceAndCollectionEncodingTest >> testSameMediaTypeIsEncodedPerCase [
     equals: 'version 1 of all things'
 ]
 
+{ #category : 'tests' }
+ResourceAndCollectionEncodingTest >> testSchemaJsonEncodingIsConfiguredPerCase [
+
+  requestHandler := RESTfulRequestHandlerBuilder new
+                      handling: 'things' extractingIdentifierWith: [ :httpRequest | 1 ];
+                      whenResponding: self thingVersion1MediaType
+                      encodeResourceToJsonApplying: [ :resource :requestContext :writer |
+                          writer
+                            for: #Thing
+                            customDo: [ :mapping | mapping encoder: [ :thing | thing asUppercase ] ] ]
+                      as: #Thing;
+                      whenResponding: self thingVersion1MediaType
+                      encodeCollectionToJsonApplying: [ :collection :requestContext :writer |
+                          writer
+                            for: #Things
+                            customDo: [ :mapping | mapping encoder: [ :things | things size ] ] ]
+                      as: #Things;
+                      createEntityTagHashingEncodedResource;
+                      build.
+
+  self
+    assert: ( self getResourceAccepting: self thingVersion1MediaType ) contents equals: '"THING"';
+    assert: ( self getCollectionAccepting: self thingVersion1MediaType ) contents equals: '2'
+]
+
 { #category : 'private' }
 ResourceAndCollectionEncodingTest >> thingVersion1MediaType [
 
