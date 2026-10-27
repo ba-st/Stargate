@@ -184,6 +184,40 @@ the builder using any of:
 The media types attached to an encoding rule are automatically considered in the
 content negotiation.
 
+### Encoding resources and collections differently
+
+The messages above configure a rule for both single resources and collections.
+To offer a media type for only one of them, or to encode the same media type
+differently for each, use the variants naming the case:
+
+- `whenResponding:encodeResourceApplying:`,
+  `whenResponding:encodeResourceToJsonApplying:` and
+  `whenResponding:encodeResourceToJsonApplying:as:` configure a rule for single
+  resources only: the ones answered by `get:`, creations and updates.
+- `whenResponding:encodeCollectionApplying:`,
+  `whenResponding:encodeCollectionToJsonApplying:` and
+  `whenResponding:encodeCollectionToJsonApplying:as:` configure a rule for
+  collections only, the ones answered by `getCollection:`.
+
+Each case negotiates `Accept` against its own media types, so a request for a
+media type offered only for the other case is answered `406 Not Acceptable`,
+listing the media types of its own case. For example, to export the collection
+as CSV and move single resources to a new version before the collection:
+
+```smalltalk
+builder
+  whenResponding: self petVersion1dot0dot0MediaType
+  encodeToJsonApplying: [ :resource :requestContext :writer | ... ];
+  whenResponding: self petVersion2dot0dot0MediaType
+  encodeResourceToJsonApplying: [ :resource :requestContext :writer | ... ];
+  whenResponding: 'text/csv' asMediaType
+  encodeCollectionApplying: [ :pets | ... ]
+```
+
+Configuring a media type twice for the same case fails, including a
+`whenResponding:encode*` message for a media type already configured for one of
+them.
+
 ## Hypermedia driven controllers
 
 Controllers wanting to provide hypermedia links must configure the builder using

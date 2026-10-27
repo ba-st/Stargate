@@ -9,10 +9,12 @@ Class {
 		'paginationPolicy',
 		'collectionValidationPolicy',
 		'decodingRules',
-		'encodingRules',
+		'resourceEncodingRules',
+		'collectionEncodingRules',
 		'entityTagCalculator',
 		'resourceLocator',
-		'acceptNegotiator',
+		'resourceAcceptNegotiator',
+		'collectionAcceptNegotiator',
 		'cachingDirectives'
 	],
 	#category : 'Stargate-Model-Controllers',
@@ -100,15 +102,27 @@ RESTfulRequestHandlerBehavior >> decode: httpRequest within: requestContext [
         decodingRule cull: httpRequest contents cull: requestContext ]
 ]
 
+{ #category : 'private' }
+RESTfulRequestHandlerBehavior >> encode: resource as: targetMediaType using: theEncodingRules within: requestContext [
+
+  | encodingRule |
+  encodingRule := theEncodingRules
+                    at: targetMediaType
+                    ifAbsent: [
+                      HTTPClientError unsupportedMediaType signal:
+                        'Encoder not found for given media type' ].
+
+  ^ encodingRule encode: resource within: requestContext
+]
+
 { #category : 'decoding/encoding' }
 RESTfulRequestHandlerBehavior >> encode: resource as: targetMediaType within: requestContext [
 
-	| encodingRule |
-	encodingRule := encodingRules at: targetMediaType ifAbsent: [ 
-		                HTTPClientError unsupportedMediaType signal:
-			                'Encoder not found for given media type' ].
-
-	^ encodingRule encode: resource within: requestContext
+  ^ self
+      encode: resource
+      as: targetMediaType
+      using: resourceEncodingRules
+      within: requestContext
 ]
 
 { #category : 'decoding/encoding' }
@@ -138,7 +152,11 @@ RESTfulRequestHandlerBehavior >> encodeResource: resource within: requestContext
 { #category : 'private' }
 RESTfulRequestHandlerBehavior >> encodeResourceCollection: resourceCollection basedOn: httpRequest within: requestContext [
 
-	^ self encode: resourceCollection within: requestContext
+  ^ self
+      encode: resourceCollection
+      as: requestContext targetMediaType
+      using: collectionEncodingRules
+      within: requestContext
 ]
 
 { #category : 'accessing' }
@@ -260,7 +278,10 @@ RESTfulRequestHandlerBehavior >> from: httpRequest within: requestContext get: f
 { #category : 'API' }
 RESTfulRequestHandlerBehavior >> from: httpRequest within: requestContext getCollection: aQueryEvaluationBlock [
 
-  self holdTargetMediaTypeAndLanguageFrom: httpRequest within: requestContext.
+  self
+    holdTargetMediaTypeAndLanguageFrom: httpRequest
+    negotiatingWith: collectionAcceptNegotiator
+    within: requestContext.
   ^ self useTargetLanguageTagIn: requestContext asCurrentLocaleDuring: [
         | resourceCollection response |
         resourceCollection := paginationPolicy
@@ -286,29 +307,51 @@ RESTfulRequestHandlerBehavior >> from: httpRequest within: requestContext getCol
 ]
 
 { #category : 'private' }
+RESTfulRequestHandlerBehavior >> holdTargetLanguageFrom: httpRequest negotiatingWith: anAcceptNegotiator within: requestContext [
+
+  self
+    holdTargetLanguageNegotiatedBy: [ anAcceptNegotiator bestLanguageFor: httpRequest ]
+    for: httpRequest
+    within: requestContext
+]
+
+{ #category : 'private' }
 RESTfulRequestHandlerBehavior >> holdTargetLanguageFrom: httpRequest within: requestContext [
 
   self
-    holdTargetLanguageNegotiatedBy: [ acceptNegotiator bestLanguageFor: httpRequest ]
-    for: httpRequest
+    holdTargetLanguageFrom: httpRequest
+    negotiatingWith: resourceAcceptNegotiator
     within: requestContext
 ]
 
 { #category : 'private' }
 RESTfulRequestHandlerBehavior >> holdTargetLanguageNegotiatedBy: aNegotiationBlock for: httpRequest within: requestContext [
   "A handler offering languages always negotiates one, taking the first when the request
-  has no preference. One offering none still rejects requests asking for a language"
+  has no preference. One offering none still rejects requests asking for a language.
+  Resources and collections offer the same languages"
 
-  ( acceptNegotiator offersLanguages or: [ httpRequest hasLanguageProrityList ] ) then: [
+  ( resourceAcceptNegotiator offersLanguages or: [ httpRequest hasLanguageProrityList ] ) then: [
       requestContext targetLanguageTag: aNegotiationBlock value ]
+]
+
+{ #category : 'private' }
+RESTfulRequestHandlerBehavior >> holdTargetMediaTypeAndLanguageFrom: httpRequest negotiatingWith: anAcceptNegotiator within: requestContext [
+
+  self
+    holdTargetLanguageFrom: httpRequest
+    negotiatingWith: anAcceptNegotiator
+    within: requestContext.
+
+  ^ requestContext targetMediaType: ( anAcceptNegotiator bestRepresentationFor: httpRequest )
 ]
 
 { #category : 'private' }
 RESTfulRequestHandlerBehavior >> holdTargetMediaTypeAndLanguageFrom: httpRequest within: requestContext [
 
-  self holdTargetLanguageFrom: httpRequest within: requestContext.
-
-  ^ requestContext targetMediaType: ( acceptNegotiator bestRepresentationFor: httpRequest )
+  ^ self
+      holdTargetMediaTypeAndLanguageFrom: httpRequest
+      negotiatingWith: resourceAcceptNegotiator
+      within: requestContext
 ]
 
 { #category : 'private' }
@@ -319,17 +362,19 @@ RESTfulRequestHandlerBehavior >> holdTargetMediaTypeAndLanguageOfUpdate: httpReq
   self
     holdTargetLanguageNegotiatedBy: [
         httpRequest contentLanguageTags
-          ifEmpty: [ acceptNegotiator bestLanguageFor: httpRequest ]
+          ifEmpty: [ resourceAcceptNegotiator bestLanguageFor: httpRequest ]
           ifNotEmpty: [ :languageTags |
-            acceptNegotiator bestLanguageFor: httpRequest preferring: languageTags first ]
+              resourceAcceptNegotiator bestLanguageFor: httpRequest preferring: languageTags first ]
       ]
     for: httpRequest
     within: requestContext.
 
   ^ requestContext targetMediaType: ( httpRequest hasEntity
           then: [
-            acceptNegotiator bestRepresentationFor: httpRequest preferring: httpRequest contentType ]
-          otherwise: [ acceptNegotiator bestRepresentationFor: httpRequest ] )
+            resourceAcceptNegotiator
+              bestRepresentationFor: httpRequest
+              preferring: httpRequest contentType ]
+          otherwise: [ resourceAcceptNegotiator bestRepresentationFor: httpRequest ] )
 ]
 
 { #category : 'private' }
@@ -352,17 +397,21 @@ RESTfulRequestHandlerBehavior >> ifNoneMatchIn: httpRequest matchesWeakly: anEnt
 ]
 
 { #category : 'initialization' }
-RESTfulRequestHandlerBehavior >> initializeResourceLocator: aResouceLocator paginationPolicy: aPaginationPolicy collectionValidationPolicy: aCollectionValidationPolicy decodingRules: theDecodingRules encodingRules: theEncodingRules calculateEntityTagsWith: anEntityTagCalculator cachingDirectives: theCachingDirectives allowedLanguageTags: allowedLanguageTags handleErrorsWith: anExceptionHandler [
+RESTfulRequestHandlerBehavior >> initializeResourceLocator: aResouceLocator paginationPolicy: aPaginationPolicy collectionValidationPolicy: aCollectionValidationPolicy decodingRules: theDecodingRules resourceEncodingRules: theResourceEncodingRules collectionEncodingRules: theCollectionEncodingRules calculateEntityTagsWith: anEntityTagCalculator cachingDirectives: theCachingDirectives allowedLanguageTags: allowedLanguageTags handleErrorsWith: anExceptionHandler [
 
   resourceLocator := aResouceLocator.
   resourceLocator handleExceptionsWith: anExceptionHandler.
   paginationPolicy := aPaginationPolicy cull: self.
   collectionValidationPolicy := aCollectionValidationPolicy cull: self.
   decodingRules := theDecodingRules.
-  encodingRules := theEncodingRules.
-  acceptNegotiator := RESTfulControllerAcceptNegotiator
-                        accepting: encodingRules keys
-                        inAnyOf: allowedLanguageTags.
+  resourceEncodingRules := theResourceEncodingRules.
+  collectionEncodingRules := theCollectionEncodingRules.
+  resourceAcceptNegotiator := RESTfulControllerAcceptNegotiator
+                                accepting: resourceEncodingRules keys
+                                inAnyOf: allowedLanguageTags.
+  collectionAcceptNegotiator := RESTfulControllerAcceptNegotiator
+                                  accepting: collectionEncodingRules keys
+                                  inAnyOf: allowedLanguageTags.
   entityTagCalculator := anEntityTagCalculator.
   cachingDirectives := theCachingDirectives
 ]
