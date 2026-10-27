@@ -275,13 +275,12 @@ RESTfulRequestHandlerBuilder >> toJsonApplying: aBlock as: schema [
 
 { #category : 'decoding' }
 RESTfulRequestHandlerBuilder >> whenAccepting: aMediaType decodeApplying: aDecodingBlock [
+  "aDecodingBlock will be evaluated with the request contents and optionally the request context"
 
-	"aDecodingBlock will be evaluated with the request contents and optionally the request context"
-
-	decodingRules
-		at: aMediaType
-		ifPresent: [ :rule | 'Decoding rule for media type already configured' expandMacrosWith: aMediaType ]
-		ifAbsentPut: [ aDecodingBlock ]
+  AssertionChecker
+    refuse: [ decodingRules includesKey: aMediaType ]
+    because: 'Decoding rule for media type already configured'.
+  decodingRules at: aMediaType put: aDecodingBlock
 ]
 
 { #category : 'decoding' }
