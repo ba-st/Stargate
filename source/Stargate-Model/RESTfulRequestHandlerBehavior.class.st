@@ -233,6 +233,33 @@ RESTfulRequestHandlerBehavior >> from: httpRequest within: requestContext get: a
 ]
 
 { #category : 'API' }
+RESTfulRequestHandlerBehavior >> from: httpRequest within: requestContext get: aQueryEvaluationBlock thenConditionallyDo: actionBlock [
+  "Like from:within:get:thenDo:, but If-Match is required and the preconditions are evaluated
+  before the action, as for an update: against the representation the request negotiates"
+
+  | entityTags |
+  entityTags := self entityTagsToMatchBasedOn: httpRequest.
+
+  self holdTargetMediaTypeAndLanguageOfUpdate: httpRequest within: requestContext.
+  ^ self useTargetLanguageTagIn: requestContext asCurrentLocaleDuring: [
+        | resource response |
+        resource := resourceLocator
+                      lookupResourceIdentifiedBy: httpRequest
+                      evaluating: aQueryEvaluationBlock.
+        self
+          assertPreconditionsOf: httpRequest
+          matching: entityTags
+          holdFor: resource
+          within: requestContext.
+        self exceptionHandler handleConflictsDuring: [ actionBlock value: resource ].
+        response := ZnResponse noContent.
+        response addToVary: 'Accept'.
+        self putLanguageContentTagIn: response within: requestContext.
+        response
+      ]
+]
+
+{ #category : 'API' }
 RESTfulRequestHandlerBehavior >> from: httpRequest within: requestContext get: aQueryEvaluationBlock thenDo: actionBlock [
 
   self holdTargetLanguageFrom: httpRequest within: requestContext.
